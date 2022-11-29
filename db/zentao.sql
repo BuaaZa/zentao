@@ -425,7 +425,7 @@ CREATE TABLE IF NOT EXISTS `zt_cfd` (
   UNIQUE KEY `execution_type_name_date` (`execution`,`type`,`name`,`date`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 -- DROP TABLE IF EXISTS `zt_chart`;
-CREATE TABLE `zt_chart` (
+CREATE TABLE IF NOT EXISTS `zt_chart` (
   `id` mediumint NOT NULL AUTO_INCREMENT,
   `name` varchar(255) NOT NULL,
   `type` varchar(30) NOT NULL,
@@ -501,7 +501,7 @@ CREATE TABLE IF NOT EXISTS `zt_cron` (
   KEY `lastTime` (`lastTime`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 -- DROP TABLE IF EXISTS `zt_dashboard`;
-CREATE TABLE `zt_dashboard` (
+CREATE TABLE IF NOT EXISTS `zt_dashboard` (
   `id` mediumint(8) NOT NULL AUTO_INCREMENT,
   `name` varchar(255) NOT NULL,
   `module` mediumint NOT NULL,
@@ -514,7 +514,7 @@ CREATE TABLE `zt_dashboard` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 -- DROP TABLE IF EXISTS `zt_dataset`;
-CREATE TABLE `zt_dataset` (
+CREATE TABLE IF NOT EXISTS `zt_dataset` (
   `id` mediumint unsigned NOT NULL AUTO_INCREMENT,
   `name` varchar(155) NOT NULL,
   `sql` text NOT NULL,
@@ -1615,7 +1615,7 @@ CREATE TABLE IF NOT EXISTS `zt_taskspec` (
   UNIQUE KEY `task` (`task`,`version`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 -- DROP TABLE IF EXISTS `zt_taskteam`;
-CREATE TABLE `zt_taskteam` (
+CREATE TABLE IF NOT EXISTS `zt_taskteam` (
   `id` mediumint(8) unsigned NOT NULL AUTO_INCREMENT,
   `task` mediumint(8) unsigned NOT NULL,
   `account` char(30) NOT NULL,
