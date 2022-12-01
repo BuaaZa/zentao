@@ -1,2 +1,2 @@
 <?php
-    echo "test CI/CD"
+    echo "test CI/CD";
