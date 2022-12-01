@@ -1,2 +1,11 @@
+# Idea-like IDE
 .idea/
+target/
+
+# VScode
+.vscode/
+
+config/my.php
 tmp/log/
+# maybe dangerous!
+# tmp/model/*.php
