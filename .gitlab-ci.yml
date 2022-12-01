@@ -24,6 +24,8 @@ deploy:
     - echo "This job deploys something from the $CI_COMMIT_BRANCH branch."
     - echo "Deploying application..."
     - echo ${ROOT_PASSWD} | su root
+    - whoami
+    - chmod -xR .
     - cp -fr . /home/product/
     - echo "Application successfully deployed."
   tags:
