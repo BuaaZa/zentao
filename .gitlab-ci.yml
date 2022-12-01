@@ -1,28 +1,29 @@
 
-stages:          # List of stages for jobs, and their order of execution
-  - build
-  - deploy
+# stages:          # List of stages for jobs, and their order of execution
+#   - build
+#   - deploy
 
-build-job:       # This job runs in the build stage, which runs first.
-  stage: build
-  script:
-    - echo "Hello, $GITLAB_USER_LOGIN!"
-    - echo "Compiling the code..."
-    - echo "Compile complete."
-  tags:
-    - zentao
-  only:
-    - main
+# build:       # This job runs in the build stage, which runs first.
+#   stage: build
+#   script:
+#     - echo "Hello, $GITLAB_USER_LOGIN!"
+#     - echo "Compiling the code..."
+#     - echo "Compile complete."
+#   tags:
+#     - zentao
+#   only:
+#     - main
 
-
-deploy-job:      # This job runs in the deploy stage.
-  stage: deploy  # It only runs when *both* jobs in the test stage complete successfully.
+deploy:    
+  stage: deploy  
   environment: production
   script:
+    - whoami
+    - echo "Hello, $GITLAB_USER_LOGIN!"
     - echo "This project's root directory is ${CI_PROJECT_NAME}"
     - echo "This job deploys something from the $CI_COMMIT_BRANCH branch."
     - echo "Deploying application..."
-    - cp -fr . /home/product/
+    - echo ${ROOT_PASSWD} | sudo -S cp -fr . /home/product/
     - echo "Application successfully deployed."
   tags:
     - zentao
