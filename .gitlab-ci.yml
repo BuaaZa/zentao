@@ -25,7 +25,7 @@ deploy:
     - echo "Deploying application..."
     - echo ${ROOT_PASSWD} | su root
     - whoami
-    - chmod -xR .
+    - chmod +x -R .
     - cp -fr . /home/product/
     - echo "Application successfully deployed."
   tags:
