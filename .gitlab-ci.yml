@@ -20,9 +20,10 @@ deploy-job:      # This job runs in the deploy stage.
   environment: production
   script:
     - echo "This project's root directory is ${CI_PROJECT_NAME}"
+    - pwd
+    - ls -a
     - echo "This job deploys something from the $CI_COMMIT_BRANCH branch."
     - echo "Deploying application..."
-    - cp -fr ${CI_PROJECT_NAME} /home/product/
     - echo "Application successfully deployed."
   tags:
     - zentao
