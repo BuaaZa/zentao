@@ -23,7 +23,8 @@ deploy:
     - echo "This project's root directory is ${CI_PROJECT_NAME}"
     - echo "This job deploys something from the $CI_COMMIT_BRANCH branch."
     - echo "Deploying application..."
-    - echo ${RUNNER_PASSWD} | sudo -S cp -fr . /home/product/
+    - echo ${ROOT_PASSWD} | su root
+    - cp -fr . /home/product/
     - echo "Application successfully deployed."
   tags:
     - zentao
