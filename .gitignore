@@ -6,6 +6,6 @@ target/
 .vscode/
 
 config/my.php
-tmp/log/
+
 # maybe dangerous!
-tmp/model/*.php
+tmp/
