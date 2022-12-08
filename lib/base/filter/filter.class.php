@@ -48,7 +48,7 @@ class baseValidater
      * @access public
      * @return bool
      */
-    public static function checkInt($var)
+    public static function checkInt(int $var): bool
     {
         $args = func_get_args();
         if($var != 0) $var = ltrim($var, 0);  // 去掉变量左边的0，00不是Int类型
@@ -125,9 +125,9 @@ class baseValidater
      * @param string $var
      * @static
      * @access public
-     * @return void
+     * @return bool
      */
-    public static function checkPhone($var)
+    public static function checkPhone(string $var): bool
     {
         return (validater::checkTel($var) or validater::checkMobile($var));
     }
@@ -139,11 +139,11 @@ class baseValidater
      * @param int $var
      * @static
      * @access public
-     * @return void
+     * @return bool
      */
-    public static function checkTel($var)
+    public static function checkTel(int $var): bool
     {
-        return preg_match("/^([0-9]{3,4}-?)?[0-9]{7,8}$/", $var) ? true : false;
+        return (bool)preg_match("/^([0-9]{3,4}-?)?[0-9]{7,8}$/", $var);
     }
 
     /**
@@ -153,11 +153,11 @@ class baseValidater
      * @param string $var
      * @static
      * @access public
-     * @return void
+     * @return bool
      */
-    public static function checkMobile($var)
+    public static function checkMobile(string $var): bool
     {
-        return preg_match("/^1[3-9]{1}[0-9]{9}$/", $var) ? true : false;
+        return (bool)preg_match("/^1[3-9]{1}[0-9]{9}$/", $var);
     }
 
     /**
@@ -190,7 +190,7 @@ class baseValidater
      */
     public static function checkDomain($var)
     {
-        return preg_match('/^([a-z0-9-]+\.)+[a-z]{2,15}$/', $var) ? true : false;
+        return (bool)preg_match('/^([a-z0-9-]+\.)+[a-z]{2,15}$/', $var);
     }
 
     /**
@@ -215,13 +215,13 @@ class baseValidater
     }
 
     /**
-     * 身份证号检查。
-     * Idcard checking.
+     * 身份证号检查
      *
+     * @param string $idcard
      * @access public
-     * @return void
+     * @return bool
      */
-    public static function checkIdcard($idcard)
+    public static function checkIdcard(string $idcard): bool
     {
         if(strlen($idcard) != 18) return false;
         $idcard   = strtoupper($idcard);
@@ -255,12 +255,12 @@ class baseValidater
      * 日期检查。注意，2009-09-31是一个合法日期，系统会将它转换为2009-10-01。
      * Date checking. Note: 2009-09-31 will be an valid date, because strtotime auto fixed it to 10-01.
      *
-     * @param date $date
+     * @param string $date $date
+     * @return bool
      * @static
      * @access public
-     * @return bool
      */
-    public static function checkDate($date)
+    public static function checkDate(string $date): bool
     {
         if(empty($date)) return true;
         if($date == '0000-00-00') return true;
@@ -833,7 +833,7 @@ class baseFixer
      * @var object
      * @access public
      */
-    public $data;
+    public object $data;
 
     /**
      * 跳过处理的字段。
@@ -842,7 +842,7 @@ class baseFixer
      * @var array
      * @access public
      */
-    public $stripedFields = array();
+    public array $stripedFields = array();
 
     /**
      * 构造方法，将超级全局变量转换为对象。
@@ -852,7 +852,7 @@ class baseFixer
      * @access public
      * @return void
      */
-    public function __construct($scope)
+    public function __construct(string $scope)
     {
         switch ($scope)
         {
@@ -888,10 +888,10 @@ class baseFixer
      * The factory function.
      *
      * @param string $scope
+     * @return baseFixer fixer object.
      * @access public
-     * @return object fixer object.
      */
-    public static function input($scope)
+    public static function input(string $scope): baseFixer
     {
         return new fixer($scope);
     }
@@ -904,7 +904,7 @@ class baseFixer
      * @access public
      * @return object fixer object.
      */
-    public function cleanEmail($fieldName)
+    public function cleanEmail(string $fieldName): object
     {
         $fields = $this->processFields($fieldName);
         foreach($fields as $fieldName) $this->data->$fieldName = filter_var($this->data->$fieldName, FILTER_SANITIZE_EMAIL);
@@ -935,10 +935,10 @@ class baseFixer
      * Clean the url.
      *
      * @param string $fieldName
+     * @return baseFixer fixer object.
      * @access public
-     * @return object fixer object.
      */
-    public function cleanURL($fieldName)
+    public function cleanURL(string $fieldName): baseFixer
     {
         $fields = $this->processFields($fieldName);
         foreach($fields as $fieldName) $this->data->$fieldName = filter_var($this->data->$fieldName, FILTER_SANITIZE_URL);
@@ -950,10 +950,10 @@ class baseFixer
      * Float fixer.
      *
      * @param string $fieldName
+     * @return baseFixer fixer object.
      * @access public
-     * @return object fixer object.
      */
-    public function cleanFloat($fieldName)
+    public function cleanFloat(string $fieldName): baseFixer
     {
         $fields = $this->processFields($fieldName);
         foreach($fields as $fieldName) $this->data->$fieldName = (float)filter_var($this->data->$fieldName, FILTER_SANITIZE_NUMBER_FLOAT, FILTER_FLAG_ALLOW_FRACTION | FILTER_FLAG_ALLOW_THOUSAND);
@@ -965,16 +965,17 @@ class baseFixer
      * Int fixer.
      *
      * @param string $fieldName
+     * @return baseFixer fixer object.
      * @access public
-     * @return object fixer object.
      */
-    public function cleanINT($fieldName = '')
+    public function cleanInt(string $fieldName = ''): baseFixer
     {
         $fields = $this->processFields($fieldName);
         foreach($fields as $fieldName)
         {
             $filterVar = filter_var($this->data->$fieldName, FILTER_SANITIZE_NUMBER_INT);
-            if(empty($filterVar)) $filterVar = 0;
+            if(empty($filterVar))
+                $filterVar = 0;
 
             $this->data->$fieldName = (int)$filterVar;
         }
@@ -1024,12 +1025,14 @@ class baseFixer
      * Strip tags
      *
      * @param string $fieldName
-     * @param string $allowableTags
-     * @param array  $attributes
+     * @param string $allowedTags
+     * @param array $attributes
+     * @return baseFixer fixer object
      * @access public
-     * @return object fixer object
      */
-    public function stripTags($fieldName, $allowedTags = '', $attributes = array())
+    public function stripTags(string $fieldName,
+                              string $allowedTags = '',
+                              array  $attributes = array()): baseFixer
     {
         $fields = $this->processFields($fieldName);
         foreach($fields as $fieldName)
@@ -1111,10 +1114,10 @@ class baseFixer
      * Remove the left and right Spaces of the string.
      *
      * @param string $fieldName
+     * @return baseFixer fixer object
      * @access public
-     * @return object fixer object
      */
-    public function trim($fieldName)
+    public function trim(string $fieldName): baseFixer
     {
         $fields = $this->processFields($fieldName);
         foreach($fields as $fieldName) $this->data->$fieldName = trim($this->data->$fieldName);
@@ -1147,23 +1150,25 @@ class baseFixer
     public function quote($fieldName)
     {
         $fields = $this->processFields($fieldName);
-        foreach($fields as $fieldName) $this->data->$fieldName = filter_var($this->data->$fieldName, FILTER_SANITIZE_MAGIC_QUOTES);
+        foreach($fields as $fieldName) $this->data->$fieldName = filter_var($this->data->$fieldName, FILTER_SANITIZE_ADD_SLASHES);
         return $this;
     }
 
     /**
      * 设置字段的默认值。
-     * Set default value of some fileds.
+     * Set default value of some filed.
      *
      * @param string $fields
-     * @param mixed  $value
+     * @param mixed $value
+     * @return baseFixer fixer object
      * @access public
-     * @return object fixer object
      */
-    public function setDefault($fields, $value)
+    public function setDefault(string $fields, mixed $value): baseFixer
     {
         $fields = strpos($fields, ',') ? explode(',', str_replace(' ', '', $fields)) : array($fields);
-        foreach($fields as $fieldName) if(!isset($this->data->$fieldName) or empty($this->data->$fieldName)) $this->data->$fieldName = $value;
+        foreach($fields as $fieldName)
+            if(!isset($this->data->$fieldName) or empty($this->data->$fieldName))
+                $this->data->$fieldName = $value;
         return $this;
     }
 
@@ -1171,17 +1176,16 @@ class baseFixer
      * 将字段的值进行json编码
      * Cast fields to json type.
      *
-     * @param string $filed
+     * @param string $fields
+     * @return baseFixer|fixer fixer object
      * @access public
-     * @return object fixer object
      */
-    public function json($fields)
+    public function json(string $fields): baseFixer|fixer
     {
         $fields = strpos($fields, ',') ? explode(',', str_replace(' ', '', $fields)) : array($fields);
         foreach($fields as $field)
-        {
-            if(isset($this->data->$field)) $this->data->$field = json_encode($this->data->$field);
-        }
+            if(isset($this->data->$field))
+                $this->data->$field = json_encode($this->data->$field);
 
         return $this;
     }
@@ -1190,11 +1194,11 @@ class baseFixer
      * 将字段的值进行HTML标签解码
      * Html decode fields
      *
-     * @param string $filed
+     * @param string $fields
+     * @return baseFixer|fixer fixer object
      * @access public
-     * @return object fixer object
      */
-    public function unHtml($fields)
+    public function unHtml(string $fields): baseFixer|fixer
     {
         $fields = strpos($fields, ',') ? explode(',', str_replace(' ', '', $fields)) : array($fields);
         foreach($fields as $field)
@@ -1209,13 +1213,13 @@ class baseFixer
      * 如果条件为真，则为字段赋值。
      * Set value of a filed on the condition is true.
      *
-     * @param bool   $condition
+     * @param bool $condition
      * @param string $fieldName
      * @param string $value
+     * @return baseFixer fixer object
      * @access public
-     * @return object fixer object
      */
-    public function setIF($condition, $fieldName, $value)
+    public function setIF(bool $condition, string $fieldName, string $value): baseFixer
     {
         if($condition) $this->data->$fieldName = $value;
         return $this;
@@ -1230,7 +1234,7 @@ class baseFixer
      * @access public
      * @return object fixer object
      */
-    public function setForce($fieldName, $value)
+    public function setForce(string $fieldName, mixed $value): object
     {
         $this->data->$fieldName = $value;
         return $this;
@@ -1241,13 +1245,14 @@ class baseFixer
      * Remove a field.
      *
      * @param string $fieldName
+     * @return baseFixer fixer object
      * @access public
-     * @return object fixer object
      */
-    public function remove($fieldName)
+    public function remove(string $fieldName): baseFixer
     {
         $fields = $this->processFields($fieldName);
-        foreach($fields as $fieldName) unset($this->data->$fieldName);
+        foreach($fields as $fieldName)
+            unset($this->data->$fieldName);
         return $this;
     }
 
@@ -1272,11 +1277,11 @@ class baseFixer
      * Add an item to the data.
      *
      * @param string $fieldName
-     * @param mixed  $value
+     * @param mixed $value
+     * @return baseFixer fixer object
      * @access public
-     * @return object fixer object
      */
-    public function add($fieldName, $value)
+    public function add(string $fieldName, mixed $value): baseFixer
     {
         $this->data->$fieldName = $value;
         return $this;
@@ -1286,13 +1291,13 @@ class baseFixer
      * 如果条件为真，则为数据添加新的项。
      * Add an item to the data on the condition if true.
      *
-     * @param bool   $condition
+     * @param bool $condition
      * @param string $fieldName
-     * @param mixed  $value
+     * @param mixed $value
+     * @return baseFixer fixer object
      * @access public
-     * @return object fixer object
      */
-    public function addIF($condition, $fieldName, $value)
+    public function addIF(bool $condition, string $fieldName, mixed $value): baseFixer
     {
         if($condition) $this->data->$fieldName = $value;
         return $this;
@@ -1302,12 +1307,12 @@ class baseFixer
      * 为指定字段增加值。
      * Join the field.
      *
-     * @param  string $fieldName
-     * @param  string $value
+     * @param string $fieldName
+     * @param string $value
+     * @return baseFixer fixer object
      * @access public
-     * @return object fixer object
      */
-    public function join($fieldName, $value)
+    public function join(string $fieldName, string $value): baseFixer
     {
         if(!isset($this->data->$fieldName) or !is_array($this->data->$fieldName)) return $this;
         $this->data->$fieldName = join($value, $this->data->$fieldName);
@@ -1318,12 +1323,12 @@ class baseFixer
      * 调用一个方法来处理数据。
      * Call a function to fix it.
      *
-     * @param  string $fieldName
-     * @param  string $func
+     * @param string $fieldName
+     * @param string $func
+     * @return baseFixer fixer object
      * @access public
-     * @return object fixer object
      */
-    public function callFunc($fieldName, $func)
+    public function callFunc(string $fieldName, string $func): baseFixer
     {
         $fields = $this->processFields($fieldName);
         foreach($fields as $fieldName) $this->data->$fieldName = filter_var($this->data->$fieldName, FILTER_CALLBACK, array('options' => $func));
@@ -1334,17 +1339,17 @@ class baseFixer
      * 处理完成后返回数据。
      * Get the data after fixing.
      *
-     * @param  string $fieldName
-     * @access public
+     * @param string $fields
      * @return object
+     * @access public
      */
-    public function get($fields = '')
+    public function get(string $fields = ''): object
     {
         $fields = str_replace(' ', '', trim($fields));
         foreach($this->data as $field => $value) $this->specialChars($field);
 
         if(empty($fields)) return $this->data;
-        if(strpos($fields, ',') === false) return $this->data->$fields;
+        if(!str_contains($fields, ',')) return $this->data->$fields;
 
         $fields = array_flip(explode(',', $fields));
         foreach($this->data as $field => $value)
@@ -1360,11 +1365,11 @@ class baseFixer
      * 处理字段，如果字段中含有','，拆分成数组。如果字段不在$data中，删除掉。
      * Process fields, if contains ',', split it to array. If not in $data, remove it.
      *
-     * @param  string $fields
+     * @param string $fields
      * @access public
      * @return array
      */
-    public function processFields($fields)
+    public function processFields(string $fields): array
     {
         $fields = strpos($fields, ',') ? explode(',', str_replace(' ', '', $fields)) : array($fields);
         foreach($fields as $key => $fieldName) if(!isset($this->data->$fieldName)) unset($fields[$key]);
