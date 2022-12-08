@@ -46,9 +46,9 @@ class baseValidater
      * @param int $var
      * @static
      * @access public
-     * @return bool
+     * @return mixed
      */
-    public static function checkInt(int $var): bool
+    public static function checkInt(int $var): mixed
     {
         $args = func_get_args();
         if($var != 0) $var = ltrim($var, 0);  // 去掉变量左边的0，00不是Int类型
@@ -84,7 +84,7 @@ class baseValidater
      * @access public
      * @return bool
      */
-    public static function checkNotInt($var)
+    public static function checkNotInt(int $var): bool
     {
         return !self::checkInt($var);
     }
