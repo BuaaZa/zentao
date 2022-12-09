@@ -11,7 +11,7 @@
  *  May you share freely, never taking more than you give.
  */
 
-helper::import(dirname(dirname(__FILE__)) . '/base/filter/filter.class.php');
+helper::import(dirname(__FILE__, 2) . '/base/filter/filter.class.php');
 /**
  * validater类，检查数据是否符合规则。
  * The validater class, checking data by rules.
@@ -29,7 +29,7 @@ class validater extends baseValidater
      * @access public
      * @return bool
      */
-    public static function checkFileName($var)
+    public static function checkFileName($var): bool
     {
         return !preg_match('/>+|<+/', $var);
     }
@@ -43,7 +43,12 @@ class validater extends baseValidater
  */
 class fixer extends baseFixer
 {
-    public function get($fields = '')
+    /**
+     * @param string $fields
+     * @return object
+     * @access public
+     */
+    public function get(string $fields = ''): object
     {
         global $config;
         /* Get extend field by flow. */
@@ -84,11 +89,11 @@ class fixer extends baseFixer
      * 过滤Emoji表情。
      * Filter Emoji.
      *
-     * @param  string $value
+     * @param string $value
      * @access public
-     * @return object
+     * @return array|string|string[]
      */
-    public function filterEmoji($value)
+    public function filterEmoji(string $value)
     {
         if(is_object($value) or is_array($value))
         {

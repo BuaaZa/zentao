@@ -11,16 +11,17 @@
  *  May you share freely, never taking more than you give.
  */
 
-helper::import(dirname(dirname(__FILE__)) . '/base/dao/dao.class.php');
+helper::import(dirname(__FILE__, 2) . '/base/dao/dao.class.php');
 /**
  * DAO类。
  * DAO, data access object.
  *
  * @package framework
+ * @method findById($execution)
  */
 class dao extends baseDAO
 {
-    public function exec($sql = '')
+    public function exec(string $sql = ''): int|PDOStatement
     {
         if(isset($_SESSION['tutorialMode']) and $_SESSION['tutorialMode']) return true;
         return parent::exec($sql);
@@ -30,22 +31,21 @@ class dao extends baseDAO
      * 设置需要更新或插入的数据。
      * Set the data to update or insert.
      *
-     * @param  object $data  the data object or array
+     * @param object|array $data the data object or array
+     * @param string $skipFields
+     * @return dao the dao object self.
      * @access public
-     * @return object the dao object self.
      */
-    public function data($data, $skipFields = '')
+    public function data(object|array $data, string $skipFields = ''): dao
     {
         global $app, $config;
-
-        if(!is_object($data)) $data = (object)$data;
 
         if(isset($config->bizVersion))
         {
             $app->loadLang('workflow');
             $app->loadConfig('workflow');
 
-            /* Check current module is buildin workflow. */
+            /* Check current module is build-in workflow. */
             if(isset($config->workflow->buildin->modules))
             {
                 $currentModule = $app->fetchModule ? $app->fetchModule : $app->rawModule;
@@ -90,11 +90,11 @@ class dao extends baseDAO
     /**
      * Process workflow data
      *
-     * @param  object  $data
+     * @param object $data
      * @access public
      * @return object
      */
-    public function processData($data)
+    public function processData(object $data): object
     {
         global $app, $config;
 
@@ -137,7 +137,7 @@ class dao extends baseDAO
             }
             else
             {
-                if(strpos(',radio,checkbox,multi-select,', ",$field->control,") !== false) $data->{$field->field} = '';
+                if(str_contains(',radio,checkbox,multi-select,', ",$field->control,")) $data->{$field->field} = '';
             }
         }
 
@@ -152,11 +152,11 @@ class dao extends baseDAO
     /**
      * Get param real value
      *
-     * @param  string $param
+     * @param string $param
      * @access public
      * @return string
      */
-    public function getParamRealValue($param)
+    public function getParamRealValue(string $param): string
     {
         global $app;
 
@@ -167,17 +167,14 @@ class dao extends baseDAO
             $this->deptManager = $manager ? trim($manager->manager, ',') : '';
         }
 
-        switch((string)$param)
-        {
-            case 'today'       : return date('Y-m-d');
-            case 'now'         :
-            case 'currentTime' : return date('Y-m-d H:i:s');
-            case 'actor'       :
-            case 'currentUser' : return $app->user->account;
-            case 'currentDept' : return $app->user->dept ? $app->user->dept : $param;
-            case 'deptManager' : return $this->deptManager ? $this->deptManager : $param;
-            default            : return $param;
-        }
+        return match ((string)$param) {
+            'today' => date('Y-m-d'),
+            'now', 'currentTime' => date('Y-m-d H:i:s'),
+            'actor', 'currentUser' => $app->user->account,
+            'currentDept' => $app->user->dept ? $app->user->dept : $param,
+            'deptManager' => $this->deptManager ? $this->deptManager : $param,
+            default => $param,
+        };
     }
 
     /**
@@ -186,7 +183,7 @@ class dao extends baseDAO
      * @access public
      * @return object the dao object self.
      */
-    public function checkFlow()
+    public function checkFlow(): object
     {
         global $app, $config, $lang;
 
@@ -235,11 +232,11 @@ class dao extends baseDAO
      * 检查工作流扩展字段
      * check workflow extend field
      *
-     * @param  array $fields
+     * @param array $fields
      * @access public
      * @return object the dao object self
      */
-    public function checkExtend($fields)
+    public function checkExtend(array $fields): object
     {
         global $lang;
 
@@ -306,11 +303,11 @@ class sql extends baseSQL
      * 创建GROUP BY部分。
      * Create the groupby part.
      *
-     * @param  string $groupBy
+     * @param string $groupBy
+     * @return sql the sql object.
      * @access public
-     * @return object the sql object.
      */
-    public function groupBy($groupBy)
+    public function groupBy(string $groupBy): sql
     {
         if($this->inCondition and !$this->conditionIsTrue) return $this;
         if(!preg_match('/^[a-zA-Z0-9_`\.,\s]+$/', $groupBy))
@@ -318,7 +315,7 @@ class sql extends baseSQL
             $groupBy = htmlspecialchars($groupBy);
             die("Group is bad query, The group is $groupBy");
         }
-        $this->sql .= ' ' . DAO::GROUPBY . " $groupBy";
+        $this->sql .= ' ' . baseDAO::GROUPBY . " $groupBy";
         return $this;
     }
 }
