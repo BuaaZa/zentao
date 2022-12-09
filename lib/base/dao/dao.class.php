@@ -1722,11 +1722,11 @@ class baseSQL
      * 创建'='部分。
      * Create the '='.
      *
-     * @param string $value
-     * @access public
+     * @param string|null $value
      * @return static|sql the sql object.
+     * @access public
      */
-    public function eq(string $value): sql|static
+    public function eq(string $value = null): sql|static
     {
         if ($this->inCondition and !$this->conditionIsTrue) return $this;
         $this->sql .= " = " . $this->quote($value);
@@ -1737,11 +1737,11 @@ class baseSQL
      * 创建'!='。
      * Create '!='.
      *
-     * @param string $value
-     * @access public
+     * @param string|null $value
      * @return static|sql the sql object.
+     * @access public
      */
-    public function ne(string $value): sql|static
+    public function ne(string $value = null): sql|static
     {
         if ($this->inCondition and !$this->conditionIsTrue) return $this;
         $this->sql .= " != " . $this->quote($value);
@@ -1752,11 +1752,11 @@ class baseSQL
      * 创建'>'。
      * Create '>'.
      *
-     * @param string $value
-     * @access public
+     * @param string|null $value
      * @return static|sql the sql object.
+     * @access public
      */
-    public function gt(string $value): sql|static
+    public function gt(string $value = null): sql|static
     {
         if ($this->inCondition and !$this->conditionIsTrue) return $this;
         $this->sql .= " > " . $this->quote($value);
@@ -1786,7 +1786,7 @@ class baseSQL
      * @access public
      * @return static|sql the sql object.
      */
-    public function lt(mixed $value): sql|static
+    public function lt(mixed $value = null): sql|static
     {
         if ($this->inCondition and !$this->conditionIsTrue) return $this;
         $this->sql .= " < " . $this->quote($value);
@@ -1801,7 +1801,7 @@ class baseSQL
      * @access public
      * @return static|sql the sql object.
      */
-    public function le($value)
+    public function le(mixed $value): sql|static
     {
         if ($this->inCondition and !$this->conditionIsTrue) return $this;
         $this->sql .= " <= " . $this->quote($value);
@@ -1817,7 +1817,7 @@ class baseSQL
      * @access public
      * @return static|sql the sql object.
      */
-    public function between($min, $max)
+    public function between(string $min, string $max): sql|static
     {
         if ($this->inCondition and !$this->conditionIsTrue) return $this;
         $min = $this->quote($min);

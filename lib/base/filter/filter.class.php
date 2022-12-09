@@ -43,12 +43,12 @@ class baseValidater
      * 是否是Int类型。
      * Int checking.
      *
-     * @param int $var
+     * @param int|string $var
      * @static
      * @access public
      * @return mixed
      */
-    public static function checkInt(int $var): mixed
+    public static function checkInt(int|string $var): mixed
     {
         $args = func_get_args();
         if($var != 0) $var = ltrim($var, 0);  // 去掉变量左边的0，00不是Int类型
