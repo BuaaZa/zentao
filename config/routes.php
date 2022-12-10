@@ -169,4 +169,6 @@ $routes['/gitlab/webhook'] = 'gitlabWebhook';
 
 $routes['/ciresults'] = 'ciresults';
 
+$routes['/teamAccount/:id'] = 'teamAccount';
+
 $config->routes = $routes;

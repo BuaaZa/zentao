@@ -1,0 +1,5 @@
+body {margin-bottom: 25px;}
+td.c-title,td.c-closedReason,.c-solution {white-space: nowrap; overflow: hidden;}
+.table-form>tbody>tr>th {width:135px;}
+.dropdown-menu>li>a {text-align: left;}
+#feedbackList td.c-notifyEmail {overflow: hidden;}

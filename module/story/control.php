@@ -117,7 +117,7 @@ class story extends control
         $copyStoryID = $storyID;
 
         if(!empty($_POST))
-        {
+        {   
             $response['result'] = 'success';
 
             setcookie('lastStoryModule', (int)$this->post->module, $this->config->cookieLife, $this->config->webRoot, '', $this->config->cookieSecure, false);
@@ -395,6 +395,7 @@ class story extends control
         foreach(explode(',', $this->config->story->list->customCreateFields) as $field) $customFields[$field] = $this->lang->story->$field;
         $this->view->customFields = $customFields;
         $this->view->showFields   = $this->config->story->custom->createFields;
+        $this->view->storyID = $storyID;
 
         $this->view->title            = $product->name . $this->lang->colon . $this->lang->story->create;
         $this->view->position[]       = html::a($this->createLink('product', 'browse', "product=$productID&branch=$branch"), $product->name);
