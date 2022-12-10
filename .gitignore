@@ -1,2 +1,10 @@
+# Idea-like IDE
 .idea/
-tmp/log/
+target/
+
+# VScode
+.vscode/
+
+# maybe dangerous!
+tmp/
+

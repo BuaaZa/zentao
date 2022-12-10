@@ -12,3 +12,9 @@ $config->db->password    = '1234';
 $config->db->prefix      = 'zt_';
 $config->webRoot         = getWebRoot();
 $config->default->lang   = 'zh-cn';
+
+/*  将config/config.php中引入my.php放在routes.php之后可在此添加自定义api路由
+ *  格式: config->routes[${url}] = '${filename}'
+ *  注意filename命名小写
+ * */
+$config->routes['/projects/:id/batchupteams'] = 'teambatchcreate';
