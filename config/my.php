@@ -13,3 +13,4 @@ $config->db->prefix      = 'zt_';
 $config->webRoot         = getWebRoot();
 $config->default->lang   = 'zh-cn';
 $config->customSession = true;
+$config->routes['/teamAccount/:id']  = 'teamaccount';
