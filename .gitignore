@@ -7,8 +7,6 @@ target/
 
 # maybe dangerous!
 tmp/
+tmp/backup
 
-/www/data/upload/1/202212/0613024207196ivn
-/www/data/upload/1/202212/062314480247253f
-/www/data/upload/1/202212/index.html
-/www/data/ok.txt
+www/
