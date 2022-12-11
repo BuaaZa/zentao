@@ -17,4 +17,4 @@ $config->default->lang   = 'zh-cn';
  *  格式: config->routes[${url}] = '${filename}'
  *  注意filename命名小写
  * */
-$config->routes['/projects/:id/batchupteams'] = 'teambatchcreate';
+$config->routes['/projects/:id/teams/batchCreate'] = 'teamBatchCreate';

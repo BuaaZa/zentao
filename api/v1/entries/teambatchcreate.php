@@ -21,46 +21,105 @@ class teamBatchCreateEntry extends Entry
      */
     public function post($projectID = 0)
     {
-        # 检查请求参数，获取请求参数
-        if (!$projectID)
-            $projectID = $this->param('project', 0);
-        if (!$projectID)
-            $this->send400('Need project or execution id.');
+        $res = new stdclass();
+
+        $res->memberIDList = array();
+        $res->success = false;
+        $res->error = '';
 
         # 检查请求体
         if (!isset($this->requestBody->members)) {
-            $this->send400('Need team’s members.');
+            $res->error = '请求体缺少 members ';
+            $this->send(200, $this->format($res, ''));
+        }
+
+        # 查询项目(执行)
+        $project = $this->dao->select('project,type')->from(TABLE_PROJECT)
+            ->where('id')->eq($projectID)
+            ->fetch();
+
+        # 判断是否存在项目(执行)
+        if (empty($project)) {
+            $res->error = "不存在的项目(执行)ID $projectID ";
+            $this->send(200, $this->format($res, ''));
+        }
+
+        # 查询全部项目(执行)团队成员
+        $team = $this->dao->select('account')->from(TABLE_TEAM)
+            ->where('root')->eq($projectID)
+            ->fetchAll();
+
+        $teamMembers = array();
+
+        foreach ($team as $member){
+            array_push($teamMembers,$member->account);
         }
 
         # 批量插入数据库
-        $teamMembers = array();
-        $memberIDList = new stdClass();
-        $memberIDList->memberIDList=array();
-        foreach ($this->request('members') as $person) {
+        foreach ($this->request('members') as $index => $person) {
             if (empty($person))
                 continue;
-            if(!isset($person->name) )
-                $this->send400('Member must have name.');
 
+            # 检查必填字段
+            $this->checkFields($index, $person, 'name', $res);
+
+            # 检查用户是否已经存在
+            if (in_array($person->name, $teamMembers)) {
+                $res->error = "已存在用户 $person->name ";
+                $this->send(200, $this->format($res, ''));
+            }
+
+            # 准备数据
             $member = new stdClass();
             $member->root = $projectID;
-            $member->type = 'project';
+            $member->type = $project->type;
             $member->account = $person->name;
-            $member->role = zget($person->role, 'role', '');
+            $member->role = $person->role ?? '';
+            $member->limited = $person->limited ?? 'no';
             $member->join = helper::now();
-            $member->days = zget($person->days, 'days', 0);
-            $member->hours = $this->config->execution->defaultWorkhours;
+            $member->days = $person->days ?? 0;
+            $member->hours = $person->hours ?? '0.0';
+
+            var_dump($member);
+
+            # 插入数据库
             $this->dao->insert(TABLE_TEAM)->data($member)->exec();
-            array_push($memberIDList->memberIDList, $this->dao->lastInsertId());
-            $teamMembers[$person->account] = $member;
+            array_push($res->memberIDList, $this->dao->lastInsertId());
+
+//            $teamMembers[$person->account] = $member;
         }
 
-        if (dao::isError())
-            $this->send400('Database error.');
+        if (dao::isError()){
+            $res->error = "数据库操作错误";
+            $this->send(200, $this->format($res, ''));
+        }
 
         # 添加执行团队时添加项目团队
 //        if($this->config->systemMode == 'new') $this->loadModel('execution')->addProjectMembers($projectID, $teamMembers);
 
-        $this->send(201, $this->format($memberIDList, ''));
+        $res->success=true;
+        $this->send(200, $this->format($res, ''));
+    }
+
+    /**
+     * 确保字段不能为空.
+     * Make sure the fields is not empty.
+     *
+     * @param integer $index
+     * @param object $object
+     * @param string $fields
+     * @param object $res
+     * @access public
+     * @return void
+     */
+    public function checkFields($index, $object, $fields, $res)
+    {
+        $fields = explode(',', $fields);
+        foreach ($fields as $field) {
+            if (!isset($object->$field)) {
+                $res->error = "添加的第${index}个成员缺少 $field 字段";
+                $this->send(200, $this->format($res, ''));
+            }
+        }
     }
 }
