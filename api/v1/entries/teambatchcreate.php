@@ -44,13 +44,11 @@ class teamBatchCreateEntry extends Entry
             $res->error[] = "不存在的项目(执行)ID『{$projectID}』";
             $this->send(200, $this->format($res, ''));
         }elseif ($project->deleted == '1' ){
-            $res->error[] = "项目(执行){$projectID}已被删除";
+            $res->error[] = "项目(执行)『{$projectID}』已被删除";
             $this->send(200, $this->format($res, ''));
         }
-//        var_dump($project);
 
         $parent=$project->project;
-
         # 检查和准备数据
         $checkedMemberList=array();
         foreach ($this->request('members') as $index => $person) {
@@ -74,6 +72,13 @@ class teamBatchCreateEntry extends Entry
                 ->fetch();
             if($team){
                 $res->error[] = "已存在团队成员『{$person->name}』";
+                $this->send(200, $this->format($res, ''));
+            }
+
+            # 检查 可用工时/天
+            if((float)$person->hours > 24)
+            {
+                $res->error[] = "可用工时/天不能大于『24』";
                 $this->send(200, $this->format($res, ''));
             }
 
@@ -119,7 +124,7 @@ class teamBatchCreateEntry extends Entry
                 ->fetchAll();
             foreach ($parentTeam as $member){
                 $resMember = new stdClass();
-                $resMember->id = $member->id;
+                $resMember->id = strval($member->id);
                 $resMember->name = $member->account;
 
                 $res->parentIDList[]=$resMember;
