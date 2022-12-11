@@ -18,3 +18,7 @@ $config->default->lang   = 'zh-cn';
  *  注意filename命名小写
  * */
 $config->routes['/projects/:id/teams/batchCreate'] = 'teamBatchCreate';
+
+# 自定义执行设置
+$config->execution = new stdclass();
+$config->execution->defaultWorkhours  = '7.0'; # 默认可用工时/天
