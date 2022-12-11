@@ -10,6 +10,14 @@ class teamModel extends model
         return $teamAccount;
     }
 
+    public function getById($id)
+    {
+        $teamAccount = $this->dao->select("*")->from(TABLE_TEAM)
+                                ->where('id')->eq($id)
+                                ->fetch();
+        return $teamAccount;
+    }
+
     public function getTeam($root){
         $team = $this->dao->select("*")->from(TABLE_TEAM)
                     ->where('root')->eq($root)
