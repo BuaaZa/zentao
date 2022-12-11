@@ -13,4 +13,15 @@ $config->db->prefix      = 'zt_';
 $config->webRoot         = getWebRoot();
 $config->default->lang   = 'zh-cn';
 $config->customSession = true;
+
+/*  将config/config.php中引入my.php放在routes.php之后可在此添加自定义api路由
+ *  格式: config->routes[${url}] = '${filename}'
+ *  注意filename命名小写
+ * */
 $config->routes['/teamAccount/:id']  = 'teamaccount';
+$config->routes['/projects/:id/teams/batchCreate'] = 'teamBatchCreate';
+
+# 自定义执行设置
+$config->execution = new stdclass();
+$config->execution->defaultWorkhours  = '7.0'; # 默认可用工时/天
+
