@@ -35,7 +35,7 @@ deploy:
     when: on_success
     expire_in: 30 days
     paths:
-      - .
+      - ../${CI_PROJECT_NAME}
     exclude:
       - .gitignore
       - .gitlab-ci.yml
