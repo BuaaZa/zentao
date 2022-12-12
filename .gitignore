@@ -7,5 +7,5 @@ target/
 
 # maybe dangerous!
 tmp/
-
+config/my.php
 www/
