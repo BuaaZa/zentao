@@ -30,3 +30,12 @@ deploy:
     - zentao
   only:
     - main
+  artifacts:
+    untracked: true
+    when: on_success
+    expire_in: 30 days
+    paths:
+      - .
+    exclude:
+      - .gitignore
+      - .gitlab-ci.yml
