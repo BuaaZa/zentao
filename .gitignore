@@ -7,3 +7,5 @@ target/
 
 # maybe dangerous!
 tmp/
+
+www/
