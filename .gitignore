@@ -7,6 +7,5 @@ target/
 
 # maybe dangerous!
 tmp/
-tmp/backup
 
 www/

@@ -169,4 +169,8 @@ $routes['/gitlab/webhook'] = 'gitlabWebhook';
 
 $routes['/ciresults'] = 'ciresults';
 
+# 添加新的路由，注意创建的filename命名小写
+$routes['/teamAccount/:id']  = 'teamaccount';
+$routes['/projects/:id/teams/batchCreate'] = 'teamBatchCreate';
+
 $config->routes = $routes;

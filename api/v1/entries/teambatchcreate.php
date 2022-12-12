@@ -82,6 +82,8 @@ class teamBatchCreateEntry extends Entry
                 $this->send(200, $this->format($res, ''));
             }
 
+            $defaultWorkhours =  '7.0'; # 默认可用工时/天
+
             # 准备数据
             $member             = new stdClass();
             $member->root       = $projectID;
@@ -91,7 +93,7 @@ class teamBatchCreateEntry extends Entry
             $member->limited    = $person->limited ?? 'no';
             $member->join       = helper::today();
             $member->days       = $person->days ?? 0;
-            $member->hours      = $person->hours ?? $this->config->execution->defaultWorkhours;
+            $member->hours      = $person->hours ?? $defaultWorkhours;
 
             $checkedMemberList[$person->name] = $member;
         }
