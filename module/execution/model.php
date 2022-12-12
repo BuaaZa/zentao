@@ -3111,7 +3111,10 @@ class executionModel extends model
     public function addProjectMembers($projectID = 0, $members = array())
     {
         $projectType = 'project';
-        $oldJoin     = $this->dao->select('`account`, `join`')->from(TABLE_TEAM)->where('root')->eq($projectID)->andWhere('type')->eq($projectType)->fetchPairs();
+        $oldJoin     = $this->dao->select('`account`, `join`')->from(TABLE_TEAM)
+            ->where('root')->eq($projectID)
+            ->andWhere('type')->eq($projectType)
+            ->fetchPairs();
 
         $accounts = array();
         foreach($members as $account => $member)

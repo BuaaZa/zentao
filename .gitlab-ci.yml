@@ -24,8 +24,18 @@ deploy:
     - echo "This job deploys something from the $CI_COMMIT_BRANCH branch."
     - echo "Deploying application..."
     - echo ${RUNNER_PASSWD} | sudo -S cp -fr ../${CI_PROJECT_NAME} /home/product/
+    - echo ${RUNNER_PASSWD} | sudo -S chmod -R 777  tmp
     - echo "Application successfully deployed."
   tags:
     - zentao
   only:
     - main
+  artifacts:
+    untracked: true
+    when: on_success
+    expire_in: 30 days
+    paths:
+      - ../${CI_PROJECT_NAME}
+    exclude:
+      - .gitignore
+      - .gitlab-ci.yml

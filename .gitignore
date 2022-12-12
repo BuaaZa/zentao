@@ -5,7 +5,7 @@ target/
 # VScode
 .vscode/
 
-config/my.php
-
 # maybe dangerous!
 tmp/
+
+www/
