@@ -24,7 +24,7 @@ deploy:
     - echo "This job deploys something from the $CI_COMMIT_BRANCH branch."
     - echo "Deploying application..."
     - echo ${RUNNER_PASSWD} | sudo -S cp -fr ../${CI_PROJECT_NAME} /home/product/
-    - echo ${RUNNER_PASSWD} | sudo -S chmod -R 777  tmp/session
+    - echo ${RUNNER_PASSWD} | sudo -S chmod -R 777  tmp
     - echo "Application successfully deployed."
   tags:
     - zentao
