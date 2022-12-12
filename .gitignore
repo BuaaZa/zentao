@@ -2,10 +2,10 @@
 .idea/
 target/
 
+config/my.php
+
 # VScode
 .vscode/
 
 # maybe dangerous!
 tmp/
-
-www/
