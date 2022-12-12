@@ -85,6 +85,53 @@ class usersEntry extends entry
         $user = $this->loadModel('user')->getByID($data->id, 'id');
         unset($user->password);
 
-        $this->send(201, $this->format($user, 'last:time,locked:time'));
+        // dwr: 对于POST/users请求，只保留id
+        unset($user->company);
+        unset($user->type);
+        unset($user->dept);
+        unset($user->account);
+        unset($user->role);
+        unset($user->realname);
+        unset($user->pinyin);
+        unset($user->nickname);
+        unset($user->commiter);
+        unset($user->avatar);
+        unset($user->birthday);
+        unset($user->gender);
+        unset($user->email);
+        unset($user->skype);
+        unset($user->qq);
+        unset($user->mobile);
+        unset($user->phone);
+        unset($user->weixin);
+        unset($user->dingding);
+        unset($user->slack);
+        unset($user->whatsapp);
+        unset($user->address);
+        unset($user->zipcode);
+        unset($user->nature);
+        unset($user->analysis);
+        unset($user->strategy);
+        unset($user->join);
+        unset($user->visits);
+        unset($user->visions);
+        unset($user->ip);
+        unset($user->last);
+        unset($user->fails);
+        unset($user->locked);
+        unset($user->feedback);
+        unset($user->ranzhi);
+        unset($user->ldap);
+        unset($user->score);
+        unset($user->scoreLevel);
+        unset($user->resetToken);
+        unset($user->deleted);
+        unset($user->clientStatus);
+        unset($user->clientLang);
+
+        // $this->send(201, $this->format($user, 'last:time,locked:time'));
+
+        $user->message = "success";
+        $this->send(201, $this->format($user, ""));
     }
 }

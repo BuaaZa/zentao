@@ -99,7 +99,65 @@ class projectsEntry extends entry
 
         $project = $this->loadModel('project')->getByID($data->id);
 
-        $this->send(201, $this->format($data->id, 'openedBy:user,openedDate:time,lastEditedBy:user,lastEditedDate:time,closedBy:user,closedDate:time,canceledBy:user,canceledDate:time,realBegan:date,realEnd:date,PM:user,whitelist:userList,deleted:bool'));
+        // dwr: 对于POST/projects请求，只保留id
+        unset($project->project);
+        unset($project->model);
+        unset($project->type);
+        unset($project->lifetime);
+        unset($project->budget);
+        unset($project->budgetUnit);
+        unset($project->attribute);
+        unset($project->percent);
+        unset($project->milestone);
+        unset($project->output);
+        unset($project->auth);
+        unset($project->parent);
+        unset($project->path);
+        unset($project->grade);
+        unset($project->name);
+        unset($project->code);
+        unset($project->begin);
+        unset($project->end);
+        unset($project->realBegan);
+        unset($project->realEnd);
+        unset($project->days);
+        unset($project->status);
+        unset($project->subStatus);
+        unset($project->pri);
+        unset($project->desc);
+        unset($project->version);
+        unset($project->parentVersion);
+        unset($project->planDuration);
+        unset($project->realDuration);
+        unset($project->openedBy);
+        unset($project->openedDate);
+        unset($project->openedVersion);
+        unset($project->lastEditedBy);
+        unset($project->lastEditedDate);
+        unset($project->closedBy);
+        unset($project->closedDate);
+        unset($project->canceledBy);
+        unset($project->canceledDate);
+        unset($project->suspendedDate);
+        unset($project->PO);
+        unset($project->PM);
+        unset($project->QD);
+        unset($project->RD);
+        unset($project->team);
+        unset($project->acl);
+        unset($project->whitelist);
+        unset($project->order);
+        unset($project->vision);
+        unset($project->displayCards);
+        unset($project->fluidBoard);
+        unset($project->colWidth);
+        unset($project->minColWidth);
+        unset($project->maxColWidth);
+        unset($project->deleted);
+//        $this->send(201, $this->format($project, 'openedBy:user,openedDate:time,lastEditedBy:user,lastEditedDate:time,closedBy:user,closedDate:time,canceledBy:user,canceledDate:time,realBegan:date,realEnd:date,PM:user,whitelist:userList,deleted:bool'));
+
+        $project->message = "success";
+        $this->send(201, $this->format($project, ""));
     }
 
     /**
