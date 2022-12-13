@@ -1367,7 +1367,7 @@ class baseSQL
      * @var bool
      * @access public;
      */
-    public bool|array $conditionIsTrue = false;
+    public bool|array|null $conditionIsTrue = false;
 
     /**
      * WHERE条件嵌套小括号标记。
@@ -1638,7 +1638,7 @@ class baseSQL
      * @return baseSQL the sql object.
      * @access public
      */
-    public function beginIF(bool|array $condition): baseSQL
+    public function beginIF(bool|array|null $condition): baseSQL
     {
         $this->inCondition = true;
         $this->conditionIsTrue = $condition;
