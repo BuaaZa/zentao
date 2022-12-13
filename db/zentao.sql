@@ -267,7 +267,7 @@ CREATE TABLE IF NOT EXISTS `zt_bug` (
   `hardware` varchar(30) NOT NULL,
   `found` varchar(30) NOT NULL default '',
   `steps` mediumtext NOT NULL,
-  `status` enum('active','resolved','closed') NOT NULL default 'active',
+  `status` enum('active','resolved','closed', 'tobedeliberated') NOT NULL default 'active',
   `subStatus` varchar(30) NOT NULL default '',
   `color` char(7) NOT NULL,
   `confirmed` tinyint(1) NOT NULL default '0',
@@ -7745,6 +7745,22 @@ DROP VIEW IF EXISTS `view_datasource_54`;
 CREATE VIEW `view_datasource_54` AS select `id`,`name` from `zt_task` where `deleted` = '0' and vision = 'lite';
 
 UPDATE `zt_user` SET `visions` = 'lite', `feedback` = '0' WHERE `feedback` = '1';
+
+DROP TABLE IF EXISTS `zt_deliberation`;
+CREATE TABLE `zt_deliberation`  (
+`id`              int       NOT NULL AUTO_INCREMENT,
+`frombugid`       mediumint NOT NULL,
+`deliberateddate` datetime NULL DEFAULT NULL,
+`description`     text,
+`tostatus`        enum('active','closed') NOT NULL DEFAULT 'active',
+`launcherid`      int       NOT NULL,
+`organizerid`     int       NOT NULL,
+`times`           int       NOT NULL,
+`deleted`         enum('0','1') NOT NULL DEFAULT '0',
+PRIMARY KEY (`id`),
+INDEX             `frombugid`(`frombugid`),
+CONSTRAINT `fromBugId` FOREIGN KEY (`frombugid`) REFERENCES `zt_bug` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT
+)AUTO_INCREMENT = 1;
 
 REPLACE INTO `zt_grouppriv` (`group`, `module`, `method`) VALUES
 (1,'account','browse'),

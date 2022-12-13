@@ -8,4 +8,5 @@ target/
 # maybe dangerous!
 tmp/
 config/my.php
-www/
+# 暂时只屏蔽upload
+www/data/upload/
