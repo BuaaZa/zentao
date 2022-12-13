@@ -27,6 +27,11 @@ class execution extends control
     public $objectType = 'execution';
 
     /**
+     * @var executionModel
+     */
+    public executionModel $execution;
+
+    /**
      * Construct function, Set executions.
      *
      * @param  string $moduleName
