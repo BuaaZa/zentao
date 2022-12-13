@@ -1707,11 +1707,11 @@ class baseSQL
      * 创建OR部分。
      * Create the OR part.
      *
-     * @param bool $condition
+     * @param string|null $condition
      * @access public
      * @return static|sql the sql object.
      */
-    public function orWhere(string $condition): sql|static
+    public function orWhere(string $condition = null): sql|static
     {
         if ($this->inCondition and !$this->conditionIsTrue) return $this;
         $this->sql .= " OR $condition ";
