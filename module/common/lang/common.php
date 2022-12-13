@@ -164,6 +164,9 @@ $lang->icons['unlock']             = 'unlock-alt';
 $lang->icons['confirmStoryChange'] = 'search';
 $lang->icons['score']              = 'tint';
 
+$lang->icons['launchdeliberation']           = 'magic';
+$lang->icons['recorddeliberation']           = 'check';
+
 $lang->createIcons['todo']        = 'todo';
 $lang->createIcons['effort']      = 'time';
 $lang->createIcons['bug']         = 'bug';

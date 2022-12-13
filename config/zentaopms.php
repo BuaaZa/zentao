@@ -341,6 +341,8 @@ define('TABLE_CHART',     '`' . $config->db->prefix . 'chart`');
 define('TABLE_DASHBOARD', '`' . $config->db->prefix . 'dashboard`');
 define('TABLE_DATASET',   '`' . $config->db->prefix . 'dataset`');
 
+define('TABLE_DELIBERATION',  '`' . $config->db->prefix . 'deliberation`');
+
 $config->objectTables['product']      = TABLE_PRODUCT;
 $config->objectTables['productplan']  = TABLE_PRODUCTPLAN;
 $config->objectTables['story']        = TABLE_STORY;
