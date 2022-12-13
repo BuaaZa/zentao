@@ -8,4 +8,5 @@ target/
 # maybe dangerous!
 tmp/
 
-www/data
+# 暂时只屏蔽upload
+www/data/upload/
