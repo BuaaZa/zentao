@@ -324,7 +324,7 @@ class baseDAO
      * @return baseDAO|sql the dao object self.
      * @access public
      */
-    public function select(string $fields = '*'): baseDAO|sql
+    public function select(string $fields = '*'): sql|static
     {
         $this->setMode('raw');
         $this->setMethod('select');
@@ -450,10 +450,10 @@ class baseDAO
      * Set the 'from' table.
      *
      * @param string $table
-     * @return baseDAO the dao object self.
+     * @return sql|baseDAO the dao object self.
      * @access public
      */
-    public function from(string $table): baseDAO
+    public function from(string $table): sql|static
     {
         $this->setTable($table);
         if ($this->mode == 'raw') $this->sqlobj->from($table);
@@ -1711,7 +1711,7 @@ class baseSQL
      * @access public
      * @return static|sql the sql object.
      */
-    public function orWhere(bool $condition): sql|static
+    public function orWhere(string $condition): sql|static
     {
         if ($this->inCondition and !$this->conditionIsTrue) return $this;
         $this->sql .= " OR $condition ";
@@ -1894,7 +1894,7 @@ class baseSQL
      * @return sql|baseSQL the sql object.
      * @access public
      */
-    public function orderBy(string $order): sql|baseSQL
+    public function orderBy(string $order): sql|static
     {
         if ($this->inCondition and !$this->conditionIsTrue) return $this;
 
@@ -1946,7 +1946,7 @@ class baseSQL
      * @access public
      * @return static|sql the sql object.
      */
-    public function limit(string $limit): sql|static
+    public function limit(string $limit): sql|static|dao|baseDAO
     {
         if ($this->inCondition and !$this->conditionIsTrue) return $this;
         if (empty($limit)) return $this;
