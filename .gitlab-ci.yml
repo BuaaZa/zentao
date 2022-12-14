@@ -31,6 +31,7 @@ deploy:
   only:
     - main
   artifacts:
+    name: ${CI_PROJECT_NAME}
     untracked: true
     when: on_success
     expire_in: 30 days
@@ -39,4 +40,5 @@ deploy:
     exclude:
       - .gitignore
       - .gitlab-ci.yml
+      - .git/**/*
       - .git
