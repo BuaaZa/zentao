@@ -177,9 +177,9 @@ class helper extends baseHelper
  * Check exist onlybody param.
  *
  * @access public
- * @return void
+ * @return bool
  */
-function isonlybody()
+function isonlybody(): bool
 {
     return helper::inOnlyBodyMode();
 }
