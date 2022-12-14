@@ -136,7 +136,71 @@ class executionEntry extends Entry
         if(!isset($data->result)) return $this->sendError(400, 'error');
 
         $execution = $this->execution->getByID($executionID);
-        $this->send(200, $this->format($execution, 'openedBy:user,openedDate:time,lastEditedBy:user,lastEditedDate:time,closedBy:user,closedDate:time,canceledBy:user,canceledDate:time,PM:user,PO:user,RD:user,QD:user,whitelist:userList,begin:date,end:date,realBegan:date,realEnd:date,deleted:bool'));
+
+        // dwr: 对于PUT/executions/{id}请求，只保留id
+        unset($execution->project);
+        unset($execution->model);
+        unset($execution->type);
+        unset($execution->lifetime);
+        unset($execution->budget);
+        unset($execution->budgetUnit);
+        unset($execution->attribute);
+        unset($execution->percent);
+        unset($execution->milestone);
+        unset($execution->output);
+        unset($execution->auth);
+        unset($execution->parent);
+        unset($execution->path);
+        unset($execution->grade);
+        unset($execution->name);
+        unset($execution->code);
+        unset($execution->begin);
+        unset($execution->end);
+        unset($execution->realBegan);
+        unset($execution->realEnd);
+        unset($execution->days);
+        unset($execution->status);
+        unset($execution->subStatus);
+        unset($execution->pri);
+        unset($execution->desc);
+        unset($execution->version);
+        unset($execution->parentVersion);
+        unset($execution->planDuration);
+        unset($execution->realDuration);
+        unset($execution->openedBy);
+        unset($execution->openedDate);
+        unset($execution->openedVersion);
+        unset($execution->lastEditedBy);
+        unset($execution->lastEditedDate);
+        unset($execution->closedBy);
+        unset($execution->closedDate);
+        unset($execution->canceledBy);
+        unset($execution->canceledDate);
+        unset($execution->suspendedDate);
+        unset($execution->PO);
+        unset($execution->PM);
+        unset($execution->QD);
+        unset($execution->RD);
+        unset($execution->team);
+        unset($execution->acl);
+        unset($execution->whitelist);
+        unset($execution->order);
+        unset($execution->vision);
+        unset($execution->displayCards);
+        unset($execution->fluidBoard);
+        unset($execution->colWidth);
+        unset($execution->minColWidth);
+        unset($execution->maxColWidth);
+        unset($execution->deleted);
+        unset($execution->totalHours);
+        unset($execution->totalEstimate);
+        unset($execution->totalConsumed);
+        unset($execution->totalLeft);
+
+//        $this->send(200, $this->format($execution, 'openedBy:user,openedDate:time,lastEditedBy:user,lastEditedDate:time,closedBy:user,closedDate:time,canceledBy:user,canceledDate:time,PM:user,PO:user,RD:user,QD:user,whitelist:userList,begin:date,end:date,realBegan:date,realEnd:date,deleted:bool'));
+
+        $execution->message = "success";
+        $this->send(201, $this->format($execution, ""));
     }
 
     /**

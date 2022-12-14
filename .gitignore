@@ -5,7 +5,9 @@ target/
 # VScode
 .vscode/
 
-# maybe dangerous!
+# 删去自定义文件
 config/my.php
+# maybe dangerous!
 tmp/
-www/data/upload
+# 暂时只屏蔽upload
+www/data/upload/
