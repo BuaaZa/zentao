@@ -2,10 +2,10 @@
 .idea/
 target/
 
-config/my.php
-
 # VScode
 .vscode/
 
 # maybe dangerous!
+config/my.php
 tmp/
+www/data/upload
