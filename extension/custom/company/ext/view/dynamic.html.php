@@ -76,7 +76,7 @@
                                         <?php echo zget($accountPairs, $action->actor); ?>
                                         <!--    change here      -->
                                         <span>
-                                            <?php echo " ( " . zget($userIpPairs, $action->actor) . " ) "; ?>
+                                            <?php echo " ( " . $action->ip . " ) "; ?>
                                         </span>
                                         <!--  -----------------  -->
                                         <span class='label-action'>

@@ -14269,3 +14269,6 @@ BEGIN
     return 0__DELIMITER__
     END IF__DELIMITER__
 END;
+
+alter table zt_action
+    add ip char(15) default '' not null after actor;
