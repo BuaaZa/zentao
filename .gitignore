@@ -11,3 +11,5 @@ config/my.php
 tmp/
 # 暂时只屏蔽upload
 www/data/upload/
+
+db/myDbChange/allChangeLocal.sql
