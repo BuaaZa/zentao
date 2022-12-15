@@ -23,14 +23,12 @@ public function create($objectType, $objectID, $actionType, $comment = '', $extr
 
     $objectType = str_replace('`', '', $objectType);
 
-    # get actor's ip
-    $ip = $this->dao->select('ip')->from(TABLE_USER)->where('account')->eq($actor)->fetch('ip');
-
     $action = new stdclass();
     $action->objectType = strtolower($objectType);
     $action->objectID = $objectID;
     $action->actor = $actor;
-    $action->ip = $ip;
+    # get actor's ip
+    $action->ip = helper::getRemoteIp();
     $action->action = $actionType;
     $action->date = helper::now();
     $action->extra = $extra;
