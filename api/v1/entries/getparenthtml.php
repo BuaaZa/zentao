@@ -4,7 +4,7 @@ class getparenthtmlEntry extends baseEntry{
     {
         $this->loadModel("story");
         $stories = $this->story->getParentStoryHTML($id, $_GET['execution']);
-        echo html::select('parent', $stories, '', "class='form-control chosen'");
+        echo html::select('parent', $stories, 0, "class='form-control chosen'");
     }
 }
 ?>

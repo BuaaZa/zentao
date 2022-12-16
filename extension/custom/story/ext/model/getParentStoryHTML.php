@@ -25,6 +25,6 @@ public function getParentStoryHTML($productID, $executionID = -1, $append = '')
             ->beginIF($append)->orWhere('id')->in($append)->fi()
             ->fetchPairs();
     }
-    return array('' => '') + $stories ;
+    return array(0 => '') + $stories ;
 }
 ?>
