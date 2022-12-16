@@ -10,7 +10,7 @@
  * @link        http://www.zentao.net
  */
 ?>
-<?php include '../../common/view/header.html.php'; ?>
+<?php include '../../../../../module/common/view/header.html.php'; ?>
 <?php js::set('browseType', $browseType); ?>
 <?php js::set('systemMode', $config->systemMode); ?>
 <div id="mainMenu" class="clearfix">
@@ -74,7 +74,11 @@
                                     </span>
                                     <span class="timeline-text">
                                         <?php echo zget($accountPairs, $action->actor); ?>
-
+                                        <!--    change here      -->
+                                        <span>
+                                            <?php echo " ( " . $action->ip . " ) "; ?>
+                                        </span>
+                                        <!--  -----------------  -->
                                         <span class='label-action'>
                                             <?php echo $action->actionLabel; ?>
                                         </span>
@@ -101,7 +105,7 @@
                                                 } else {
                                                     echo html::a($action->objectLink, $action->objectName, '', $tab);
                                                 }
-                                              ?>
+                                                ?>
                                             </span>
                                         <?php endif; ?>
 

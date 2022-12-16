@@ -676,17 +676,17 @@ class groupModel extends model
     /**
      * Check menu have module
      *
-     * @param  string    $menu
-     * @param  string    $moduleName
+     * @param string $menu
+     * @param string $moduleName
      * @access public
-     * @return void
+     * @return bool
      */
-    public function checkMenuModule($menu, $moduleName)
+    public function checkMenuModule(string $menu, string $moduleName): bool
     {
         if(empty($menu)) return true;
         if($menu == 'other' and (isset($this->lang->navGroup->$moduleName) or isset($this->lang->mainNav->$moduleName))) return false;
         if($menu != 'other' and !($moduleName == $menu or (isset($this->lang->navGroup->$moduleName) and $this->lang->navGroup->$moduleName == $menu))) return false;
-        if($menu == 'project' and strpos('caselib|testsuite|report', $moduleName) !== false) return false;
+        if($menu == 'project' and str_contains('caselib|testsuite|report', $moduleName)) return false;
         return true;
     }
 

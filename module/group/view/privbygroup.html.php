@@ -95,7 +95,7 @@
           $hasMethod = false;
           foreach($moduleActions as $action => $actionLabel)
           {
-              if(strpos($changelogs, ",$moduleName-$actionLabel,") !== false)
+              if(str_contains($changelogs, ",$moduleName-$actionLabel,"))
               {
                   $hasMethod = true;
                   break;
@@ -113,18 +113,18 @@
         </th>
         <?php if(isset($lang->$moduleName->menus)):?>
         <td class='menus'>
-          <?php echo html::checkbox("actions[$moduleName]", array('browse' => $lang->$moduleName->browse), isset($groupPrivs[$moduleName]) ? $groupPrivs[$moduleName] : '');?>
+          <?php echo html::checkbox("actions[$moduleName]", array('browse' => $lang->$moduleName->browse), $groupPrivs[$moduleName] ?? '');?>
           <a href='javascript:;'><i class='icon icon-plus'></i></a>
-          <?php echo html::checkbox("actions[$moduleName]", $lang->$moduleName->menus, isset($groupPrivs[$moduleName]) ? $groupPrivs[$moduleName] : '');?>
+          <?php echo html::checkbox("actions[$moduleName]", $lang->$moduleName->menus, $groupPrivs[$moduleName] ?? '');?>
         </td>
         <?php endif;?>
         <td id='<?php echo $moduleName;?>' class='pv-10px' colspan='<?php echo !empty($lang->$moduleName->menus) ? 1 : 2?>'>
           <?php $i = 1;?>
           <?php foreach($moduleActions as $action => $actionLabel):?>
           <?php if(!empty($lang->$moduleName->menus) and $action == 'browse') continue;;?>
-          <?php if(!empty($version) and strpos($changelogs, ",$moduleName-$actionLabel,") === false) continue;?>
+          <?php if(!empty($version) and !str_contains($changelogs, ",$moduleName-$actionLabel,")) continue;?>
           <div class='group-item'>
-            <?php echo html::checkbox("actions[{$moduleName}]", array($action => $lang->$moduleName->$actionLabel), isset($groupPrivs[$moduleName][$action]) ? $action : '', "title='{$lang->$moduleName->$actionLabel}'", 'inline');?>
+            <?php echo html::checkbox("actions[$moduleName]", array($action => $lang->$moduleName->$actionLabel), isset($groupPrivs[$moduleName][$action]) ? $action : '', "title='{$lang->$moduleName->$actionLabel}'", 'inline');?>
           </div>
           <?php endforeach;?>
         </td>
