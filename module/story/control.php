@@ -59,6 +59,7 @@ class story extends control
             if(!empty($project)) $productID = key($product);
         }
 
+        $this->view->fromExecution = -1;
         $this->story->replaceURLang($storyType);
         if($this->app->tab == 'product')
         {
@@ -76,6 +77,7 @@ class story extends control
             $objectID = empty($objectID) ? $this->session->execution : $objectID;
             $this->execution->setMenu($objectID);
             $execution = $this->dao->findById((int)$objectID)->from(TABLE_EXECUTION)->fetch();
+            $this->view->fromExecution = $execution->id;
             if($execution->type == 'kanban')
             {
                 $this->loadModel('kanban');
@@ -429,6 +431,7 @@ class story extends control
         $this->view->URS              = $storyType == 'story' ? $this->story->getProductStoryPairs($productID, $branch, $moduleIdList, 'changing,active,reviewing', 'id_desc', 0, '', 'requirement') : '';
         $this->view->needReview       = ($this->app->user->account == $product->PO or $objectID > 0 or $this->config->story->needReview == 0 or !$this->story->checkForceReview()) ? "checked='checked'" : "";
         $this->view->type             = $storyType;
+        $this->view->dfsxj = "wocao";
 
         $this->display();
     }
