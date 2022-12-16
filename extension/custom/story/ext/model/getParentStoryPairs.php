@@ -11,6 +11,6 @@ public function getParentStoryPairs($productID, $append = '')
         ->andWhere('plan')->in('0,')
         ->beginIF($append)->orWhere('id')->in($append)->fi()
         ->fetchPairs();
-    return array(0 => '') + $stories ;
+    return $stories[0] = "" ;
 } 
 ?>
