@@ -10,8 +10,7 @@
  * @link        http://www.zentao.net
  */
 ?>
-<?php include './header.html.php';
-?>
+<?php include './header.html.php';?>
 <?php js::set('page', 'create');?>
 <?php js::set('holders', $lang->story->placeholder); ?>
 <?php js::set('blockID', $blockID); ?>
@@ -42,7 +41,7 @@ foreach(explode(',', $config->story->create->requiredFields) as $field)
       <?php endif;?>
       <div class="pull-right btn-toolbar">
         <?php $customLink = $this->createLink('custom', 'ajaxSaveCustomFields', 'module=story&section=custom&key=createFields')?>
-        <?php include '../../../../../module/common/view/customfield.html.php';?>
+        <?php include '../../common/view/customfield.html.php';?>
       </div>
     </div>
     <form class="load-indicator main-form form-ajax" method='post' enctype='multipart/form-data' id='dataform'>
@@ -158,18 +157,18 @@ foreach(explode(',', $config->story->create->requiredFields) as $field)
           <tr>
             <th><?php echo $lang->story->requirement;?></th>
             <td colspan="2"><?php echo html::select('URS[]', $URS, '', "class='form-control chosen' multiple");?></td>
-            <!-- <td colspan="2">
+            <td colspan="2">
               <div class='input-group' id='moduleIdBox'>
-                <div class="input-group-addon"><?php #echo $lang->story->parent;?></div>
-                <?php #echo html::select('parent', $stories, '', "class='form-control chosen'");?>
+                <div class="input-group-addon"><?php echo $lang->story->parent;?></div>
+                <?php echo html::select('parent', $stories, '', "class='form-control chosen'");?>
               </div>
-            </td> -->
+            </td>
           </tr>
-          <?php #else:?>
-          <!-- <tr>
-            <th><?php #echo $lang->story->parent;?></th>
-            <td colspan="4"><?php #echo html::select('parent', $stories, '', "class='form-control chosen'");?></td>
-          </tr> -->
+          <?php else:?>
+          <tr>
+            <th><?php echo $lang->story->parent;?></th>
+            <td colspan="4"><?php echo html::select('parent', $stories, '', "class='form-control chosen'");?></td>
+          </tr>
           <?php endif;?>
           <?php endif;?>
           <?php if (isset($executionType) and $executionType == 'kanban'):?>
@@ -308,4 +307,4 @@ foreach(explode(',', $config->story->create->requiredFields) as $field)
 <script>
 $(function(){parent.$('body.hide-modal-close').removeClass('hide-modal-close');})
 </script>
-<?php include '../../../../../module/common/view/footer.html.php';?>
+<?php include '../../common/view/footer.html.php';?>
