@@ -12,5 +12,5 @@ tmp/
 config/my.php
 # 暂时只屏蔽upload
 www/data/upload/
-.DS_Store
-db/myDbChange/allChangeLocal.sql
+
+db/myDbChange/updateDbLocal.sh

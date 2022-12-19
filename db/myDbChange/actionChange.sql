@@ -4,10 +4,8 @@ DELIMITER //
 CREATE PROCEDURE addIpAtAction()
 
 BEGIN
-    DECLARE num INT;
-    SELECT count(*) into num FROM information_schema.COLUMNS
-        WHERE COLUMN_NAME = 'ip' AND TABLE_NAME = 'zt_action';
-    IF (num = 0)
+    IF NOT EXISTS(SELECT * FROM information_schema.COLUMNS
+                  WHERE COLUMN_NAME = 'ip' AND TABLE_NAME = 'zt_action')
     THEN
         alter table `zt_action` add `ip` char(15) default '' not null after `actor`;
     END IF;
