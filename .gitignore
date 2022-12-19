@@ -13,4 +13,4 @@ config/my.php
 # 暂时只屏蔽upload
 www/data/upload/
 
-db/myDbChange/allChangeLocal.sql
+db/myDbChange/updateDbLocal.sh
