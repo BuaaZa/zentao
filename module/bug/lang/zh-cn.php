@@ -321,6 +321,7 @@ $lang->bug->report->charts['bugsPerActivatedCount'] = '按Bug重新打开次数�
 $lang->bug->report->charts['bugsPerPri']            = '按Bug优先级统计';
 $lang->bug->report->charts['bugsPerType']           = '按Bug类型统计';
 $lang->bug->report->charts['bugsPerAssignedTo']     = '按指派给统计';
+$lang->bug->report->charts['bugsIfDeliberated']     = '按审议历史统计';
 //$lang->bug->report->charts['bugLiveDays']        = 'Bug处理时间统计';
 //$lang->bug->report->charts['bugHistories']       = 'Bug处理步骤统计';
 
@@ -346,6 +347,7 @@ $lang->bug->report->bugsPerActivatedCount = new stdclass();
 $lang->bug->report->bugsPerType           = new stdclass();
 $lang->bug->report->bugsPerPri            = new stdclass();
 $lang->bug->report->bugsPerAssignedTo     = new stdclass();
+$lang->bug->report->bugsIfDeliberated     = new stdclass();
 $lang->bug->report->bugLiveDays           = new stdclass();
 $lang->bug->report->bugHistories          = new stdclass();
 
@@ -365,6 +367,7 @@ $lang->bug->report->bugsPerActivatedCount->graph = new stdclass();
 $lang->bug->report->bugsPerType->graph           = new stdclass();
 $lang->bug->report->bugsPerPri->graph            = new stdclass();
 $lang->bug->report->bugsPerAssignedTo->graph     = new stdclass();
+$lang->bug->report->bugsIfDeliberated->graph     = new stdclass();
 $lang->bug->report->bugLiveDays->graph           = new stdclass();
 $lang->bug->report->bugHistories->graph          = new stdclass();
 
