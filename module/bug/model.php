@@ -412,6 +412,7 @@ class bugModel extends model
         elseif ($browseType == 'unresolved') $bugs = $this->getByStatus($productIDList, $branch, $modules, $executions, 'unresolved', $sort, $pager, $projectID);
         elseif ($browseType == 'unclosed') $bugs = $this->getByStatus($productIDList, $branch, $modules, $executions, 'unclosed', $sort, $pager, $projectID);
         elseif ($browseType == 'toclosed') $bugs = $this->getByStatus($productIDList, $branch, $modules, $executions, 'toclosed', $sort, $pager, $projectID);
+        elseif ($browseType == 'tobedeliberated') $bugs = $this->getByStatus($productIDList, $branch, $modules, $executions, 'tobedeliberated', $sort, $pager, $projectID);
         elseif ($browseType == 'longlifebugs') $bugs = $this->getByLonglifebugs($productIDList, $branch, $modules, $executions, $sort, $pager, $projectID);
         elseif ($browseType == 'postponedbugs') $bugs = $this->getByPostponedbugs($productIDList, $branch, $modules, $executions, $sort, $pager, $projectID);
         elseif ($browseType == 'needconfirm') $bugs = $this->getByNeedconfirm($productIDList, $branch, $modules, $executions, $sort, $pager, $projectID);
@@ -2712,23 +2713,23 @@ class bugModel extends model
     /**
      * Get unconfirmed bugs.
      *
-     * @param array $productIDList
+     * @param array|int $productIDList
      * @param int|string $branch
      * @param array $modules
      * @param array $executions
      * @param string $orderBy
      * @param object $pager
      * @param int $projectID
-     * @access public
      * @return array
+     * @access public
      */
-    public function getUnconfirmed(array      $productIDList,
-                                   int|string $branch,
-                                   array      $modules,
-                                   array      $executions,
-                                   string     $orderBy,
-                                   object     $pager,
-                                   int        $projectID)
+    public function getUnconfirmed(array|int    $productIDList,
+                                   int|string   $branch,
+                                   array|string $modules,
+                                   array        $executions,
+                                   string       $orderBy,
+                                   object       $pager,
+                                   int          $projectID)
     {
         return $this->dao->select("*, IF(`pri` = 0, {$this->config->maxPriValue}, `pri`) as priOrder, IF(`severity` = 0, {$this->config->maxPriValue}, `severity`) as severityOrder")->from(TABLE_BUG)
             ->where('product')->in($productIDList)
@@ -2796,6 +2797,7 @@ class bugModel extends model
             ->beginIF($status == 'unclosed')->andWhere('status')->ne('closed')->fi()
             ->beginIF($status == 'unresolved')->andWhere('status')->eq('active')->fi()
             ->beginIF($status == 'toclosed')->andWhere('status')->eq('resolved')->fi()
+            ->beginIF($status == 'tobedeliberated')->andWhere('status')->eq('tobedeliberated')->fi()
             ->beginIF($projectID)->andWhere('project')->eq($projectID)->fi()
             ->andWhere('deleted')->eq(0)
             ->beginIF(!$this->app->user->admin)->andWhere('project')->in('0,' . $this->app->user->view->projects)->fi()
