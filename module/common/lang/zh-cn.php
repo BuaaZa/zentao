@@ -32,7 +32,8 @@ $lang->proName        = '专业版';
 $lang->bizName        = '企业版';
 $lang->maxName        = '旗舰版';
 $lang->liteName       = '迅捷版';
-$lang->logoImg        = 'zt-logo.png';
+#$lang->logoImg        = 'zt-logo.png';
+//这里可以修改首页的logo图片指向的文件名
 $lang->welcome        = "%s项目管理系统";
 $lang->logout         = '退出';
 $lang->login          = '登录';
