@@ -1215,11 +1215,11 @@ class baseFixer
      *
      * @param bool $condition
      * @param string $fieldName
-     * @param string $value
+     * @param string|null $value
      * @return baseFixer fixer object
      * @access public
      */
-    public function setIF(bool $condition, string $fieldName, string $value): baseFixer
+    public function setIF(bool $condition, string $fieldName, string|null $value): baseFixer
     {
         if($condition) $this->data->$fieldName = $value;
         return $this;

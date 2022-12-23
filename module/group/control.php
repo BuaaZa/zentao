@@ -11,6 +11,8 @@
  */
 class group extends control
 {
+
+    public groupModel $group;
     /**
      * Construct function.
      *
@@ -61,9 +63,9 @@ class group extends control
      * Create a group.
      *
      * @access public
-     * @return void
+     * @return int
      */
-    public function create()
+    public function create(): int
     {
         if(!empty($_POST))
         {
@@ -77,6 +79,7 @@ class group extends control
         $this->view->title      = $this->lang->company->orgView . $this->lang->colon . $this->lang->group->create;
         $this->view->position[] = $this->lang->group->create;
         $this->display();
+        return 0;
     }
 
     /**

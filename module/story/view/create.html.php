@@ -51,7 +51,9 @@ foreach(explode(',', $config->story->create->requiredFields) as $field)
             <th><?php echo $lang->story->product;?></th>
             <td colspan="2">
               <div class='input-group'>
-              <?php echo html::select('product', $products, $productID, "onchange='loadProduct(this.value);' class='form-control chosen control-product'");?>
+              <?php
+                $products[""] = "";
+                echo html::select('product', $products, '', "onchange=\"loadProduct(this.value);$('#parent_select1').load('/www/api.php/v1/getparenthtml/'+this.value+'?execution='+".$fromExecution.");$('#parent_select2').load('/www/api.php/v1/getparenthtml/'+this.value+'?execution='+".$fromExecution.");\" class='form-control chosen control-product' required");?>
               <span class='input-group-addon fix-border fix-padding'></span>
               <?php if($branches) echo html::select('branch', $branches, $branch, "onchange='loadBranch();' class='form-control chosen control-branch'");?>
               </div>
@@ -160,14 +162,24 @@ foreach(explode(',', $config->story->create->requiredFields) as $field)
             <td colspan="2">
               <div class='input-group' id='moduleIdBox'>
                 <div class="input-group-addon"><?php echo $lang->story->parent;?></div>
-                <?php echo html::select('parent', $stories, '', "class='form-control chosen'");?>
+                  <div id='parent_select1'>
+                    <?php
+                      $stories = array(); 
+                      echo html::select('parent', $stories, '', "class='form-control chosen'");?>
+                  </div>
               </div>
             </td>
           </tr>
           <?php else:?>
           <tr>
             <th><?php echo $lang->story->parent;?></th>
-            <td colspan="4"><?php echo html::select('parent', $stories, '', "class='form-control chosen'");?></td>
+            <td colspan="4">
+              <div id='parent_select2'>
+                <?php
+                  $stories = array(); 
+                  echo html::select('parent', $stories, '', "class='form-control chosen'");?>
+              </div>
+            </td>
           </tr>
           <?php endif;?>
           <?php endif;?>

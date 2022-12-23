@@ -146,6 +146,7 @@ $lang->bug->assignedByMe       = '由我指派';
 $lang->bug->assignToNull       = '未指派';
 $lang->bug->unResolved         = '未解决';
 $lang->bug->toClosed           = '待关闭';
+$lang->bug->toDeliberated      = '待审议';
 $lang->bug->unclosed           = '未关闭';
 $lang->bug->unconfirmed        = '未确认';
 $lang->bug->longLifeBugs       = '久未处理';
@@ -320,6 +321,7 @@ $lang->bug->report->charts['bugsPerActivatedCount'] = '按Bug重新打开次数�
 $lang->bug->report->charts['bugsPerPri']            = '按Bug优先级统计';
 $lang->bug->report->charts['bugsPerType']           = '按Bug类型统计';
 $lang->bug->report->charts['bugsPerAssignedTo']     = '按指派给统计';
+$lang->bug->report->charts['bugsIfDeliberated']     = '按审议历史统计';
 //$lang->bug->report->charts['bugLiveDays']        = 'Bug处理时间统计';
 //$lang->bug->report->charts['bugHistories']       = 'Bug处理步骤统计';
 
@@ -345,6 +347,7 @@ $lang->bug->report->bugsPerActivatedCount = new stdclass();
 $lang->bug->report->bugsPerType           = new stdclass();
 $lang->bug->report->bugsPerPri            = new stdclass();
 $lang->bug->report->bugsPerAssignedTo     = new stdclass();
+$lang->bug->report->bugsIfDeliberated     = new stdclass();
 $lang->bug->report->bugLiveDays           = new stdclass();
 $lang->bug->report->bugHistories          = new stdclass();
 
@@ -364,6 +367,7 @@ $lang->bug->report->bugsPerActivatedCount->graph = new stdclass();
 $lang->bug->report->bugsPerType->graph           = new stdclass();
 $lang->bug->report->bugsPerPri->graph            = new stdclass();
 $lang->bug->report->bugsPerAssignedTo->graph     = new stdclass();
+$lang->bug->report->bugsIfDeliberated->graph     = new stdclass();
 $lang->bug->report->bugLiveDays->graph           = new stdclass();
 $lang->bug->report->bugHistories->graph          = new stdclass();
 
@@ -420,13 +424,15 @@ $lang->bug->featureBar['browse']['assigntome']   = $lang->bug->assignToMe;
 $lang->bug->featureBar['browse']['resolvedbyme'] = $lang->bug->resolvedByMe;
 $lang->bug->featureBar['browse']['assignedbyme'] = $lang->bug->assignedByMe;
 $lang->bug->featureBar['browse']['unresolved']   = $lang->bug->unResolved;
+$lang->bug->featureBar['browse']['tobedeliberated'] = $lang->bug->toDeliberated;
 $lang->bug->featureBar['browse']['more']         = $lang->more;
 
 
-$lang->bug->moreSelects['unconfirmed']   = $lang->bug->unconfirmed;
-$lang->bug->moreSelects['assigntonull']  = $lang->bug->assignToNull;
-$lang->bug->moreSelects['longlifebugs']  = $lang->bug->longLifeBugs;
-$lang->bug->moreSelects['toclosed']      = $lang->bug->toClosed;
+$lang->bug->moreSelects['unconfirmed'] = $lang->bug->unconfirmed;
+$lang->bug->moreSelects['assigntonull'] = $lang->bug->assignToNull;
+$lang->bug->moreSelects['longlifebugs'] = $lang->bug->longLifeBugs;
+$lang->bug->moreSelects['toclosed'] = $lang->bug->toClosed;
+//$lang->bug->moreSelects['tobedeliberated'] = $lang->bug->toDeliberated;
 $lang->bug->moreSelects['postponedbugs'] = $lang->bug->postponedBugs;
-$lang->bug->moreSelects['overduebugs']   = $lang->bug->overdueBugs;
-$lang->bug->moreSelects['needconfirm']   = $lang->bug->needConfirm;
+$lang->bug->moreSelects['overduebugs'] = $lang->bug->overdueBugs;
+$lang->bug->moreSelects['needconfirm'] = $lang->bug->needConfirm;

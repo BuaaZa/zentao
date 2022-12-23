@@ -990,6 +990,8 @@ $lang->resource->bug->delete             = 'deleteAction';
 $lang->resource->bug->batchChangeModule  = 'batchChangeModule';
 $lang->resource->bug->batchChangeBranch  = 'batchChangeBranch';
 $lang->resource->bug->batchChangePlan    = 'batchChangePlan';
+$lang->resource->bug->launchdeliberation    = 'launchdeliberation';
+$lang->resource->bug->recorddeliberation    = 'recorddeliberation';
 
 $lang->bug->methodOrder[0]   = 'index';
 $lang->bug->methodOrder[5]   = 'browse';
@@ -1015,6 +1017,8 @@ $lang->bug->methodOrder[95]  = 'delete';
 $lang->bug->methodOrder[100] = 'linkBugs';
 $lang->bug->methodOrder[105] = 'batchChangeModule';
 $lang->bug->methodOrder[110] = 'batchChangeBranch';
+$lang->bug->methodOrder[115] = 'launchdeliberation';
+$lang->bug->methodOrder[120] = 'recorddeliberation';
 
 /* Test case. */
 $lang->resource->testcase = new stdclass();

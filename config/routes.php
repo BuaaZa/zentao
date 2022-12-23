@@ -173,5 +173,6 @@ $routes['/ciresults'] = 'ciresults';
 $routes['/teamAccount/:id']  = 'teams';
 $routes['/projects/:id/teams/batchCreate'] = 'teamBatchCreate';
 $routes['/teamAccount/:id/user']  = 'teamaccountuser';
+$routes['/getparenthtml/:id']  = 'getparenthtml';
 
 $config->routes = $routes;

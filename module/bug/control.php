@@ -267,14 +267,14 @@ class bug extends control
         if(($browseType == 'bymodule' || $browseType == 'bybranch') and $this->session->bugBrowseType == 'bysearch') $this->session->set('bugBrowseType', 'unclosed');
 
         /* Process the order by field. */
-        if(!$orderBy) $orderBy = $this->cookie->qaBugOrder ? $this->cookie->qaBugOrder : 'id_desc';
+        if(!$orderBy) $orderBy = $this->cookie->qaBugOrder ?: 'id_desc';
         setcookie('qaBugOrder', $orderBy, 0, $this->config->webRoot, '', $this->config->cookieSecure, true);
 
         /* Append id for secend sort. */
         $sort = common::appendOrder($orderBy);
 
         /* Load pager. */
-        $this->app->loadClass('pager', $static = true);
+        $this->app->loadClass('pager', true);
         if($this->app->getViewType() == 'mhtml' || $this->app->getViewType() == 'xhtml') $recPerPage = 10;
         $pager = new pager($recTotal, $recPerPage, $pageID);
 
@@ -282,7 +282,7 @@ class bug extends control
         $executions = $this->loadModel('execution')->getPairs($this->projectID, 'all', 'empty|withdelete');
 
         /* Get product id list. */
-        $productIDList = $productID ? $productID : array_keys($this->products);
+        $productIDList = $productID ?: array_keys($this->products);
 
         /* Get bugs. */
         $bugs = $this->bug->getBugs($productIDList, $executions, $branch, $browseType, $moduleID, $queryID, $sort, $pager, $this->projectID);
@@ -372,14 +372,19 @@ class bug extends control
     /**
      * The report page.
      *
-     * @param  int    $productID
-     * @param  string $browseType
-     * @param  int    $branchID
-     * @param  int    $moduleID
-     * @access public
+     * @param int $productID
+     * @param string $browseType
+     * @param int|string $branchID
+     * @param int $moduleID
+     * @param string $chartType
      * @return void
+     * @access public
      */
-    public function report($productID, $browseType, $branchID, $moduleID, $chartType = 'default')
+    public function report(int    $productID,
+                           string $browseType,
+                           int|string    $branchID,
+                           int    $moduleID,
+                           string $chartType = 'default'): void
     {
         $this->loadModel('report');
         $this->view->charts = array();
