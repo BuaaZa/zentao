@@ -2316,10 +2316,38 @@ class bugModel extends model
      */
     public function getDataOfBugsPerModule()
     {
-        $datas = $this->dao->select('module as name, count(module) as value')->from(TABLE_BUG)->where($this->reportCondition())->groupBy('module')->orderBy('value DESC')->fetchAll('name');
+        $datas = $this->dao->select('module as name, count(module) as value')
+            ->from(TABLE_BUG)
+            ->where($this->reportCondition())
+            ->groupBy('module')
+            ->orderBy('value DESC')
+            ->fetchAll('name');
         if(!$datas) return array();
         $modules = $this->loadModel('tree')->getModulesName(array_keys($datas), true, true);
         foreach($datas as $moduleID => $data) $data->name = isset($modules[$moduleID]) ? $modules[$moduleID] : '/';
+        return $datas;
+    }
+
+    /**
+     * Get report data of bugs per story
+     *
+     * @access public
+     * @return array
+     */
+    public function getDataOfBugsPerStory()
+    {
+        $datas = $this->dao->select('story as name, count(story) as value')
+            ->from(TABLE_BUG)
+            ->where($this->reportCondition())
+            ->groupBy('story')
+            ->orderBy('value DESC')
+            ->fetchAll('name');
+        if(!$datas) return array();
+        foreach($datas as $storyID => $data)
+        {
+            $story = $this->loadModel('story')->getById($storyID);
+            $data->name = $story->title;
+        }
         return $datas;
     }
 
