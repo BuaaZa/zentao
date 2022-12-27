@@ -412,6 +412,7 @@ class bugModel extends model
         elseif ($browseType == 'unresolved') $bugs = $this->getByStatus($productIDList, $branch, $modules, $executions, 'unresolved', $sort, $pager, $projectID);
         elseif ($browseType == 'unclosed') $bugs = $this->getByStatus($productIDList, $branch, $modules, $executions, 'unclosed', $sort, $pager, $projectID);
         elseif ($browseType == 'toclosed') $bugs = $this->getByStatus($productIDList, $branch, $modules, $executions, 'toclosed', $sort, $pager, $projectID);
+        elseif ($browseType == 'tobedeliberated') $bugs = $this->getByStatus($productIDList, $branch, $modules, $executions, 'tobedeliberated', $sort, $pager, $projectID);
         elseif ($browseType == 'longlifebugs') $bugs = $this->getByLonglifebugs($productIDList, $branch, $modules, $executions, $sort, $pager, $projectID);
         elseif ($browseType == 'postponedbugs') $bugs = $this->getByPostponedbugs($productIDList, $branch, $modules, $executions, $sort, $pager, $projectID);
         elseif ($browseType == 'needconfirm') $bugs = $this->getByNeedconfirm($productIDList, $branch, $modules, $executions, $sort, $pager, $projectID);
@@ -2483,11 +2484,17 @@ class bugModel extends model
      * @access public
      * @return array
      */
-    public function getDataOfBugsPerActivatedCount()
+    public function getDataOfBugsPerActivatedCount(): array
     {
-        $datas = $this->dao->select('activatedCount AS name, COUNT(*) AS value')->from(TABLE_BUG)->where($this->reportCondition())->groupBy('name')->orderBy('value DESC')->fetchAll('name');
+        $datas = $this->dao->select('activatedCount AS name, COUNT(*) AS value')
+            ->from(TABLE_BUG)
+            ->where($this->reportCondition())
+            ->groupBy('name')
+            ->orderBy('value DESC')
+            ->fetchAll('name');
         if(!$datas) return array();
-        foreach($datas as $data) $data->name = $this->lang->bug->report->bugsPerActivatedCount->graph->xAxisName . ':' . $data->name;
+        foreach($datas as $data)
+            $data->name = $this->lang->bug->report->bugsPerActivatedCount->graph->xAxisName . ':' . $data->name;
         return $datas;
     }
 
@@ -2509,9 +2516,9 @@ class bugModel extends model
      * getDataOfBugsPerAssignedTo
      *
      * @access public
-     * @return void
+     * @return array
      */
-    public function getDataOfBugsPerAssignedTo()
+    public function getDataOfBugsPerAssignedTo(): array
     {
         $datas = $this->dao->select('assignedTo AS name, COUNT(*) AS value')
             ->from(TABLE_BUG)->where($this->reportCondition())
@@ -2519,18 +2526,48 @@ class bugModel extends model
             ->orderBy('value DESC')->fetchAll('name');
         if(!$datas) return array();
         if(!isset($this->users)) $this->users = $this->loadModel('user')->getPairs('noletter');
-        foreach($datas as $account => $data) if(isset($this->users[$account])) $data->name = $this->users[$account];
+        foreach($datas as $account => $data)
+            if(isset($this->users[$account]))
+                $data->name = $this->users[$account];
         return $datas;
+    }
+
+    public function getDataOfBugsIfDeliberated(): array
+    {
+        $datas = $this->dao->select('activatedCount AS name, COUNT(*) AS value')
+            ->from(TABLE_BUG)
+            ->where($this->reportCondition())
+            ->groupBy('name')
+            ->orderBy('value DESC')
+            ->fetchAll('name');
+        if(!$datas)
+            return array();
+
+        $_0 = new stdClass();
+        $_0->name = "无审议历史";
+        $_0->value = 0;
+        $_1 = new stdClass();
+        $_1->name = "有审议历史";
+        $_1->value = 0;
+        foreach ($datas as $data) {
+            $count = intval($data->name);
+            if ($count < 2) {
+                $_0->value += $data->value;
+            } else {
+                $_1->value += $data->value;
+            }
+        }
+        return array($_0, $_1);
     }
 
     /**
      * Merge the default chart settings and the settings of current chart.
      *
-     * @param  string    $chartType
+     * @param string $chartType
      * @access public
      * @return void
      */
-    public function mergeChartOption($chartType)
+    public function mergeChartOption(string $chartType): void
     {
         $chartOption  = $this->lang->bug->report->$chartType;
         $commonOption = $this->lang->bug->report->options;
@@ -2608,12 +2645,12 @@ class bugModel extends model
      * @access public
      */
     private function getByAssigntome(array|int    $productIDList,
-                                    int|string   $branch,
-                                    array|string $modules,
-                                    array        $executions,
-                                    string       $orderBy,
-                                    object       $pager,
-                                    int          $projectID): array
+                                     int|string   $branch,
+                                     array|string $modules,
+                                     array        $executions,
+                                     string       $orderBy,
+                                     object       $pager,
+                                     int          $projectID): array
     {
         return $this->dao->select("*, IF(`pri` = 0, {$this->config->maxPriValue}, `pri`) as priOrder, IF(`severity` = 0, {$this->config->maxPriValue}, `severity`) as severityOrder")->from(TABLE_BUG)
             ->where('assignedTo')->eq($this->app->user->account)
@@ -2712,23 +2749,23 @@ class bugModel extends model
     /**
      * Get unconfirmed bugs.
      *
-     * @param array $productIDList
+     * @param array|int $productIDList
      * @param int|string $branch
      * @param array $modules
      * @param array $executions
      * @param string $orderBy
      * @param object $pager
      * @param int $projectID
-     * @access public
      * @return array
+     * @access public
      */
-    public function getUnconfirmed(array      $productIDList,
-                                   int|string $branch,
-                                   array      $modules,
-                                   array      $executions,
-                                   string     $orderBy,
-                                   object     $pager,
-                                   int        $projectID)
+    public function getUnconfirmed(array|int    $productIDList,
+                                   int|string   $branch,
+                                   array|string $modules,
+                                   array        $executions,
+                                   string       $orderBy,
+                                   object       $pager,
+                                   int          $projectID)
     {
         return $this->dao->select("*, IF(`pri` = 0, {$this->config->maxPriValue}, `pri`) as priOrder, IF(`severity` = 0, {$this->config->maxPriValue}, `severity`) as severityOrder")->from(TABLE_BUG)
             ->where('product')->in($productIDList)
@@ -2796,6 +2833,7 @@ class bugModel extends model
             ->beginIF($status == 'unclosed')->andWhere('status')->ne('closed')->fi()
             ->beginIF($status == 'unresolved')->andWhere('status')->eq('active')->fi()
             ->beginIF($status == 'toclosed')->andWhere('status')->eq('resolved')->fi()
+            ->beginIF($status == 'tobedeliberated')->andWhere('status')->eq('tobedeliberated')->fi()
             ->beginIF($projectID)->andWhere('project')->eq($projectID)->fi()
             ->andWhere('deleted')->eq(0)
             ->beginIF(!$this->app->user->admin)->andWhere('project')->in('0,' . $this->app->user->view->projects)->fi()
@@ -3167,7 +3205,8 @@ class bugModel extends model
     {
         if(isset($_SESSION['bugQueryCondition']))
         {
-            if(!$this->session->bugOnlyCondition) return 'id in (' . preg_replace('/SELECT .* FROM/', 'SELECT t1.id FROM', $this->session->bugQueryCondition) . ')';
+            if(!$this->session->bugOnlyCondition)
+                return 'id in (' . preg_replace('/SELECT .* FROM/', 'SELECT t1.id FROM', $this->session->bugQueryCondition) . ')';
             return $this->session->bugQueryCondition;
         }
         return true;
@@ -3338,169 +3377,169 @@ class bugModel extends model
             if($this->config->edition != 'open') $this->loadModel('flow')->printFlowCell('bug', $bug, $id);
             switch($id)
             {
-            case 'id':
-                if($canBatchAction)
-                {
-                    echo html::checkbox('bugIDList', array($bug->id => '')) . html::a(helper::createLink('bug', 'view', "bugID=$bug->id"), sprintf('%03d', $bug->id), '', "data-app='{$this->app->tab}'");
-                }
-                else
-                {
-                    printf('%03d', $bug->id);
-                }
-                break;
-            case 'severity':
-                $severityValue     = zget($this->lang->bug->severityList, $bug->severity);
-                $hasCustomSeverity = !is_numeric($severityValue);
-                if($hasCustomSeverity)
-                {
-                    echo "<span class='label-severity-custom' data-severity='{$bug->severity}' title='" . $severityValue . "'>" . $severityValue . "</span>";
-                }
-                else
-                {
-                    echo "<span class='label-severity' data-severity='{$bug->severity}' title='" . $severityValue . "'></span>";
-                }
-                break;
-            case 'pri':
-                echo "<span class='label-pri label-pri-" . $bug->pri . "' title='" . zget($this->lang->bug->priList, $bug->pri, $bug->pri) . "'>";
-                echo zget($this->lang->bug->priList, $bug->pri, $bug->pri);
-                echo "</span>";
-                break;
-            case 'confirmed':
-                $class = 'confirm' . $bug->confirmed;
-                echo "<span class='$class' title='" . zget($this->lang->bug->confirmedList, $bug->confirmed, $bug->confirmed) . "'>" . zget($this->lang->bug->confirmedList, $bug->confirmed, $bug->confirmed) . "</span> ";
-                break;
-            case 'title':
-                $showBranch = isset($this->config->bug->browse->showBranch) ? $this->config->bug->browse->showBranch : 1;
-                if(isset($branches[$bug->branch]) and $showBranch) echo "<span class='label label-outline label-badge' title={$branches[$bug->branch]}>{$branches[$bug->branch]}</span> ";
-                if($bug->module and isset($modulePairs[$bug->module])) echo "<span class='label label-gray label-badge'>{$modulePairs[$bug->module]}</span> ";
-                echo $canView ? html::a($bugLink, $bug->title, null, "style='color: $bug->color' data-app={$this->app->tab}") : "<span style='color: $bug->color'>{$bug->title}</span>";
-                if($bug->case) echo html::a(helper::createLink('testcase', 'view', "caseID=$bug->case&version=$bug->caseVersion"), "[" . $this->lang->testcase->common  . "#$bug->case]", '', "class='bug' title='$bug->case'");
-                break;
-            case 'branch':
-                echo zget($branches, $bug->branch, '');
-                break;
-            case 'project':
-                echo zget($projectPairs, $bug->project, '');
-                break;
-            case 'execution':
-                echo zget($executions, $bug->execution, '');
-                break;
-            case 'plan':
-                echo zget($plans, $bug->plan, '');
-                break;
-            case 'story':
-                if(isset($stories[$bug->story]))
-                {
-                    $story = $stories[$bug->story];
-                    echo common::hasPriv('story', 'view') ? html::a(helper::createLink('story', 'view', "storyID=$story->id", 'html', true), $story->title, '', "class='iframe'") : $story->title;
-                }
-                break;
-            case 'task':
-                if(isset($tasks[$bug->task]))
-                {
-                    $task = $tasks[$bug->task];
-                    echo common::hasPriv('task', 'view') ? html::a(helper::createLink('task', 'view', "taskID=$task->id", 'html', true), $task->name, '', "class='iframe'") : $task->name;
-                }
-                break;
-            case 'toTask':
-                if(isset($tasks[$bug->toTask]))
-                {
-                    $task = $tasks[$bug->toTask];
-                    echo common::hasPriv('task', 'view') ? html::a(helper::createLink('task', 'view', "taskID=$task->id", 'html', true), $task->name, '', "class='iframe'") : $task->name;
-                }
-                break;
-            case 'type':
-                echo zget($this->lang->bug->typeList, $bug->type);
-                break;
-            case 'status':
-                echo "<span class='status-bug status-{$bug->status}'>";
-                echo $this->processStatus('bug', $bug);
-                echo  '</span>';
-                break;
-            case 'activatedCount':
-                echo $bug->activatedCount;
-                break;
-            case 'activatedDate':
-                echo helper::isZeroDate($bug->activatedDate) ? '' : substr($bug->activatedDate, 5, 11);
-                break;
-            case 'keywords':
-                echo $bug->keywords;
-                break;
-            case 'os':
-                echo $os;
-                break;
-            case 'browser':
-                echo $browser;
-                break;
-            case 'mailto':
-                $mailto = explode(',', $bug->mailto);
-                foreach($mailto as $account)
-                {
-                    $account = trim($account);
-                    if(empty($account)) continue;
-                    echo zget($users, $account) . " &nbsp;";
-                }
-                break;
-            case 'found':
-                echo zget($users, $bug->found);
-                break;
-            case 'openedBy':
-                echo zget($users, $bug->openedBy);
-                break;
-            case 'openedDate':
-                echo helper::isZeroDate($bug->openedDate) ? '' : substr($bug->openedDate, 5, 11);
-                break;
-            case 'openedBuild':
-                $builds = array_flip($builds);
-                foreach(explode(',', $bug->openedBuild) as $build)
-                {
-                    $buildID = zget($builds, $build, '');
-                    if($buildID == 'trunk')
+                case 'id':
+                    if($canBatchAction)
                     {
-                        echo $build . ' ';
+                        echo html::checkbox('bugIDList', array($bug->id => '')) . html::a(helper::createLink('bug', 'view', "bugID=$bug->id"), sprintf('%03d', $bug->id), '', "data-app='{$this->app->tab}'");
                     }
-                    elseif($buildID and common::hasPriv('build', 'view'))
+                    else
                     {
-                        echo html::a(helper::createLink('build', 'view', "buildID=$buildID"), $build, '', "title='$bug->openedBuild'") . ' ';
+                        printf('%03d', $bug->id);
                     }
-                }
-                break;
-            case 'assignedTo':
-                $this->printAssignedHtml($bug, $users);
-                break;
-            case 'assignedDate':
-                echo helper::isZeroDate($bug->assignedDate) ? '' : substr($bug->assignedDate, 5, 11);
-                break;
-            case 'deadline':
-                echo helper::isZeroDate($bug->deadline) ? '' : '<span>' . substr($bug->deadline, 5, 11) . '</span>';
-                break;
-            case 'resolvedBy':
-                echo zget($users, $bug->resolvedBy, $bug->resolvedBy);
-                break;
-            case 'resolution':
-                echo zget($this->lang->bug->resolutionList, $bug->resolution);
-                break;
-            case 'resolvedDate':
-                echo helper::isZeroDate($bug->resolvedDate) ? '' : substr($bug->resolvedDate, 5, 11);
-                break;
-            case 'resolvedBuild':
-                echo $bug->resolvedBuild;
-                break;
-            case 'closedBy':
-                echo zget($users, $bug->closedBy);
-                break;
-            case 'closedDate':
-                echo helper::isZeroDate($bug->closedDate) ? '' : substr($bug->closedDate, 5, 11);
-                break;
-            case 'lastEditedBy':
-                echo zget($users, $bug->lastEditedBy);
-                break;
-            case 'lastEditedDate':
-                echo helper::isZeroDate($bug->lastEditedDate) ? '' : substr($bug->lastEditedDate, 5, 11);
-                break;
-            case 'actions':
-                echo $this->buildOperateMenu($bug, 'browse');
-                break;
+                    break;
+                case 'severity':
+                    $severityValue     = zget($this->lang->bug->severityList, $bug->severity);
+                    $hasCustomSeverity = !is_numeric($severityValue);
+                    if($hasCustomSeverity)
+                    {
+                        echo "<span class='label-severity-custom' data-severity='{$bug->severity}' title='" . $severityValue . "'>" . $severityValue . "</span>";
+                    }
+                    else
+                    {
+                        echo "<span class='label-severity' data-severity='{$bug->severity}' title='" . $severityValue . "'></span>";
+                    }
+                    break;
+                case 'pri':
+                    echo "<span class='label-pri label-pri-" . $bug->pri . "' title='" . zget($this->lang->bug->priList, $bug->pri, $bug->pri) . "'>";
+                    echo zget($this->lang->bug->priList, $bug->pri, $bug->pri);
+                    echo "</span>";
+                    break;
+                case 'confirmed':
+                    $class = 'confirm' . $bug->confirmed;
+                    echo "<span class='$class' title='" . zget($this->lang->bug->confirmedList, $bug->confirmed, $bug->confirmed) . "'>" . zget($this->lang->bug->confirmedList, $bug->confirmed, $bug->confirmed) . "</span> ";
+                    break;
+                case 'title':
+                    $showBranch = isset($this->config->bug->browse->showBranch) ? $this->config->bug->browse->showBranch : 1;
+                    if(isset($branches[$bug->branch]) and $showBranch) echo "<span class='label label-outline label-badge' title={$branches[$bug->branch]}>{$branches[$bug->branch]}</span> ";
+                    if($bug->module and isset($modulePairs[$bug->module])) echo "<span class='label label-gray label-badge'>{$modulePairs[$bug->module]}</span> ";
+                    echo $canView ? html::a($bugLink, $bug->title, null, "style='color: $bug->color' data-app={$this->app->tab}") : "<span style='color: $bug->color'>{$bug->title}</span>";
+                    if($bug->case) echo html::a(helper::createLink('testcase', 'view', "caseID=$bug->case&version=$bug->caseVersion"), "[" . $this->lang->testcase->common  . "#$bug->case]", '', "class='bug' title='$bug->case'");
+                    break;
+                case 'branch':
+                    echo zget($branches, $bug->branch, '');
+                    break;
+                case 'project':
+                    echo zget($projectPairs, $bug->project, '');
+                    break;
+                case 'execution':
+                    echo zget($executions, $bug->execution, '');
+                    break;
+                case 'plan':
+                    echo zget($plans, $bug->plan, '');
+                    break;
+                case 'story':
+                    if(isset($stories[$bug->story]))
+                    {
+                        $story = $stories[$bug->story];
+                        echo common::hasPriv('story', 'view') ? html::a(helper::createLink('story', 'view', "storyID=$story->id", 'html', true), $story->title, '', "class='iframe'") : $story->title;
+                    }
+                    break;
+                case 'task':
+                    if(isset($tasks[$bug->task]))
+                    {
+                        $task = $tasks[$bug->task];
+                        echo common::hasPriv('task', 'view') ? html::a(helper::createLink('task', 'view', "taskID=$task->id", 'html', true), $task->name, '', "class='iframe'") : $task->name;
+                    }
+                    break;
+                case 'toTask':
+                    if(isset($tasks[$bug->toTask]))
+                    {
+                        $task = $tasks[$bug->toTask];
+                        echo common::hasPriv('task', 'view') ? html::a(helper::createLink('task', 'view', "taskID=$task->id", 'html', true), $task->name, '', "class='iframe'") : $task->name;
+                    }
+                    break;
+                case 'type':
+                    echo zget($this->lang->bug->typeList, $bug->type);
+                    break;
+                case 'status':
+                    echo "<span class='status-bug status-{$bug->status}'>";
+                    echo $this->processStatus('bug', $bug);
+                    echo  '</span>';
+                    break;
+                case 'activatedCount':
+                    echo $bug->activatedCount;
+                    break;
+                case 'activatedDate':
+                    echo helper::isZeroDate($bug->activatedDate) ? '' : substr($bug->activatedDate, 5, 11);
+                    break;
+                case 'keywords':
+                    echo $bug->keywords;
+                    break;
+                case 'os':
+                    echo $os;
+                    break;
+                case 'browser':
+                    echo $browser;
+                    break;
+                case 'mailto':
+                    $mailto = explode(',', $bug->mailto);
+                    foreach($mailto as $account)
+                    {
+                        $account = trim($account);
+                        if(empty($account)) continue;
+                        echo zget($users, $account) . " &nbsp;";
+                    }
+                    break;
+                case 'found':
+                    echo zget($users, $bug->found);
+                    break;
+                case 'openedBy':
+                    echo zget($users, $bug->openedBy);
+                    break;
+                case 'openedDate':
+                    echo helper::isZeroDate($bug->openedDate) ? '' : substr($bug->openedDate, 5, 11);
+                    break;
+                case 'openedBuild':
+                    $builds = array_flip($builds);
+                    foreach(explode(',', $bug->openedBuild) as $build)
+                    {
+                        $buildID = zget($builds, $build, '');
+                        if($buildID == 'trunk')
+                        {
+                            echo $build . ' ';
+                        }
+                        elseif($buildID and common::hasPriv('build', 'view'))
+                        {
+                            echo html::a(helper::createLink('build', 'view', "buildID=$buildID"), $build, '', "title='$bug->openedBuild'") . ' ';
+                        }
+                    }
+                    break;
+                case 'assignedTo':
+                    $this->printAssignedHtml($bug, $users);
+                    break;
+                case 'assignedDate':
+                    echo helper::isZeroDate($bug->assignedDate) ? '' : substr($bug->assignedDate, 5, 11);
+                    break;
+                case 'deadline':
+                    echo helper::isZeroDate($bug->deadline) ? '' : '<span>' . substr($bug->deadline, 5, 11) . '</span>';
+                    break;
+                case 'resolvedBy':
+                    echo zget($users, $bug->resolvedBy, $bug->resolvedBy);
+                    break;
+                case 'resolution':
+                    echo zget($this->lang->bug->resolutionList, $bug->resolution);
+                    break;
+                case 'resolvedDate':
+                    echo helper::isZeroDate($bug->resolvedDate) ? '' : substr($bug->resolvedDate, 5, 11);
+                    break;
+                case 'resolvedBuild':
+                    echo $bug->resolvedBuild;
+                    break;
+                case 'closedBy':
+                    echo zget($users, $bug->closedBy);
+                    break;
+                case 'closedDate':
+                    echo helper::isZeroDate($bug->closedDate) ? '' : substr($bug->closedDate, 5, 11);
+                    break;
+                case 'lastEditedBy':
+                    echo zget($users, $bug->lastEditedBy);
+                    break;
+                case 'lastEditedDate':
+                    echo helper::isZeroDate($bug->lastEditedDate) ? '' : substr($bug->lastEditedDate, 5, 11);
+                    break;
+                case 'actions':
+                    echo $this->buildOperateMenu($bug, 'browse');
+                    break;
             }
             echo '</td>';
         }

@@ -11,7 +11,7 @@ deploy:
     - echo "Fix /tmp access issue..."
     - echo sudo chmod -R 777  ${PROJECT_FULLPATH}/${CI_PROJECT_NAME}/tmp
     - echo "Change database..."
-    - mysql -u ${DATABASE_USER} -p${DATABASE_PASSWORD} -D ${DATABASE} < ${PROJECT_FULLPATH}/${CI_PROJECT_NAME}/db/myDbChange/allChangeServer.sql
+    - db/myDbChange/updateDbServer.sh
     - echo "Application successfully deployed!"
   tags:
     - zentao

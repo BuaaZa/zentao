@@ -13,6 +13,8 @@ class product extends control
 {
     public $products = array();
 
+    public projectModel $project;
+
     /**
      * Construct function.
      *
@@ -1211,13 +1213,13 @@ class product extends control
     /**
      * Show error no product when visit qa.
      *
-     * @param  string $moduleName
-     * @param  string $activeMenu
-     * @param  int    $objectID
+     * @param string $moduleName
+     * @param string $activeMenu
+     * @param int|string $objectID
      * @access public
      * @return void
      */
-    public function showErrorNone($moduleName = 'qa', $activeMenu = 'index', $objectID = 0)
+    public function showErrorNone(string $moduleName = 'qa', string $activeMenu = 'index', int|string $objectID = 1)
     {
         if($moduleName == 'project')
         {
