@@ -2544,10 +2544,10 @@ class bugModel extends model
             return array();
 
         $_0 = new stdClass();
-        $_0->name = "有审议历史";
+        $_0->name = "无审议历史";
         $_0->value = 0;
         $_1 = new stdClass();
-        $_1->name = "无审议历史";
+        $_1->name = "有审议历史";
         $_1->value = 0;
         foreach ($datas as $data) {
             $count = intval($data->name);
