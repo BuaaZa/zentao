@@ -24,8 +24,17 @@
     <div class="page-title">
       <span class="label label-id"><?php echo $story->id?></span>
       <span class="text" title='<?php echo $story->title;?>' style='color: <?php echo $story->color;?>'>
-        <?php if($story->parent > 0) echo '<span class="label label-badge label-primary no-margin">' . $this->lang->story->childrenAB . '</span>';?>
-        <?php if($story->parent > 0) echo isset($story->parentName) ? html::a(inlink('view', "storyID={$story->parent}&version=0&param=0&storyType=$story->type"), $story->parentName) . ' / ' : '';?><?php echo $story->title;?>
+        <?php if($story->parent > 0 && $story->type == 'story') echo '<span class="label label-badge label-primary no-margin">' . $this->lang->story->childrenAB . '</span>';?>
+        <?php 
+        if($story->parent > 0){
+          if(isset($story->grandId)){
+            echo html::a(inlink('view', "storyID={$story->grandId}&version=0&param=0&storyType=$story->type"), $story->grandName).'/';
+          }
+          echo html::a(inlink('view', "storyID={$story->parent}&version=0&param=0&storyType=$story->type"), $story->parentName);
+          echo ($story->type == 'taskPoint') ? '- '.$story->title : '/'.$story->title;
+        }else{
+          echo $story->title;
+        }?>
       </span>
       <?php if($story->version > 1):?>
       <small class='dropdown'>
@@ -59,6 +68,7 @@
     }
     ?>
     <?php common::printLink('story', 'create', "productID={$story->product}&branch={$story->branch}&moduleID={$story->module}&$otherParam&bugID=0&planID=0&todoID=0&extra=&type=$story->type", "<i class='icon icon-plus'></i> " . $lang->story->create, '', "class='btn btn-primary' data-app='$tab'"); ?>
+    <?php common::printLink('story', 'create', "productID={$story->product}&branch={$story->branch}&moduleID={$story->module}&$otherParam&bugID=0&planID=0&todoID=0&extra=&type=taskPoint&storyID=$story->id", "<i class='icon icon-plus'></i> " . $lang->story->createTaskPoint, '', "class='btn btn-primary' data-app='$tab'"); ?>
     <?php endif;?>
   </div>
   <?php endif;?>
@@ -184,19 +194,57 @@
         </div>
       </div>
       <?php endif;?>
+      <?php if(!empty($story->taskPoint)):?>
+      <div class='detail'>
+        <div class='detail-title'><?php echo $this->lang->story->taskPoint;?></div>
+        <div class='detail-content article-content'>
+          <table class='table table-hover table-fixed'>
+            <thead>
+              <tr class='text-center'>
+                <th class='w-50px'> <?php echo $lang->story->id;?></th>
+                <th class='w-110px'><?php echo $lang->story->taskPointTitle;?></th>
+                <th>                <?php echo $lang->story->taskPointSpec;?></th>
+                <th class='w-220px'> <?php echo $lang->story->taskPointVerify;?></th>
+                <th class='w-120px'><?php echo $lang->actions;?></th>
+              </tr>
+            </thead>
+            <tbody>
+              <?php foreach($story->taskPoint as $child):?>
+              <tr class='text-center'>
+                <td><?php echo $child->id;?></td>
+                <td><?php echo $child->title;?></td>
+                <td><?php echo $child->spec;?></td>
+                <td><?php echo $child->verify;?></td>
+                <td class='c-actions'>
+                  <?php
+                  common::printIcon('story', 'change',     "storyID=$child->id&from=&storyType=$child->type", $child, 'list', 'edit');
+                  common::printIcon('testcase', 'create', "productID=$child->product&branch=$child->branch&module=0&from=&param=0&story={$child->id}", $child, 'list', 'sitemap');
+                  common::printIcon('story', 'delete',      "storyID=$child->id&confirm='yes'&from=&storyType=$child->type&fromExecution=$param", $child, 'list', 'close', '', 'iframe showinonlybody', true);
+                  ?>
+                </td>
+              </tr>
+              <?php endforeach;?>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <?php endif;?>
     </div>
     <?php $this->printExtendFields($story, 'div', "position=left&inForm=0&inCell=1");?>
     <?php if($this->app->getViewType() != 'xhtml'):?>
     <div class="cell"><?php include '../../common/view/action.html.php';?></div>
     <?php endif;?>
     <div class='main-actions'>
+      <?php if($story->type != 'taskPoint'):?>
       <div class="btn-toolbar">
         <?php common::printBack($browseLink);?>
         <?php if(!isonlybody()) echo "<div class='divider'></div>";?>
         <?php if(!$story->deleted) echo $this->story->buildOperateMenu($story, 'view');?>
       </div>
+      <?php endif;?>
     </div>
   </div>
+  <?php if($story->type == 'story'):?>
   <div class="side-col col-4">
     <div class="cell">
       <div class='tabs'>
@@ -583,6 +631,7 @@
     </div>
     <?php $this->printExtendFields($story, 'div', "position=right&inForm=0&inCell=1");?>
   </div>
+  <?php endif;?>
 </div>
 <?php if($this->app->getViewType() == 'xhtml'):?>
 </div>

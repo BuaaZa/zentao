@@ -23,6 +23,7 @@
     </div>
     <form class="main-form" method='post' enctype='multipart/form-data' target='hiddenwin' id='dataform'>
       <table class='table table-form'>
+        <?php if($story->type != 'taskPoint'):?>
         <tr>
           <th class='w-80px'><?php echo $lang->story->reviewedBy;?></th>
           <td id='reviewerBox'>
@@ -36,6 +37,7 @@
             </div>
           </td>
         </tr>
+        <?php endif;?>
         <tr class='hide'>
           <th><?php echo $lang->story->status;?></th>
           <td><?php echo html::hidden('status', $story->status);?></td>
@@ -66,6 +68,7 @@
           <th><?php echo $lang->story->comment;?></th>
           <td><?php echo html::textarea('comment', '', 'rows=5 class="form-control"');?></td>
         </tr>
+        <?php if($story->type != 'taskPoint'):?>
         <tr>
           <th><?php echo $lang->attatch;?></th>
           <td>
@@ -77,13 +80,14 @@
           <th><?php echo $lang->story->checkAffection;?></th>
           <td><?php include './affected.html.php';?></td>
         </tr>
+        <?php endif;?>
         <tr>
           <td></td>
           <td class='text-center form-actions'>
             <?php
             echo html::hidden('lastEditedDate', $story->lastEditedDate);
             echo html::commonButton($lang->save, "id='saveButton'", 'btn btn-primary btn-wide');
-            echo html::commonButton($lang->story->doNotSubmit, "id='saveDraftButton'", 'btn btn-secondary btn-wide');
+            if($story->type != 'taskPoint')echo html::commonButton($lang->story->doNotSubmit, "id='saveDraftButton'", 'btn btn-secondary btn-wide');
             if(!isonlybody()) echo html::backButton();
             ?>
           </td>

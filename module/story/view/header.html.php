@@ -49,6 +49,18 @@ function loadProduct(productID)
     //         $('#parent').chosen();
     //     });
     // }
+
+    if(typeof(storyType) == 'string' && storyType == 'taskPoint')
+    {
+        var storyLink = createLink('story', 'ajaxGetParentStoryTaskPoint', 'productID=' + productID + '&labelName=parent');
+        $.get(storyLink, function(data)
+        {
+            $('#parent').replaceWith(data);
+            $('#parent' + "_chosen").remove();
+            $('#parent').next('.picker').remove();
+            $('#parent').chosen();
+        });
+    }
 }
 
 /**
