@@ -9,9 +9,6 @@ build-job:       # This job runs in the build stage, which runs first.
   only:
     - main
   script:
-    - mv www/_install.php www/install.php
-    - mv www/_upgrade.php www/upgrade.php
-    - mkdir tmp/
     - docker build --tag zentaopms:$(date "+%Y-%m-%d") .
 
 deploy:    

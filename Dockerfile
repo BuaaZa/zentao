@@ -9,6 +9,7 @@ RUN docker-php-ext-install pdo pdo_mysql
 ADD --chown=${USER}:${GROUP} . ${APACHE_DOCUMENT_ROOT}/zentaopms
 
 RUN set -x ; \
+    mkdir zentaopms/tmp/ ; \
     chmod -R 777 ${APACHE_DOCUMENT_ROOT}/zentaopms/www/data ; \
     chmod -R 777 ${APACHE_DOCUMENT_ROOT}/zentaopms/tmp ;
 
