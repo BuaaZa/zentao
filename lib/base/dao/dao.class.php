@@ -60,7 +60,7 @@ class baseDAO
      * @var object
      * @access public
      */
-    public object $dbh;
+    public object|null $dbh;
 
     /**
      * 全局对象$slaveDBH。
