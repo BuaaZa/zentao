@@ -16,7 +16,9 @@
 <?php js::set('blockID', $blockID); ?>
 <?php js::set('feedbackSource', $config->story->feedbackSource); ?>
 <?php js::set('storyType', $type);?>
-<?php js::set('requiredFields', $config->story->create->requiredFields);?>
+<?php 
+  js::set('requiredFields', $config->story->create->requiredFields);
+?>
 <?php
 foreach(explode(',', $config->story->create->requiredFields) as $field)
 {
@@ -30,7 +32,7 @@ foreach(explode(',', $config->story->create->requiredFields) as $field)
 <div id="mainContent" class="main-content">
   <div class="center-block">
     <div class="main-header">
-      <h2><?php echo $lang->story->create;?></h2>
+      <h2><?php echo ($type=='taskPoint')?$lang->story->createTaskPoint:$lang->story->create;?></h2>
       <?php if(!$this->story->checkForceReview()):?>
       <div class="needNotReviewBox">
         <div class='checkbox-primary'>
@@ -39,14 +41,17 @@ foreach(explode(',', $config->story->create->requiredFields) as $field)
         </div>
       </div>
       <?php endif;?>
+      <?php if($type != 'taskPoint'):?>
       <div class="pull-right btn-toolbar">
         <?php $customLink = $this->createLink('custom', 'ajaxSaveCustomFields', 'module=story&section=custom&key=createFields')?>
         <?php include '../../common/view/customfield.html.php';?>
       </div>
+      <?php endif;?>
     </div>
     <form class="load-indicator main-form form-ajax" method='post' enctype='multipart/form-data' id='dataform'>
       <table class="table table-form">
         <tbody>
+          <?php if($type != 'taskPoint'):?>
           <tr>
             <th><?php echo $lang->story->product;?></th>
             <td colspan="2">
@@ -75,7 +80,22 @@ foreach(explode(',', $config->story->create->requiredFields) as $field)
               </div>
             </td>
           </tr>
+          <?php else:?>
+          <tr>
+            <th><?php echo $lang->story->product;?></th>
+            <td colspan="4">
+              <div class='input-group'>
+              <?php
+                $products[""] = "";
+                echo html::select('product', $products, $productID, "onchange=\"loadProduct(this.value);\" class='form-control chosen control-product' required");?>
+              <span class='input-group-addon fix-border fix-padding'></span>
+              <?php if($branches) echo html::select('branch', $branches, $branch, "onchange='loadBranch();' class='form-control chosen control-branch'");?>
+              </div>
+            </td>
+          </tr>
+          <?php endif;?>
           <?php $hiddenSource = strpos(",$showFields,", ',source,') !== false ? '' : 'hidden';?>
+          <?php if($type != 'taskPoint'):?>
           <?php if($type == 'story'):?>
           <tr>
             <th class='planTh'><?php echo $lang->story->planAB;?></th>
@@ -154,7 +174,11 @@ foreach(explode(',', $config->story->create->requiredFields) as $field)
               </div>
             </td>
           </tr>
-          <?php if($type == 'story'):?>
+          <?php endif;?>
+          <?php
+          include "../../common/ChromePhp.php";
+          ChromePhp::log($type); 
+          if($type == 'story' or $type == 'taskPoint'):?>
           <?php if($this->config->URAndSR):?>
           <tr>
             <th><?php echo $lang->story->requirement;?></th>
@@ -164,8 +188,12 @@ foreach(explode(',', $config->story->create->requiredFields) as $field)
                 <div class="input-group-addon"><?php echo $lang->story->parent;?></div>
                   <div id='parent_select1'>
                     <?php
-                      $stories = array(); 
-                      echo html::select('parent', $stories, '', "class='form-control chosen'");?>
+                      if($type == 'taskPoint'){ 
+                        echo html::select('parent', $stories, $storyID, "class='form-control chosen' required");
+                      }else{
+                        $stories = array(); 
+                        echo html::select('parent', $stories, '', "class='form-control chosen'");
+                      }?>
                   </div>
               </div>
             </td>
@@ -176,8 +204,12 @@ foreach(explode(',', $config->story->create->requiredFields) as $field)
             <td colspan="4">
               <div id='parent_select2'>
                 <?php
-                  $stories = array(); 
-                  echo html::select('parent', $stories, '', "class='form-control chosen'");?>
+                  if($type == 'taskPoint'){ 
+                    echo html::select('parent', $stories, $storyID, "class='form-control chosen' required");
+                  }else{
+                    $stories = array(); 
+                    echo html::select('parent', $stories, '', "class='form-control chosen'");
+                  }?>
               </div>
             </td>
           </tr>
@@ -196,7 +228,14 @@ foreach(explode(',', $config->story->create->requiredFields) as $field)
           </tr>
           <?php endif;?>
           <tr>
-            <th><?php echo $lang->story->title;?></th>
+            <th><?php
+              if($type == 'taskPoint'){
+                echo $lang->story->taskPointTitle;
+              }
+              else{
+                echo $lang->story->title;
+              }
+            ?></th>
             <td colspan="4">
               <div class='table-row'>
                 <div class='table-col input-size'>
@@ -211,6 +250,7 @@ foreach(explode(',', $config->story->create->requiredFields) as $field)
                     </div>
                   </div>
                 </div>
+                <?php if($type != 'taskPoint'):?>
                 <?php $hiddenPri = strpos(",$showFields,", ',pri,') !== false ? '' : 'hidden';?>
                 <div class="table-col categoryBox">
                   <div class="input-group">
@@ -261,6 +301,7 @@ foreach(explode(',', $config->story->create->requiredFields) as $field)
                     <input type="text" name="estimate" id="estimate" value="<?php echo $estimate;?>" class="form-control" autocomplete="off" placeholder='<?php echo $lang->story->hour;?>' />
                   </div>
                 </div>
+                <?php endif;?>
               </div>
             </td>
           </tr>
@@ -277,6 +318,7 @@ foreach(explode(',', $config->story->create->requiredFields) as $field)
             <td colspan="4"><?php echo html::textarea('verify', $verify, "rows='6' class='form-control kindeditor' hidefocus='true'");?></td>
           </tr>
           <?php $this->printExtendFields('', 'table', 'columns=4');?>
+          <?php if($type != 'taskPoint'):?>
           <tr>
             <th><?php echo $lang->story->legendAttatch;?></th>
             <td colspan='4'><?php echo $this->fetch('file', 'buildform');?></td>
@@ -298,13 +340,13 @@ foreach(explode(',', $config->story->create->requiredFields) as $field)
               <?php echo html::input('keywords', $keywords, 'class="form-control"');?>
             </td>
           </tr>
+          <?php endif;?>
         </tbody>
         <tfoot>
           <tr>
             <td colspan="5" class="text-center form-actions">
               <?php echo html::hidden('type', $type);?>
               <?php echo html::commonButton($lang->save, "id='saveButton'", 'btn btn-primary btn-wide');?>
-              <?php echo html::commonButton($lang->story->saveDraft, "id='saveDraftButton'", 'btn btn-secondary btn-wide');?>
               <?php echo $gobackLink ? html::a($gobackLink, $lang->goback, '', 'class="btn btn-wide"') : html::backButton('', $source == 'bug' ? 'data-app=qa' : '');?>
             </td>
           </tr>
