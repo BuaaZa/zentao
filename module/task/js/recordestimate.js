@@ -32,6 +32,17 @@ $(function()
     {
         if(confirmed) return true;
 
+        var myMessager =  new $.zui.Messager('正在同步到WBS平台... ', {
+            type: 'info',
+            close: true,
+            icon: 'info-sign',
+            time: 0 // 不进行自动隐藏
+        });
+        myMessager.show();
+
+        // 修改样式
+        $('.messagger-zt').removeClass('messagger-zt');
+
         var $this = $(this);
         $('#recordForm .left').each(function()
         {
@@ -73,5 +84,20 @@ $(function()
     $('#recordForm .date-group .input-group-addon').on('click', function()
     {
         $(this).prev().datetimepicker('show');
+    });
+
+    $("a[id='sync2wbs']").click(function(){
+
+        var myMessager =  new $.zui.Messager('正在同步到WBS平台... ', {
+            type: 'info',
+            close: true,
+            icon: 'info-sign',
+            time: 0 // 不进行自动隐藏
+        });
+        myMessager.show();
+
+        // 修改样式
+        $('.messagger-zt').removeClass('messagger-zt');
+
     });
 })
