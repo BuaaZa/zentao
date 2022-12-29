@@ -765,7 +765,7 @@ class commonModel extends model
         self::printClientLink();
 
         #echo '<li>' . html::a(helper::createLink('misc', 'about'), "<i class='icon icon-about'></i> " . $lang->aboutZenTao, '', "class='about iframe' data-width='1050' data-headerless='true' data-backdrop='true' data-keyboard='true' data-class='modal-about'") . '</li>';
-        echo '<li>' . $lang->designedByAIUX . '</li>';
+        #echo '<li>' . $lang->designedByAIUX . '</li>';
     }
 
     /**
