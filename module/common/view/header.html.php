@@ -15,7 +15,7 @@ include 'chosen.html.php';
         <?php common::printHomeButton($app->tab);?>
         <?php echo isset($lang->switcherMenu) ? $lang->switcherMenu : '';?>
       </div>
-      <nav id='navbar'><?php $activeMenu = commonModel::printMainMenu();?></nav>
+      <nav id='navbar'><?php $activeMenu = commonModel::printMainMenu();#修改顶部导航栏?></nav>
       <div id='headerActions'><?php if(isset($lang->headerActions)) echo $lang->headerActions;?></div>
       <div id='toolbar'>
         <div id='userMenu'>

@@ -2615,7 +2615,6 @@ class bug extends control
                 }
                 else
                 {
-                    error_log("there");
                     return print(js::closeModal('parent.parent'));
                 }
             }
@@ -2740,7 +2739,6 @@ class bug extends control
                 }
                 else
                 {
-                    error_log("here");
                     return print(js::closeModal('parent.parent'));
                 }
             }
