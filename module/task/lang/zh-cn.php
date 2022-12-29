@@ -9,6 +9,11 @@
  * @version     $Id: zh-cn.php 5040 2013-07-06 06:22:18Z zhujinyonging@gmail.com $
  * @link        http://www.zentao.net
  */
+$lang->task->sync2WbsStatus      = '状态';
+$lang->task->syncEstimate        = '同步工时信息';
+$lang->task->sync2WbsSuccess     = '同步成功';
+$lang->task->sync2WbsFail        = '同步失败';
+
 $lang->task->index               = "任务一览";
 $lang->task->create              = "建任务";
 $lang->task->batchCreate         = "批量创建";
