@@ -90,7 +90,7 @@ if (!empty($members) && $task->mode == 'linear') {
                                 $canOperateEffort = $this->task->canOperateEffort($task, $effort);
                                 common::printIcon('task', 'editEstimate', "effortID=$effort->id", '', 'list', 'edit', '', 'showinonlybody', true, $canOperateEffort ? '' : 'disabled');
                                 common::printIcon('task', 'deleteEstimate', "effortID=$effort->id", '', 'list', 'trash', 'hiddenwin', 'showinonlybody', false, $canOperateEffort ? '' : 'disabled');
-                                common::printIcon('task', 'syncEstimate', "effortID=$effort->id", '', 'list', 'refresh', 'hiddenwin', 'showinonlybody', false, $canOperateEffort ? '' : 'disabled');
+                                common::printIcon('task', 'syncEstimate', "effortID=$effort->id", '', 'list', 'refresh', 'hiddenwin', 'showinonlybody', false, ($canOperateEffort ? '' : 'disabled').' id=sync2wbs');
                                 ?>
                             </td>
                         </tr>
