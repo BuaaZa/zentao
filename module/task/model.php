@@ -3690,7 +3690,7 @@ class taskModel extends model
 
         $responseObject = $this->taskFeedback($feedbackData);
 
-        if($responseObject->httpcode == 200 && $responseObject->msg == '操作成功'){
+        if($responseObject->httpCode == 200 && $responseObject->msg == '操作成功'){
             $this->dao->update(TABLE_EFFORT)
                 ->set('syncStatus')->eq('1')
                 ->where('id')->eq($effort_id)

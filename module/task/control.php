@@ -1303,7 +1303,7 @@ class task extends control
 
         // 导入自定义js,显示提示信息
         js::import('/zentaopms/module/task/js/syncmessage.js');
-        if($responseObject->httpcode == 200 && $responseObject->msg == '操作成功'){
+        if($responseObject->httpCode == 200 && $responseObject->msg == '操作成功'){
             $this->dao->update(TABLE_EFFORT)
                 ->set('syncStatus')->eq('1')
                 ->where('id')->eq($estimateID)
