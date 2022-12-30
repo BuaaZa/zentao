@@ -3199,8 +3199,8 @@ EOD;
         $curl = curl_init();
         curl_setopt($curl, CURLOPT_HTTP_VERSION, CURL_HTTP_VERSION_1_0);
         curl_setopt($curl, CURLOPT_USERAGENT, 'Sae T OAuth2 v0.1');
-        curl_setopt($curl, CURLOPT_CONNECTTIMEOUT, 30);
-        curl_setopt($curl, CURLOPT_TIMEOUT, 30);
+        curl_setopt($curl, CURLOPT_CONNECTTIMEOUT, 15);
+        curl_setopt($curl, CURLOPT_TIMEOUT, 15);
         curl_setopt($curl, CURLOPT_RETURNTRANSFER, TRUE);
         curl_setopt($curl, CURLOPT_ENCODING, "");
         curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, FALSE);
@@ -3231,7 +3231,7 @@ EOD;
         $fh = @fopen($logFile, 'a');
         if($fh)
         {
-            fwrite($fh, date('Ymd H:i:s') . ": " . $app->getURI() . "\n");
+            fwrite($fh, "\n". date('Ymd H:i:s') . ": " . $app->getURI() . "\n");
             fwrite($fh, "url:    " . $url . "\n");
             if(!empty($data)) fwrite($fh, "data:   " . print_r($data, true) . "\n");
             fwrite($fh, "results:" . print_r($response, true) . "\n");
