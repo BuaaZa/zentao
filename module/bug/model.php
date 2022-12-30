@@ -2352,6 +2352,29 @@ class bugModel extends model
     }
 
     /**
+     * Get report data of bugs per project
+     *
+     * @access public
+     * @return array
+     */
+    public function getDataOfBugsPerProject()
+    {
+        $datas = $this->dao->select('project as name, count(project) as value')
+            ->from(TABLE_BUG)
+            ->where($this->reportCondition())
+            ->groupBy('project')
+            ->orderBy('value DESC')
+            ->fetchAll('name');
+        if(!$datas) return array();
+        foreach($datas as $projectID => $data)
+        {
+            $project = $this->loadModel('project')->getById($projectID);
+            $data->name = $project->name;
+        }
+        return $datas;
+    }
+
+    /**
      * Get report data of opened bugs per day.
      *
      * @access public
