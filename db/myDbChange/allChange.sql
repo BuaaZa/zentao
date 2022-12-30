@@ -4,3 +4,6 @@
 #   source ${yourPath}/allChange.sql
 source actionChange.sql;
 source effortChange.sql;
+source zt_testcase_io.sql;
+source zt_data_sample.sql;
+source casestepChange.sql;
