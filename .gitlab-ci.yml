@@ -37,10 +37,27 @@ deploy:
     when: on_success
     expire_in: 1 days
     paths:
-      - ../${CI_PROJECT_NAME}
+      - ${PROJECT_FULLPATH}/${CI_PROJECT_NAME}
     exclude:
       - .gitignore
       - .gitlab-ci.yml
+      - README.md
+      - .dockerignore
+      - docker-compose.yml
+      - Dockerfile
       - .git/**/*
       - .git
+      - .idea/**/*
+      - .idea
+      - .vscode/**/*
+      - .vscode
+      - config/my.php
+      - www/data/upload/**/*
+      - tmp/backup/**/*
+      - tmp/backup
+      - tmp/log/**/*
+      - tmp/log
+      - tmp/session/**/*
+      - tmp/session
+
 
