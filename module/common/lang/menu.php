@@ -383,7 +383,7 @@ $lang->qa->menu->testsuite  = array('link' => "{$lang->testcase->testsuite}|test
 $lang->qa->menu->testtask   = array('link' => "{$lang->testtask->common}|testtask|browse|productID=%s", 'subModule' => 'testtask', 'alias' => 'view,edit,linkcase,cases,start,close,batchrun,groupcase,report,importunitresult');
 $lang->qa->menu->report     = array('link' => "{$lang->testreport->common}|testreport|browse|productID=%s", 'subModule' => 'testreport');
 $lang->qa->menu->caselib    = array('link' => "{$lang->testcase->caselib}|caselib|browse|libID=0", 'subModule' => 'caselib');
-$lang->qa->menu->automation = array('link' => "{$lang->automation->common}|automation|browse|productID=%s", 'subModule' => 'automation', 'alias' => '');
+#$lang->qa->menu->automation = array('link' => "{$lang->automation->common}|automation|browse|productID=%s", 'subModule' => 'automation', 'alias' => '');
 
 /* QA menu order. */
 $lang->qa->menuOrder[5]  = 'product';
@@ -502,8 +502,8 @@ $lang->admin->menu->index     = array('link' => "$lang->indexPage|admin|index", 
 $lang->admin->menu->company   = array('link' => "{$lang->personnel->common}|company|browse|", 'subModule' => ',user,dept,group,');
 $lang->admin->menu->model     = array('link' => "$lang->model|custom|browsestoryconcept|", 'class' => 'dropdown dropdown-hover', 'exclude' => 'custom-index,custom-set,custom-product,custom-execution,custom-kanban,custom-required,custom-flow,custom-score,custom-feedback,custom-timezone,custom-mode');
 $lang->admin->menu->custom    = array('link' => "{$lang->custom->common}|custom|index", 'exclude' => 'custom-browsestoryconcept,custom-timezone,custom-estimate,custom-code');
-$lang->admin->menu->extension = array('link' => "{$lang->extension->common}|extension|browse", 'subModule' => 'extension');
-$lang->admin->menu->dev       = array('link' => "$lang->redev|dev|api", 'alias' => 'db', 'subModule' => 'dev,editor,entry');
+#$lang->admin->menu->extension = array('link' => "{$lang->extension->common}|extension|browse", 'subModule' => 'extension');
+#$lang->admin->menu->dev       = array('link' => "$lang->redev|dev|api", 'alias' => 'db', 'subModule' => 'dev,editor,entry');
 $lang->admin->menu->message   = array('link' => "{$lang->message->common}|message|index", 'subModule' => 'message,mail,webhook');
 $lang->admin->menu->system    = array('link' => "{$lang->admin->system}|backup|index", 'subModule' => 'cron,backup,action,admin,search,convert', 'exclude' => 'admin-index,admin-xuanxuan,admin-register,admin-ztcompany');
 
