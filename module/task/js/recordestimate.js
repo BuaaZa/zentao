@@ -36,7 +36,7 @@ $(function()
             type: 'info',
             close: true,
             icon: 'info-sign',
-            time: 0 // 不进行自动隐藏
+            time: 1000 // 不进行自动隐藏
         });
         myMessager.show();
 
@@ -92,7 +92,7 @@ $(function()
             type: 'info',
             close: true,
             icon: 'info-sign',
-            time: 0 // 不进行自动隐藏
+            time: 1000 // 不进行自动隐藏
         });
         myMessager.show();
 

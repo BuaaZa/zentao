@@ -3690,7 +3690,7 @@ class taskModel extends model
 
         $responseObject = $this->taskFeedback($feedbackData);
 
-        if($responseObject->isSuccess == '1'){
+        if($responseObject->httpcode == 200 && $responseObject->msg == '操作成功'){
             $this->dao->update(TABLE_EFFORT)
                 ->set('syncStatus')->eq('1')
                 ->where('id')->eq($effort_id)
@@ -3709,7 +3709,7 @@ class taskModel extends model
      */
     public function taskFeedback($data)
     {
-        $url = 'http://192.168.233.52:6102/task/taskFeedback';
+        $url = $this->config->task->sync2wbsApi;
         $response = common::http($url,$data,array(), array(), 'json');
         return json_decode($response);
     }
