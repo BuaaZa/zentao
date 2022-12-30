@@ -1,3 +1,17 @@
+stages:          # List of stages for jobs, and their order of execution
+  - build
+  - deploy
+
+build-job:       # This job runs in the build stage, which runs first.
+  stage: build
+  tags:
+    - zentao
+  only:
+    - main
+  script:
+    - docker build --tag zentaopms:$(date "+%Y-%m-%d") .
+    - docker tag zentaopms:$(date "+%Y-%m-%d") zentaopms:latest
+
 deploy:    
   stage: deploy  
   environment: production
@@ -29,4 +43,5 @@ deploy:
       - .gitlab-ci.yml
       - .git/**/*
       - .git
+
 

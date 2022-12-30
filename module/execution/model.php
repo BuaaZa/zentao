@@ -310,12 +310,12 @@ class executionModel extends model
     /**
      * Create a execution.
      *
-     * @param int $copyExecutionID
+     * @param int|string $copyExecutionID
      *
      * @access public
      * @return bool|int
      */
-    public function create($copyExecutionID = '')
+    public function create(int|string $copyExecutionID = '')
     {
         $type = 'sprint';
         $this->lang->execution->team = $this->lang->execution->teamname;
@@ -402,7 +402,7 @@ class executionModel extends model
         }
 
         $this->lang->error->unique = $this->lang->error->repeat;
-        $sprintProject = isset($sprint->project) ? $sprint->project : '0';
+        $sprintProject = $sprint->project ?? '0';
         $this->dao->insert(TABLE_EXECUTION)->data($sprint)
             ->autoCheck($skipFields = 'begin,end')
             ->batchcheck($this->config->execution->create->requiredFields, 'notempty')
@@ -433,7 +433,7 @@ class executionModel extends model
             $this->updateProducts($executionID);
 
             /* Set team of execution. */
-            $members = isset($_POST['teamMembers']) ? $_POST['teamMembers'] : array();
+            $members = $_POST['teamMembers'] ?? array();
             array_push($members, $sprint->PO, $sprint->QD, $sprint->PM, $sprint->RD, $sprint->openedBy);
             $members = array_unique($members);
             $roles   = $this->loadModel('user')->getUserRoles(array_values($members));

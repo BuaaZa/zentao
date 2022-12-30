@@ -1268,6 +1268,58 @@ class task extends control
     }
 
     /**
+     * Synchronize estimate information 同步工时信息.
+     *
+     * @param  int    $estimateID
+     * @access public
+     * @return void
+     */
+    public function syncEstimate($estimateID)
+    {
+        $estimate = $this->task->getEstimateById($estimateID);
+
+        //进度计算
+        $task = $this->dao->select()->from(TABLE_TASK)
+            ->where('id')->eq($estimate->objectID)
+            ->fetch();
+        if($task->left == 0)
+        {
+            $progress = 100;
+        }
+        else
+        {
+            $progress = round($task->consumed / ($task->consumed + $task->left) * 100);
+        }
+
+        $feedbackData = new stdclass();
+        $feedbackData->createUserCode =$this->app->user->account;
+        $feedbackData->createUserName =$this->app->user->realname;
+        $feedbackData->currentProgress =$progress;
+        $feedbackData->feedbackContent =$estimate->work;
+        $feedbackData->workHours=$estimate->consumed;
+        $feedbackData->zenTaoTaskId=strval($estimate->objectID);
+
+        $responseObject = $this->task->taskFeedback($feedbackData);
+
+        // 导入自定义js,显示提示信息
+        js::import('/zentaopms/module/task/js/syncmessage.js');
+        if($responseObject->httpCode == 200 && $responseObject->msg == '操作成功'){
+            $this->dao->update(TABLE_EFFORT)
+                ->set('syncStatus')->eq('1')
+                ->where('id')->eq($estimateID)
+                ->exec();
+
+            $js ="showSuccessMessage();";
+
+        }else{
+            $js ="showFailMessage();";
+        }
+
+        print(js::execute($js));
+
+    }
+
+    /**
      * Delete estimate.
      *
      * @param  int    $estimateID

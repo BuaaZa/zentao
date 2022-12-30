@@ -34,14 +34,26 @@ class storyModel extends model
         if(helper::isZeroDate($story->closedDate)) $story->closedDate = '';
         if($version == 0) $version = $story->version;
         $spec = $this->dao->select('title,spec,verify,files')->from(TABLE_STORYSPEC)->where('story')->eq($storyID)->andWhere('version')->eq($version)->fetch();
-        $story->title  = isset($spec->title)  ? $spec->title  : '';
+        $story->title  = isset($spec->title)  ? $spec->title  : $story->title;
         $story->spec   = isset($spec->spec)   ? $spec->spec   : '';
         $story->verify = isset($spec->verify) ? $spec->verify : '';
         $story->files  = isset($spec->files)  ? $this->file->getByIdList($spec->files) : '';
         if(!empty($story->fromStory)) $story->sourceName = $this->dao->select('title')->from(TABLE_STORY)->where('id')->eq($story->fromStory)->fetch('title');
 
         /* Check parent story. */
-        if($story->parent > 0) $story->parentName = $this->dao->findById($story->parent)->from(TABLE_STORY)->fetch('title');
+        if($story->parent > 0) {
+            $thisP = $this->dao->select('*')->from(TABLE_STORY)
+                ->where('id')->eq($story->parent)
+                ->fetch();
+            $story->parentName = $thisP->title;
+            if($thisP->parent>0){
+                $story->grandId = $thisP->parent;
+                $thisG = $this->dao->select('*')->from(TABLE_STORY)
+                    ->where('id')->eq($thisP->parent)
+                    ->fetch();
+                $story->grandName = $thisG->title;
+            }
+        }
 
         $story = $this->file->replaceImgURL($story, 'spec,verify');
         if($setImgSize) $story->spec   = $this->file->setImgSize($story->spec);
@@ -78,7 +90,15 @@ class storyModel extends model
         if($story->{$linkStoryField}) $story->linkStoryTitles = $this->dao->select('id,title')->from(TABLE_STORY)->where('id')->in($story->{$linkStoryField})->fetchPairs();
 
         $story->children = array();
-        if($story->parent == '-1') $story->children = $this->dao->select('*')->from(TABLE_STORY)->where('parent')->eq($storyID)->andWhere('deleted')->eq(0)->fetchAll('id');
+        $story->taskPoint = array();
+        if($story->parent == '-1') $story->children = $this->dao->select('*')->from(TABLE_STORY)->where('parent')->eq($storyID)->andWhere('deleted')->eq(0)->andWhere('type')->eq('story')->fetchAll('id');
+        $story->taskPoint = $this->dao->select('*')->from(TABLE_STORY)->where('parent')->eq($storyID)->andWhere('deleted')->eq(0)->andWhere('type')->eq('taskPoint')->fetchAll('id');
+        foreach($story->taskPoint as $tp){
+            $spec = $this->dao->select('title,spec,verify')->from(TABLE_STORYSPEC)->where('story')->eq($tp->id)->andWhere('version')->eq($tp->version)->fetch();
+            $tp->title  = isset($spec->title)  ? $spec->title  : $tp->title;
+            $tp->spec   = isset($spec->spec)   ? $spec->spec   : '';
+            $tp->verify = isset($spec->verify) ? $spec->verify : '';
+        }
 
         return $story;
     }
@@ -202,11 +222,13 @@ class storyModel extends model
         $extra = str_replace(array(',', ' '), array('&', ''), $extra);
         parse_str($extra, $output);
 
-        if(isset($_POST['reviewer'])) $_POST['reviewer'] = array_filter($_POST['reviewer']);
-        if(!$this->post->needNotReview and empty($_POST['reviewer']))
-        {
-            dao::$errors['reviewer'] = sprintf($this->lang->error->notempty, $this->lang->story->reviewedBy);
-            return false;
+        if($_POST['type'] != 'taskPoint'){
+            if(isset($_POST['reviewer'])) $_POST['reviewer'] = array_filter($_POST['reviewer']);
+            if(!$this->post->needNotReview and empty($_POST['reviewer']))
+            {
+                dao::$errors['reviewer'] = sprintf($this->lang->error->notempty, $this->lang->story->reviewedBy);
+                return false;
+            }
         }
 
         $now   = helper::now();
@@ -247,6 +269,11 @@ class storyModel extends model
         }
 
         $requiredFields = trim($requiredFields, ',');
+
+        if($_POST['type'] == 'taskPoint'){
+            $story->status = 'active';
+            $story->stage = 'projected';
+        }
 
         $this->dao->insert(TABLE_STORY)->data($story, 'spec,verify')
             ->autoCheck()
@@ -677,7 +704,7 @@ class storyModel extends model
         }
 
         if(isset($_POST['reviewer'])) $_POST['reviewer'] = array_filter($_POST['reviewer']);
-        if(!$this->post->needNotReview and empty($_POST['reviewer']))
+        if($oldStory->type != "taskPoint" and !$this->post->needNotReview and empty($_POST['reviewer']))
         {
             dao::$errors[] = $this->lang->story->errorEmptyReviewedBy;
             return false;
@@ -2763,6 +2790,102 @@ class storyModel extends model
         return $this->formatStories($stories, $type, $limit);
     }
 
+    public function getProductStoryPairsTestcase($productID = 0, $branch = 'all', $moduleIdList = 0, $status = 'all', $order = 'id_desc', $limit = 0, $type = 'full', $storyType = 'story', $hasParent = true)
+    {
+        $stories = $this->dao->select('t1.id, t1.title, t1.module, t1.pri, t1.estimate, t2.name AS product')
+            ->from(TABLE_STORY)->alias('t1')->leftJoin(TABLE_PRODUCT)->alias('t2')->on('t1.product = t2.id')
+            ->where('1=1')
+            ->beginIF($productID)->andWhere('t1.product')->in($productID)->fi()
+            ->beginIF($moduleIdList)->andWhere('t1.module')->in($moduleIdList)->fi()
+            ->beginIF($branch !== 'all')->andWhere('t1.branch')->in("0,$branch")->fi()
+            ->beginIF(!$hasParent)->andWhere('t1.parent')->ge(0)->fi()
+            ->beginIF($status and $status != 'all')->andWhere('t1.status')->in($status)->fi()
+            ->andWhere('t1.type')->eq($storyType)
+            ->andWhere('t1.deleted')->eq(0)
+            ->orderBy($order)
+            ->fetchAll();
+        if(!$stories) return array();
+        $taskpoint = $this->dao->select('*')->from(TABLE_STORY)
+            ->where('deleted')->eq(0)
+            ->andWhere('type')->eq('taskPoint')
+            ->andWhere('status')->notin('closed,draft')
+            ->orderBy('parent')
+            ->fetchAll();
+        $res = $this->formatStories($stories, $type, $limit);
+        $res2 = array();
+        foreach($res as $key => $value){
+            if(!empty($value))
+                $res2[$key] = $this->lang->story->requirementfix.$value;
+            else
+                $res2[$key] = $value;
+        }
+        foreach($taskpoint as $key => $value){
+            if(!empty($value)){
+                if(isset($res2[$value->parent])){
+                    $str = $this->lang->story->taskPoint.$value->id.":";
+                    if($value->parent>0){
+                        $fstory = $this->getById($value->parent);
+                        if(isset($fstory->parentName))
+                            $str .= $fstory->parentName."/";
+                        $str .= $fstory->title."-".$value->title;
+                        $res2[$value->id] = $str;
+                    }
+                }
+            }
+        }
+        return $res2;
+    }
+
+    public function getExecutionStoryPairsTestcase($executionID = 0, $productID = 0, $branch = 'all', $moduleIdList = 0, $type = 'full', $status = 'all')
+    {
+        if(defined('TUTORIAL')) return $this->loadModel('tutorial')->getExecutionStoryPairs();
+        $stories = $this->dao->select('t2.id, t2.title, t2.module, t2.pri, t2.estimate, t3.name AS product')
+            ->from(TABLE_PROJECTSTORY)->alias('t1')
+            ->leftJoin(TABLE_STORY)->alias('t2')->on('t1.story = t2.id')
+            ->leftJoin(TABLE_PRODUCT)->alias('t3')->on('t1.product = t3.id')
+            ->where('t1.project')->eq((int)$executionID)
+            ->andWhere('t2.deleted')->eq(0)
+            ->beginIF($productID)->andWhere('t2.product')->eq((int)$productID)->fi()
+            ->beginIF($branch !== 'all')->andWhere('t2.branch')->in("0,$branch")->fi()
+            ->beginIF($moduleIdList)->andWhere('t2.module')->in($moduleIdList)->fi()
+            ->beginIF($status == 'unclosed')->andWhere('t2.status')->ne('closed')->fi()
+            ->beginIF($status == 'review')->andWhere('t2.status')->in('draft,changing')->fi()
+            ->beginIF($status == 'active')->andWhere('t2.status')->eq('active')->fi()
+            ->orderBy('t1.`order` desc, t1.`story` desc')
+            ->fetchAll('id');
+        if(!$stories) return array();
+        #include "../common/ChromePhp.php";
+        $taskpoint = $this->dao->select('*')->from(TABLE_STORY)
+            ->where('deleted')->eq(0)
+            ->andWhere('type')->eq('taskPoint')
+            ->andWhere('status')->notin('closed,draft')
+            ->orderBy('parent')
+            ->fetchAll();
+        $res = $this->formatStories($stories, $type, $limit);
+        $res2 = array();
+        foreach($res as $key => $value){
+            if(!empty($value))
+                $res2[$key] = $this->lang->story->requirementfix.$value;
+            else
+                $res2[$key] = $value;
+        }
+        foreach($taskpoint as $key => $value){
+            if(!empty($value)){
+                if(isset($res2[$value->parent])){
+                    $str = $this->lang->story->taskPoint.$value->id.":";
+                    if($value->parent>0){
+                        $fstory = $this->getById($value->parent);
+                        if(isset($fstory->parentName))
+                            $str .= $fstory->parentName."/";
+                        $str .= $fstory->title."-".$value->title;
+                        $res2[$value->id] = $str;
+                    }
+                }
+            }
+        }
+        return $res2;
+    }
+
     /**
      * Get stories by assignedTo.
      *
@@ -3431,6 +3554,16 @@ class storyModel extends model
             ->fetchAll();
     }
 
+    public function getStoryProduct()
+    {
+        $products = $this->dao->select('DISTINCT product')->from(TABLE_STORY)
+            ->where('deleted')->eq(0)
+            ->andWhere('type')->eq('story')
+            ->andWhere('status')->notin('closed,draft')
+            ->fetchPairs('product', 'product');
+        return $products;
+    }
+
     /**
      * Get stories by plan id list.
      *
@@ -3468,6 +3601,18 @@ class storyModel extends model
             ->beginIF($append)->orWhere('id')->in($append)->fi()
             ->fetchPairs();
         return array(0 => '') + $stories ;
+    }
+
+    public function getParentStoryPairsTaskPoint($productID, $append = '')
+    {
+        $stories = $this->dao->select('id, title')->from(TABLE_STORY)
+            ->where('deleted')->eq(0)
+            ->andWhere('type')->eq('story')
+            ->andWhere('status')->notin('closed,draft')
+            ->andWhere('product')->eq($productID)
+            ->beginIF($append)->orWhere('id')->in($append)->fi()
+            ->fetchPairs();
+        return $stories ;
     }
 
     /**

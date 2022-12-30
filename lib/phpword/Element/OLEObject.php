@@ -82,7 +82,7 @@ class OLEObject extends AbstractElement
             $this->source = $source;
             $this->style = $this->setNewStyle(new ImageStyle(), $style, true);
             $this->icon = realpath(__DIR__ . "/../resources/{$ext}.png");
-
+            #error_log($this->icon);
             return;
         }
 

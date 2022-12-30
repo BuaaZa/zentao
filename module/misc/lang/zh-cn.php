@@ -17,23 +17,23 @@ $lang->misc->cancel  = '取消';
 
 $lang->misc->zentao = new stdclass();
 $lang->misc->zentao->version           = '版本%s';
-$lang->misc->zentao->labels['about']   = '关于禅道';
+#$lang->misc->zentao->labels['about']   = '关于禅道';
 $lang->misc->zentao->labels['support'] = '技术支持';
 $lang->misc->zentao->labels['cowin']   = '帮助我们';
-$lang->misc->zentao->labels['service'] = '服务列表';
+#$lang->misc->zentao->labels['service'] = '服务列表';
 $lang->misc->zentao->labels['others']  = '其他产品';
 
-$lang->misc->zentao->icons['about']   = 'group';
+#$lang->misc->zentao->icons['about']   = 'group';
 $lang->misc->zentao->icons['support'] = 'question-sign';
 $lang->misc->zentao->icons['cowin']   = 'hand-right';
-$lang->misc->zentao->icons['service'] = 'heart';
+#$lang->misc->zentao->icons['service'] = 'heart';
 
-$lang->misc->zentao->about['bizversion']   = '升级企业版本';
+/*$lang->misc->zentao->about['bizversion']   = '升级企业版本';
 $lang->misc->zentao->about['official']     = "官方网站";
 $lang->misc->zentao->about['changelog']    = "版本历史";
 $lang->misc->zentao->about['license']      = "授权协议";
 $lang->misc->zentao->about['extension']    = "插件平台";
-$lang->misc->zentao->about['follow']       = "关注我们";
+$lang->misc->zentao->about['follow']       = "关注我们";*/
 
 $lang->misc->zentao->support['vip']        = "商业技术支持";
 $lang->misc->zentao->support['manual']     = "用户手册";
@@ -46,9 +46,9 @@ $lang->misc->zentao->cowin['reportbug']    = "汇报Bug";
 $lang->misc->zentao->cowin['feedback']     = "反馈需求";
 $lang->misc->zentao->cowin['recommend']    = "推荐给朋友";
 
-$lang->misc->zentao->service['zentaotrain'] = '禅道使用培训';
+/*$lang->misc->zentao->service['zentaotrain'] = '禅道使用培训';
 $lang->misc->zentao->service['idc']         = '禅道在线托管';
-$lang->misc->zentao->service['custom']      = '禅道定制开发';
+$lang->misc->zentao->service['custom']      = '禅道定制开发';*/
 
 global $config;
 $lang->misc->zentao->others['chanzhi']  = "<img src='{$config->webRoot}theme/default/images/main/chanzhi.ico' /> 蝉知门户";

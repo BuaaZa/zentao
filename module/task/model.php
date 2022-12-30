@@ -3664,7 +3664,54 @@ class taskModel extends model
         $effort->order      = isset($data->order) ? $data->order : 0;
         $this->dao->insert(TABLE_EFFORT)->data($effort)->autoCheck()->exec();
 
-        return $this->dao->lastInsertID();
+        $effort_id = $this->dao->lastInsertID();
+
+        //进度计算
+        $progress = 0;
+        $oldConsumed = $this->dao->select('consumed')->from(TABLE_TASK)
+            ->where('id')->eq($data->task)
+            ->fetch('consumed');
+        if($data->left == 0)
+        {
+            $progress = 100;
+        }
+        else
+        {
+            $progress = round(($oldConsumed + $data->consumed) / ($oldConsumed + $data->consumed + $data->left) * 100);
+        }
+
+        $feedbackData = new stdclass();
+        $feedbackData->createUserCode =$data->account;
+        $feedbackData->createUserName =$this->app->user->realname;
+        $feedbackData->currentProgress =$progress;
+        $feedbackData->feedbackContent =$data->work;
+        $feedbackData->workHours=intval($data->consumed);
+        $feedbackData->zenTaoTaskId=$data->task;
+
+        $responseObject = $this->taskFeedback($feedbackData);
+
+        if($responseObject->httpCode == 200 && $responseObject->msg == '操作成功'){
+            $this->dao->update(TABLE_EFFORT)
+                ->set('syncStatus')->eq('1')
+                ->where('id')->eq($effort_id)
+                ->exec();
+        }
+
+        return $effort_id;
+    }
+
+    /**
+     * Return task feedback to WBS.
+     *
+     * @param  object    $data
+     * @access public
+     * @return object
+     */
+    public function taskFeedback($data)
+    {
+        $url = $this->config->task->sync2wbsApi;
+        $response = common::http($url,$data,array(), array(), 'json');
+        return json_decode($response);
     }
 
     /**

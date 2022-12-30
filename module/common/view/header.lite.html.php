@@ -18,7 +18,8 @@ $commonLang   = array('zh-cn', 'zh-tw', 'en', 'fr', 'de');
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="renderer" content="webkit">
   <?php
-  echo html::title($title . ' - ' . $lang->zentaoPMS);
+  #echo html::title($title . ' - ' . $lang->zentaoPMS);
+  echo html::title($title);
   js::exportConfigVars();
   if($config->debug)
   {
@@ -57,7 +58,7 @@ $commonLang   = array('zh-cn', 'zh-tw', 'en', 'fr', 'de');
 
   if(isset($pageCSS)) css::internal($pageCSS);
 
-  echo html::favicon($webRoot . 'favicon.ico');
+  echo html::favicon($webRoot . $lang->logoFavicon);
   ?>
 <!--[if lt IE 10]>
 <?php js::import($jsRoot . 'jquery/placeholder/min.js'); ?>

@@ -15,14 +15,13 @@ include 'chosen.html.php';
         <?php common::printHomeButton($app->tab);?>
         <?php echo isset($lang->switcherMenu) ? $lang->switcherMenu : '';?>
       </div>
-      <nav id='navbar'><?php $activeMenu = commonModel::printMainMenu();?></nav>
+      <nav id='navbar'><?php $activeMenu = commonModel::printMainMenu();#修改顶部导航栏?></nav>
       <div id='headerActions'><?php if(isset($lang->headerActions)) echo $lang->headerActions;?></div>
       <div id='toolbar'>
         <div id='userMenu'>
           <ul id="userNav" class="nav nav-default">
             <li class='dropdown dropdown-hover' id='globalCreate'><?php common::printCreateList();?></li>
             <li class='dropdown dropdown-hover has-avatar'><?php common::printUserBar();?></li>
-            <li class='dropdown dropdown-hover' id='visionSwitcher'><?php common::printVisionSwitcher();?></li>
           </ul>
         </div>
       </div>

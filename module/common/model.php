@@ -752,20 +752,20 @@ class commonModel extends model
     public static function printAboutBar()
     {
         global $app, $config, $lang;
-        echo "<li class='dropdown-submenu'>";
-        echo "<a data-toggle='dropdown'>" . "<i class='icon icon-help'></i> " . $lang->help . "</a>";
-        echo "<ul class='dropdown-menu pull-left'>";
+        #echo "<li class='dropdown-submenu'>";
+        #echo "<a data-toggle='dropdown'>" . "<i class='icon icon-help'></i> " . $lang->help . "</a>";
+        #echo "<ul class='dropdown-menu pull-left'>";
 
         $manualUrl = ((!empty($config->isINT)) ? $config->manualUrl['int'] : $config->manualUrl['home']) . '&theme=' . $_COOKIE['theme'];
-        echo '<li>' . html::a($manualUrl, $lang->manual, '', "class='show-in-app' id='helpLink' data-app='help'") . '</li>';
+        #echo '<li>' . html::a($manualUrl, $lang->manual, '', "class='show-in-app' id='helpLink' data-app='help'") . '</li>';
 
-        echo '<li>' . html::a(helper::createLink('misc', 'changeLog'), $lang->changeLog, '', "class='iframe' data-width='800' data-headerless='true' data-backdrop='true' data-keyboard='true'") . '</li>';
-        echo "</ul></li>\n";
+        #echo '<li>' . html::a(helper::createLink('misc', 'changeLog'), $lang->changeLog, '', "class='iframe' data-width='800' data-headerless='true' data-backdrop='true' data-keyboard='true'") . '</li>';
+        #echo "</ul></li>\n";
 
         self::printClientLink();
 
-        echo '<li>' . html::a(helper::createLink('misc', 'about'), "<i class='icon icon-about'></i> " . $lang->aboutZenTao, '', "class='about iframe' data-width='1050' data-headerless='true' data-backdrop='true' data-keyboard='true' data-class='modal-about'") . '</li>';
-        echo '<li>' . $lang->designedByAIUX . '</li>';
+        #echo '<li>' . html::a(helper::createLink('misc', 'about'), "<i class='icon icon-about'></i> " . $lang->aboutZenTao, '', "class='about iframe' data-width='1050' data-headerless='true' data-backdrop='true' data-keyboard='true' data-class='modal-about'") . '</li>';
+        #echo '<li>' . $lang->designedByAIUX . '</li>';
     }
 
     /**
@@ -3199,8 +3199,8 @@ EOD;
         $curl = curl_init();
         curl_setopt($curl, CURLOPT_HTTP_VERSION, CURL_HTTP_VERSION_1_0);
         curl_setopt($curl, CURLOPT_USERAGENT, 'Sae T OAuth2 v0.1');
-        curl_setopt($curl, CURLOPT_CONNECTTIMEOUT, 30);
-        curl_setopt($curl, CURLOPT_TIMEOUT, 30);
+        curl_setopt($curl, CURLOPT_CONNECTTIMEOUT, 15);
+        curl_setopt($curl, CURLOPT_TIMEOUT, 15);
         curl_setopt($curl, CURLOPT_RETURNTRANSFER, TRUE);
         curl_setopt($curl, CURLOPT_ENCODING, "");
         curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, FALSE);
@@ -3231,7 +3231,7 @@ EOD;
         $fh = @fopen($logFile, 'a');
         if($fh)
         {
-            fwrite($fh, date('Ymd H:i:s') . ": " . $app->getURI() . "\n");
+            fwrite($fh, "\n". date('Ymd H:i:s') . ": " . $app->getURI() . "\n");
             fwrite($fh, "url:    " . $url . "\n");
             if(!empty($data)) fwrite($fh, "data:   " . print_r($data, true) . "\n");
             fwrite($fh, "results:" . print_r($response, true) . "\n");
