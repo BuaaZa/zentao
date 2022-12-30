@@ -1557,7 +1557,6 @@ class execution extends control
                            int|string $productID = 0,
                            string $extra = '')
     {
-        ChromePhp::log(__LINE__, $extra);
         if($this->app->tab == 'doc') unset($this->lang->doc->menu->execution['subMenu']);
 
         $project = $this->project->getByID($projectID);
