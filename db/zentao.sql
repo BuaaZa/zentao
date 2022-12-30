@@ -14271,3 +14271,8 @@ END;
 
 alter table zt_action
     add ip char(15) default '' not null after actor;
+
+
+alter table `zt_effort`
+    add `syncStatus` enum ('0', '1') default '0' not null after `work`;
+

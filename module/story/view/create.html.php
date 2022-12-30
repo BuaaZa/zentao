@@ -176,8 +176,6 @@ foreach(explode(',', $config->story->create->requiredFields) as $field)
           </tr>
           <?php endif;?>
           <?php
-          include "../../common/ChromePhp.php";
-          ChromePhp::log($type); 
           if($type == 'story' or $type == 'taskPoint'):?>
           <?php if($this->config->URAndSR):?>
           <tr>

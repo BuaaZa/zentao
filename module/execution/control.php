@@ -31,6 +31,12 @@ class execution extends control
      */
     public executionModel $execution;
 
+    public userModel $user;
+
+    public projectModel $project;
+
+    public productModel $product;
+
     /**
      * Construct function, Set executions.
      *
@@ -1498,7 +1504,7 @@ class execution extends control
 
         $execution = $this->execution->getById($executionID);
 
-        $this->view->firstBurn = $this->dao->select('*')->from(TABLE_BURN)->where('execution')->eq($executionID)->andWhere('date')->eq($execution->begin)->fetch();
+        $this->view->firstBurn = $this->dao->select()->from(TABLE_BURN)->where('execution')->eq($executionID)->andWhere('date')->eq($execution->begin)->fetch();
         $this->view->execution   = $execution;
         $this->display();
     }
@@ -1533,17 +1539,23 @@ class execution extends control
      * Create a execution.
      *
      * @param string $projectID
-     * @param int    $executionID
+     * @param int $executionID
      * @param string $copyExecutionID
      * @param int    $planID
      * @param string $confirm
-     * @param string $productID
+     * @param int|string $productID
      * @param string $extra
      *
      * @access public
      * @return void
      */
-    public function create($projectID = '', $executionID = 0, $copyExecutionID = '', $planID = 0, $confirm = 'no', $productID = 0, $extra = '')
+    public function create($projectID = '',
+                           int $executionID = 0,
+        $copyExecutionID = '',
+        $planID = 0,
+        $confirm = 'no',
+                           int|string $productID = 0,
+                           string $extra = '')
     {
         if($this->app->tab == 'doc') unset($this->lang->doc->menu->execution['subMenu']);
 
@@ -1609,7 +1621,7 @@ class execution extends control
         $productPlans = array();
         if($copyExecutionID)
         {
-            $copyExecution = $this->dao->select('*')->from(TABLE_EXECUTION)->where('id')->eq($copyExecutionID)->fetch();
+            $copyExecution = $this->dao->select()->from(TABLE_EXECUTION)->where('id')->eq($copyExecutionID)->fetch();
             $name          = $copyExecution->name;
             $code          = $copyExecution->code;
             $team          = $copyExecution->team;
@@ -1628,7 +1640,7 @@ class execution extends control
                 foreach($branches[$productID] as $branchID => $branch)
                 {
                     $linkedBranches[$productID][$branchID] = $branchID;
-                    $productPlans[$productID][$branchID]   = isset($plans[$productID][$branchID]) ? $plans[$productID][$branchID] : array();
+                    $productPlans[$productID][$branchID]   = $plans[$productID][$branchID] ?? array();
                 }
             }
 
@@ -1638,7 +1650,7 @@ class execution extends control
 
         if(!empty($planID))
         {
-            $plan     = $this->dao->select('*')->from(TABLE_PRODUCTPLAN)->where('id')->eq($planID)->fetch();
+            $plan     = $this->dao->select()->from(TABLE_PRODUCTPLAN)->where('id')->eq($planID)->fetch();
             $products = $this->dao->select('t1.id, t1.name, t1.type, t2.branch')->from(TABLE_PRODUCT)->alias('t1')
                 ->leftJoin(TABLE_PROJECTPRODUCT)->alias('t2')->on('t1.id = t2.product')
                 ->where('t1.id')->eq($plan->product)
@@ -1723,7 +1735,7 @@ class execution extends control
 
         $this->loadModel('product');
         $allProducts   = $this->config->systemMode == 'classic' ? $this->product->getPairs('noclosed') : $this->product->getProductPairsByProject($projectID, 'noclosed');
-        $copyProjects  = $this->loadModel('project')->getPairsByProgram(isset($project->parent) ? $project->parent : '', 'noclosed', '', 'order_asc', '', isset($project->model) ? $project->model : '');
+        $copyProjects  = $this->loadModel('project')->getPairsByProgram($project->parent ?? '', 'noclosed', '', 'order_asc', '', $project->model ?? '');
         $copyProjectID = ($projectID == 0) ? key($copyProjects) : $projectID;
 
         $this->view->title               = (($this->app->tab == 'execution') and ($this->config->systemMode == 'new')) ? $this->lang->execution->createExec : $this->lang->execution->create;
@@ -1750,15 +1762,15 @@ class execution extends control
         $this->view->productPlans        = array(0 => '') + $productPlans;
         $this->view->whitelist           = $whitelist;
         $this->view->copyExecutionID     = $copyExecutionID;
-        $this->view->branchGroups        = isset($branchGroups) ? $branchGroups : $this->execution->getBranchByProduct(array_keys($products), $this->config->systemMode == 'new' ? $projectID : 0);
+        $this->view->branchGroups        = $branchGroups ?? $this->execution->getBranchByProduct(array_keys($products), $this->config->systemMode == 'new' ? $projectID : 0);
         $this->view->poUsers             = $poUsers;
         $this->view->pmUsers             = $pmUsers;
         $this->view->qdUsers             = $qdUsers;
         $this->view->rdUsers             = $rdUsers;
         $this->view->users               = $this->loadModel('user')->getPairs('nodeleted|noclosed');
-        $this->view->copyExecution       = isset($copyExecution) ? $copyExecution : '';
+        $this->view->copyExecution       = $copyExecution ?? '';
         $this->view->from                = $this->app->tab;
-        $this->view->isStage             = (isset($project->model) and $project->model == 'waterfall') ? true : false;
+        $this->view->isStage             = (isset($project->model) and $project->model == 'waterfall');
         $this->view->project             = $project;
         $this->display();
     }
@@ -1898,7 +1910,7 @@ class execution extends control
             {
                 $linkedBranchList[$branchID]           = $branchID;
                 $linkedBranches[$productID][$branchID] = $branchID;
-                $productPlans[$productID][$branchID]   = isset($plans[$productID][$branchID]) ? $plans[$productID][$branchID] : array();
+                $productPlans[$productID][$branchID]   = $plans[$productID][$branchID] ?? array();
                 if($branchID != BRANCH_MAIN and isset($plans[$productID][BRANCH_MAIN])) $productPlans[$productID][$branchID] += $plans[$productID][BRANCH_MAIN];
                 if(!empty($executionStories[$productID][$branchID]))
                 {
@@ -3458,14 +3470,15 @@ class execution extends control
     /**
      * AJAX: get team members of the execution.
      *
-     * @param  int    $executionID
-     * @param  string $assignedTo
+     * @param int $executionID
+     * @param string $assignedTo
      * @access public
-     * @return void
+     * @return int
      */
-    public function ajaxGetMembers($executionID, $assignedTo = '')
+    public function ajaxGetMembers(int $executionID, string $assignedTo = '')
     {
-        $users = $this->loadModel('user')->getTeamMemberPairs($executionID, 'execution');
+        $this->loadModel('user');
+        $users = $this->user->getTeamMemberPairs($executionID, 'execution');
         if($this->app->getViewType() === 'json')
         {
             return print(json_encode($users));
@@ -3480,12 +3493,13 @@ class execution extends control
     /**
      * AJAX: get team members by projectID/executionID.
      *
-     * @param  int    $objectID
+     * @param int $objectID
      * @access public
      * @return string
      */
-    public function ajaxGetTeamMembers($objectID)
+    public function ajaxGetTeamMembers(int $objectID)
     {
+        $this->loadModel('user');
         $type = 'execution';
         if($this->config->systemMode == 'new')
         {
@@ -3493,7 +3507,7 @@ class execution extends control
             if($type != 'project') $type = 'execution';
         }
 
-        $users   = $this->loadModel('user')->getPairs('nodeleted|noclosed');
+        $users   = $this->user->getPairs('nodeleted|noclosed');
         $members = $this->user->getTeamMemberPairs($objectID, $type);
 
         return print(html::select('teamMembers[]', $users, array_keys($members), "class='form-control picker-select' multiple"));

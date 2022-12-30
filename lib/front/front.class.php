@@ -146,31 +146,34 @@ class html extends baseHTML
      * 生成select标签。
      * Create tags like "<select><option></option></select>"
      *
-     * @param  string $name          the name of the select tag.
-     * @param  array  $options       the array to create select tag from.
-     * @param  string $selectedItems the item(s) to be selected, can like item1,item2.
-     * @param  string $attrib        other params such as multiple, size and style.
-     * @param  string $append        adjust if add options[$selectedItems].
+     * @param string $name the name of the select tag.
+     * @param string|array $options the array to create select tag from.
+     * @param string $selectedItems the item(s) to be selected, can like item1,item2.
+     * @param string $attrib other params such as multiple, size and style.
+     * @param bool $append adjust if add options[$selectedItems].
+     * @return string
      * @static
      * @access public
-     * @return string
      */
-    static public function select($name = '', $options = array(), $selectedItems = "", $attrib = "", $append = false)
+    static public function select($name = '', string|array $options = array(), $selectedItems = "", $attrib = "", $append = false)
     {
         $options = (array)($options);
-        if($append and !isset($options[$selectedItems])) $options[$selectedItems] = $selectedItems;
+        if($append and !isset($options[$selectedItems]))
+            $options[$selectedItems] = $selectedItems;
 
         /* The begin. */
         $id = $name;
-        if(strpos($name, '[') !== false) $id = trim(str_replace(']', '', str_replace('[', '', $name)));
+        if(str_contains($name, '['))
+            $id = trim(str_replace(']', '', str_replace('[', '', $name)));
         $id = "id='{$id}'";
-        if(strpos($attrib, 'id=') !== false) $id = '';
+        if(str_contains($attrib, 'id='))
+            $id = '';
 
         global $config;
         $convertedPinYin = (empty($config->isINT) and class_exists('common')) ? common::convert2Pinyin($options) : array();
         if(count($options) >= $config->maxCount or isset($config->moreLinks[$name]))
         {
-            if(strpos($attrib, 'chosen') !== false) $attrib = str_replace('chosen', 'picker-select', $attrib);
+            if(str_contains($attrib, 'chosen')) $attrib = str_replace('chosen', 'picker-select', $attrib);
             if(isset($config->moreLinks[$name]))
             {
                 $link = $config->moreLinks[$name];
