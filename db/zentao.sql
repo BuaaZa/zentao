@@ -243,6 +243,7 @@ CREATE TABLE IF NOT EXISTS `zt_branch` (
   PRIMARY KEY  (`id`),
   KEY `product` (`product`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+DROP TABLE IF EXISTS `zt_deliberation`;
 -- DROP TABLE IF EXISTS `zt_bug`;
 CREATE TABLE IF NOT EXISTS `zt_bug` (
   `id` mediumint(8) NOT NULL auto_increment,
@@ -7746,20 +7747,18 @@ CREATE VIEW `view_datasource_54` AS select `id`,`name` from `zt_task` where `del
 
 UPDATE `zt_user` SET `visions` = 'lite', `feedback` = '0' WHERE `feedback` = '1';
 
-DROP TABLE IF EXISTS `zt_deliberation`;
-CREATE TABLE `zt_deliberation`  (
-`id`              int       NOT NULL AUTO_INCREMENT,
-`frombugid`       mediumint NOT NULL,
-`deliberateddate` datetime NULL DEFAULT NULL,
-`description`     text,
-`tostatus`        enum('active','closed') NOT NULL DEFAULT 'active',
-`launcherid`      int       NOT NULL,
-`organizerid`     int       NOT NULL,
-`times`           int       NOT NULL,
-`deleted`         enum('0','1') NOT NULL DEFAULT '0',
-PRIMARY KEY (`id`),
-INDEX             `frombugid`(`frombugid`),
-CONSTRAINT `fromBugId` FOREIGN KEY (`frombugid`) REFERENCES `zt_bug` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT
+CREATE TABLE IF NOT EXISTS `zt_deliberation`  (
+ `id`              mediumint NOT NULL AUTO_INCREMENT,
+ `frombugid`       mediumint NOT NULL,
+ `deliberateddate` datetime NOT NULL,
+ `description`     text,
+ `tostatus`        enum('active','closed') NOT NULL DEFAULT 'active',
+ `launcherid`      mediumint NOT NULL,
+ `organizerid`     mediumint NOT NULL,
+ `times`           int       NOT NULL,
+ `deleted`         enum('0','1') NOT NULL DEFAULT '0',
+ PRIMARY KEY (`id`),
+ INDEX  `frombugid`(`frombugid`)
 )AUTO_INCREMENT = 1;
 
 REPLACE INTO `zt_grouppriv` (`group`, `module`, `method`) VALUES
