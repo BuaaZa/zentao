@@ -78,6 +78,7 @@ $routes['/projects']              = 'projects';
 $routes['/projects/:id']          = 'project';
 
 $routes['/projects/:id/executions'] = 'executions';
+$routes['/projects/:id/executionsWithMember'] = 'executionsWithMember';
 $routes['/executions']              = 'executions';
 $routes['/executions/:id']          = 'execution';
 
