@@ -174,7 +174,7 @@ class company extends control
      * @access public
      * @return void
      */
-    public function dynamic($browseType = 'today', $param = '', $recTotal = 0, $date = '', $direction = 'next', $userID = '', $productID = 0, $projectID = 0, $executionID = 0, $orderBy = 'date_desc')
+    public function dynamic($browseType = 'all', $param = '', $recTotal = 0, $date = '', $direction = 'next', $userID = '', $productID = 0, $projectID = 0, $executionID = 0, $orderBy = 'date_desc')
     {
         $this->company->setMenu();
         $this->app->loadLang('user');
