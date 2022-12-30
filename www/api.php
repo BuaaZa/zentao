@@ -23,6 +23,7 @@ include '../framework/api/entry.class.php';
 include '../framework/api/helper.class.php';
 include '../framework/control.class.php';
 include '../framework/model.class.php';
+require '../module/common/ChromePhp.php';
 
 /* Log the time and define the run mode. */
 $startTime = getTime();

@@ -1,11 +1,9 @@
-version: "3"
-
 services:
   app:
-    image: zentaopms:2022-12-28
+    image: zentaopms:latest
     container_name: app
     ports:
-      - 8808:80
+      - "8808:80"
     environment:
       MYSQL_HOST: database
       MYSQL_USER: root
@@ -17,7 +15,7 @@ services:
     image: mysql:8.0
     container_name: database
     ports:
-      - 3306:3306
+      - "3306:3306"
     volumes:
       - zentao:/var/lib/mysql
     environment:

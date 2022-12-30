@@ -94,11 +94,13 @@ class executionsEntry extends entry
         $this->setPost('products',  $this->request('products', array()));
         $this->setPost('plans',     $this->request('plans', array()));
 
-        $control = $this->loadController('execution', 'create'); $this->requireFields('name,code,begin,end,days');
+        $control = $this->loadController('execution', 'create');
+        $this->requireFields('name,code,begin,end,days');
         $control->create($projectID);
 
         $data = $this->getData();
-        if(isset($data->result) and $data->result == 'fail') return $this->sendError(400, $data->message);
+        if(isset($data->result) and $data->result == 'fail')
+            return $this->sendError(400, $data->message);
 
         $execution = $this->loadModel('execution')->getByID($data->id);
 
