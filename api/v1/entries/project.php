@@ -104,6 +104,16 @@ class projectEntry extends entry
         /* Set $_POST variables. */
         $fields = 'name,code,begin,end,acl,parent,desc,PM,whitelist,model,status';
         $this->batchSetPost($fields, $oldProject);
+        $statusArray = array("wait","doing","suspended","closed");
+        if(isset($_POST["status"]) && !in_array($_POST["status"],$statusArray) ){
+            $errorStr = "status:[";
+            foreach($statusArray as $status){
+                $errorStr.=$status;
+                $errorStr.=",";
+            }
+            $errorStr.="]";
+            return $this->sendError(400, $errorStr);
+        }
 
         $products = array();
         $plans    = array();
