@@ -102,7 +102,7 @@ class projectEntry extends entry
         $linkedProducts = $this->loadModel('product')->getProducts($projectID);
 
         /* Set $_POST variables. */
-        $fields = 'name,code,begin,end,acl,parent,desc,PM,whitelist,model';
+        $fields = 'name,code,begin,end,acl,parent,desc,PM,whitelist,model,status';
         $this->batchSetPost($fields, $oldProject);
 
         $products = array();
