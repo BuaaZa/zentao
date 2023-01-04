@@ -88,7 +88,7 @@ $(function()
 
     $("a[id='sync2wbs']").click(function(){
 
-        var myMessager =  new $.zui.Messager('正在同步到WBS平台... ', {
+        var myMessager =  new $.zui.Messager('正在同步至任务管理平台', {
             type: 'info',
             close: true,
             icon: 'info-sign',

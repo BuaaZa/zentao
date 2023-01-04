@@ -1666,7 +1666,9 @@ EOD;
      * @access public
      * @return void
      */
-    public static function buildIconButton($module, $method, $vars = '', $object = '', $type = 'button', $icon = '', $target = '', $extraClass = '', $onlyBody = false, $misc = '', $title = '', $programID = 0, $extraEnabled = '')
+    public static function buildIconButton($module, $method, $vars = '', $object = '', $type = 'button',
+                                           $icon = '', $target = '', $extraClass = '', $onlyBody = false,
+                                           $misc = '', $title = '', $programID = 0, $extraEnabled = '')
     {
         if(isonlybody() and strpos($extraClass, 'showinonlybody') === false) return false;
 
