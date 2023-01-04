@@ -19,7 +19,8 @@ $commonLang   = array('zh-cn', 'zh-tw', 'en', 'fr', 'de');
   <meta name="renderer" content="webkit">
   <?php
   #echo html::title($title . ' - ' . $lang->zentaoPMS);
-  echo html::title($title);
+  #echo html::title($title);
+  echo html::title('开发管理');
   js::exportConfigVars();
   if($config->debug)
   {

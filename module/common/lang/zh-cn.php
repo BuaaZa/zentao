@@ -27,6 +27,7 @@ $lang->dash      = '-';
 $lang->and       = '和';
 
 $lang->zentaoPMS      = '禅道';
+$lang->systemName     = '开发管理';
 $lang->pmsName        = '开源版';
 $lang->proName        = '专业版';
 $lang->bizName        = '企业版';
@@ -37,7 +38,7 @@ $lang->logoImg        = 'cetc-logo.png';
 $lang->logoImg2       = 'cetc-logo-corner.png';
 $lang->logoFavicon    = 'cetc-favicon.png';
 //这里可以修改登录页的logo图片指向的文件名
-$lang->welcome        = "%s项目管理系统";
+$lang->welcome        = "%s开发管理系统";
 $lang->logout         = '退出';
 $lang->login          = '登录';
 $lang->help           = '帮助';
