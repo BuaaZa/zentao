@@ -95,6 +95,8 @@ $routes['/tasks/:id/finish']     = 'taskFinish';
 $routes['/tasks/:id/close']      = 'taskClose';
 $routes['/tasks/:id/estimate']   = 'taskRecordEstimate';
 $routes['/tasks/:id/active']     = 'taskActive';
+$routes['/tasks/:id/batchDelete']    = 'taskBatchDelete';
+$routes['/tasks/:id/batchStart']    = 'taskBatchStart';
 
 $routes['/users']     = 'users';
 $routes['/users/:id'] = 'user';
