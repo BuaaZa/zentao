@@ -160,7 +160,7 @@ $lang->pri     = '优先级';
 $lang->delayed = '已延期';
 
 $lang->common->common     = '公有模块';
-$lang->my->common         = '地盘';
+$lang->my->common         = '首页';
 $lang->program->common    = '项目集';
 $lang->product->common    = '产品';
 $lang->project->common    = '项目';
@@ -214,7 +214,7 @@ $lang->release->common     = '发布';
 $lang->message->common     = '通知';
 $lang->mail->common        = '邮件';
 
-$lang->my->shortCommon          = '地盘';
+$lang->my->shortCommon          = '首页';
 $lang->testcase->shortCommon    = '用例';
 $lang->productplan->shortCommon = '计划';
 $lang->score->shortCommon       = '积分';
