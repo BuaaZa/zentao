@@ -161,7 +161,10 @@ foreach(explode(',', $config->testcase->create->requiredFields) as $field)
                   <tr>
                     <th class='w-50px text-center'><?php echo $lang->testcase->stepID;?></th>
                     <th width="45%"><?php echo $lang->testcase->stepDesc;?></th>
+                    <th><?php echo $lang->testcase->stepinput;?></th>
+                    <th><?php echo $lang->testcase->step_goal_action;?></th>
                     <th><?php echo $lang->testcase->stepExpect;?></th>
+                    <th><?php echo $lang->testcase->step_eval_criteria;?></th>
                     <th class='step-actions'><?php echo $lang->actions;?></th>
                   </tr>
                 </thead>
@@ -179,9 +182,18 @@ foreach(explode(',', $config->testcase->create->requiredFields) as $field)
                             <label class="checkbox-inline"><?php echo $lang->testcase->group ?></label>
                           </div>
                         </span>
+                          <span class="input-group-addon step-type-toggle2">
+                          <div class='checkbox-primary'>
+                            <input tabindex='-1' type="checkbox" class='step-group-toggle2'>
+                            <label class="checkbox-inline"><?php echo "勾选为输出项" ?></label>
+                          </div>
+                        </span>
                       </div>
                     </td>
+                      <td><textarea rows='1' class='form-control autosize step-expects' name='inputs[]'></textarea></td>
+                      <td><textarea rows='1' class='form-control autosize step-expects' name='goal_actions[]'></textarea></td>
                     <td><textarea rows='1' class='form-control autosize step-expects' name='expects[]'></textarea></td>
+                      <td><textarea rows='1' class='form-control autosize step-expects' name='eval_criterias[]'></textarea></td>
                     <td class='step-actions'>
                       <div class='btn-group'>
                         <button type='button' class='btn btn-step-add' tabindex='-1'><i class='icon icon-plus'></i></button>
@@ -197,7 +209,7 @@ foreach(explode(',', $config->testcase->create->requiredFields) as $field)
                       <div class='input-group'>
                         <span class='input-group-addon step-item-id'></span>
                         <?php echo html::textarea('steps[]', $step->desc, "rows='1' class='form-control autosize step-steps'") ?>
-                        <span class='input-group-addon step-type-toggle'>
+                          <span class='input-group-addon step-type-toggle'>
                           <?php if(!isset($step->type)) $step->type = 'step';?>
                           <input type='hidden' name='stepType[]' value='<?php echo $step->type;?>' class='step-type'>
                           <div class='checkbox-primary'>
@@ -205,9 +217,19 @@ foreach(explode(',', $config->testcase->create->requiredFields) as $field)
                             <label><?php echo $lang->testcase->group ?></label>
                           </div>
                         </span>
+                          <span class='input-group-addon step-type-toggle2'>
+                          <?php if(!isset($step->type)) $step->type = 'step';?>
+                          <div class='checkbox-primary'>
+                            <input tabindex='-1' type="checkbox" class='step-group-toggle2'>
+                            <label><?php echo "勾选为输出项" ?></label>
+                          </div>
+                        </span>
                       </div>
                     </td>
+                      <td><?php echo html::textarea('inputs[]', $step->input, "rows='1' class='form-control autosize step-expects'") ?></td>
+                      <td><?php echo html::textarea('goal_actions[]', $step->goal_action, "rows='1' class='form-control autosize step-expects'") ?></td>
                     <td><?php echo html::textarea('expects[]', $step->expect, "rows='1' class='form-control autosize step-expects'") ?></td>
+                      <td><?php echo html::textarea('eval_criterias[]', $step->eval_criteria, "rows='1' class='form-control autosize step-expects'") ?></td>
                     <td class='step-actions'>
                       <div class='btn-group'>
                         <button type='button' class='btn btn-step-add' tabindex='-1'><i class='icon icon-plus'></i></button>

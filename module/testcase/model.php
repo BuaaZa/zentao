@@ -61,7 +61,7 @@ class testcaseModel extends model
             ->setIF($this->config->systemMode == 'new' and $this->app->tab == 'project', 'project', $this->session->project)
             ->setIF($this->app->tab == 'execution', 'execution', $this->session->execution)
             ->setIF($this->post->story != false, 'storyVersion', $this->loadModel('story')->getVersion((int)$this->post->story))
-            ->remove('steps,expects,files,labels,stepType,forceNotReview')
+            ->remove('steps,expects,files,labels,stepType,forceNotReview,inputs,goal_actions,eval_criterias')
             ->setDefault('story', 0)
             ->cleanInt('story,product,branch,module')
             ->join('stage', ',')
@@ -96,7 +96,12 @@ class testcaseModel extends model
                 $step->case    = $caseID;
                 $step->version = 1;
                 $step->desc    = rtrim(htmlSpecialString($stepDesc));
-                $step->expect  = $step->type == 'group' ? '' : rtrim(htmlSpecialString($data->expects[$stepID]));
+                $judge = $step->type == 'group' || $step->type == 'item';
+                $step->input  = $judge ? '' : rtrim(htmlSpecialString($data->inputs[$stepID]));
+                $step->goal_action  = $judge ? '' : rtrim(htmlSpecialString($data->goal_actions[$stepID]));
+                $step->expect  = $judge ? '' : rtrim(htmlSpecialString($data->expects[$stepID]));
+                $step->eval_criteria  = $judge ? '' : rtrim(htmlSpecialString($data->eval_criterias[$stepID]));
+                $step->eval_criteria = strlen($step->eval_criteria) == 0 ? $step->expect : $step->eval_criteria;
                 $this->dao->insert(TABLE_CASESTEP)->data($step)->autoCheck()->exec();
                 if($step->type == 'group') $parentStepID = $this->dao->lastInsertID();
                 if($step->type == 'step')  $parentStepID = 0;
@@ -806,7 +811,7 @@ class testcaseModel extends model
             ->setForce('status', $status)
             ->cleanInt('story,product,branch,module')
             ->stripTags($this->config->testcase->editor->edit['id'], $this->config->allowedTags)
-            ->remove('comment,steps,expects,files,labels,linkBug,stepType')
+            ->remove('comment,steps,expects,files,labels,linkBug,stepType,inputs,goal_actions,eval_criterias')
             ->get();
 
         $requiredFields = $this->config->testcase->edit->requiredFields;
@@ -847,7 +852,12 @@ class testcaseModel extends model
                         $step->case    = $caseID;
                         $step->version = $version;
                         $step->desc    = rtrim(htmlSpecialString($stepDesc));
-                        $step->expect  = $step->type == 'group' ? '' : rtrim(htmlSpecialString($data->expects[$stepID]));
+                        $judge = $step->type == 'group' || $step->type == 'item';
+                        $step->input  = $judge ? '' : rtrim(htmlSpecialString($data->inputs[$stepID]));
+                        $step->goal_action  = $judge ? '' : rtrim(htmlSpecialString($data->goal_actions[$stepID]));
+                        $step->expect  = $judge ? '' : rtrim(htmlSpecialString($data->expects[$stepID]));
+                        $step->eval_criteria  = $judge ? '' : rtrim(htmlSpecialString($data->eval_criterias[$stepID]));
+                        $step->eval_criteria = strlen($step->eval_criteria) == 0 ? $step->expect : $step->eval_criteria;
                         $this->dao->insert(TABLE_CASESTEP)->data($step)->autoCheck()->exec();
                         if($step->type == 'group') $parentStepID = $this->dao->lastInsertID();
                         if($step->type == 'step')  $parentStepID = 0;

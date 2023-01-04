@@ -102,8 +102,13 @@ $lang->case = $lang->testcase;  // 用于DAO检查时使用。因为case是系�
 
 $lang->testcase->stepID      = '编号';
 $lang->testcase->stepDesc    = '步骤';
-$lang->testcase->stepExpect  = '预期';
+$lang->testcase->stepinput  = '输入';
+$lang->testcase->step_goal_action  = '目的和动作';
+$lang->testcase->stepExpect  = '预期结果';
+$lang->testcase->step_eval_criteria  = '评价准则';
 $lang->testcase->stepVersion = '版本';
+$lang->testcase->noticegroupnum = '最多使一个步骤绑定输入输出项！';
+
 
 $lang->testcase->common                  = '用例';
 $lang->testcase->index                   = "用例管理首页";
