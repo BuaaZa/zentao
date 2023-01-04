@@ -84,7 +84,7 @@ $lang->dev->tableList['index']                 = '首页';
 $lang->dev->tableList['install']               = '安装';
 $lang->dev->tableList['mail']                  = '邮箱';
 $lang->dev->tableList['misc']                  = '杂项';
-$lang->dev->tableList['my']                    = '我的地盘';
+$lang->dev->tableList['my']                    = '我的首页';
 $lang->dev->tableList['qa']                    = '测试';
 $lang->dev->tableList['report']                = '统计';
 $lang->dev->tableList['search']                = '搜索';
@@ -142,7 +142,7 @@ $lang->dev->tableList['personnel']             = '可访问人员';
 $lang->dev->tableList['projectbuild']          = '项目版本';
 $lang->dev->tableList['projectrelease']        = '项目发布';
 
-$lang->dev->groupList['my']        = '我的地盘';
+$lang->dev->groupList['my']        = '我的首页';
 $lang->dev->groupList['program']   = '项目集';
 $lang->dev->groupList['product']   = $lang->productCommon;
 $lang->dev->groupList['project']   = '项目';

@@ -47,7 +47,7 @@ $lang->my->assignedToMe    = '指派给我';
 $lang->my->byQuery         = '搜索';
 $lang->my->contactList     = '联系人列表';
 
-$lang->my->indexAction      = '地盘仪表盘';
+$lang->my->indexAction      = '首页仪表盘';
 $lang->my->calendarAction   = '我的日程';
 $lang->my->workAction       = '我的待处理';
 $lang->my->contributeAction = '我的贡献';

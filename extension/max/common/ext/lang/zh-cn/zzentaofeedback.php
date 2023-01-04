@@ -1,6 +1,6 @@
 <?php
 $lang->nonRDMenu = new stdclass();
-$lang->nonRDMenu->my       = $lang->navIcons['my'] . '地盘|my|calendar|';
+$lang->nonRDMenu->my       = $lang->navIcons['my'] . '首页|my|calendar|';
 $lang->nonRDMenu->oa       = $lang->navIcons['oa'] . '办公|attend|personal|';
 $lang->nonRDMenu->feedback = $lang->navIcons['feedback'] . '反馈|feedback|browse|';
 $lang->nonRDMenu->admin    = "{$lang->navIcons['admin']} {$lang->admin->common}|company|browse|";
@@ -25,7 +25,7 @@ $lang->admin->nonRDMenuOrder[5]  = 'company';
 $lang->admin->nonRDMenuOrder[10] = 'group';
 
 $lang->nonRDWebMenu = new stdclass();
-$lang->nonRDWebMenu->my       = $lang->navIcons['my'] . '地盘|my|calendar|';
+$lang->nonRDWebMenu->my       = $lang->navIcons['my'] . '首页|my|calendar|';
 $lang->nonRDWebMenu->oa       = $lang->navIcons['oa'] . '办公|attend|personal|';
 $lang->nonRDWebMenu->feedback = $lang->navIcons['feedback'] . '反馈|feedback|browse|';
 $lang->nonRDWebMenu->company  = "{$lang->navIcons['admin']} {$lang->admin->common}|company|browse|";
