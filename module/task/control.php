@@ -1316,8 +1316,9 @@ class task extends control
         $responseObject = $this->task->taskFeedback($feedbackData);
 
         // 导入自定义js,显示提示信息
-        // todo:路径在服务器上有问题
-        js::import('/zentaopms/module/task/js/syncmessage.js');
+        $webRoot = $this->config->webRoot;
+        $jsRoot = str_replace('www/','module/task/js/',$webRoot);
+        js::import($jsRoot.'syncmessage.js');
         if($responseObject->httpCode == 200 && $responseObject->msg == '操作成功'){
             $this->dao->update(TABLE_EFFORT)
                 ->set('syncStatus')->eq('1')
