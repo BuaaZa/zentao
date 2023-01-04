@@ -1278,17 +1278,31 @@ class task extends control
     {
         $estimate = $this->task->getEstimateById($estimateID);
 
-        //进度计算
+        //获取任务
         $task = $this->dao->select()->from(TABLE_TASK)
             ->where('id')->eq($estimate->objectID)
             ->fetch();
-        if($task->left == 0)
+
+        //进度计算
+        //如果任务是子任务
+        if($task->parent >0){
+            $oldParentTask = $this->dao->select()->from(TABLE_TASK)
+                ->where('id')->eq($task->parent)
+                ->fetch();
+            $consumed = $oldParentTask->consumed;
+            $left = $oldParentTask->left;
+        }else{
+            $consumed = $task->consumed;
+            $left = $task->left;
+        }
+
+        if($left == 0)
         {
             $progress = 100;
         }
         else
         {
-            $progress = round($task->consumed / ($task->consumed + $task->left) * 100);
+            $progress = round($consumed / ($consumed + $left ) * 100);
         }
 
         $feedbackData = new stdclass();
@@ -1297,9 +1311,9 @@ class task extends control
         $feedbackData->currentProgress =$progress;
         $feedbackData->feedbackContent =$estimate->work;
         $feedbackData->workHours=$estimate->consumed;
-        $feedbackData->zenTaoTaskId=strval($estimate->objectID);
+        $feedbackData->zenTaoTaskId=strval(($task->parent >0)?$task->parent:$estimate->objectID);
 
-        $responseObject = $this->task->taskFeedback($feedbackData);
+//        $responseObject = $this->task->taskFeedback($feedbackData);
 
         // 导入自定义js,显示提示信息
         js::import('/zentaopms/module/task/js/syncmessage.js');

@@ -1871,9 +1871,10 @@ class taskModel extends model
         $oldStatus  = $task->status;
         $lastDate   = $this->dao->select('*')->from(TABLE_EFFORT)->where('objectID')->eq($taskID)->andWhere('objectType')->eq('task')->orderBy('date_desc,id_desc')->limit(1)->fetch('date');
 
+        $oldTask = $task;
         foreach($estimates as $estimate)
         {
-            $this->addTaskEstimate($estimate);
+            $effort_id = $this->addTaskEstimate($estimate);
 
             $work       = $estimate->work;
             $estimateID = $this->dao->lastInsertID();
@@ -1951,6 +1952,48 @@ class taskModel extends model
             if($changes and !empty($actionID)) $this->action->logHistory($actionID, $changes);
             if($changes) $allChanges = array_merge($allChanges, $changes);
             $task = $newTask;
+
+            //进度计算
+            //如果任务是子任务
+            if($task->parent >0){
+                $parentTask = $this->dao->select()->from(TABLE_TASK)
+                    ->where('id')->eq($task->parent)
+                    ->fetch();
+                $consumed = $parentTask->consumed - $oldTask->consumed + $task->consumed;
+                $left = $parentTask->left - $oldTask->left + $task->left;
+            }else{
+                $consumed = $task->consumed;
+                $left = $task->left;
+            }
+
+            if($left == 0)
+            {
+                $progress = 100;
+            }
+            else
+            {
+                $progress = round($consumed / ($consumed + $left) * 100);
+            }
+
+            $feedbackData = new stdclass();
+            $feedbackData->createUserCode =$estimate->account;
+            $feedbackData->createUserName =$this->app->user->realname;
+            $feedbackData->currentProgress =$progress;
+            $feedbackData->feedbackContent =$estimate->work;
+            $feedbackData->workHours=intval($estimate->consumed);
+            $feedbackData->zenTaoTaskId=strval(($task->parent >0)?$task->parent:$taskID);
+
+            ChromePhp::log($feedbackData);
+
+//        $responseObject = $this->taskFeedback($feedbackData);
+
+            if($responseObject->httpCode == 200 && $responseObject->msg == '操作成功'){
+                $this->dao->update(TABLE_EFFORT)
+                    ->set('syncStatus')->eq('1')
+                    ->where('id')->eq($effort_id)
+                    ->exec();
+            }
+
         }
 
         if($allChanges)
@@ -3646,7 +3689,6 @@ class taskModel extends model
     public function addTaskEstimate($data)
     {
         $oldTask = $this->getById($data->task);
-
         $relation = $this->loadModel('action')->getRelatedFields('task', $data->task);
 
         $effort = new stdclass();
@@ -3664,40 +3706,7 @@ class taskModel extends model
         $effort->order      = isset($data->order) ? $data->order : 0;
         $this->dao->insert(TABLE_EFFORT)->data($effort)->autoCheck()->exec();
 
-        $effort_id = $this->dao->lastInsertID();
-
-        //进度计算
-        $progress = 0;
-        $oldConsumed = $this->dao->select('consumed')->from(TABLE_TASK)
-            ->where('id')->eq($data->task)
-            ->fetch('consumed');
-        if($data->left == 0)
-        {
-            $progress = 100;
-        }
-        else
-        {
-            $progress = round(($oldConsumed + $data->consumed) / ($oldConsumed + $data->consumed + $data->left) * 100);
-        }
-
-        $feedbackData = new stdclass();
-        $feedbackData->createUserCode =$data->account;
-        $feedbackData->createUserName =$this->app->user->realname;
-        $feedbackData->currentProgress =$progress;
-        $feedbackData->feedbackContent =$data->work;
-        $feedbackData->workHours=intval($data->consumed);
-        $feedbackData->zenTaoTaskId=$data->task;
-
-        $responseObject = $this->taskFeedback($feedbackData);
-
-        if($responseObject->httpCode == 200 && $responseObject->msg == '操作成功'){
-            $this->dao->update(TABLE_EFFORT)
-                ->set('syncStatus')->eq('1')
-                ->where('id')->eq($effort_id)
-                ->exec();
-        }
-
-        return $effort_id;
+        return $this->dao->lastInsertID();
     }
 
     /**
