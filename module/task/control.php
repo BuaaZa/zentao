@@ -1313,9 +1313,10 @@ class task extends control
         $feedbackData->workHours=$estimate->consumed;
         $feedbackData->zenTaoTaskId=strval(($task->parent >0)?$task->parent:$estimate->objectID);
 
-//        $responseObject = $this->task->taskFeedback($feedbackData);
+        $responseObject = $this->task->taskFeedback($feedbackData);
 
         // 导入自定义js,显示提示信息
+        // todo:路径在服务器上有问题
         js::import('/zentaopms/module/task/js/syncmessage.js');
         if($responseObject->httpCode == 200 && $responseObject->msg == '操作成功'){
             $this->dao->update(TABLE_EFFORT)

@@ -1985,7 +1985,7 @@ class taskModel extends model
 
             ChromePhp::log($feedbackData);
 
-//        $responseObject = $this->taskFeedback($feedbackData);
+            $responseObject = $this->taskFeedback($feedbackData);
 
             if($responseObject->httpCode == 200 && $responseObject->msg == '操作成功'){
                 $this->dao->update(TABLE_EFFORT)
