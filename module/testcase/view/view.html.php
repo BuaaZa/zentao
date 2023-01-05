@@ -73,7 +73,10 @@
               <tr>
                 <th class='w-50px'><?php echo $lang->testcase->stepID;?></th>
                 <th class='w-p60 text-left'><?php echo $lang->testcase->stepDesc;?></th>
+                  <th class='text-left'><?php echo $lang->testcase->stepinput;?></th>
+                  <th class='text-left'><?php echo $lang->testcase->step_goal_action;?></th>
                 <th class='text-left'><?php echo $lang->testcase->stepExpect;?></th>
+                  <th class='text-left'><?php echo $lang->testcase->step_eval_criteria;?></th>
               </tr>
             </thead>
             <?php
@@ -92,7 +95,10 @@
                 echo "<td class='text-left'><div class='input-group'>";
                 if($step->type == 'item') echo "<span class='step-item-id'>{$stepId}.{$childId}</span>";
                 echo nl2br(str_replace(' ', '&nbsp;', $step->desc)) . "</td>";
+                echo "<td class='text-left'>" . nl2br(str_replace(' ', '&nbsp;', $step->input)) . "</div></td>";
+                echo "<td class='text-left'>" . nl2br(str_replace(' ', '&nbsp;', $step->goal_action)) . "</div></td>";
                 echo "<td class='text-left'>" . nl2br(str_replace(' ', '&nbsp;', $step->expect)) . "</div></td>";
+                echo "<td class='text-left'>" . nl2br(str_replace(' ', '&nbsp;', $step->eval_criteria)) . "</div></td>";
                 echo "</tr>";
                 $childId ++;
             }

@@ -385,6 +385,23 @@ class testcase extends control
         $this->loadModel('story');
         if(!empty($_POST))
         {
+
+            $checkGroup = $this->post->stepType;
+            $groupsNum = 0;
+            foreach($checkGroup as $val){
+                if($val == 'group'){
+                    $groupsNum += 1;
+                }
+            }
+            #如果选了两个多选框，则提示：'最多使一个步骤绑定输入输出项！'
+            if($groupsNum >= 2){
+                $noticeStr = $this->lang->testcase->noticegroupnum;
+                $response['result']  = 'fail';
+                $response['message'] = $noticeStr;
+                return $this->send($response);
+                //die($noticeStr);
+            }
+
             $response['result'] = 'success';
 
             setcookie('lastCaseModule', (int)$this->post->module, $this->config->cookieLife, $this->config->webRoot, '', $this->config->cookieSecure, false);
@@ -505,9 +522,13 @@ class testcase extends control
         {
             $paddingCount = $this->config->testcase->defaultSteps - count($steps);
             $step = new stdclass();
-            $step->type   = 'item';
+            //$step->type   = 'item';
+            $step->type   = 'step';
             $step->desc   = '';
+            $step->input = '';
+            $step->goal_action = '';
             $step->expect = '';
+            $step->eval_criteria = '';
             for($i = 1; $i <= $paddingCount; $i ++) $steps[] = $step;
         }
 
@@ -860,6 +881,21 @@ class testcase extends control
 
         if(!empty($_POST))
         {
+            $checkGroup = $this->post->stepType;
+            $groupsNum = 0;
+            foreach($checkGroup as $val){
+                if($val == 'group'){
+                    $groupsNum += 1;
+                }
+            }
+            #如果选了两个多选框，则提示：'最多使一个步骤绑定输入输出项！'
+            if($groupsNum >= 2){
+                $noticeStr = $this->lang->testcase->noticegroupnum;
+                $response['result']  = 'fail';
+                $response['message'] = $noticeStr;
+                return $this->send($response);
+                //die($noticeStr);
+            }
             $changes = array();
             if($comment == false or $comment == 'false')
             {

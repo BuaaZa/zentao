@@ -497,7 +497,7 @@
         {
             history[push ? 'pushState' : 'replaceState']({app: appCode}, title, url);
         }
-        document.title = title;
+        //document.title = title;
     }
 
     /* Bind helper methods to global object "$.apps" */
