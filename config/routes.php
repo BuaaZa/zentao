@@ -5,6 +5,7 @@
 $routes = array();
 
 $routes['/tokens']   = 'tokens';
+$routes['/tokensWithEncryption']   = 'tokensWithEncryption';
 $routes['/langs']    = 'langs';
 $routes['/views']    = 'views';
 $routes['/groups']   = 'groups';

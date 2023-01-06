@@ -867,19 +867,19 @@ class userModel extends model
     /**
      * Identify a user.
      *
-     * @param   string $account     the user account
-     * @param   string $password    the user password or auth hash
+     * @param string $account     the user account
+     * @param string $password    the user password or auth hash
      * @access  public
      * @return  object
      */
-    public function identify($account, $password)
+    public function identify(string $account, string $password)
     {
         if(!$account or !$password) return false;
         /* Check account rule in login.  */
         if(!validater::checkAccount($account)) return false;
 
         /* Get the user first. If $password length is 32, don't add the password condition.  */
-        $record = $this->dao->select('*')->from(TABLE_USER)
+        $record = $this->dao->select()->from(TABLE_USER)
             ->where('account')->eq($account)
             ->beginIF(strlen($password) < 32)->andWhere('password')->eq(md5($password))->fi()
             ->andWhere('deleted')->eq(0)
@@ -914,7 +914,7 @@ class userModel extends model
 
             $user->lastTime       = $user->last;
             $user->last           = date(DT_DATETIME1, $last);
-            $user->admin          = strpos($this->app->company->admins, ",{$user->account},") !== false;
+            $user->admin          = str_contains($this->app->company->admins, ",{$user->account},");
             $user->modifyPassword = ($user->visits == 0 and !empty($this->config->safe->modifyPasswordFirstLogin));
             if($user->modifyPassword) $user->modifyPasswordReason = 'modifyPasswordFirstLogin';
             if(!$user->modifyPassword and !empty($this->config->safe->changeWeak))
@@ -934,6 +934,57 @@ class userModel extends model
 
             /* Create cycle todo in login. */
             $todoList = $this->dao->select('*')->from(TABLE_TODO)->where('cycle')->eq(1)->andWhere('deleted')->eq('0')->andWhere('account')->eq($user->account)->fetchAll('id');
+            $this->loadModel('todo')->createByCycle($todoList);
+
+            /* Fix bug #17082. */
+            if($user->avatar)
+            {
+                $avatarRoot = substr($user->avatar, 0, strpos($user->avatar, 'data/upload/'));
+                if($this->config->webRoot != $avatarRoot) $user->avatar = substr_replace($user->avatar, $this->config->webRoot, 0, strlen($avatarRoot));
+            }
+        }
+        return $user;
+    }
+
+    public function identifyWithMD5(string $account, string $md5)
+    {
+        if(!$account or !$md5) return false;
+        /* Check account rule in login.  */
+        if(!validater::checkAccount($account)) return false;
+
+        $user = $this->dao->select()->from(TABLE_USER)
+            ->where('account')->eq($account)
+            ->andWhere('password')->eq($md5)
+            ->andWhere('deleted')->eq(0)
+            ->fetch();
+
+        if($user)
+        {
+            $ip   = helper::getRemoteIp();
+            $last = $this->server->request_time;
+
+            $user->lastTime       = $user->last;
+            $user->last           = date(DT_DATETIME1, $last);
+            $user->admin          = str_contains($this->app->company->admins, ",$user->account,");
+            $user->modifyPassword = ($user->visits == 0 and !empty($this->config->safe->modifyPasswordFirstLogin));
+            if($user->modifyPassword) $user->modifyPasswordReason = 'modifyPasswordFirstLogin';
+            if(!$user->modifyPassword and !empty($this->config->safe->changeWeak))
+            {
+                $user->modifyPassword = $this->loadModel('admin')->checkWeak($user);
+                if($user->modifyPassword) $user->modifyPasswordReason = 'weak';
+            }
+            /* Check weak password when login. */
+            if(!$user->modifyPassword and $this->app->moduleName == 'user' and $this->app->methodName == 'login' and isset($_POST['passwordStrength']))
+            {
+                $user->modifyPassword = (isset($this->config->safe->mode) and $this->post->passwordStrength < $this->config->safe->mode);
+                if($user->modifyPassword) $user->modifyPasswordReason = 'passwordStrengthWeak';
+            }
+
+            /* code for bug #2729. */
+            if(defined('IN_USE')) $this->dao->update(TABLE_USER)->set('visits = visits + 1')->set('ip')->eq($ip)->set('last')->eq($last)->where('account')->eq($account)->exec();
+
+            /* Create cycle todo in login. */
+            $todoList = $this->dao->select()->from(TABLE_TODO)->where('cycle')->eq(1)->andWhere('deleted')->eq('0')->andWhere('account')->eq($user->account)->fetchAll('id');
             $this->loadModel('todo')->createByCycle($todoList);
 
             /* Fix bug #17082. */
@@ -1364,7 +1415,7 @@ class userModel extends model
      */
     public function checkLocked($account)
     {
-        if($this->session->{"{$account}.loginLocked"} and (time() - strtotime($this->session->{"{$account}.loginLocked"})) <= $this->config->user->lockMinutes * 60) return true;
+        if($this->session->{"$account.loginLocked"} and (time() - strtotime($this->session->{"$account.loginLocked"})) <= $this->config->user->lockMinutes * 60) return true;
 
         $user = $this->dao->select('locked')->from(TABLE_USER)->where('account')->eq($account)->fetch();
         if(empty($user)) return false;
