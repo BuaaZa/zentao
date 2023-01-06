@@ -384,10 +384,10 @@ class baseDAO
      * The update method, call sql::update().
      *
      * @param string $table
-     * @return baseDAO the dao object self.
+     * @return baseDAO|baseSQL the dao object self.
      * @access public
      */
-    public function update(string $table): baseDAO
+    public function update(string $table): baseDAO|baseSQL
     {
         $this->setMode('raw');
         $this->setMethod('update');
