@@ -16,11 +16,11 @@ class taskModel extends model
     /**
      * Create a task.
      *
-     * @param  int    $executionID
+     * @param int $executionID
      * @access public
-     * @return void
+     * @return array|bool
      */
-    public function create($executionID, $bugID)
+    public function create(int $executionID, $bugID): bool|array
     {
         if((float)$this->post->estimate < 0)
         {
@@ -96,11 +96,11 @@ class taskModel extends model
             ->setIF($this->post->story != false, 'storyVersion', $this->loadModel('story')->getVersion($this->post->story))
             ->setDefault('estStarted', '0000-00-00')
             ->setDefault('deadline', '0000-00-00')
-            ->setIF(strpos($requiredFields, 'estStarted') !== false, 'estStarted', helper::isZeroDate($this->post->estStarted) ? '' : $this->post->estStarted)
-            ->setIF(strpos($requiredFields, 'deadline') !== false, 'deadline', helper::isZeroDate($this->post->deadline) ? '' : $this->post->deadline)
-            ->setIF(strpos($requiredFields, 'estimate') !== false, 'estimate', $this->post->estimate)
-            ->setIF(strpos($requiredFields, 'left') !== false, 'left', $this->post->left)
-            ->setIF(strpos($requiredFields, 'story') !== false, 'story', $this->post->story)
+            ->setIF(str_contains($requiredFields, 'estStarted'), 'estStarted', helper::isZeroDate($this->post->estStarted) ? '' : $this->post->estStarted)
+            ->setIF(str_contains($requiredFields, 'deadline'), 'deadline', helper::isZeroDate($this->post->deadline) ? '' : $this->post->deadline)
+            ->setIF(str_contains($requiredFields, 'estimate'), 'estimate', $this->post->estimate)
+            ->setIF(str_contains($requiredFields, 'left'), 'left', $this->post->left)
+            ->setIF(str_contains($requiredFields, 'story'), 'story', $this->post->story)
             ->setIF(is_numeric($this->post->estimate), 'estimate', (float)$this->post->estimate)
             ->setIF(is_numeric($this->post->consumed), 'consumed', (float)$this->post->consumed)
             ->setIF(is_numeric($this->post->left),     'left',     (float)$this->post->left)
@@ -144,7 +144,7 @@ class taskModel extends model
                 $task->story = 0;
             }
 
-            if(strpos($requiredFields, ',estimate,') !== false)
+            if(str_contains($requiredFields, ',estimate,'))
             {
                 if(strlen(trim($task->estimate)) == 0) dao::$errors['estimate'] = sprintf($this->lang->error->notempty, $this->lang->task->estimate);
                 $requiredFields = str_replace(',estimate,', ',', $requiredFields);
@@ -155,7 +155,7 @@ class taskModel extends model
             /* Fix Bug #2466 */
             if($this->post->multiple) $task->assignedTo = '';
             if(!$this->post->multiple or count(array_filter($this->post->team)) < 1) $task->mode = '';
-            $this->dao->insert(TABLE_TASK)->data($task, $skip = 'gitlab,gitlabProject')
+            $this->dao->insert(TABLE_TASK)->data($task, 'gitlab,gitlabProject')
                 ->autoCheck()
                 ->batchCheck($requiredFields, 'notempty')
                 ->checkIF($task->estimate != '', 'estimate', 'float')
@@ -793,7 +793,7 @@ class taskModel extends model
     {
         if(!$oldTask) return false;
 
-        if(empty($team)) $team = $this->dao->select('*')->from(TABLE_TASKTEAM)->where('task')->eq($oldTask->id)->orderBy('order')->fetchAll();
+        if(empty($team)) $team = $this->dao->select()->from(TABLE_TASKTEAM)->where('task')->eq($oldTask->id)->orderBy('order')->fetchAll();
         if(!empty($team))
         {
             $now         = helper::now();
@@ -875,17 +875,17 @@ class taskModel extends model
     }
 
     /**
-     * Manage multi task team members.
+     * Manage multitask team members.
      *
-     * @param  string  $mode
-     * @param  int     $taskID
-     * @param  string  $taskStatus
+     * @param string $mode
+     * @param int $taskID
+     * @param string $taskStatus
      * @access public
      * @return array
      */
-    public function manageTaskTeam($mode, $taskID, $taskStatus)
+    public function manageTaskTeam(string $mode, int $taskID, string $taskStatus)
     {
-        $oldTeams   = $this->dao->select('*')->from(TABLE_TASKTEAM)->where('task')->eq($taskID)->fetchAll();
+        $oldTeams   = $this->dao->select()->from(TABLE_TASKTEAM)->where('task')->eq($taskID)->fetchAll();
         $oldMembers = array_map(function($team){return $team->account;}, $oldTeams);
 
         $this->dao->delete()->from(TABLE_TASKTEAM)->where('task')->eq($taskID)->exec();

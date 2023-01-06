@@ -13,6 +13,8 @@ class user extends control
 {
     public $referer;
 
+    public userModel $user;
+
     /**
      * Construct
      *
@@ -480,11 +482,11 @@ class user extends control
     /**
      * Set the rerferer.
      *
-     * @param  string   $referer
+     * @param string $referer
      * @access public
      * @return void
      */
-    public function setReferer($referer = '')
+    public function setReferer(string $referer = '')
     {
         $this->referer = $this->server->http_referer ? $this->server->http_referer: '';
         if(!empty($referer)) $this->referer = helper::safe64Decode($referer);
@@ -783,16 +785,16 @@ class user extends control
      * @access public
      * @return void
      */
-    public function login($referer = '', $from = '')
+    public function login(string $referer = '', $from = '')
     {
-        /* Check if you can operating on the folder. */
+        /* Check if you can operate on the folder. */
         $canModifyDIR = true;
         if($this->user->checkTmp() === false)
         {
             $canModifyDIR = false;
             $floderPath   = $this->app->tmpRoot;
         }
-        elseif(!is_dir($this->app->dataRoot) or substr(base_convert(@fileperms($this->app->dataRoot), 10, 8), -4) != '0777')
+        elseif(!is_dir($this->app->dataRoot) or !str_ends_with(base_convert(@fileperms($this->app->dataRoot), 10, 8), '0777'))
         {
             $canModifyDIR = false;
             $floderPath   = $this->app->dataRoot;
@@ -832,21 +834,21 @@ class user extends control
             }
 
             $response['result'] = 'success';
-            if(strpos($this->referer, $loginLink) === false and
-               strpos($this->referer, $denyLink)  === false and
-               strpos($this->referer, 'ajax') === false and
-               strpos($this->referer, 'block')  === false and $this->referer
+            if(!str_contains($this->referer, $loginLink) and
+               !str_contains($this->referer, $denyLink) and
+               !str_contains($this->referer, 'ajax') and
+               !str_contains($this->referer, 'block') and $this->referer
             )
             {
                 $response['locate'] = $this->referer;
-                if(helper::isWithTID() and strpos($response['locate'], 'tid=') === false) $response['locate'] .= (strpos($response['locate'], '?') === false ? '?' : '&') . "tid={$this->get->tid}";
-                return $this->send($response);
+                if(helper::isWithTID() and !str_contains($response['locate'], 'tid='))
+                    $response['locate'] .= (!str_contains($response['locate'], '?') ? '?' : '&') . "tid={$this->get->tid}";
             }
             else
             {
                 $response['locate'] = $this->config->webRoot . (helper::isWithTID() ? "?tid={$this->get->tid}" : '');
-                return $this->send($response);
             }
+            return $this->send($response);
         }
 
         /* Passed account and password by post or get. */
@@ -883,7 +885,7 @@ class user extends control
                 $user = $this->user->login($user);
 
                 /* Go to the referer. */
-                if($this->post->referer and strpos($this->post->referer, $loginLink) === false and strpos($this->post->referer, $denyLink) === false and strpos($this->post->referer, 'block') === false)
+                if($this->post->referer and !str_contains($this->post->referer, $loginLink) and !str_contains($this->post->referer, $denyLink) and strpos($this->post->referer, 'block') === false)
                 {
                     if($this->app->getViewType() == 'json')
                     {
