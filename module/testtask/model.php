@@ -28,15 +28,28 @@ class testtaskModel extends model
             $projectID = $execution->project;
         }
 
+        if(isset($_POST["handle"])){
+            $handle = $_POST["handle"];
+        }else{
+            $handle = 0;
+        }
+        if(isset($_POST["parent"]) && (int)$_POST["parent"] > 0){
+            $parent = $this->dao->select("*")->from(TABLE_TESTTASK)->where('id')->eq((int)$_POST["parent"])->fetch();
+            if(!$parent){
+                $_POST["parent"] = 0;
+            }
+        }
+
         $task = fixer::input('post')
             ->setDefault('build', '')
             ->setIF($this->config->systemMode == 'new', 'project', $projectID)
             ->setDefault('createdBy', $this->app->user->account)
             ->setDefault('createdDate', helper::now())
+            ->setDefault('parent', 0)
             ->stripTags($this->config->testtask->editor->create['id'], $this->config->allowedTags)
             ->join('mailto', ',')
             ->join('type', ',')
-            ->remove('files,labels,uid,contactListMenu')
+            ->remove('files,labels,uid,contactListMenu,handle')
             ->get();
 
         $task = $this->loadModel('file')->processImgURL($task, $this->config->testtask->editor->create['id'], $this->post->uid);
@@ -52,6 +65,52 @@ class testtaskModel extends model
         if(!dao::isError())
         {
             $taskID = $this->dao->lastInsertID();
+            if(isset($parent) && !empty($parent)){
+                $this->loadModel("testtask");
+                $pCases = $this->testtask->getCase($parent->id);
+                if(!empty($pCases)){
+                    switch((int)$handle){
+                        case 0:
+                            foreach($pCases as $case){
+                                $row = new stdclass();
+                                $row->task       = $taskID;
+                                $row->case       = $case->case;
+                                $row->version    = $case->version;
+                                $row->assignedTo = $case->assignedTo;
+                                $row->status     = $case->status;
+                                $this->dao->insert(TABLE_TESTRUN)->data($row)->exec();
+
+                                // if($this->app->tab != 'qa')
+                                // {
+                                //     $projectID = $this->app->tab == 'project' ? $this->session->project : $this->session->execution;
+                                //     $lastOrder = (int)$this->dao->select('*')->from(TABLE_PROJECTCASE)->where('project')->eq($projectID)->orderBy('order_desc')->limit(1)->fetch('order');
+
+                                //     $data = new stdclass();
+                                //     $data->project = $projectID;
+                                //     $data->product = $this->session->product;
+                                //     $data->case    = $case->case;
+                                //     $data->version = 1;
+                                //     $data->order   = ++ $lastOrder;
+                                //     $this->dao->replace(TABLE_PROJECTCASE)->data($data)->exec();
+                                // }
+
+                                $this->dao->delete()->from(TABLE_TESTRUN)
+                                    ->where('id')->eq($case->id)
+                                    ->exec();
+                            }
+                            break;
+                        case 1:
+                            foreach($pCases as $case){
+                                $this->dao->delete()->from(TABLE_TESTRUN)
+                                    ->where('id')->eq($case->id)
+                                    ->exec();
+                            }
+                            break;
+                        default:
+                            ChromePhp::log("default");
+                    }
+                }
+            }
             $this->file->updateObjectID($this->post->uid, $taskID, 'testtask');
             $this->file->saveUpload('testtask', $taskID);
             return $taskID;
@@ -2385,5 +2444,24 @@ class testtaskModel extends model
         }
         $output .= '</div>';
         return $output;
+    }
+
+    public function getTestParent($productID, $projectID=0, $excutionID=0)
+    {
+        $tests = $this->dao->select('id, name')->from(TABLE_TESTTASK)
+            ->where('deleted')->eq(0)
+            ->andWhere('product')->eq($productID)
+            ->beginIF(!empty($projectID) && $projectID > 0)->andWhere('project')->eq($projectID)->fi()
+            ->beginIF(!empty($projectID) && $excutionID > 0)->andWhere('excution')->eq($excutionID)->fi()
+            ->fetchPairs();
+        return array(0 => '') + $tests;
+    }
+
+    public function getCase($taskID)
+    {
+        $cases = $this->dao->select('*')->from(TABLE_TESTRUN)
+            ->where('task')->eq($taskID)
+            ->fetchAll();
+        return $cases;
     }
 }

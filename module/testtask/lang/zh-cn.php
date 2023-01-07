@@ -215,3 +215,9 @@ $lang->testtask->typeList['system']      = '系统测试';
 $lang->testtask->typeList['acceptance']  = '验收测试';
 $lang->testtask->typeList['performance'] = '性能测试';
 $lang->testtask->typeList['safety']      = '安全测试';
+
+$lang->testtask->testParent = "父测试集";
+$lang->testtask->handleCase = "父测试集用例";
+$lang->testtask->handle0 = "转移到当前测试集下";
+$lang->testtask->handle1 = "直接删除";
+$lang->testtask->handle2 = "创建默认子测试集，并转移到该测试集下";
