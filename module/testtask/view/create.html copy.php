@@ -25,31 +25,17 @@
         <?php if(isset($executionID)):?>
         <tr>
           <th class='w-100px'><?php echo $lang->testtask->product;?></th>
-          <td class='w-p35-f'><?php echo html::select('product', $products, $productID, "class='form-control chosen' onchange='loadProductRelated();loadTestParent(this.value)'");?></td><td></td>
+          <td class='w-p35-f'><?php echo html::select('product', $products, $productID, "class='form-control chosen' onchange='loadProductRelated()'");?></td><td></td>
         </tr>
         <?php else:?>
         <tr class='hide'>
           <th class='w-80px'><?php echo $lang->testtask->product;?></th>
-          <td class='w-p35-f'><?php echo html::input('product', $productID, "class='form-control' onchange='loadTestReports(this.value);loadTestParent(this.value)'");?></td><td></td>
+          <td class='w-p35-f'><?php echo html::input('product', $productID, "class='form-control' onchange='loadTestReports(this.value)'");?></td><td></td>
         </tr>
         <?php endif;?>
         <tr>
           <th class='w-80px'><?php echo $lang->testtask->execution;?></th>
-          <td class='w-p35-f'><?php echo html::select('execution', $executions, $executionID, "class='form-control chosen' onchange='loadExecutionRelated(this.value);loadTestEParent(this.value)'");?></td><td></td>
-        </tr>
-        <tr>
-          <div id='parent_select'>
-            <th class='w-80px'><?php echo $lang->testtask->testParent;?></th>
-            <td class='w-p35-f'><?php echo html::select('parent', $testParent, 0, "class='form-control chosen'");?>
-          </div>
-        </tr>
-        <tr>
-          <div id='case_select'>
-            <th class='w-80px'><?php echo $lang->testtask->handleCase;?></th>
-            <td class='w-p35-f'><?php 
-              $handleArray = array(0 => $lang->testtask->handle0, 1 => $lang->testtask->handle1, 2 => $lang->testtask->handle2);
-              echo html::select('handle', $handleArray, 0, "class='form-control chosen'");?>
-          </div>
+          <td class='w-p35-f'><?php echo html::select('execution', $executions, $executionID, "class='form-control chosen' onchange='loadExecutionRelated(this.value)'");?></td><td></td>
         </tr>
         <tr>
           <th class='w-80px'><?php echo $lang->testtask->build;?></th>

@@ -214,8 +214,11 @@ class testtask extends control
     {
         if(!empty($_POST))
         {
+            #include "../common/ChromePhp.php";
             $taskID = $this->testtask->create($projectID);
-            if(dao::isError()) return $this->send(array('result' => 'fail', 'message' => dao::getError()));
+            if(dao::isError()){
+                return $this->send(array('result' => 'fail', 'message' =>  dao::getError()));
+            }
             $this->loadModel('action')->create('testtask', $taskID, 'opened');
 
             $message = $this->executeHooks($taskID);
@@ -269,6 +272,8 @@ class testtask extends control
         $this->view->testreports = array('') + $this->loadModel('testreport')->getPairs($productID);
         $this->view->users       = $this->loadModel('user')->getPairs('noclosed|qdfirst|nodeleted');
 
+        $this->view->testParent = $this->testtask->getTestParent($productID, $projectID, $excutionID);
+        
         $this->display();
     }
 
@@ -1574,5 +1579,22 @@ class testtask extends control
         $this->view->testtasksPinyin = common::convert2Pinyin($namePairs);
 
         $this->display();
+    }
+
+    public function ajaxGetTestParent($productID, $projectID = 0, $executionID = 0)
+    {
+        $testParent = $this->testtask->getTestParent($productID, $projectID, $excutionID);
+        return print(html::select('parent', $testParent, 0, "class='form-control chosen'"));
+    }
+    
+    public function ajaxCheckUsecase($taskID){
+        if(!isset($taskID) || $taskID <= 0)
+            return print("false");
+        $cases = $this->testtask->getCase($taskID);
+        if(empty($cases)){
+            return print("false");
+        }else{
+            return print("true");
+        }
     }
 }
