@@ -106,6 +106,32 @@ class testtaskModel extends model
                                     ->exec();
                             }
                             break;
+                        case 2:
+
+                            $parent_copy = $parent;
+                            $parent_copy->parent = $parent->id;
+                            $parent_copy->createdDate = helper::now();
+                            $parent_copy->status = 'wait';
+                            $parent_copy->name = $parent->name . '-子测试集';
+                            unset($parent_copy->id);
+                            $this->dao->insert(TABLE_TESTTASK)->data($parent_copy)->exec();
+
+                            $taskID = $this->dao->lastInsertID();
+
+                            foreach($pCases as $case){
+                                $row = new stdclass();
+                                $row->task       = $taskID;
+                                $row->case       = $case->case;
+                                $row->version    = $case->version;
+                                $row->assignedTo = $case->assignedTo;
+                                $row->status     = $case->status;
+                                $this->dao->insert(TABLE_TESTRUN)->data($row)->exec();
+
+                                $this->dao->delete()->from(TABLE_TESTRUN)
+                                    ->where('id')->eq($case->id)
+                                    ->exec();
+                            }
+                            break;
                         default:
                             ChromePhp::log("default");
                     }
