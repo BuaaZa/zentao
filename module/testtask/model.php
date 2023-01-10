@@ -164,7 +164,7 @@ class testtaskModel extends model
         $branch   = $scopeAndStatus[0] == 'all' ? 'all' : $branch;
 
         $executionNameField = $this->config->systemMode == 'new' ? "IF(t5.id IS NOT NULL, CONCAT(t5.name, ' / ', t3.name), t3.name)" : 't3.name';
-        return $this->dao->select("t1.*, t2.name AS productName, $executionNameField AS executionName, t4.name AS buildName, t4.branch AS branch")
+        $tasks =  $this->dao->select("t1.*, t2.name AS productName, $executionNameField AS executionName, t4.name AS buildName, t4.branch AS branch")
             ->from(TABLE_TESTTASK)->alias('t1')
             ->leftJoin(TABLE_PRODUCT)->alias('t2')->on('t1.product = t2.id')
             ->leftJoin(TABLE_EXECUTION)->alias('t3')->on('t1.execution = t3.id')
@@ -193,6 +193,14 @@ class testtaskModel extends model
             ->orderBy($orderBy)
             ->page($pager)
             ->fetchAll('id');
+        $parentList = $this->getParentList($proudctID);
+        foreach($tasks as $task){
+            if(isset($parentList[$task->id]))
+                $task->isParent = true;
+            else
+                $task->isParent = false;
+        }
+        return $tasks;
     }
 
     /**
@@ -2373,8 +2381,10 @@ class testtaskModel extends model
         $menu .= $this->buildMenu('testtask', 'close',    $params, $task, 'view', '', '', 'iframe showinonlybody', true);
         $menu .= $this->buildMenu('testtask', 'block',    $params, $task, 'view', 'pause', '', 'iframe showinonlybody', true);
         $menu .= $this->buildMenu('testtask', 'activate', $params, $task, 'view', 'magic', '', 'iframe showinonlybody', true);
-        $menu .= $this->buildMenu('testtask', 'cases',    $params, $task, 'view', 'sitemap');
-        $menu .= $this->buildMenu('testtask', 'linkCase', $params, $task, 'view', 'link');
+        if(!$task->isParent){
+            $menu .= $this->buildMenu('testtask', 'cases',    $params, $task, 'view', 'sitemap');
+            $menu .= $this->buildMenu('testtask', 'linkCase', $params, $task, 'view', 'link');
+        }
 
         $menu  .= "<div class='divider'></div>";
         $menu  .= $this->buildFlowMenu('testtask', $task, 'view', 'direct');
@@ -2399,8 +2409,10 @@ class testtaskModel extends model
         $params = "taskID=$task->id";
 
         $menu .= '<div id="action-divider">';
-        $menu .= $this->buildMenu('testtask',   'cases',    $params, $task, 'browse', 'sitemap');
-        $menu .= $this->buildMenu('testtask',   'linkCase', "$params&type=all&param=myQueryID", $task, 'browse', 'link');
+        if(!$task->isParent){
+            $menu .= $this->buildMenu('testtask',   'cases',    $params, $task, 'browse', 'sitemap');
+            $menu .= $this->buildMenu('testtask',   'linkCase', "$params&type=all&param=myQueryID", $task, 'browse', 'link');
+        }
         $menu .= $this->buildMenu('testreport', 'browse',   "objectID=$task->product&objectType=product&extra=$task->id", $task, 'browse', 'summary');
         $menu .= '</div>';
         $menu .= $this->buildMenu('testtask',   'view',     $params, $task, 'browse', 'list-alt', '', 'iframe', true, "data-width='90%'");
@@ -2503,5 +2515,45 @@ class testtaskModel extends model
             ->where('task')->eq($taskID)
             ->fetchAll();
         return $cases;
+    }
+    
+    public function getParentList($productID = -1){
+        $parents = $this->dao->select('DISTINCT parent')->from(TABLE_TESTTASK)
+            ->where('deleted')->eq(0)
+            ->beginIF(!empty($productID) && $productID > 0)->andWhere('product')->eq($productID)->fi()
+            ->fetchPairs('parent','parent');
+        return $parents;        
+    }
+
+    public function getAllSons($taskID){
+        $task = $this->dao->select('*')->from(TABLE_TESTTASK)
+            ->where('id')->eq($taskID)
+            ->fetch();
+        if(!$task) return false;
+        $parents = $this->getParentList();
+        $childs = $this->dao->select('id')->from(TABLE_TESTTASK)
+            ->where('deleted')->eq(0)
+            ->andWhere('id')->notin($parents)
+            ->fetchPairs('id','id');
+        $ans = array();
+        if(isset($childs[$taskID])){
+            $ans[$taskID] = $task;
+        }else{
+            $list = array($taskID => $taskID);
+            while(count($list)>0){
+                $list = $this->dao->select('id')->from(TABLE_TESTTASK)
+                    ->where('deleted')->eq(0)
+                    ->andWhere('parent')->in($list)
+                    ->fetchPairs('id','id');
+                $inter = array_intersect_assoc($list,$childs);
+                $ans = $ans + $inter;
+                $list = array_diff($list,$inter);
+            }
+            $ans = $this->dao->select('*')->from(TABLE_TESTTASK)
+                ->where('deleted')->eq(0)
+                ->andWhere('id')->in($ans)
+                ->fetchAll('id');
+        }
+        return $ans;        
     }
 }
