@@ -124,7 +124,8 @@
           <?php if(!empty($lang->$moduleName->menus) and $action == 'browse') continue;;?>
           <?php if(!empty($version) and !str_contains($changelogs, ",$moduleName-$actionLabel,")) continue;?>
           <div class='group-item'>
-            <?php echo html::checkbox("actions[$moduleName]", array($action => $lang->$moduleName->$actionLabel), isset($groupPrivs[$moduleName][$action]) ? $action : '', "title='{$lang->$moduleName->$actionLabel}'", 'inline');?>
+            <?php echo html::checkbox("actions[$moduleName]", array($action => $lang->$moduleName->$actionLabel),
+                isset($groupPrivs[$moduleName][$action]) ? $action : '', "title='{$lang->$moduleName->$actionLabel}'", 'inline');?>
           </div>
           <?php endforeach;?>
         </td>

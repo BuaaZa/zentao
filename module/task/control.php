@@ -11,6 +11,14 @@
  */
 class task extends control
 {
+
+    public executionModel $execution;
+
+    public kanbanModel $kanban;
+
+    public taskModel $task;
+
+    public treeModel $tree;
     /**
      * Construct function, load model of project and story modules.
      *
@@ -29,18 +37,25 @@ class task extends control
     /**
      * Create a task.
      *
-     * @param  int    $executionID
-     * @param  int    $storyID
+     * @param int $executionID
+     * @param int $storyID
      * @param  int    $moduleID
      * @param  int    $taskID
      * @param  int    $todoID
      * @param  string $extra
      * @access public
-     * @return void
+     * @return int
      */
-    public function create($executionID = 0, $storyID = 0, $moduleID = 0, $taskID = 0, $todoID = 0, $extra = '', $bugID = 0)
+    public function create(int $executionID = 0,
+                           int $storyID = 0,
+                               $moduleID = 0,
+                               $taskID = 0,
+                               $todoID = 0,
+                               $extra = '',
+                               $bugID = 0)
     {
-        if(empty($this->app->user->view->sprints) and !$executionID) $this->locate($this->createLink('execution', 'create'));
+        if(empty($this->app->user->view->sprints) and !$executionID)
+            $this->locate($this->createLink('execution', 'create'));
         $extra = str_replace(array(',', ' '), array('&', ''), $extra);
         parse_str($extra, $output);
 
@@ -53,7 +68,7 @@ class task extends control
 
         $this->execution->getLimitedExecution();
         $limitedExecutions = !empty($_SESSION['limitedExecutions']) ? $_SESSION['limitedExecutions'] : '';
-        if(strpos(",{$limitedExecutions},", ",$executionID,") !== false)
+        if(str_contains(",$limitedExecutions,", ",$executionID,"))
         {
             echo js::alert($this->lang->task->createDenied);
             return print(js::locate($this->createLink('execution', 'task', "executionID=$executionID")));
@@ -103,7 +118,7 @@ class task extends control
             $regionPairs = $this->kanban->getRegionPairs($execution->id, 0, 'execution');
             $regionID    = !empty($output['regionID']) ? $output['regionID'] : key($regionPairs);
             $lanePairs   = $this->kanban->getLanePairsByRegion($regionID, 'task');
-            $laneID      = isset($output['laneID']) ? $output['laneID'] : key($lanePairs);
+            $laneID      = $output['laneID'] ?? key($lanePairs);
 
             $this->view->regionID    = $regionID;
             $this->view->laneID      = $laneID;
@@ -253,7 +268,7 @@ class task extends control
 
         $users            = $this->loadModel('user')->getPairs('noclosed|nodeleted');
         $members          = $this->loadModel('user')->getTeamMemberPairs($executionID, 'execution', 'nodeleted');
-        $showAllModule    = isset($this->config->execution->task->allModule) ? $this->config->execution->task->allModule : '';
+        $showAllModule    = $this->config->execution->task->allModule ?? '';
         $moduleOptionMenu = $this->tree->getTaskOptionMenu($executionID, 0, 0, $showAllModule ? 'allModule' : '');
 
         /* Fix bug #3381. When the story module is the root module. */
@@ -731,7 +746,7 @@ class task extends control
             $this->execution->setMenu($execution->id);
 
             /* Set modules and members. */
-            $showAllModule = isset($this->config->task->allModule) ? $this->config->task->allModule : '';
+            $showAllModule = $this->config->task->allModule ?? '';
             $modules       = $this->tree->getTaskOptionMenu($executionID, 0, 0, $showAllModule ? 'allModule' : '');
             $modules       = array('ditto' => $this->lang->task->ditto) + $modules;
 
@@ -753,8 +768,8 @@ class task extends control
         }
 
         /* Get edited tasks. */
-        $tasks = $this->dao->select('*')->from(TABLE_TASK)->where('id')->in($taskIDList)->fetchAll('id');
-        $teams = $this->dao->select('*')->from(TABLE_TASKTEAM)->where('task')->in($taskIDList)->fetchGroup('task', 'id');
+        $tasks = $this->dao->select()->from(TABLE_TASK)->where('id')->in($taskIDList)->fetchAll('id');
+        $teams = $this->dao->select()->from(TABLE_TASKTEAM)->where('task')->in($taskIDList)->fetchGroup('task', 'id');
 
         /* Get execution teams. */
         $executionIDList = array();
@@ -1313,10 +1328,12 @@ class task extends control
         $feedbackData->workHours=$estimate->consumed;
         $feedbackData->zenTaoTaskId=strval(($task->parent >0)?$task->parent:$estimate->objectID);
 
-//        $responseObject = $this->task->taskFeedback($feedbackData);
+        $responseObject = $this->task->taskFeedback($feedbackData);
 
         // 导入自定义js,显示提示信息
-        js::import('/zentaopms/module/task/js/syncmessage.js');
+        $webRoot = $this->config->webRoot;
+        $jsRoot = str_replace('www/','module/task/js/',$webRoot);
+        js::import($jsRoot.'syncmessage.js');
         if($responseObject->httpCode == 200 && $responseObject->msg == '操作成功'){
             $this->dao->update(TABLE_EFFORT)
                 ->set('syncStatus')->eq('1')

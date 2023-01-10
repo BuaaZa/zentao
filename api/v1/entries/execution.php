@@ -11,6 +11,9 @@
  */
 class executionEntry extends Entry
 {
+
+    public executionModel $execution;
+
     /**
      * GET method.
      *

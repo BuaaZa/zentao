@@ -177,10 +177,10 @@ function initSteps(selector)
         }
         if(!notFocus && $step) setTimeout(function(){$step.find('.step-steps').focus();}, 10);
     };
-    var updateStepType = function($step, type)
+    var updateStepType = function($step, type, defaultText)
     {
-        var targetIsGroup = type =='group';
-        $step.attr('data-type', type).find('.step-steps').addClass('autosize').attr('placeholder', targetIsGroup ? groupNameText : null);
+        $step.attr('data-type', type).find('.step-steps').addClass('autosize').attr('placeholder', defaultText);
+
     };
     var getStepsElements = function()
     {
@@ -189,17 +189,20 @@ function initSteps(selector)
     var refreshSteps = function(skipAutoAddStep)
     {
         var parentId = 1, childId = 0;
+
         getStepsElements().each(function(idx)
         {
             var $step = $(this).attr('data-index', idx + 1);
             var type = $step.find('.step-type').val();
             var stepID;
+            var defaultText = null;
             if(type == 'group')
             {
                 $step.removeClass('step-item').removeClass('step-step').addClass('step-group');
                 stepID = parentId++;
                 $step.find('.step-id').text(stepID);
                 childId = 1;
+                defaultText = groupNameText;
             }
             else if(type == 'step')
             {
@@ -214,6 +217,10 @@ function initSteps(selector)
                 {
                     stepID = (parentId - 1) + '.' + (childId++);
                     $step.removeClass('step-step').removeClass('step-group').addClass('step-item').find('.step-item-id').text(stepID);
+                    defaultText = "输入项名称";
+                    if($step.find('.step-group-toggle2').is(':checked')){
+                        defaultText = "输出项名称";
+                    }
                 }
                 else // type as step
                 {
@@ -224,9 +231,13 @@ function initSteps(selector)
             }
             $step.find('[name^="steps["]').attr('name', "steps[" +stepID + ']');
             $step.find('[name^="stepType["]').attr('name', "stepType[" +stepID + ']');
+            //从1开始索引
+            $step.find('[name^="inputs["]').attr('name', "inputs[" +stepID + ']');
+            $step.find('[name^="goal_actions["]').attr('name', "goal_actions[" +stepID + ']');
             $step.find('[name^="expects["]').attr('name', "expects[" +stepID + ']');
+            $step.find('[name^="eval_criterias["]').attr('name', "eval_criterias[" +stepID + ']');
 
-            updateStepType($step, type);
+            updateStepType($step, type, defaultText);
         });
 
         /* Auto insert step to group without any steps */
@@ -289,7 +300,16 @@ function initSteps(selector)
     }
     $steps.on('click', '.btn-step-add', function()
     {
-        insertStepRow($(this).closest('.step'));
+        var $step = $(this).closest('.step');
+        var type = $step.find('.step-type').val();
+        if(type === 'group'){
+            $step = $stepTemplate.clone();
+            $steps.append($step);
+            $step.addClass('step-new');
+            $step.find('.step-type').val('step');
+        }else{
+            insertStepRow($step);
+        }
         refreshSteps();
     }).on('click', '.btn-step-delete', function()
     {
@@ -321,6 +341,9 @@ function initSteps(selector)
         }
 
         refreshSteps();
+    }).on('change', '.step-group-toggle2', function()
+    {
+        refreshSteps();
     }).on('change', '.form-control', function()
     {
         var $control = $(this);
@@ -329,8 +352,8 @@ function initSteps(selector)
             var $step = $control.closest('.step');
             if($step.data('index') === getStepsElements().length)
             {
-                insertStepRow($step, 1, 'step', true);
-                if($step.is('.step-item,.step-group')) insertStepRow($step, 1, 'item', true);
+/*                insertStepRow($step, 1, 'step', true);
+                if($step.is('.step-item,.step-group')) insertStepRow($step, 1, 'item', true);*/
                 refreshSteps();
             }
         }

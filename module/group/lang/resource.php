@@ -908,6 +908,7 @@ $lang->resource->task->confirmStoryChange = 'confirmStoryChange';
 $lang->resource->task->recordEstimate     = 'recordEstimateAction';
 $lang->resource->task->editEstimate       = 'editEstimate';
 $lang->resource->task->deleteEstimate     = 'deleteEstimate';
+$lang->resource->task->syncEstimate       = 'syncEstimate';
 $lang->resource->task->report             = 'reportChart';
 
 $lang->task->methodOrder[5]   = 'create';
