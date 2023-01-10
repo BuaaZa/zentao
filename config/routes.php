@@ -5,6 +5,7 @@
 $routes = array();
 
 $routes['/tokens']   = 'tokens';
+$routes['/tokensWithEncryption']   = 'tokensWithEncryption';
 $routes['/langs']    = 'langs';
 $routes['/views']    = 'views';
 $routes['/groups']   = 'groups';
@@ -86,6 +87,7 @@ $routes['/executions/:id/tasks/batchCreate'] = 'taskBatchCreate';
 $routes['/tasks/batchCreate']                = 'taskBatchCreate';
 
 $routes['/executions/:id/tasks'] = 'tasks';
+$routes['/executions/:id/tasksMultiple'] = 'tasksMultiple';
 $routes['/tasks']                = 'tasks';
 $routes['/tasks/:id']            = 'task';
 $routes['/tasks/:id/assignto']   = 'taskAssignTo';

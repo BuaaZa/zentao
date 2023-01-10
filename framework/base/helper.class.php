@@ -178,9 +178,9 @@ class baseHelper
      * Check in only body mode or not.
      *
      * @access public
-     * @return void
+     * @return bool
      */
-    public static function inOnlyBodyMode()
+    public static function inOnlyBodyMode(): bool
     {
         return (isset($_GET['onlybody']) and $_GET['onlybody'] == 'yes');
     }
@@ -192,7 +192,7 @@ class baseHelper
      * @access public
      * @return bool
      */
-    public static function isWithTID()
+    public static function isWithTID(): bool
     {
         global $config;
         return (!empty($config->tabSession) and isset($_GET['tid']));

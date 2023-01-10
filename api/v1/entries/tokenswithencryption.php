@@ -9,7 +9,7 @@
  * @version     1
  * @link        http://www.zentao.net
  */
-class tokensEntry extends baseEntry
+class tokensWithEncryptionEntry extends baseEntry
 {
 
     public userModel $user;
@@ -23,13 +23,13 @@ class tokensEntry extends baseEntry
     {
         $this->user = $this->loadModel('user');
         $account   = $this->request('account');
-        $password  = $this->request('password');
+        $md5  = $this->request('md5');
         $addAction = $this->request('addAction', false);
 
         if($this->user->checkLocked($account))
             return $this->sendError(400, sprintf($this->lang->user->loginLocked, $this->config->user->lockMinutes));
 
-        $user = $this->user->identify($account, $password);
+        $user = $this->user->identifyWithMD5($account, $md5);
         if($user)
         {
             $this->user->login($user, $addAction);
