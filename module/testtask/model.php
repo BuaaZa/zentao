@@ -113,7 +113,8 @@ class testtaskModel extends model
                             $parent_copy->createdDate = helper::now();
                             $parent_copy->status = 'wait';
                             $parent_copy->name = $parent->name . '-子测试集';
-                            unset($parent_copy->id);
+                            $parent_copy->realFinishedDate = '0000-00-00 00:00:00';
+                            unset($parent_copy->id, $parent_copy->report);
                             $this->dao->insert(TABLE_TESTTASK)->data($parent_copy)->exec();
 
                             $taskID = $this->dao->lastInsertID();
