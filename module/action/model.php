@@ -968,6 +968,22 @@ class actionModel extends model
         }
     }
 
+    public function archiveaction()
+    {
+        //上个月1日之前的
+        $end = date('Y-m-01 00:00:00', strtotime('-1 month')) ;
+        $actions = $this->dao->select('*')->from(TABLE_ACTION)
+            ->where('date')->lt($end)
+            ->fetchAll();
+
+        foreach ($actions as $action){
+            $this->dao->replace(TABLE_ACTIONARCHIVE)->data($action)->autoCheck()->exec();
+        }
+        $this->dao->delete()->from(TABLE_ACTION)->where('id')->in(array_column($actions,'id'))->exec();
+
+        return $actions;
+    }
+
     /**
      * Get actions as dynamic.
      *

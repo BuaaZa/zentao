@@ -1976,12 +1976,13 @@ class taskModel extends model
             }
 
             $feedbackData = new stdclass();
-            $feedbackData->createUserCode =$estimate->account;
-            $feedbackData->createUserName =$this->app->user->realname;
-            $feedbackData->currentProgress =$progress;
-            $feedbackData->feedbackContent =$estimate->work;
-            $feedbackData->workHours=intval($estimate->consumed);
-            $feedbackData->zenTaoTaskId=strval(($task->parent >0)?$task->parent:$taskID);
+            $feedbackData->createUserCode = $task->assignedTo;
+            $realname = $this->loadModel('user')->getRealNameByAccount($task->assignedTo);
+            $feedbackData->createUserName = $realname;
+            $feedbackData->currentProgress = $progress;
+            $feedbackData->feedbackContent = $estimate->work;
+            $feedbackData->workHours = intval($estimate->consumed);
+            $feedbackData->zenTaoTaskId = strval(($task->parent >0)?$task->parent:$taskID);
 
             ChromePhp::log($feedbackData);
 
@@ -3625,7 +3626,7 @@ class taskModel extends model
         if($action == 'close'          and $task->parent < 0) return false;
         if($action == 'batchcreate'    and !empty($task->team))     return false;
         if($action == 'batchcreate'    and $task->parent > 0)       return false;
-        if($action == 'recordestimate' and $task->parent == -1)     return false;
+        if($action == 'recordestimate' and ($task->parent == -1 || $task->status =='wait'))     return false;
         if($action == 'delete'         and $task->parent < 0)       return false;
 
         if(!empty($task->team))
@@ -4208,7 +4209,7 @@ class taskModel extends model
         $canRestart        = ($task->status == 'pause' and common::hasPriv('task', 'restart'));
         $canFinish         = common::hasPriv('task', 'finish');
         $canClose          = common::hasPriv('task', 'close');
-        $canRecordEstimate = common::hasPriv('task', 'recordEstimate');
+        $canRecordEstimate = ($task->status != 'wait' and common::hasPriv('task', 'recordEstimate'));
         $canEdit           = common::hasPriv('task', 'edit');
         $canBatchCreate    = ($this->config->vision == 'rnd' and common::hasPriv('task', 'batchCreate'));
 
