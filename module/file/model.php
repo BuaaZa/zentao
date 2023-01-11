@@ -1037,7 +1037,7 @@ class fileModel extends model
      * @access public
      * @return void
      */
-    public function sendDownHeader($fileName, $fileType, $content, $type = 'content')
+    public function sendDownHeader($fileName, $fileType, $content, $type = 'content', $otherFile_notavailable = true)
     {
         /* Clean the ob content to make sure no space or utf-8 bom output. */
         $obLevel = ob_get_level();
@@ -1047,7 +1047,7 @@ class fileModel extends model
         setcookie('downloading', 1, 0, $this->config->webRoot, '', $this->config->cookieSecure, false);
 
         /* Only download upload file that is in zentao. */
-        if($type == 'file' and stripos($content, $this->savePath) !== 0) helper::end();
+        if($otherFile_notavailable and $type == 'file' and stripos($content, $this->savePath) !== 0) helper::end();
 
         /* Append the extension name auto. */
         $extension = '.' . $fileType;

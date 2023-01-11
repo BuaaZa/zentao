@@ -65,10 +65,8 @@
                   <tr>
                     <th class='w-60px'><?php echo $lang->testcase->stepID;?></th>
                     <th class='text-left'><?php echo $lang->testcase->stepDesc;?></th>
-                    <th class='w-p25 text-left'><?php echo $lang->testcase->stepExpect;?></th>
                     <th class='w-p5 text-left'><?php echo $lang->testcase->stepVersion;?></th>
                     <th class='w-80px text-center'><?php echo $lang->testcase->result;?></th>
-                    <th class='w-p20 text-left'><?php echo $lang->testcase->real;?></th>
                     <th class='w-80px'></th>
                   </tr>
                 </thead>
@@ -103,16 +101,14 @@
                     </td>
                     <td class='text-left' <?php if($stepResult['type'] == 'group') echo "colspan='6'"?>>
                       <div class='input-group'>
-                      <?php if($stepResult['type'] == 'item') echo "<span class='step-item-id'>{$stepId}.{$childId}</span>";?>
+                      <?php /*if($stepResult['type'] == 'item') echo "<span class='step-item-id'>{$stepId}.{$childId}</span>";*/?>
                       <?php if(isset($stepResult['desc'])) echo nl2br($stepResult['desc']);?>
                       </div>
                     </td>
                     <?php if($stepResult['type'] != 'group'):?>
-                    <td class='text-left'><?php if(isset($stepResult['expect'])) echo nl2br($stepResult['expect']);?></td>
                     <td><?php if(isset($result->version)) echo nl2br($result->version);?></td>
                     <?php if(!empty($stepResult['result'])):?>
                     <td class='<?php echo $stepResult['result'];?> text-center'><?php echo $lang->testcase->resultList[$stepResult['result']];?></td>
-                    <td><?php echo nl2br($stepResult['real']);?></td>
                     <td class='text-center'><?php if(!empty($stepResult['files'])) echo html::a("#stepResult{$modalID}", $lang->files . $fileCount, '', "data-toggle='modal' data-type='iframe'")?></td>
                     <?php else:?>
                     <td></td>

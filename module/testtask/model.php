@@ -1209,16 +1209,26 @@ class testtaskModel extends model
             $stepResults[$stepID] = $step;
         }
 
+        $sample_data = array();
+        $sample_in = $postData->sample_in;
+        $sample_out = $postData->sample_out;
+        $sample_result = $postData->sample_result;
+        $sample_data['sample_in'] = $sample_in;
+        $sample_data['sample_out'] = $sample_out;
+        $sample_data['sample_result'] = $sample_result;
+
+
         /* Insert into testResult table. */
         $now = helper::now();
         $result = fixer::input('post')
             ->add('run', $runID)
             ->add('caseResult', $caseResult)
             ->setForce('stepResults', serialize($stepResults))
+            ->setForce('sample_data', serialize($sample_data))
             ->setDefault('lastRunner', $this->app->user->account)
             ->setDefault('date', $now)
-            ->skipSpecial('stepResults')
-            ->remove('steps,reals,result')
+            ->skipSpecial('stepResults,sample_data')
+            ->remove('steps,reals,result,sample_in,sample_out,sample_result')
             ->get();
 
         /* Remove files and labels field when uploading files for case result or step result. */
@@ -1413,6 +1423,8 @@ class testtaskModel extends model
         foreach($results as $resultID => $result)
         {
             $result->stepResults = unserialize($result->stepResults);
+            $result->sample_data = unserialize($result->sample_data);
+
             $result->build       = $result->run ? zget($runs, $result->run, 0) : 0;
             $result->files       = zget($resultFiles, $resultID, array()); //Get files of case result.
             if(isset($relatedSteps[$result->version]))
