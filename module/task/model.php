@@ -49,7 +49,7 @@ class taskModel extends model
             {
                 if(empty($storyID)) continue;
                 $estStarted = (!isset($this->post->testEstStarted[$i]) or (isset($this->post->estStartedDitto[$i]) and $this->post->estStartedDitto[$i] == 'on')) ? $estStarted : $this->post->testEstStarted[$i];
-                $deadline   = (!isset($this->post->testDeadline[$i]) or (isset($this->post->deadlineDitto[$i]) and $this->post->deadlineDitto[$i] == 'on'))     ? $deadline : $this->post->testDeadline[$i];
+                $deadline   = (!isset($this->post->testDeadline[$i]) or (isset($this->post->deadlineDitto[$i]) and $this->post->deadlineDitto[$i] == 'on')) ? $deadline : $this->post->testDeadline[$i];
                 $assignedTo = (!isset($this->post->testAssignedTo[$i]) or $this->post->testAssignedTo[$i] == 'ditto') ? $assignedTo : $this->post->testAssignedTo[$i];
 
                 if($estStarted > $deadline)
@@ -883,7 +883,7 @@ class taskModel extends model
      * @access public
      * @return array
      */
-    public function manageTaskTeam(string $mode, int $taskID, string $taskStatus)
+    public function manageTaskTeam(string $mode = null, int $taskID, string $taskStatus)
     {
         $oldTeams   = $this->dao->select()->from(TABLE_TASKTEAM)->where('task')->eq($taskID)->fetchAll();
         $oldMembers = array_map(function($team){return $team->account;}, $oldTeams);
