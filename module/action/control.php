@@ -12,6 +12,19 @@
 class action extends control
 {
     /**
+     * @var executionModel
+     */
+    public executionModel $execution;
+
+    public actionModel $action;
+
+    public function archiveaction()
+    {
+        $this->view->actions = $this->action->archiveaction();
+        $this->display();
+    }
+
+    /**
      * Create a action or delete all patch actions, this method is used by the Ztools.
      *
      * @param  string $objectType

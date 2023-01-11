@@ -1321,14 +1321,17 @@ class task extends control
         }
 
         $feedbackData = new stdclass();
-        $feedbackData->createUserCode =$this->app->user->account;
-        $feedbackData->createUserName =$this->app->user->realname;
+        $feedbackData->createUserCode =$task->assignedTo;
+        $realname= $this->loadModel('user')->getRealNameByAccount($task->assignedTo);
+        $feedbackData->createUserName =$realname;
         $feedbackData->currentProgress =$progress;
         $feedbackData->feedbackContent =$estimate->work;
         $feedbackData->workHours=$estimate->consumed;
         $feedbackData->zenTaoTaskId=strval(($task->parent >0)?$task->parent:$estimate->objectID);
 
-        $responseObject = $this->task->taskFeedback($feedbackData);
+        ChromePhp::log($feedbackData);
+
+//        $responseObject = $this->task->taskFeedback($feedbackData);
 
         // 导入自定义js,显示提示信息
         $webRoot = $this->config->webRoot;
