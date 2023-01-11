@@ -109,14 +109,18 @@ $doneCount    = 0;
             <?php
             if($canBeChanged)
             {
-                common::printIcon('testtask', 'cases',    "taskID=$task->id", $task, 'list', 'sitemap');
+              common::printIcon('testtask', 'cases',    "taskID=$task->id", $task, 'list', 'sitemap');
+              if($task->isParent){
+                common::printIcon('testtask', 'linkCase', "taskID=$task->id", $task, 'list', 'link','','',false, $misc = "disabled='disabled'");
+              }else{
                 common::printIcon('testtask', 'linkCase', "taskID=$task->id", $task, 'list', 'link');
-                if(common::hasPriv('execution', 'testreport'))
-                {
-                    echo html::a($this->createLink('execution', 'testreport', "executionID=$executionID&objctType=execution&extra=$task->id"), '<i class="icon-testreport-browse icon-summary"></i>', '', 'class="btn " title="' . $lang->testreport->browse . '" data-app="execution"');
-                }
-                common::printIcon('testtask', 'edit',   "taskID=$task->id", $task, 'list');
-                common::printIcon('testtask', 'delete', "taskID=$task->id", $task, 'list', 'trash', 'hiddenwin');
+              }
+              if(common::hasPriv('execution', 'testreport'))
+              {
+                  echo html::a($this->createLink('execution', 'testreport', "executionID=$executionID&objctType=execution&extra=$task->id"), '<i class="icon-testreport-browse icon-summary"></i>', '', 'class="btn " title="' . $lang->testreport->browse . '" data-app="execution"');
+              }
+              common::printIcon('testtask', 'edit',   "taskID=$task->id", $task, 'list');
+              common::printIcon('testtask', 'delete', "taskID=$task->id", $task, 'list', 'trash', 'hiddenwin');
             }
             ?>
           </td>
