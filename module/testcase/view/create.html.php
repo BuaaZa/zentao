@@ -173,7 +173,7 @@ foreach(explode(',', $config->testcase->create->requiredFields) as $field)
                     <td class='step-id'></td>
                     <td>
                       <div class='input-group'>
-                        <span class='input-group-addon step-item-id'></span>
+                          <!-- <span class='input-group-addon step-item-id'></span> -->
                         <textarea rows='1' class='form-control autosize step-steps' name='steps[]'></textarea>
                         <span class="input-group-addon step-type-toggle">
                           <input type='hidden' name='stepType[]' value='item' class='step-type'>
@@ -183,6 +183,7 @@ foreach(explode(',', $config->testcase->create->requiredFields) as $field)
                           </div>
                         </span>
                           <span class="input-group-addon step-type-toggle2">
+                              <input type='hidden' name='stepIoType[]' value='0' class='step-iotype'>
                           <div class='checkbox-primary'>
                             <input tabindex='-1' type="checkbox" class='step-group-toggle2'>
                             <label class="checkbox-inline"><?php echo "勾选为输出项" ?></label>
@@ -207,7 +208,7 @@ foreach(explode(',', $config->testcase->create->requiredFields) as $field)
                     <td class='step-id'></td>
                     <td>
                       <div class='input-group'>
-                        <span class='input-group-addon step-item-id'></span>
+                          <!-- <span class='input-group-addon step-item-id'></span> -->
                         <?php echo html::textarea('steps[]', $step->desc, "rows='1' class='form-control autosize step-steps'") ?>
                           <span class='input-group-addon step-type-toggle'>
                           <?php if(!isset($step->type)) $step->type = 'step';?>
@@ -218,9 +219,10 @@ foreach(explode(',', $config->testcase->create->requiredFields) as $field)
                           </div>
                         </span>
                           <span class='input-group-addon step-type-toggle2'>
-                          <?php if(!isset($step->type)) $step->type = 'step';?>
+                          <?php if(!isset($step->iotype)) $step->iotype = '0';?>
+                          <input type='hidden' name='stepIoType[]' value='<?php echo $step->iotype;?>' class='step-iotype'>
                           <div class='checkbox-primary'>
-                            <input tabindex='-1' type="checkbox" class='step-group-toggle2'>
+                            <input tabindex='-1' type="checkbox" class='step-group-toggle2'<?php if($step->iotype === '1') echo ' checked' ?>>
                             <label><?php echo "勾选为输出项" ?></label>
                           </div>
                         </span>

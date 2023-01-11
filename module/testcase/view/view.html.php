@@ -91,9 +91,17 @@
                 }
                 if($step->type == 'step') $stepClass = 'step-group';
                 echo "<tr class='step {$stepClass}'>";
-                echo "<th class='step-id'>$stepId</th>";
+                if($step->type != 'item'){
+                    echo "<th class='step-id'>$stepId</th>";
+                }else{
+                    if($step->iotype == '0'){
+                        echo "<th class='step-iotype'>输入项</th>";
+                    }else{
+                        echo "<th class='step-iotype'>输出项</th>";
+                    }
+                }
                 echo "<td class='text-left'><div class='input-group'>";
-                if($step->type == 'item') echo "<span class='step-item-id'>{$stepId}.{$childId}</span>";
+                //if($step->type == 'item') echo "<span class='step-item-id'>{$stepId}.{$childId}</span>";
                 echo nl2br(str_replace(' ', '&nbsp;', $step->desc)) . "</td>";
                 echo "<td class='text-left'>" . nl2br(str_replace(' ', '&nbsp;', $step->input)) . "</div></td>";
                 echo "<td class='text-left'>" . nl2br(str_replace(' ', '&nbsp;', $step->goal_action)) . "</div></td>";
