@@ -72,13 +72,16 @@ class testtaskModel extends model
                     switch((int)$handle){
                         case 0:
                             foreach($pCases as $case){
-                                $row = new stdclass();
-                                $row->task       = $taskID;
-                                $row->case       = $case->case;
-                                $row->version    = $case->version;
-                                $row->assignedTo = $case->assignedTo;
-                                $row->status     = $case->status;
-                                $this->dao->insert(TABLE_TESTRUN)->data($row)->exec();
+                                // $row = new stdclass();
+                                // $row->task       = $taskID;
+                                // $row->case       = $case->case;
+                                // $row->version    = $case->version;
+                                // $row->assignedTo = $case->assignedTo;
+                                // $row->status     = $case->status;
+                                $this->dao->update(TABLE_TESTRUN)
+                                    ->where('id')->eq($case->id)
+                                    ->set('task')->eq($taskID)
+                                    ->exec();
 
                                 // if($this->app->tab != 'qa')
                                 // {
@@ -94,9 +97,9 @@ class testtaskModel extends model
                                 //     $this->dao->replace(TABLE_PROJECTCASE)->data($data)->exec();
                                 // }
 
-                                $this->dao->delete()->from(TABLE_TESTRUN)
-                                    ->where('id')->eq($case->id)
-                                    ->exec();
+                                // $this->dao->delete()->from(TABLE_TESTRUN)
+                                //     ->where('id')->eq($case->id)
+                                //     ->exec();
                             }
                             break;
                         case 1:
@@ -118,19 +121,23 @@ class testtaskModel extends model
                             unset($parent_copy->id, $parent_copy->report);
                             $this->dao->insert(TABLE_TESTTASK)->data($parent_copy)->exec();
 
-                            $taskID = $this->dao->lastInsertID();
+                            $sonTaskID = $this->dao->lastInsertID();
 
                             foreach($pCases as $case){
-                                $row = new stdclass();
-                                $row->task       = $taskID;
-                                $row->case       = $case->case;
-                                $row->version    = $case->version;
-                                $row->assignedTo = $case->assignedTo;
-                                $row->status     = $case->status;
-                                $this->dao->insert(TABLE_TESTRUN)->data($row)->exec();
+                                // $row = new stdclass();
+                                // $row->task       = $taskID;
+                                // $row->case       = $case->case;
+                                // $row->version    = $case->version;
+                                // $row->assignedTo = $case->assignedTo;
+                                // $row->status     = $case->status;
+                                // $this->dao->insert(TABLE_TESTRUN)->data($row)->exec();
 
-                                $this->dao->delete()->from(TABLE_TESTRUN)
+                                // $this->dao->delete()->from(TABLE_TESTRUN)
+                                //     ->where('id')->eq($case->id)
+                                //     ->exec();
+                                $this->dao->update(TABLE_TESTRUN)
                                     ->where('id')->eq($case->id)
+                                    ->set('task')->eq($sonTaskID)
                                     ->exec();
                             }
                             break;
@@ -269,7 +276,7 @@ class testtaskModel extends model
      */
     public function getProjectTasks($projectID, $orderBy = 'id_desc', $pager = null)
     {
-        return $this->dao->select('t1.*, t2.name AS buildName')
+        $tasks = $this->dao->select('t1.*, t2.name AS buildName')
             ->from(TABLE_TESTTASK)->alias('t1')
             ->leftJoin(TABLE_BUILD)->alias('t2')->on('t1.build = t2.id')
             ->where('t1.project')->eq((int)$projectID)
@@ -278,6 +285,14 @@ class testtaskModel extends model
             ->orderBy($orderBy)
             ->page($pager)
             ->fetchAll('id');
+        $parentList = $this->getParentList($proudctID);
+        foreach($tasks as $task){
+            if(isset($parentList[$task->id]))
+                $task->isParent = true;
+            else
+                $task->isParent = false;
+        }
+        return $tasks;
     }
 
     /**
@@ -291,7 +306,7 @@ class testtaskModel extends model
      */
     public function getExecutionTasks($executionID, $orderBy = 'id_desc', $pager = null)
     {
-        return $this->dao->select('t1.*, t2.name AS buildName')
+        $tasks = $this->dao->select('t1.*, t2.name AS buildName')
             ->from(TABLE_TESTTASK)->alias('t1')
             ->leftJoin(TABLE_BUILD)->alias('t2')->on('t1.build = t2.id')
             ->where('t1.execution')->eq((int)$executionID)
@@ -300,6 +315,14 @@ class testtaskModel extends model
             ->orderBy($orderBy)
             ->page($pager)
             ->fetchAll('id');
+        $parentList = $this->getParentList($proudctID);
+        foreach($tasks as $task){
+            if(isset($parentList[$task->id]))
+                $task->isParent = true;
+            else
+                $task->isParent = false;
+        }
+        return $tasks;
     }
 
     /**
@@ -379,6 +402,11 @@ class testtaskModel extends model
         $task = $this->loadModel('file')->replaceImgURL($task, 'desc');
         if($setImgSize) $task->desc = $this->loadModel('file')->setImgSize($task->desc);
         $task->files = $this->loadModel('file')->getByObject('testtask', $task->id);
+        $parentList = $this->getParentList();
+        if(isset($parentList[$task->id]))
+                $task->isParent = true;
+            else
+                $task->isParent = false;
         return $task;
     }
 
@@ -2369,9 +2397,11 @@ class testtaskModel extends model
         $menu .= $this->buildMenu('testtask', 'close',    $params, $task, 'view', '', '', 'iframe showinonlybody', true);
         $menu .= $this->buildMenu('testtask', 'block',    $params, $task, 'view', 'pause', '', 'iframe showinonlybody', true);
         $menu .= $this->buildMenu('testtask', 'activate', $params, $task, 'view', 'magic', '', 'iframe showinonlybody', true);
+        $menu .= $this->buildMenu('testtask', 'cases',    $params, $task, 'view', 'sitemap');
         if(!$task->isParent){
-            $menu .= $this->buildMenu('testtask', 'cases',    $params, $task, 'view', 'sitemap');
             $menu .= $this->buildMenu('testtask', 'linkCase', $params, $task, 'view', 'link');
+        }else{
+            $menu .= $this->buildMenu('testtask', 'linkCase', $params, $task, 'view', 'link','', '',false, "disabled='disabled'");
         }
 
         $menu  .= "<div class='divider'></div>";
@@ -2397,9 +2427,11 @@ class testtaskModel extends model
         $params = "taskID=$task->id";
 
         $menu .= '<div id="action-divider">';
+        $menu .= $this->buildMenu('testtask',   'cases',    $params, $task, 'browse', 'sitemap');
         if(!$task->isParent){
-            $menu .= $this->buildMenu('testtask',   'cases',    $params, $task, 'browse', 'sitemap');
             $menu .= $this->buildMenu('testtask',   'linkCase', "$params&type=all&param=myQueryID", $task, 'browse', 'link');
+        }else{
+            $menu .= $this->buildMenu('testtask',   'linkCase', "$params&type=all&param=myQueryID", $task, 'browse', 'link','', '',false, "disabled='disabled'");
         }
         $menu .= $this->buildMenu('testreport', 'browse',   "objectID=$task->product&objectType=product&extra=$task->id", $task, 'browse', 'summary');
         $menu .= '</div>';
