@@ -14,6 +14,8 @@ class executionEntry extends Entry
 
     public executionModel $execution;
 
+    public execution $control;
+
     /**
      * GET method.
      *
@@ -114,11 +116,11 @@ class executionEntry extends Entry
     /**
      * PUT method.
      *
-     * @param  int    $executionID
+     * @param int $executionID
      * @access public
      * @return void
      */
-    public function put($executionID)
+    public function put(int $executionID)
     {
         $oldExecution = $this->loadModel('execution')->getByID($executionID);
 
@@ -131,12 +133,12 @@ class executionEntry extends Entry
         $products = $this->loadModel('product')->getProducts($executionID);
         $this->setPost('products', $this->request('products', array_keys($products)));
 
-        $control = $this->loadController('execution', 'edit');
-        $control->edit($executionID);
+        $this->control = $this->loadController('execution', 'edit');
+        $this->control->edit($executionID);
 
         $data = $this->getData();
-        if(isset($data->result) and $data->result == 'fail') return $this->sendError(400, $data->message);
-        if(!isset($data->result)) return $this->sendError(400, 'error');
+        if(isset($data->result) and $data->result == 'fail') $this->sendError(400, $data->message);
+        if(!isset($data->result)) $this->sendError(400, 'error');
 
         $execution = $this->execution->getByID($executionID);
 
