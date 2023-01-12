@@ -2347,24 +2347,32 @@ class testcase extends control
      * @access public
      * @return void
      */
-    public function exportToWord($caseID)
+    public function exportToWord($caseID, $version = -1)
     {
         require_once 'vendor/autoload.php';
         if($this->server->request_method == 'POST')
         {
             $results = $this->loadModel('testtask')->getResults(0, $caseID);
             $sample_data_all = array();
-            $sample_id = 1;
-            foreach($results as $result){
-                $sample_data_all[$sample_id] = $result->sample_data;
-                $sample_id++;
+            if($version==-1){
+                foreach($results as $result){
+                    if($result->version > $version){
+                        $version = $result->version;
+                    }
+                }
             }
+            foreach($results as $result){
+                if($result->version != $version)continue;
+                array_push($sample_data_all, $result->sample_data);
+            }
+            $sample_data_all = array_reverse($sample_data_all);
             $PHPWord = new \PhpOffice\PhpWord\PhpWord();
             $PHPWord = $this->testcase->exportToWord($caseID,$sample_data_all, $PHPWord);
             $saveTime = date("Ymd-H:i:m");
             $filename = $caseID . '_' . $saveTime . '.docx';
+            //$filepath = 'tmp_case/' . $filename;
             $PHPWord->save($filename, 'Word2007', true);
-            //$this->loadModel('file')->sendDownHeader($filename, 'docx', realpath($filepath), 'file', false);
+            //$this->loadModel('file')->sendDownHeader($filename, 'docx', realpath('./'.$filename), 'file', false);
             return $this->send(array('result' => 'success', 'closeModal' => true));
         }
 
