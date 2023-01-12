@@ -19,6 +19,8 @@ class task extends control
     public taskModel $task;
 
     public treeModel $tree;
+    public actionModel $action;
+
     /**
      * Construct function, load model of project and story modules.
      *
@@ -1092,7 +1094,8 @@ class task extends control
 
             if(dao::isError())
             {
-                if($this->viewType == 'json' or (defined('RUN_MODE') && RUN_MODE == 'api')) return $this->send(array('result' => 'fail', 'message' => dao::getError()));
+                if($this->viewType == 'json' or (defined('RUN_MODE') && RUN_MODE == 'api'))
+                    return $this->send(array('result' => 'fail', 'message' => dao::getError()));
                 return print(js::error(dao::getError()));
             }
 
@@ -1118,7 +1121,8 @@ class task extends control
                 }
             }
 
-            if($this->viewType == 'json' or (defined('RUN_MODE') && RUN_MODE == 'api')) return $this->send(array('result' => 'success'));
+            if($this->viewType == 'json' or (defined('RUN_MODE') && RUN_MODE == 'api'))
+                return $this->send(array('result' => 'success'));
 
             if(isonlybody())
             {
