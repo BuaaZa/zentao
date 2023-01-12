@@ -19,6 +19,17 @@ class action extends control
     public actionModel $action;
 
     /**
+     * Construct function, load model.
+     *
+     * @access public
+     * @return void
+     */
+    public function __construct()
+    {
+        parent::__construct();
+    }
+
+    /**
      * 动态定时归档.
      *
      * @access public

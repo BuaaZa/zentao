@@ -1984,6 +1984,7 @@ class taskModel extends model
             $feedbackData->currentProgress = $progress;
             $feedbackData->feedbackContent = $estimate->work;
             $feedbackData->workHours = intval($estimate->consumed);
+            $feedbackData->planWorkHours = strval($consumed + $left);
             $feedbackData->zenTaoTaskId = strval(($task->parent >0)?$task->parent:$taskID);
 
             ChromePhp::log($feedbackData);
@@ -2951,6 +2952,7 @@ class taskModel extends model
         $estimate    = fixer::input('post')
             ->setIF(is_numeric($this->post->consumed), 'consumed', (float)$this->post->consumed)
             ->setIF(is_numeric($this->post->left), 'left', (float)$this->post->left)
+            ->setDefault('syncStatus','0')
             ->get();
 
         if(helper::isZeroDate($estimate->date)) return dao::$errors[] = $this->lang->task->error->dateEmpty;
