@@ -13,6 +13,8 @@
 <?php
 class taskModel extends model
 {
+    public kanbanModel $kanban;
+
     /**
      * Create a task.
      *
