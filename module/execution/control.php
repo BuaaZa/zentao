@@ -37,6 +37,9 @@ class execution extends control
 
     public productModel $product;
 
+    public productplanModel $productplan;
+    public actionModel $action;
+
     /**
      * Construct function, Set executions.
      *
@@ -75,12 +78,12 @@ class execution extends control
     /**
      * Common actions.
      *
-     * @param  int    $executionID
-     * @param  string $extra
+     * @param int $executionID
+     * @param string $extra
      * @access public
      * @return object current object
      */
-    public function commonAction($executionID = 0, $extra = '')
+    public function commonAction(int $executionID = 0, string $extra = '')
     {
         $this->loadModel('product');
 
@@ -1778,14 +1781,14 @@ class execution extends control
     /**
      * Edit a execution.
      *
-     * @param  int    $executionID
-     * @param  string $action
-     * @param  string $extra
+     * @param int $executionID
+     * @param string $action
+     * @param string $extra
      *
      * @access public
      * @return void
      */
-    public function edit($executionID, $action = 'edit', $extra = '', $newPlans = '', $confirm = 'no')
+    public function edit(int $executionID, string $action = 'edit', string $extra = '', string $newPlans = '', string $confirm = 'no')
     {
         /* Load language files and get browseExecutionLink. */
         $this->loadModel('product');
@@ -2064,22 +2067,37 @@ class execution extends control
     /**
      * Start execution.
      *
-     * @param  int    $executionID
-     * @param  string $from
+     * @param int $executionID
+     * @param string $from
      * @access public
-     * @return void
+     * @return int
      */
-    public function start($executionID, $from = 'execution')
+    public function start(int $executionID, string $from = 'execution'): int
     {
         $execution   = $this->commonAction($executionID);
         $executionID = $execution->id;
-        if($execution->type == 'kanban') $this->lang->executionCommon = $this->lang->execution->kanban;
+        if($execution->type == 'kanban')
+            $this->lang->executionCommon = $this->lang->execution->kanban;
 
         if(!empty($_POST))
         {
             $this->loadModel('action');
             $changes = $this->execution->start($executionID);
-            if(dao::isError()) return print(js::error(dao::getError()));
+
+            if(dao::isError())
+            {
+                // 选择API报错还是页面报错
+                // @see api/v1/entries/executionstart.php
+                if($this->viewType == 'json' or (defined('RUN_MODE') && RUN_MODE == 'api'))
+                {
+                    $ob = new stdClass();
+                    $ob->status = 'fail';
+                    $ob->message = dao::getError();
+                    return $this->send($ob);
+                }
+                else
+                    return print(js::error(dao::getError()));
+            }
 
             if($this->post->comment != '' or !empty($changes))
             {
@@ -2089,6 +2107,10 @@ class execution extends control
 
             $this->loadModel('common')->syncPPEStatus($executionID);
             $this->executeHooks($executionID);
+
+            if($this->viewType == 'json' or (defined('RUN_MODE') && RUN_MODE == 'api'))
+                return $this->send(array('result' => 'success'));
+
             if(isonlybody() and $from == 'kanban')
             {
                 return print(js::closeModal('parent.parent', '', "parent.parent.changeStatus('doing')"));
@@ -2105,6 +2127,7 @@ class execution extends control
         $this->view->users      = $this->loadModel('user')->getPairs('noletter');
         $this->view->actions    = $this->loadModel('action')->getList($this->objectType, $executionID);
         $this->display();
+        return 0;
     }
 
     /**
@@ -2153,12 +2176,12 @@ class execution extends control
     /**
      * Suspend execution.
      *
-     * @param  int    $executionID
-     * @param  string $from
+     * @param int $executionID
+     * @param string $from
      * @access public
-     * @return void
+     * @return int
      */
-    public function suspend($executionID, $from = 'execution')
+    public function suspend(int $executionID, string $from = 'execution'): int
     {
         $execution   = $this->commonAction($executionID);
         $executionID = $execution->id;
@@ -2169,7 +2192,21 @@ class execution extends control
             $this->loadModel('action');
             $this->execution->computeBurn($executionID);
             $changes = $this->execution->suspend($executionID);
-            if(dao::isError()) return print(js::error(dao::getError()));
+
+            if(dao::isError())
+            {
+                // 选择API报错还是页面报错
+                // @see api/v1/entries/executionsuspend.php
+                if($this->viewType == 'json' or (defined('RUN_MODE') && RUN_MODE == 'api'))
+                {
+                    $ob = new stdClass();
+                    $ob->status = 'fail';
+                    $ob->message = dao::getError();
+                    return $this->send($ob);
+                }
+                else
+                    return print(js::error(dao::getError()));
+            }
 
             if($this->post->comment != '' or !empty($changes))
             {
@@ -2177,6 +2214,10 @@ class execution extends control
                 $this->action->logHistory($actionID, $changes);
             }
             $this->executeHooks($executionID);
+
+            if($this->viewType == 'json' or (defined('RUN_MODE') && RUN_MODE == 'api'))
+                return $this->send(array('result' => 'success'));
+
             if(isonlybody() and $from == 'kanban')
             {
                 return print(js::closeModal('parent.parent', '', "parent.parent.changeStatus('suspended')"));
@@ -2193,17 +2234,18 @@ class execution extends control
         $this->view->users      = $this->loadModel('user')->getPairs('noletter');
         $this->view->actions    = $this->loadModel('action')->getList($this->objectType, $executionID);
         $this->display();
+        return 0;
     }
 
     /**
      * Activate execution.
      *
-     * @param  int    $executionID
-     * @param  string $frim
+     * @param int $executionID
+     * @param string $from
      * @access public
-     * @return void
+     * @return int
      */
-    public function activate($executionID, $from = 'execution')
+    public function activate(int $executionID, string $from = 'execution'): int
     {
         $execution   = $this->commonAction($executionID);
         $executionID = $execution->id;
@@ -2212,17 +2254,31 @@ class execution extends control
         if(!empty($_POST))
         {
             $this->execution->activate($executionID);
-            if(dao::isError()) return print(js::error(dao::getError()));
+
+            if(dao::isError())
+            {
+                // 选择API报错还是页面报错
+                // @see api/v1/entries/executionactivate.php
+                if($this->viewType == 'json' or (defined('RUN_MODE') && RUN_MODE == 'api'))
+                {
+                    $ob = new stdClass();
+                    $ob->status = 'fail';
+                    $ob->message = dao::getError();
+                    return $this->send($ob);
+                }
+                else
+                    return print(js::error(dao::getError()));
+            }
 
             $this->executeHooks($executionID);
+
+            if($this->viewType == 'json' or (defined('RUN_MODE') && RUN_MODE == 'api'))
+                return $this->send(array('result' => 'success'));
+
             if(isonlybody() and $from == 'kanban')
-            {
                 return print(js::closeModal('parent.parent', '', "parent.parent.changeStatus('doing')"));
-            }
             else
-            {
                 return print(js::reload('parent.parent'));
-            }
         }
 
         $newBegin = date('Y-m-d');
@@ -2238,37 +2294,52 @@ class execution extends control
         $this->view->newBegin   = $newBegin;
         $this->view->newEnd     = $newEnd;
         $this->display();
+        return 0;
     }
 
     /**
      * Close execution.
      *
-     * @param  int    $executionID
-     * @param  string $from
+     * @param int $executionID
+     * @param string $from
      * @access public
-     * @return void
+     * @return int
      */
-    public function close($executionID, $from = 'execution')
+    public function close(int $executionID, string $from = 'execution'): int
     {
         $execution   = $this->commonAction($executionID);
         $executionID = $execution->id;
-        if($execution->type == 'kanban') $this->lang->executionCommon = $this->lang->execution->kanban;
+        if($execution->type == 'kanban')
+            $this->lang->executionCommon = $this->lang->execution->kanban;
 
         if(!empty($_POST))
         {
             $this->execution->computeBurn($executionID);
             $this->execution->close($executionID);
-            if(dao::isError()) return print(js::error(dao::getError()));
+            if(dao::isError())
+            {
+                // 选择API报错还是页面报错
+                // @see api/v1/entries/executionclose.php
+                if($this->viewType == 'json' or (defined('RUN_MODE') && RUN_MODE == 'api'))
+                {
+                    $ob = new stdClass();
+                    $ob->status = 'fail';
+                    $ob->message = dao::getError();
+                    return $this->send($ob);
+                }
+                else
+                    return print(js::error(dao::getError()));
+            }
 
             $this->executeHooks($executionID);
+
+            if($this->viewType == 'json' or (defined('RUN_MODE') && RUN_MODE == 'api'))
+                return $this->send(array('result' => 'success'));
+
             if(isonlybody() and $from == 'kanban')
-            {
                 return print(js::closeModal('parent.parent', '', "parent.parent.changeStatus('closed')"));
-            }
             else
-            {
                 return print(js::reload('parent.parent'));
-            }
         }
 
         $this->view->title      = $this->view->execution->name . $this->lang->colon .$this->lang->execution->close;
@@ -2277,6 +2348,7 @@ class execution extends control
         $this->view->users      = $this->loadModel('user')->getPairs('noletter');
         $this->view->actions    = $this->loadModel('action')->getList($this->objectType, $executionID);
         $this->display();
+        return 0;
     }
 
     /**
@@ -2293,7 +2365,8 @@ class execution extends control
         $executionID = $this->execution->saveState((int)$executionID, $this->executions);
         $execution   = $this->execution->getById($executionID, true);
 
-        $execution->projectInfo = $this->loadModel('project')->getByID($execution->project);
+        $this->project = $this->loadModel('project');
+        $execution->projectInfo = $this->project->getByID($execution->project);
 
         if($this->config->systemMode == 'new')
         {

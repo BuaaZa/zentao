@@ -196,12 +196,12 @@ class baseEntry
      * 发送请求的响应数据
      * Send response data
      *
-     * @param  int   $code
-     * @param  mixed $data
+     * @param int $code
+     * @param mixed $data
      * @access public
      * @return void
      */
-    public function send($code, $data = '')
+    public function send(int $code, mixed $data = '')
     {
         header("Access-Control-Allow-Origin: *");
         header("Access-Control-Allow-Credentials: true");
@@ -280,7 +280,7 @@ class baseEntry
      * @access public
      * @return object
      */
-    public function loadController($moduleName, $methodName)
+    public function loadController($moduleName, $methodName): object
     {
         ob_start();
 

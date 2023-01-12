@@ -246,7 +246,7 @@ class baseRouter
      * @var array
      * @access public
      */
-    public $params;
+    public array $params;
 
     /**
      * 视图类型。
@@ -372,7 +372,7 @@ class baseRouter
      * @access public
      * @return void
      */
-    public function __construct($appName = 'demo', $appRoot = '')
+    public function __construct(string $appName = 'demo', string $appRoot = '')
     {
         $this->setPathFix();
         $this->setBasePath();
@@ -389,10 +389,10 @@ class baseRouter
         $this->setDataRoot();
         $this->loadMainConfig();
 
-        $this->loadClass('front',  $static = true);
-        $this->loadClass('filter', $static = true);
-        $this->loadClass('dao',    $static = true);
-        $this->loadClass('mobile', $static = true);
+        $this->loadClass('front', true);
+        $this->loadClass('filter', true);
+        $this->loadClass('dao', true);
+        $this->loadClass('mobile', true);
 
         $this->setCookieSecure();
         $this->setOpenApp();
@@ -427,7 +427,7 @@ class baseRouter
      * @access public
      * @return static   the app object
      */
-    public static function createApp($appName = 'demo', $appRoot = '', $className = '')
+    public static function createApp(string $appName = 'demo', string $appRoot = '', string $className = '')
     {
         if(empty($className)) $className = __CLASS__;
         return new $className($appName, $appRoot);
@@ -1410,13 +1410,13 @@ class baseRouter
      * 设置要被调用的控制器文件。
      * Set the control file of the module to be called.
      *
-     * @param   bool    $exitIfNone     没有找到该控制器文件的情况：如果该参数为true，则终止程序；如果为false，则打印错误日志
+     * @param bool $exitIfNone     没有找到该控制器文件的情况：如果该参数为true，则终止程序；如果为false，则打印错误日志
      *                                  The control file was not found: if the parameter is true, the program is terminated;
      *                                  if false, the error log is printed.
      * @access  public
      * @return  bool
      */
-    public function setControlFile($exitIfNone = true)
+    public function setControlFile(bool $exitIfNone = true)
     {
         $this->controlFile = $this->getModulePath() . 'control.php';
         if(file_exists($this->controlFile)) return true;
@@ -2178,7 +2178,7 @@ class baseRouter
             echo $endResponseException->getContent();
         }
 
-        return isset($module) ? $module : false;
+        return $module ?? false;
     }
 
     /**

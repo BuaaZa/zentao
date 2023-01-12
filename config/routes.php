@@ -82,6 +82,10 @@ $routes['/projects/:id/executions'] = 'executions';
 $routes['/projects/:id/executionsWithMember'] = 'executionsWithMember';
 $routes['/executions']              = 'executions';
 $routes['/executions/:id']          = 'execution';
+$routes['/executions/:id/start']          = 'executionStart';
+$routes['/executions/:id/suspend']          = 'executionSuspend';
+$routes['/executions/:id/close']          = 'executionClose';
+$routes['/executions/:id/activate']          = 'executionActivate';
 
 $routes['/executions/:id/tasks/batchCreate'] = 'taskBatchCreate';
 $routes['/tasks/batchCreate']                = 'taskBatchCreate';
@@ -179,5 +183,7 @@ $routes['/teamAccount/:id']  = 'teams';
 $routes['/projects/:id/teams/batchCreate'] = 'teamBatchCreate';
 $routes['/teamAccount/:id/user']  = 'teamaccountuser';
 $routes['/getparenthtml/:id']  = 'getparenthtml';
+
+$routes['/hello'] = '';
 
 $config->routes = $routes;

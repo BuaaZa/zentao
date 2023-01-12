@@ -16,6 +16,11 @@ class executionModel extends model
     /* The members every linking. */
     const LINK_MEMBERS_ONE_TIME = 20;
 
+    public programplanModel $programplan;
+    public userModel $user;
+    public fileModel $file;
+    public productModel $product;
+
     /**
      * Check the privilege.
      *
@@ -476,14 +481,13 @@ class executionModel extends model
     /**
      * Update a execution.
      *
-     * @param  int    $executionID
+     * @param int $executionID
      * @access public
      * @return array|bool
      */
-    public function update($executionID)
+    public function update(int $executionID)
     {
         /* Convert executionID format and get oldExecution. */
-        $executionID  = (int)$executionID;
         $oldExecution = $this->dao->findById($executionID)->from(TABLE_EXECUTION)->fetch();
 
         /* Judgment of required items. */
@@ -573,7 +577,7 @@ class executionModel extends model
         /* Get team and language item. */
         $this->loadModel('user');
         $team    = $this->user->getTeamMemberPairs($executionID, 'execution');
-        $members = isset($_POST['teamMembers']) ? $_POST['teamMembers'] : array();
+        $members = $_POST['teamMembers'] ?? array();
         array_push($members, $execution->PO, $execution->QD, $execution->PM, $execution->RD);
         $members = array_unique($members);
         $roles   = $this->user->getUserRoles(array_values($members));
@@ -585,7 +589,7 @@ class executionModel extends model
             if(empty($account) or isset($team[$account])) continue;
 
             $member = new stdclass();
-            $member->root    = (int)$executionID;
+            $member->root    = $executionID;
             $member->account = $account;
             $member->join    = helper::today();
             $member->role    = zget($roles, $account, '');
@@ -598,7 +602,7 @@ class executionModel extends model
             $teamMembers[$account] = $member;
         }
         $this->dao->delete()->from(TABLE_TEAM)
-            ->where('root')->eq((int)$executionID)
+            ->where('root')->eq($executionID)
             ->andWhere('type')->eq('execution')
             ->andWhere('account')->in(array_keys($team))
             ->andWhere('account')->notin(array_values($members))
@@ -1858,13 +1862,13 @@ class executionModel extends model
     /**
      * Get child executions.
      *
-     * @param  int    $executionID
+     * @param int|string $executionID
+     * @return array
      * @access public
-     * @return void
      */
-    public function getChildExecutions($executionID)
+    public function getChildExecutions(int|string $executionID): array
     {
-        return $this->dao->select('id, name, status')->from(TABLE_EXECUTION)->where('deleted')->eq(0)->andWhere('parent')->eq((int)$executionID)->fetchAll('id');
+        return $this->dao->select('id, name, status')->from(TABLE_EXECUTION)->where('deleted')->eq(0)->andWhere('parent')->eq($executionID)->fetchAll('id');
     }
 
     /**

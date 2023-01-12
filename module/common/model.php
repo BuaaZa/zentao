@@ -13,6 +13,8 @@ class commonModel extends model
 {
     static public $requestErrors = array();
 
+    public userModel $user;
+
     /**
      * The construc method, to do some auto things.
      *
@@ -2882,7 +2884,7 @@ EOD;
         $user->rights = $this->loadModel('user')->authorize($user->account);
         $user->groups = $this->user->getGroups($user->account);
         $user->view   = $this->user->grantUserView($user->account, $user->rights['acls']);
-        $user->admin  = strpos($this->app->company->admins, ",{$user->account},") !== false;
+        $user->admin  = str_contains($this->app->company->admins, ",{$user->account},");
         $this->session->set('user', $user);
         $this->app->user = $user;
     }
@@ -2924,7 +2926,7 @@ EOD;
         $user->rights = $this->user->authorize($user->account);
         $user->groups = $this->user->getGroups($user->account);
         $user->view   = $this->user->grantUserView($user->account, $user->rights['acls']);
-        $user->admin  = strpos($this->app->company->admins, ",{$user->account},") !== false;
+        $user->admin  = str_contains($this->app->company->admins, ",{$user->account},");
         $this->session->set('user', $user);
         $this->app->user = $user;
 

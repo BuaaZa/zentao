@@ -27,7 +27,7 @@ class router extends baseRouter
      * @var array
      * @access public
      */
-    public $rawParams;
+    public array $rawParams;
 
     /**
      * 原始URI
@@ -35,7 +35,7 @@ class router extends baseRouter
      * @var string
      * @access public
      */
-    public $rawURI;
+    public string $rawURI;
 
     /**
      * 标记是否是工作流
@@ -44,7 +44,7 @@ class router extends baseRouter
      * @var bool
      * @access public
      */
-    public $isFlow = false;
+    public bool $isFlow = false;
 
     /**
      * Fetch的模块名。
@@ -53,7 +53,7 @@ class router extends baseRouter
      * @var string
      * @access public
      */
-    public $fetchModule;
+    public string $fetchModule;
 
     /**
      * Get the $moduleRoot var.
@@ -421,13 +421,13 @@ class router extends baseRouter
      * 5、如果当前请求的方法名为browse、create、edit、view、delete、export中任意一个，则方法名不变，否则方法名改为operate。
      * 5. If the currently requested method is named any one of browse, create, edit, view, delete, or export, the method name is unchanged, otherwise the method name is changed to operate.
      *
-     * @param   bool    $exitIfNone     没有找到该控制器文件的情况：如果该参数为true，则终止程序；如果为false，则打印错误日志
+     * @param bool $exitIfNone     没有找到该控制器文件的情况：如果该参数为true，则终止程序；如果为false，则打印错误日志
      *                                  The controller file was not found: if the parameter is true, the program is terminated;
      *                                                                     if false, the error log is printed.
      * @access  public
      * @return  bool
      */
-    public function setControlFile($exitIfNone = true)
+    public function setControlFile(bool $exitIfNone = true)
     {
         /* Set raw module and method name for fetch control. */
         if(empty($this->rawModule)) $this->rawModule = $this->moduleName;

@@ -10,7 +10,7 @@
  *  May you find forgiveness for yourself and forgive others.
  *  May you share freely, never taking more than you give.
  */
-include dirname(dirname(__FILE__)) . '/router.class.php';
+include dirname(__FILE__, 2) . '/router.class.php';
 class api extends router
 {
     /**
@@ -20,7 +20,7 @@ class api extends router
      * @var string
      * @access public
      */
-    public $path;
+    public string $path;
 
     /**
      * API版本号
@@ -29,7 +29,7 @@ class api extends router
      * @var string
      * @access public
      */
-    public $version = '';
+    public string $version = '';
 
     /**
      * 请求API的参数，包括键值
@@ -38,7 +38,7 @@ class api extends router
      * @var array
      * @access public
      */
-    public $params = array();
+    public array $params = array();
 
     /**
      * 请求API的参数名
@@ -47,7 +47,7 @@ class api extends router
      * @var array
      * @access public
      */
-    public $paramNames = array();
+    public array $paramNames = array();
 
     /**
      * 请求的资源名称
@@ -56,7 +56,7 @@ class api extends router
      * @var string
      * @access public
      */
-    public $entry;
+    public string $entry;
 
     /**
      * API资源的执行方法: get post put delete
@@ -65,7 +65,7 @@ class api extends router
      * @var string
      * @access public
      */
-    public $action;
+    public string $action;
 
     /**
      * 构造方法, 设置请求路径，版本等
@@ -106,11 +106,11 @@ class api extends router
      *
      * Parse request path, find entry and action.
      *
-     * @param  array $routes
+     * @param array $routes
      * @access private
      * @return void
      */
-    public function route($routes)
+    public function route(array $routes): void
     {
         foreach($routes as $route => $target)
         {
@@ -119,7 +119,7 @@ class api extends router
                 array($this, 'matchesCallback'),
                 str_replace(')', ')?', $route)
             );
-            if(substr($route, -1) === '/') $patternAsRegex .= '?';
+            if(str_ends_with($route, '/')) $patternAsRegex .= '?';
 
             /* Cache URL params' names and values if this route matches the current HTTP request. */
             if(!preg_match('#^' . $patternAsRegex . '$#', $this->path, $paramValues)) continue;
@@ -175,7 +175,8 @@ class api extends router
     public function parseRequest()
     {
         /* If version of api don't exists, call parent method. */
-        if(!$this->version) return parent::parseRequest();
+        if(!$this->version)
+            return parent::parseRequest();
 
         $this->route($this->config->routes);
     }
@@ -191,15 +192,20 @@ class api extends router
     public function loadModule()
     {
         /* If the version of api don't exists, call parent method. */
-        if(!$this->version) return parent::loadModule();
+        if(!$this->version)
+            parent::loadModule();
 
-        $entry = strtolower($this->entry);
-        include($this->appRoot . "api/$this->version/entries/$entry.php");
+        $entryFile = $this->entry;
+        if ($this->version == 'v1')
+            $entryFile = strtolower($this->entry);
+
+        include(dirname(__FILE__, 3) . "/api/$this->version/entries/$entryFile.php");
 
         $entryName = $this->entry . 'Entry';
         $entry = new $entryName();
 
-        if($this->action == 'options') return $entry->send(204);
+        if($this->action == 'options')
+            return $entry->send(204);
         call_user_func_array(array($entry, $this->action), array_values($this->params));
     }
 
@@ -208,11 +214,11 @@ class api extends router
      *
      * Load config file of api.
      *
-     * @param configPath
+     * @param string $configPath
      * @access public
      * @return void
      */
-    public function loadApiConfig($configPath)
+    public function loadApiConfig(string $configPath)
     {
         global $config;
         include($this->appRoot . "api/$this->version/config/$configPath.php");
@@ -249,7 +255,7 @@ class api extends router
         $output = json_decode($output);
 
         $data = new stdClass();
-        $data->status = isset($output->status) ? $output->status : $output->result;
+        $data->status = $output->status ?? $output->result;
         if(isset($output->message)) $data->message = $output->message;
         if(isset($output->data))    $data->data    = json_decode($output->data);
         if(isset($output->id))      $data->id      = $output->id;
@@ -259,5 +265,12 @@ class api extends router
         unset($_SESSION['VALID_ENTRY']);
 
         return $output;
+    }
+
+    public function __toString(): string {
+        return "action: " . $this->action . "\n"
+            . "entry: " . $this->entry . "\n"
+            . "paramNames: " . $this->paramNames . "\n"
+            ;
     }
 }
