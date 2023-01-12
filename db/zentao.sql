@@ -14294,7 +14294,7 @@ alter table `zt_effort`
     add `syncStatus` enum ('0', '1') default '0' not null after `work`;
 
 # zt_actionarchive
-create table `zt_actionarchive`
+create table if not exists `zt_actionarchive`
 (
     id         int unsigned auto_increment
         primary key,
