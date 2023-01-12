@@ -12,8 +12,8 @@
  * @link        http://www.zentao.net
  */
 /* Set the error reporting. */
-error_reporting(0);
-define('RUN_MODE', 'api');
+error_reporting(E_ALL);
+const RUN_MODE = 'api';
 /* Start output buffer. */
 ob_start();
 
@@ -29,7 +29,9 @@ require '../module/common/ChromePhp.php';
 $startTime = getTime();
 
 /* Instance the app. */
-$app = router::createApp('pms', dirname(dirname(__FILE__)), 'api');
+//$app = router::createApp('pms', dirname(__FILE__, 2), 'api');
+
+$app = new api('pms', dirname(__FILE__, 2));
 
 /* Run the app. */
 $common = $app->loadCommon();
@@ -39,6 +41,7 @@ $common->checkEntry();
 $common->loadConfigFromDB();
 
 /* Set default params. */
+global $config;
 if(!$app->version) $config->requestType = 'GET';
 $config->default->view = 'json';
 
