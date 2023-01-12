@@ -17,7 +17,7 @@
     {
         if(navigator.userAgent.toLowerCase().indexOf("opera") > -1) return true;   // Opera don't support, omit it.
 
-        $.cookie('downloading', 0);
+        $.cookie('downloading', 1);
         time = setInterval("closeWindow()", 300);
         return true;
     }
