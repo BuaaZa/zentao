@@ -18,9 +18,15 @@ class action extends control
 
     public actionModel $action;
 
-    public function archiveaction()
+    /**
+     * 动态定时归档.
+     *
+     * @access public
+     * @return void
+     */
+    public function cronarchiveaction()
     {
-        $this->view->actions = $this->action->archiveaction();
+        $this->view->actions = $this->action->cronarchiveaction();
         $this->display();
     }
 

@@ -17,6 +17,7 @@ class actionModel extends model
     const CAN_UNDELETED = 1;    // The deleted object can be undeleted.
     const BE_HIDDEN     = 2;    // The deleted object has been hidded.
 
+
     /**
      * Create a action.
      *
@@ -968,22 +969,6 @@ class actionModel extends model
         }
     }
 
-    public function archiveaction()
-    {
-        //上个月1日之前的
-        $end = date('Y-m-01 00:00:00', strtotime('-1 month')) ;
-        $actions = $this->dao->select('*')->from(TABLE_ACTION)
-            ->where('date')->lt($end)
-            ->fetchAll();
-
-        foreach ($actions as $action){
-            $this->dao->replace(TABLE_ACTIONARCHIVE)->data($action)->autoCheck()->exec();
-        }
-        $this->dao->delete()->from(TABLE_ACTION)->where('id')->in(array_column($actions,'id'))->exec();
-
-        return $actions;
-    }
-
     /**
      * Get actions as dynamic.
      *
@@ -1115,6 +1100,80 @@ class actionModel extends model
 
         $this->loadModel('common')->saveQueryCondition($this->dao->get(), 'action');
         return $this->transformActions($actions);
+    }
+
+    /**
+     * 动态手动归档.
+     *
+     * @param  string $beginDate 起始日期，格式 'Y-m-d'
+     * @param  string $endDate 终止日期，同上
+     * @access public
+     * @return array 归档的动态数组
+     */
+    public function archiveaction($beginDate,$endDate): array
+    {
+        $begin = $beginDate . ' 00:00:00';
+        $end = $endDate . ' 23:59:59';
+
+        $actions = $this->dao->select('*')->from(TABLE_ACTION)
+            ->where('date')->ge($begin)
+            ->andWhere('date')->le($end)
+            ->fetchAll();
+
+        foreach ($actions as $action){
+            $this->dao->replace(TABLE_ACTIONARCHIVE)->data($action)->autoCheck()->exec();
+        }
+        $this->dao->delete()->from(TABLE_ACTION)->where('id')->in(array_column($actions,'id'))->exec();
+
+        return $actions;
+    }
+
+    /**
+     * 归档动态恢复.
+     *
+     * @param  string $beginDate 起始日期，格式 'Y-m-d'
+     * @param  string $endDate 终止日期，同上
+     * @access public
+     * @return array 恢复的动态数组
+     */
+    public function recoveraction($beginDate,$endDate): array
+    {
+        $begin = $beginDate . ' 00:00:00';
+        $end = $endDate . ' 23:59:59';
+
+        $actions = $this->dao->select('*')->from(TABLE_ACTIONARCHIVE)
+            ->where('date')->ge($begin)
+            ->andWhere('date')->le($end)
+            ->fetchAll();
+
+        foreach ($actions as $action){
+            $this->dao->replace(TABLE_ACTION)->data($action)->autoCheck()->exec();
+        }
+        $this->dao->delete()->from(TABLE_ACTIONARCHIVE)->where('id')->in(array_column($actions,'id'))->exec();
+
+        return $actions;
+    }
+
+    /**
+     * 动态定时归档.(归档上月1日之前的所有动态)
+     *
+     * @access public
+     * @return array
+     */
+    public function cronarchiveaction()
+    {
+        //上个月1日之前的
+        $end = date('Y-m-01 00:00:00', strtotime('-1 month')) ;
+        $actions = $this->dao->select('*')->from(TABLE_ACTION)
+            ->where('date')->lt($end)
+            ->fetchAll();
+
+        foreach ($actions as $action){
+            $this->dao->replace(TABLE_ACTIONARCHIVE)->data($action)->autoCheck()->exec();
+        }
+        $this->dao->delete()->from(TABLE_ACTION)->where('id')->in(array_column($actions,'id'))->exec();
+
+        return $actions;
     }
 
     /**
