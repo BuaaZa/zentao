@@ -423,12 +423,12 @@ class baseEntry
      * 批量添加$_POST全局变量.
      * Batch set data to $_POST.
      *
-     * @param  string $fields
+     * @param string $fields
      * @param  mixed  $object
      * @access public
      * @return void
      */
-    public function batchSetPost($fields, $object = '')
+    public function batchSetPost(string $fields, mixed $object = '')
     {
         $fields = explode(',', $fields);
         foreach($fields as $field)

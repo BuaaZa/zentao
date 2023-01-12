@@ -575,41 +575,42 @@ class executionModel extends model
         if(dao::isError()) return false;
 
         /* Get team and language item. */
-        $this->loadModel('user');
-        $team    = $this->user->getTeamMemberPairs($executionID, 'execution');
-        $members = $_POST['teamMembers'] ?? array();
-        array_push($members, $execution->PO, $execution->QD, $execution->PM, $execution->RD);
-        $members = array_unique($members);
-        $roles   = $this->user->getUserRoles(array_values($members));
+        // 只有显式配置teamMembers时才处理团队成员，否则视作不变动
+        if (isset($_POST['teamMembers'])) {
+            $this->loadModel('user');
+            $team = $this->user->getTeamMemberPairs($executionID, 'execution');
+            $members = $_POST['teamMembers'] ?? array();
+            array_push($members, $execution->PO, $execution->QD, $execution->PM, $execution->RD);
+            $members = array_unique($members);
+            $roles = $this->user->getUserRoles(array_values($members));
 
-        $changedAccounts = array();
-        $teamMembers     = array();
-        foreach($members as $account)
-        {
-            if(empty($account) or isset($team[$account])) continue;
+            $changedAccounts = array();
+            $teamMembers = array();
+            foreach ($members as $account) {
+                if (empty($account) or isset($team[$account])) continue;
 
-            $member = new stdclass();
-            $member->root    = $executionID;
-            $member->account = $account;
-            $member->join    = helper::today();
-            $member->role    = zget($roles, $account, '');
-            $member->days    = zget($execution, 'days', 0);
-            $member->type    = 'execution';
-            $member->hours   = $this->config->execution->defaultWorkhours;
-            $this->dao->replace(TABLE_TEAM)->data($member)->exec();
+                $member = new stdclass();
+                $member->root = $executionID;
+                $member->account = $account;
+                $member->join = helper::today();
+                $member->role = zget($roles, $account, '');
+                $member->days = zget($execution, 'days', 0);
+                $member->type = 'execution';
+                $member->hours = $this->config->execution->defaultWorkhours;
+                $this->dao->replace(TABLE_TEAM)->data($member)->exec();
 
-            $changedAccounts[$account]  = $account;
-            $teamMembers[$account] = $member;
+                $changedAccounts[$account] = $account;
+                $teamMembers[$account] = $member;
+            }
+            $this->dao->delete()->from(TABLE_TEAM)
+                ->where('root')->eq($executionID)
+                ->andWhere('type')->eq('execution')
+                ->andWhere('account')->in(array_keys($team))
+                ->andWhere('account')->notin(array_values($members))
+                ->andWhere('account')->ne($oldExecution->openedBy)
+                ->exec();
+            if (isset($execution->project) and $execution->project) $this->addProjectMembers($execution->project, $teamMembers);
         }
-        $this->dao->delete()->from(TABLE_TEAM)
-            ->where('root')->eq($executionID)
-            ->andWhere('type')->eq('execution')
-            ->andWhere('account')->in(array_keys($team))
-            ->andWhere('account')->notin(array_values($members))
-            ->andWhere('account')->ne($oldExecution->openedBy)
-            ->exec();
-        if(isset($execution->project) and $execution->project) $this->addProjectMembers($execution->project, $teamMembers);
-
         $whitelist = explode(',', $execution->whitelist);
         $this->loadModel('personnel')->updateWhitelist($whitelist, 'sprint', $executionID);
 
