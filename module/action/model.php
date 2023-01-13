@@ -1128,6 +1128,40 @@ class actionModel extends model
         return $actions;
     }
 
+    public function getArchivedDates()
+    {
+        $dates = $this->dao->select('date')->from(TABLE_ACTIONARCHIVE)
+            ->orderBy('date')
+            ->fetchAll();
+        foreach ($dates as $date){
+            $tmp = $date->format("Y-m-d H:i:s");
+            $date = date("Y-m-d",substr($tmp, -9));
+        }
+        echo $dates;
+        $length = count($dates);
+        $archivedDates = array();
+        $beginDate = $dates[0];
+        for($x=0;$x<$length;$x++)
+        {
+            $date1 = $dates[$x];
+            $date2 = $dates[$x+1];
+            $diff = date_diff($date2,$date1);
+            if($diff <= 1)
+            {
+                continue;
+            }
+            else
+            {
+                $dateRange = new stdClass();
+                $dateRange->beginDate = $beginDate;
+                $dateRange->endDate = $date1;
+                $beginDate = $date2;
+                array_push($archivedDates, $dateRange);
+            }
+        }
+        return $archivedDates;
+    }
+
     /**
      * 归档动态恢复.
      *

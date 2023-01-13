@@ -41,3 +41,9 @@ $lang->company->guestOptions[1] = '允许';
 
 $lang->company->order['date_desc'] = '倒序排列';
 $lang->company->order['date_asc']  = '正序排列';
+
+$lang->company->recover = '动态恢复';
+$lang->company->archivedDates = '已归档日期';
+$lang->company->recoverRange = '请输入恢复范围';
+$lang->company->beginDate = '起始日期';
+$lang->company->endDate = '终止日期';
