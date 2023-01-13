@@ -302,6 +302,12 @@ class router extends baseRouter
         parent::saveError($level, $message, $file, $line);
     }
 
+    public function saveLog($level, $message, $file, $line)
+    {
+        $this->config->debug = true;
+        parent::saveError($level, $message, $file, $line);
+    }
+
     /**
      * 企业版部分功能是从然之合并过来的。然之代码中调用loadModuleConfig方法时传递了一个非空的appName，在禅道中会导致错误。
      * 把appName设置为空来避免这个错误。

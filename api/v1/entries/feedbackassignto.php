@@ -20,7 +20,11 @@ class feedbackAssignToEntry extends Entry
      */
     public function post($feedbackID)
     {
-        $feedback = $this->loadModel('feedback')->getById($feedbackID);
+        $this->loadModel('feedback');
+        $oldFeedback = $this->feedback->getByIdNotDeleted($feedbackID);
+        if (!$oldFeedback) {
+            return $this->sendError(400, $this->lang->feedback->notFoundDeleted);
+        }
 
         $fields = 'assignedTo,comment,mailto';
         $this->batchSetPost($fields);
@@ -32,8 +36,8 @@ class feedbackAssignToEntry extends Entry
         if(!$data) return $this->send400('error');
         if(isset($data->status) and $data->status == 'fail') return $this->sendError(zget($data, 'code', 400), $data->message);
 
-        $feedback = $this->loadModel('feedback')->getById($feedbackID);
-
+        $feedback = $this->feedback->getById($feedbackID);
+        $this->feedback->processPropertity($feedback);
         $this->send(200, $this->format($feedback, 'activatedDate:time,openedBy:user,openedDate:time,assignedTo:user,assignedDate:time,mailto:userList,resolvedBy:user,resolvedDate:time,closedBy:user,closedDate:time,lastEditedBy:user,lastEditedDate:time,deadline:date,deleted:bool'));
     }
 }

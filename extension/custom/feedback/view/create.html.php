@@ -91,6 +91,10 @@
         <th><?php echo $lang->feedback->status;?></th>
         <td><?php echo html::hidden('status', 'wait');?></td>
       </tr>
+      <tr class='hide'>
+        <th><?php echo $lang->feedback->createdAt;?></th>
+        <td><?php echo html::hidden('createdAt', 'ztservice');?></td>
+      </tr>
       <?php $this->printExtendFields('', 'table');?>
       <tr>
         <th><?php echo $lang->feedback->feedbackBy;?></th>
