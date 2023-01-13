@@ -17,26 +17,22 @@ $lang->navGroup->ticket   = 'feedback';
 $lang->searchLang = '搜索';
 
 $lang->feedback->menu = new stdclass();
-$lang->feedback->menu->ticket   = array('link' => '工单|ticket|browse', 'alias' => 'create,edit,view,batchedit,browse,showimport,createstory,createbug');
+// $lang->feedback->menu->ticket   = array('link' => '工单|ticket|browse', 'alias' => 'create,edit,view,batchedit,browse,showimport,createstory,createbug');
 $lang->feedback->menu->browse   = array('link' => '反馈|feedback|admin|browseType=wait', 'alias' => 'create,edit,view,adminview,batchedit,browse,showimport');
-$lang->feedback->menu->faq      = array('link' => 'FAQ|faq|browse', 'alias' => 'create,edit');
+// $lang->feedback->menu->faq      = array('link' => 'FAQ|faq|browse', 'alias' => 'create,edit');
 $lang->feedback->menu->products = array('link' => '权限|feedback|products', 'alias' => 'manageproduct');
 
-$lang->feedback->menuOrder[5]  = 'ticket';
+// $lang->feedback->menuOrder[5]  = 'ticket';
 $lang->feedback->menuOrder[10] = 'browse';
 $lang->feedback->menuOrder[15] = 'faq';
 $lang->feedback->menuOrder[20] = 'products';
 
-$lang->ticket = new stdclass();
-$lang->ticket->common = '工单';
-$lang->ticket->navGroup['ticket'] = 'feedback';
+// $lang->ticket = new stdclass();
+// $lang->ticket->common = '工单';
+// $lang->ticket->navGroup['ticket'] = 'feedback';
 
 $lang->faq = new stdclass();
 $lang->faq->navGroup['faq'] = 'feedback';
-
-$lang->my->menu->work['subMenu']->feedback = array('link' => "{$lang->feedback->common}|my|work|mode=feedback&type=assigntome", 'subModule' => 'feedback');
-$lang->my->menu->work['subMenu']->ticket   = array('link' => "{$lang->ticket->common}|my|work|mode=ticket&type=assignedtome", 'subModule' => 'feedback');
-$lang->my->menu->work['menuOrder'][80] = 'feedback';
 
 $lang->feedbackView[0] = '研发界面';
 $lang->feedbackView[1] = '非研发界面';
@@ -51,6 +47,10 @@ if($config->vision == 'lite')
 
     unset($lang->feedback->menu->products);
     unset($lang->feedback->menuOrder[15]);
+}else{
+    $lang->my->menu->work['subMenu']->feedback = array('link' => "{$lang->feedback->common}|my|work|mode=feedback&type=assigntome", 'subModule' => 'feedback');
+    // $lang->my->menu->work['subMenu']->ticket   = array('link' => "{$lang->ticket->common}|my|work|mode=ticket&type=assignedtome", 'subModule' => 'feedback');
+    $lang->my->menu->work['menuOrder'][80] = 'feedback';
 }
 
 $lang->noMenuModule[] = 'faq';
@@ -81,3 +81,7 @@ $lang->feedback->webMenuOrder[25] = 'totask';
 $lang->feedback->webMenuOrder[30] = 'tobug';
 $lang->feedback->webMenuOrder[35] = 'totodo';
 $lang->feedback->webMenuOrder[40] = 'assigntome';
+
+
+$lang->zentaoPMS      = '开发管理';
+$lang->welcome        = "协同研发平台";

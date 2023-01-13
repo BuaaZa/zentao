@@ -35,3 +35,6 @@ $lang->custom->menuOrder[85] = 'ticket';
 $lang->custom->ticket = new stdclass();
 $lang->custom->ticket->fields['priList']  = '优先级';
 $lang->custom->ticket->fields['typeList'] = '工单类型';
+
+
+

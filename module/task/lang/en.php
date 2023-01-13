@@ -368,3 +368,7 @@ $lang->taskestimate->consumed = 'Estimates';
 
 $lang->task->overEsStartDate = 'The %s schedule start time has exceeded, please modify the %s schedule start time first';
 $lang->task->overEsEndDate   = 'The %s schedule end time has exceeded, please modify the %s schedule end time first';
+
+/* Operating record. */
+$lang->task->action = new stdclass();
+$lang->task->action->fromfeedback        = array('main' => '$date, created by <strong>$actor</strong> from <strong>feedback</strong>, the ID which was <strong>$extra</strong>.');

@@ -43,13 +43,17 @@ function getFeedbackID(obj)
     {
         $('#taskProjects').change();
         getProjects(obj);
-        getExecutions(0);
+        // getExecutions(0);
     }
     else
     {
         var projectID  = $(obj).attr("data-product");
-        getExecutions(projectID);
+        // getExecutions(projectID);
     }
+}
+
+function loadProductExecutions(projectID,value){
+        getExecutions(projectID,value);
 }
 
 function getProjects(obj)
@@ -65,18 +69,20 @@ function getProjects(obj)
     })
 }
 
-function getExecutions(projectID)
+function getExecutions(projectID,value)
 {
     if(systemMode == 'new' && projectID)
     {
         var langLink = createLink('feedback', 'ajaxGetExecutionLang', 'projectID=' + projectID);
         $.post(langLink, function(executionLang)
         {
+          if(executionLang){
             $('#executionHead').html(executionLang);
+          }
         })
     }
 
-    var link = createLink('feedback', 'ajaxGetExecutions', 'projectID=' + projectID);
+    var link = createLink('feedback', 'ajaxGetExecutions', 'productID=' + projectID+'&projectID='+value);
 
     $.post(link, function(data)
     {
@@ -88,18 +94,18 @@ function getExecutions(projectID)
 
 $('#taskProjectButton').on('click', function()
 {
-    var projectID   = $('#taskProjects').val();
-    var executionID = $('#executions').val();
+    var projectID   = $('#project').val();
+    var executionID = $('#execution').val();
     var feedbackID  = $('#feedbackID').val();
     var executionID = executionID ? parseInt(executionID) : 0;
 
     if(systemMode == 'new' && projectID && executionID)
     {
-        location.href = createLink('task', 'create', 'executionID=' + executionID + '&storyID=0&moduleID=0&taskID=0&todoID=0&extra=projectID=' + projectID + ',feedbackID=' + feedbackID) + '#app=feedback';
+        location.href = createLink('feedback', 'toTask', 'executionID=' + executionID + '&storyID=0&moduleID=0&taskID=0&todoID=0&extra=projectID=' + projectID + ',feedbackID=' + feedbackID) + '#app=feedback';
     }
     else if(systemMode == 'classic' && executionID)
     {
-        location.href = createLink('task', 'create', 'executionID=' + executionID + '&storyID=0&moduleID=0&taskID=0&todoID=0&extra=projectID=0,feedbackID=' + feedbackID) + '#app=feedback';
+        location.href = createLink('feedback', 'toTask', 'executionID=' + executionID + '&storyID=0&moduleID=0&taskID=0&todoID=0&extra=projectID=0,feedbackID=' + feedbackID) + '#app=feedback';
     }
     else if(!executionID)
     {
