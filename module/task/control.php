@@ -1330,27 +1330,28 @@ class task extends control
         $feedbackData->createUserName =$realname;
         $feedbackData->currentProgress =$progress;
         $feedbackData->feedbackContent =$estimate->work;
-        $feedbackData->workHours=$estimate->consumed;
+        $feedbackData->workHours = intval($estimate->consumed);
+        $feedbackData->planWorkHours = strval($consumed + $left);
         $feedbackData->zenTaoTaskId=strval(($task->parent >0)?$task->parent:$estimate->objectID);
 
         ChromePhp::log($feedbackData);
 
-//        $responseObject = $this->task->taskFeedback($feedbackData);
+        $responseObject = $this->task->taskFeedback($feedbackData);
 
         // 导入自定义js,显示提示信息
         $webRoot = $this->config->webRoot;
         $jsRoot = str_replace('www/','module/task/js/',$webRoot);
-        js::import($jsRoot.'syncmessage.js');
+        js::import($this->config->webRoot.'js/message.js');
         if($responseObject->httpCode == 200 && $responseObject->msg == '操作成功'){
             $this->dao->update(TABLE_EFFORT)
                 ->set('syncStatus')->eq('1')
                 ->where('id')->eq($estimateID)
                 ->exec();
 
-            $js ="showSuccessMessage();";
+            $js ="showSuccessMessage('同步成功','parent');";
 
         }else{
-            $js ="showFailMessage();";
+            $js ="showFailMessage('同步失败','parent');";
         }
 
         print(js::execute($js));
