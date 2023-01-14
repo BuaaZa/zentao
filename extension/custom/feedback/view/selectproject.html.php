@@ -10,7 +10,7 @@
           <?php if($this->config->systemMode == 'new'):?>
           <tr>
             <th><?php echo $lang->feedback->project;?></th>
-            <td><?php echo html::select('taskProjects', $projects, '', "class='form-control chosen'");?></td>
+            <td><?php echo html::select('taskProjects', $projects ? $projects : array(), '', "class='form-control chosen'");?></td>
           </tr>
           <tr>
             <th id='executionHead'><?php echo $lang->feedback->execution;?></th>

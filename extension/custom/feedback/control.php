@@ -177,12 +177,12 @@ class feedback extends control
             }
 
             if (isonlybody()) {
-                return $this->send(array('result' => 'success', 'message' => $this->lang->saveSuccess, 'closeModal' => true, 'locate' => inlink('admin-all')));
+                return $this->send(array('result' => 'success', 'message' => $this->lang->saveSuccess, 'closeModal' => true, 'locate' => inlink('admin','browseType=all')));
             }
             if ($this->app->getViewType() == 'xhtml') $location = $this->createLink('feedback', 'view', "feedbackID=$feedbackID", 'html');
             $response['message'] = $this->lang->saveSuccess;
             $response['locate']  = $location;
-            return $this->send(array('result' => 'success', 'message' => $this->lang->saveSuccess, 'closeModal' => true, 'locate' => inlink('admin-all')));
+            return $this->send(array('result' => 'success', 'message' => $this->lang->saveSuccess, 'closeModal' => true, 'locate' => inlink('admin','browseType=all')));
         }
         $this->display();
     }
@@ -214,7 +214,7 @@ class feedback extends control
                 $actionID = $this->action->create('feedback', $feedbackID, $action, $this->post->comment);
                 $this->action->logHistory($actionID, $changes);
             }
-            return $this->send(array('result' => 'success', 'message' => $this->lang->saveSuccess, 'closeModal' => true, 'locate' => inlink('admin-all')));
+            return $this->send(array('result' => 'success', 'message' => $this->lang->saveSuccess, 'closeModal' => true, 'locate' => inlink('admin','browseType=all')));
         }
         $feedback             = $this->feedback->getById($feedbackID);
 
