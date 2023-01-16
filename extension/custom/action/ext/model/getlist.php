@@ -37,7 +37,7 @@ public function getList($objectType, $objectID)
         ->orderBy('date, id')
         ->fetchAll('id');
 
-    // 处理转需求，转任务，转bug后的反馈action chenjj 230115
+    // 澶勭悊杞渶姹傦紝杞换鍔★紝杞琤ug鍚庣殑鍙嶉action chenjj 230115
     $actions = $this->feedbackAction($objectType, $objectID, $actions);
 
     $histories = $this->getHistory(array_keys($actions));
@@ -297,7 +297,7 @@ public function getList($objectType, $objectID)
             foreach(explode(',', $action->extra) as $id) $extra .= common::hasPriv('bug', 'view') ? html::a(helper::createLink('bug', 'view', "bugID=$id"), "#$id ") . ', ' : "#$id, ";
             $action->extra = trim(trim($extra), ',');
         }
-        // 处理反馈转任务，转需求，转bug后相关任务完成后action chenjj 230115
+        // 澶勭悊鍙嶉杞换鍔★紝杞渶姹傦紝杞琤ug鍚庣浉鍏充换鍔″畬鎴愬悗action chenjj 230115
         if($objectType=='feedback'){
             if($actionName == 'finished' and $action->objectType == 'task')
             {

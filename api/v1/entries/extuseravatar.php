@@ -24,13 +24,14 @@ class extUserAvatarEntry extends Entry
             return $this->sendError(400, $this->lang->user->error->noUser);
         }
 
-        if (empty($user->avatar)) {
-            return $this->sendError(400, $this->lang->user->error->noavatar);
-        }
-
+        // 修改为用户没有头像返回默认头像 chenjj 231016
         $fileController = $this->loadModel('file');
 
-        $realPathName   = $fileController->savePath . str_replace($fileController->webPath, "", $user->avatar);
+        if (empty($user->avatar)) {
+            $realPathName   = str_replace($fileController->webPath, "", $fileController->savePath) . '/default-avatar.jpeg';
+        } else {
+            $realPathName   = $fileController->savePath . str_replace($fileController->webPath, "", $user->avatar);
+        }
 
         if (!file_exists($realPathName)) {
             return $this->sendError(400, $this->lang->user->error->avatarlost);
@@ -39,7 +40,7 @@ class extUserAvatarEntry extends Entry
         $mime_type= mime_content_type($realPathName);
         $base64_data = base64_encode(file_get_contents($realPathName));
         $base64_file = 'data:'.$mime_type.';base64,'.$base64_data;
-        
+
         return $this->send(200, array('data'=>$base64_file));
     }
 }

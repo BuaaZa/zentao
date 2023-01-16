@@ -205,7 +205,29 @@ class feedbackModel extends model
       // commenting->处理中 替换原有的 doing
       elseif($browseType == 'commenting')   $feedbacks = $this->getByStatus($productIDList, $keyword, $modules, $types, array('commenting'), $sort, $pager, $projectID);
       elseif ($browseType == 'bysearch') $feedbacks = $this->getBySearch($productIDList, $queryID, $sort, $pager, $projectID);
+      elseif($browseType == 'tostory') $feedbacks = $this->getBySolution($productIDList,$keyword,array('tostory'), $sort, $pager, $projectID);
+      elseif($browseType == 'tobug') $feedbacks = $this->getBySolution($productIDList,$keyword,array('tobug'), $sort, $pager, $projectID);
+      elseif($browseType == 'totask') $feedbacks = $this->getBySolution($productIDList,$keyword,array('totask'), $sort, $pager, $projectID);
+      elseif($browseType == 'replied') $feedbacks = $this->getByStatus($productIDList, $keyword, $modules, $types, array('replied'), $sort, $pager, $projectID);
       return $feedbacks;
+    }
+
+    public function getBySolution($productIDList,$keyword,$solution=array(), $orderBy, $pager, $projectID)
+    {
+        $openedBy = $_GET['openedBy'];
+        return $this->dao->select("*, IF(`pri` = 0, {$this->config->maxPriValue}, `pri`) as priOrder")->from(TABLE_FEEDBACK)
+            ->where('product')->in($productIDList)
+            ->beginIF(!empty($openedBy))->andWhere('openedBy')->eq($openedBy)->fi()
+            ->andWhere('solution')->in($solution)
+            ->andWhere('deleted')->eq(0)
+            ->beginIF(!empty($keyword))->andWhere()
+            ->markLeft(1)
+            ->where('title')->like($keyword)
+            ->orWhere('`desc`')->like($keyword)
+            ->markRight(1)
+            ->fi()
+            ->orderBy($orderBy)->page($pager)
+            ->fetchAll();
     }
 
      /**
@@ -792,7 +814,7 @@ class feedbackModel extends model
             //$menu .= $this->buildMenu($moduleName, 'toTask' , $toStoryParams, $feedback, 'browse', $this->lang->icons['task'],'','iframe btn-action',false,'',$this->lang->feedback->toTask);
             $menu .= '<a href="#toTask" data-toggle="modal" data-id="'.$feedback->id.'" data-product="'.$feedback->product.'" onclick="getFeedbackID(this)" class="btn btn-action" title="转任务"><i class="icon icon-check-sign"></i> </a>';
             $menu .= $this->buildMenu($moduleName, 'toBug' , $toStoryParams, $feedback, 'browse', $this->lang->icons['bug'],'','btn-action',false,'',$this->lang->feedback->toBug);
-            $menu .= $this->buildMenu($moduleName, 'toTodo' , $toStoryParams, $feedback, 'browse', $this->lang->icons['todo'],'','btn-action',false,'',$this->lang->feedback->toTodo);
+            // $menu .= $this->buildMenu($moduleName, 'toTodo' , $toStoryParams, $feedback, 'browse', $this->lang->icons['todo'],'','btn-action',false,'',$this->lang->feedback->toTodo);
             $menu .= "</ul>";
             $menu .= "</div>";
         }

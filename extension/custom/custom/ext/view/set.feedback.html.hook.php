@@ -86,6 +86,8 @@ $(function()
         var data = JSON.parse(data);
         if(data && data.result ==='success'){
           alert("保存成功")
+        }else{
+          alert(data.message)
         }
       });
 
