@@ -1074,17 +1074,18 @@ class task extends control
     /**
      * Start a task.
      *
-     * @param  int    $taskID
-     * @param  string $extra
+     * @param int $taskID
+     * @param string $extra
      * @access public
-     * @return void
+     * @return int
      */
-    public function start($taskID, $extra = '')
+    public function start(int $taskID, string $extra = ''): int
     {
         $this->commonAction($taskID);
-
+        ChromePhp::log($extra);
         $extra = str_replace(array(',', ' '), array('&', ''), $extra);
         parse_str($extra, $output);
+
 
         $task = $this->task->getById($taskID);
 
@@ -1164,6 +1165,7 @@ class task extends control
         $this->view->members    = $this->loadModel('user')->getTeamMemberPairs($task->execution, 'execution', 'nodeleted');
         $this->view->assignedTo = $assignedTo;
         $this->display();
+        return 0;
     }
 
     /**
