@@ -1298,13 +1298,13 @@ class task extends control
     {
         $estimate = $this->task->getEstimateById($estimateID);
 
-        //获取任务
+        // 获取任务
         $task = $this->dao->select()->from(TABLE_TASK)
             ->where('id')->eq($estimate->objectID)
             ->fetch();
 
-        //进度计算
-        //如果任务是子任务
+        // 进度计算
+        // 任务可能是子任务
         if($task->parent >0){
             $oldParentTask = $this->dao->select()->from(TABLE_TASK)
                 ->where('id')->eq($task->parent)
@@ -1325,15 +1325,22 @@ class task extends control
             $progress = round($consumed / ($consumed + $left ) * 100);
         }
 
-        $feedbackData = new stdclass();
-        $feedbackData->createUserCode =$task->assignedTo;
+        // 获取用户
+        $user = $task->assignedTo;
         $realname= $this->loadModel('user')->getRealNameByAccount($task->assignedTo);
-        $feedbackData->createUserName =$realname;
-        $feedbackData->currentProgress =$progress;
-        $feedbackData->feedbackContent =$estimate->work;
+        if($task->mode == 'multi'){
+            $user = $this->app->user->account;
+            $realname = $this->app->user->realname;
+        }
+
+        $feedbackData = new stdclass();
+        $feedbackData->createUserCode = $user;
+        $feedbackData->createUserName = $realname;
+        $feedbackData->currentProgress = $progress;
+        $feedbackData->feedbackContent = $estimate->work;
         $feedbackData->workHours = intval($estimate->consumed);
         $feedbackData->planWorkHours = strval($consumed + $left);
-        $feedbackData->zenTaoTaskId=strval(($task->parent >0)?$task->parent:$estimate->objectID);
+        $feedbackData->zenTaoTaskId = strval(($task->parent >0)?$task->parent:$estimate->objectID);
 
         ChromePhp::log($feedbackData);
 
