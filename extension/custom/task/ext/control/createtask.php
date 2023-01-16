@@ -168,11 +168,17 @@ class task extends control
                 $this->dao->update(TABLE_TODO)->set('status')->eq('done')->where('id')->eq($todoID)->exec();
                 $this->action->create('todo', $todoID, 'finished', '', "TASK:$taskID");
 
-                if(($this->config->edition == 'biz' || $this->config->edition == 'max') && $todo->type == 'feedback' && $todo->idvalue) $this->loadModel('feedback')->updateStatus('todo', $todo->idvalue, 'done');
+                // if增加 $this->config->edition == 'open' chenjj 230115
+                if(($this->config->edition == 'biz' || $this->config->edition == 'max' || $this->config->edition == 'open') && $todo->type == 'feedback' && $todo->idvalue) $this->loadModel('feedback')->updateStatus('todo', $todo->idvalue, 'done');
             }
 
             if ($feedbackID > 0) {
-                $this->dao->update(TABLE_FEEDBACK)->set('status')->eq('commenting')->where('id')->eq($feedbackID)->exec();
+                // 反馈转任务后的属性更新修改 chenjj 230115
+                $this->dao->update(TABLE_FEEDBACK)
+                ->set('status')->eq('commenting')
+                ->set('solution')->eq('totask')
+                ->set('result')->eq($taskID)
+                ->where('id')->eq($feedbackID)->exec();
                 // feedback的action
                 $this->action->create('feedback', $feedbackID, 'totask', '', $taskID);
             }

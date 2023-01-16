@@ -37,6 +37,9 @@ public function getList($objectType, $objectID)
         ->orderBy('date, id')
         ->fetchAll('id');
 
+    // 处理转需求，转任务，转bug后的反馈action chenjj 230115
+    $actions = $this->feedbackAction($objectType, $objectID, $actions);
+
     $histories = $this->getHistory(array_keys($actions));
     $this->loadModel('file');
 
@@ -293,6 +296,28 @@ public function getList($objectType, $objectID)
             $extra = '';
             foreach(explode(',', $action->extra) as $id) $extra .= common::hasPriv('bug', 'view') ? html::a(helper::createLink('bug', 'view', "bugID=$id"), "#$id ") . ', ' : "#$id, ";
             $action->extra = trim(trim($extra), ',');
+        }
+        // 处理反馈转任务，转需求，转bug后相关任务完成后action chenjj 230115
+        if($objectType=='feedback'){
+            if($actionName == 'finished' and $action->objectType == 'task')
+            {
+                $title = $this->dao->select('name')->from(TABLE_TASK)->where('id')->eq($action->objectID)->fetch('name');
+                if ($title) {
+                    $action->extra = common::hasPriv('task', 'view') ? html::a(helper::createLink('task', 'view', "taskID=$action->objectID"), "#$action->extra " . $title) : "#$action->extra " . $title;
+                }
+            }elseif($actionName == 'closed' and $action->objectType == 'story')
+            {
+                $title = $this->dao->select('title')->from(TABLE_STORY)->where('id')->eq($action->objectID)->fetch('title');
+                if($title) {
+                    $action->extra = common::hasPriv('story', 'view') ? html::a(helper::createLink('story', 'view', "storyID=$action->objectID"), "#$action->extra " . $title) : "#$action->extra " . $title;
+                }
+            }elseif($actionName == 'resolved' and $action->objectType == 'bug')
+            {
+                $title = $this->dao->select('title')->from(TABLE_BUG)->where('id')->eq($action->objectID)->fetch('title');
+                if ($title) {
+                    $action->extra = common::hasPriv('bug', 'view') ? html::a(helper::createLink('bug', 'view', "bugID=$action->objectID"), "#$action->extra " . $title) : "#$action->extra " . $title;
+                }
+            }
         }
 
         $action->comment = $this->file->setImgSize($action->comment, $this->config->action->commonImgSize);

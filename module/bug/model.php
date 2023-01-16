@@ -801,7 +801,8 @@ class bugModel extends model
 
             if($bug->execution and $bug->status != $oldBug->status) $this->loadModel('kanban')->updateLane($bug->execution, 'bug');
 
-            if(($this->config->edition == 'biz' || $this->config->edition == 'max') && $oldBug->feedback) $this->loadModel('feedback')->updateStatus('bug', $oldBug->feedback, $bug->status, $oldBug->status);
+            // if增加 $this->config->edition == 'open' chenjj 230115
+            if(($this->config->edition == 'biz' || $this->config->edition == 'max' || $this->config->edition == 'open') && $oldBug->feedback) $this->loadModel('feedback')->updateStatus('bug', $oldBug->feedback, $bug->status, $oldBug->status);
 
             $this->file->processFile4Object('bug', $oldBug, $bug);
             return common::createChanges($oldBug, $bug);
@@ -913,6 +914,8 @@ class bugModel extends model
 
             $isBiz = $this->config->edition == 'biz';
             $isMax = $this->config->edition == 'max';
+            // if增加 $this->config->edition == 'open' chenjj 230115
+            $isOpen = $this->config->edition == 'open';
 
             /* Update bugs. */
             foreach($bugs as $bugID => $bug)
@@ -936,7 +939,8 @@ class bugModel extends model
 
                     $allChanges[$bugID] = common::createChanges($oldBug, $bug);
 
-                    if(($isBiz || $isMax) && $oldBug->feedback && !isset($feedbacks[$oldBug->feedback]))
+                    // if增加 $this->config->edition == 'open' chenjj 230115
+                    if(($isBiz || $isMax || $isOpen) && $oldBug->feedback && !isset($feedbacks[$oldBug->feedback]))
                     {
                         $feedbacks[$oldBug->feedback] = $oldBug->feedback;
                         $this->loadModel('feedback')->updateStatus('bug', $oldBug->feedback, $bug->status, $oldBug->status);
@@ -1239,7 +1243,8 @@ class bugModel extends model
             /* Link bug to build and release. */
             $this->linkBugToBuild($bugID, $bug->resolvedBuild);
 
-            if(($this->config->edition == 'biz' || $this->config->edition == 'max') && $oldBug->feedback) $this->loadModel('feedback')->updateStatus('bug', $oldBug->feedback, $bug->status, $oldBug->status);
+            // if增加 $this->config->edition == 'open' chenjj 230115
+            if(($this->config->edition == 'biz' || $this->config->edition == 'max' || $this->config->edition == 'open') && $oldBug->feedback) $this->loadModel('feedback')->updateStatus('bug', $oldBug->feedback, $bug->status, $oldBug->status);
 
             return common::createChanges($oldBug, $bug);
         }
@@ -1367,6 +1372,8 @@ class bugModel extends model
 
         $isBiz = $this->config->edition == 'biz';
         $isMax = $this->config->edition == 'max';
+        // if增加 $this->config->edition == 'open' chenjj 230115
+        $isOpen = $this->config->edition == 'open';
 
         $changes = array();
         foreach($bugIDList as $i => $bugID)
@@ -1414,7 +1421,8 @@ class bugModel extends model
             if($oldBug->execution) $this->loadModel('kanban')->updateLane($oldBug->execution, 'bug');
             $changes[$bugID] = common::createChanges($oldBug, $bug);
 
-            if(($isBiz || $isMax) && $oldBug->feedback && !isset($feedbacks[$oldBug->feedback]))
+            // if增加 $this->config->edition == 'open' chenjj 230115
+            if(($isBiz || $isMax || $isOpen) && $oldBug->feedback && !isset($feedbacks[$oldBug->feedback]))
             {
                 $feedbacks[$oldBug->feedback] = $oldBug->feedback;
                 $this->loadModel('feedback')->updateStatus('bug', $oldBug->feedback, $bug->status, $oldBug->status);
@@ -1531,7 +1539,8 @@ class bugModel extends model
             if(isset($output['toColID'])) $this->kanban->moveCard($bugID, $output['fromColID'], $output['toColID'], $output['fromLaneID'], $output['toLaneID']);
         }
 
-        if(($this->config->edition == 'biz' || $this->config->edition == 'max') && $oldBug->feedback) $this->loadModel('feedback')->updateStatus('bug', $oldBug->feedback, $bug->status, $oldBug->status);
+        // if增加 $this->config->edition == 'open' chenjj 230115
+        if(($this->config->edition == 'biz' || $this->config->edition == 'max' || $this->config->edition == 'open') && $oldBug->feedback) $this->loadModel('feedback')->updateStatus('bug', $oldBug->feedback, $bug->status, $oldBug->status);
 
         return common::createChanges($oldBug, $bug);
     }

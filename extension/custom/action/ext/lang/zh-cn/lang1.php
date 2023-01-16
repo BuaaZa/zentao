@@ -26,3 +26,6 @@ $lang->action->dynamicAction->feedback['tobug']       = '反馈转Bug';
 $lang->action->dynamicAction->feedback['totask']      = '反馈转任务';
 $lang->action->dynamicAction->feedback['totodo']      = '反馈转待办';
 $lang->action->dynamicAction->feedback['closed']      = '关闭反馈';
+
+// chenjj 230115
+$lang->action->desc->processed    = '$date, 由系统更新状态为已处理。' . "\n";
