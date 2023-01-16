@@ -88,7 +88,7 @@ $lang->testcase->fromModule       = '来源模块';
 $lang->testcase->fromCase         = '来源用例';
 $lang->testcase->sync             = '同步';
 $lang->testcase->ignore           = '忽略';
-$lang->testcase->fromTesttask     = '来自测试单用例';
+$lang->testcase->fromTesttask     = '来自测试集用例';
 $lang->testcase->fromCaselib      = '来自用例库用例';
 $lang->testcase->fromCaseID       = '用例来源ID';
 $lang->testcase->fromCaseVersion  = '用例来源版本';
@@ -186,7 +186,7 @@ $lang->testcase->confirmDelete         = '您确认要删除该测试用例吗�
 $lang->testcase->confirmBatchDelete    = '您确认要批量删除这些测试用例吗？';
 $lang->testcase->ditto                 = '同上';
 $lang->testcase->dittoNotice           = '该用例与上一用例不属于同一产品！';
-$lang->testcase->confirmUnlinkTesttask = '用例[%s]已关联在之前所属分支/平台的测试单中，调整分支/平台后，将从之前所属分支/平台的测试单中移除，请确认是否继续修改。';
+$lang->testcase->confirmUnlinkTesttask = '用例[%s]已关联在之前所属分支/平台的测试集中，调整分支/平台后，将从之前所属分支/平台的测试集中移除，请确认是否继续修改。';
 
 $lang->testcase->reviewList[0] = '否';
 $lang->testcase->reviewList[1] = '是';

@@ -89,7 +89,7 @@ $lang->project->webMenu->execution = array('link' => "{$lang->executionCommon}|p
 $lang->project->webMenu->story     = array('link' => "{$lang->SRCommon}|projectstory|story|projectID=%s");
 $lang->project->webMenu->bug       = array('link' => 'Bug|project|bug|projectID=%s');
 $lang->project->webMenu->testcase  = array('link' => '用例|project|testcase|projectID=%s');
-$lang->project->webMenu->testtask  = array('link' => "测试单|project|testtask|projectID=%s");
+$lang->project->webMenu->testtask  = array('link' => "测试集|project|testtask|projectID=%s");
 $lang->project->webMenu->build     = array('link' => "版本|project|build|projectID=%s");
 $lang->project->webMenu->dynamic   = array('link' => '动态|project|dynamic|projectID=%s');
 $lang->project->webMenu->view      = array('link' => '概况|project|view|projectID=%s');
@@ -114,7 +114,7 @@ $lang->execution->webMenu->task     = array('link' => '任务|execution|task|exe
 $lang->execution->webMenu->story    = array('link' => "需求|execution|story|executionID=%s", 'subModule' => 'story', 'alias' => 'linkstory,storykanban');
 $lang->execution->webMenu->bug      = 'Bug|execution|bug|executionID=%s';
 $lang->execution->webMenu->build    = array('link' => '版本|execution|build|executionID=%s', 'subModule' => 'build');
-$lang->execution->webMenu->testtask = array('link' => '测试单|execution|testtask|executionID=%s', 'subModule' => 'testreport,testtask');
+$lang->execution->webMenu->testtask = array('link' => '测试集|execution|testtask|executionID=%s', 'subModule' => 'testreport,testtask');
 $lang->execution->webMenu->team     = array('link' => '团队|execution|team|executionID=%s', 'alias' => 'managemembers');
 $lang->execution->webMenu->action   = array('link' => '动态|execution|dynamic|executionID=%s', 'subModule' => 'dynamic');
 $lang->execution->webMenu->view     = array('link' => '概况|execution|view|executionID=%s', 'alias' => 'edit,start,suspend,putoff,close');
@@ -140,22 +140,22 @@ $lang->build->webMenuOrder       = $lang->execution->webMenuOrder;
 $lang->qa->webMenu = new stdclass();
 $lang->qa->webMenu->bug       = array('link' => 'Bug|bug|browse|productID=%s', 'alias' => 'view,create,batchcreate,edit,resolve,close,activate,report,batchedit,batchactivate,confirmbug,assignto');
 $lang->qa->webMenu->testcase  = array('link' => '用例|testcase|browse|productID=%s', 'alias' => 'view,create,batchcreate,edit,batchedit,showimport,groupcase,importfromlib,zerocase');
-$lang->qa->webMenu->testtask  = array('link' => '测试单|testtask|browse|productID=%s', 'alias' => 'view,create,edit,linkcase,cases,start,close,batchrun,groupcase,report');
+$lang->qa->webMenu->testtask  = array('link' => '测试集|testtask|browse|productID=%s', 'alias' => 'view,create,edit,linkcase,cases,start,close,batchrun,groupcase,report');
 
 $lang->bug->webMenu = new stdclass();
 $lang->bug->webMenu->bug       = array('link' => 'Bug|bug|browse|productID=%s', 'alias' => 'view,create,batchcreate,edit,resolve,close,activate,report,batchedit,batchactivate,confirmbug,assignto', 'subModule' => 'tree');
 $lang->bug->webMenu->testcase  = array('link' => '用例|testcase|browse|productID=%s');
-$lang->bug->webMenu->testtask  = array('link' => '测试单|testtask|browse|productID=%s');
+$lang->bug->webMenu->testtask  = array('link' => '测试集|testtask|browse|productID=%s');
 
 $lang->testcase->webMenu = new stdclass();
 $lang->testcase->webMenu->bug       = array('link' => 'Bug|bug|browse|productID=%s');
 $lang->testcase->webMenu->testcase  = array('link' => '用例|testcase|browse|productID=%s', 'alias' => 'view,create,batchcreate,edit,batchedit,showimport,groupcase,importfromlib', 'subModule' => 'tree,story', 'class' => 'dropdown dropdown-hover');
-$lang->testcase->webMenu->testtask  = array('link' => '测试单|testtask|browse|productID=%s');
+$lang->testcase->webMenu->testtask  = array('link' => '测试集|testtask|browse|productID=%s');
 
 $lang->testtask->webMenu = new stdclass();
 $lang->testtask->webMenu->bug       = array('link' => 'Bug|bug|browse|productID=%s');
 $lang->testtask->webMenu->testcase  = array('link' => '用例|testcase|browse|productID=%s');
-$lang->testtask->webMenu->testtask  = array('link' => '测试单|testtask|browse|productID=%s', 'subModule' => 'testtask', 'alias' => 'view,create,edit,linkcase,cases,start,close,batchrun,groupcase,report');
+$lang->testtask->webMenu->testtask  = array('link' => '测试集|testtask|browse|productID=%s', 'subModule' => 'testtask', 'alias' => 'view,create,edit,linkcase,cases,start,close,batchrun,groupcase,report');
 
 $lang->qa->webMenuOrder[15]     = 'bug';
 $lang->qa->webMenuOrder[20]     = 'testcase';

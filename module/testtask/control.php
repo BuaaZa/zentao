@@ -214,7 +214,7 @@ class testtask extends control
     {
         if(!empty($_POST))
         {
-            #include "../common/ChromePhp.php";
+            include "../common/ChromePhp.php";
             $taskID = $this->testtask->create($projectID);
             if(dao::isError()){
                 return $this->send(array('result' => 'fail', 'message' =>  dao::getError()));
@@ -535,6 +535,20 @@ class testtask extends control
 
         /* Get test cases. */
         $runs = $this->testtask->getTaskCases($productID, $browseType, $queryID, $moduleID, $sort, $pager, $task);
+        $allSons = $this->testtask->getSonsAndName($task->id);
+        if($task->isParent){
+            foreach($allSons as $key => $son){
+                $son->runs = $this->testtask->getTaskCases($productID, $browseType, $queryID, $moduleID, $sort, $pager, $son);
+                if(!empty($son->runs)){
+                    foreach($son->runs as $r){
+                        $r->title = $son->relativeName.'-'.$r->title;
+                        array_push($runs, $r);
+                    }
+                }else{
+                    unset($allSons[$key]);
+                }
+            }
+        }
         $this->loadModel('common')->saveQueryCondition($this->dao->get(), 'testcase', false);
 
         /* Build the search form. */
@@ -556,6 +570,11 @@ class testtask extends control
 
         /* Append bugs and results. */
         $runs = $this->testcase->appendData($runs, 'run');
+        // if($task->isParent){
+        //     foreach($allSons as $son){
+        //         $son->runs = $this->testcase->appendData($son->runs, 'run');
+        //     }
+        // }
 
         $this->view->title      = $this->products[$productID] . $this->lang->colon . $this->lang->testtask->cases;
         $this->view->position[] = html::a($this->createLink('testtask', 'browse', "productID=$productID"), $this->products[$productID]);
@@ -582,6 +601,8 @@ class testtask extends control
         $this->view->suites         = $this->loadModel('testsuite')->getSuitePairs($productID);
         $this->view->suiteName      = isset($suiteName) ? $suiteName : $this->lang->testtask->browseBySuite;
         $this->view->canBeChanged   = $canBeChanged;
+        
+        $this->view->allSons = $allSons;
 
         $this->display();
     }
