@@ -31,7 +31,9 @@
       </tr>
       <tr>
         <th class='w-80px'><?php echo $lang->feedback->module?></th>
-        <td><?php echo html::select('module', $modules, $feedback->module, "class='form-control chosen'")?></td>
+        <td>
+          <?php echo html::select('module', $modules ? $modules : array(), $feedback->module, "class='form-control chosen'")?>
+        </td>
         <td></td>
       </tr>
       <tr>

@@ -15,10 +15,10 @@ class myFeedback extends feedback
                 return print(js::error($this->lang->feedback->mustChooseResult));
             }
             // clarify 待完善
-            if($result == 'clarify'){
-                $this->feedback->updateStatus($feedbackID,$result,$feedback);
+            if($result == 'clarify'){// chenjj 230115
+                $this->feedback->updateStatusOnReview($feedbackID,$result,$feedback);
             }else if ($result == "pass"){
-                $this->feedback->updateStatus($feedbackID,$result,$feedback);
+                $this->feedback->updateStatusOnReview($feedbackID,$result,$feedback);
             }
             $this->action->create('feedback', $feedbackID, 'reviewed', $comment,ucfirst($result));
             return print(js::closeModal('parent.parent'));           

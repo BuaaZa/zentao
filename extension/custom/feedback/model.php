@@ -846,9 +846,9 @@ class feedbackModel extends model
     }
 
     /**
-     * 更新反馈单状态
+     * 评审时更新反馈单状态 chenjj 230115
      */
-    public function updateStatus($feedbackID,$status,$feedback)
+    public function updateStatusOnReview($feedbackID,$status,$feedback)
     {
         if($status == 'pass'){
             $status = 'wait';
@@ -870,6 +870,20 @@ class feedbackModel extends model
         ->set('reviewedBy')->eq($feedback->reviewedBy . ',' . $this->app->user->account)
         ->where('id')->eq((int)$feedbackID)
         ->exec();
+    }
+    
+    /**
+     * 更新反馈单状态 chenjj 230115
+     */
+    public function updateStatus($from,$feedbackID,$status,$oldstatus)
+    {
+        $this->dao->update(TABLE_FEEDBACK)
+        ->set('status')->eq('replied')
+        ->where('id')->eq((int)$feedbackID)
+        ->exec();
+
+        $this->loadModel('action');
+        $actionID = $this->action->create('feedback', $feedbackID, 'processed', '');
     }
 
     public function update($feedbackID)

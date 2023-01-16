@@ -120,6 +120,7 @@ $lang->task->batchAssignTo     = '批量指派';
 $lang->task->assignedTo        = '指派给';
 $lang->task->assignedToAB      = '指派给';
 $lang->task->assignedDate      = '指派日期';
+$lang->task->assigner          = '指派人';
 $lang->task->openedBy          = '由谁创建';
 $lang->task->openedByAB        = '创建者';
 $lang->task->openedDate        = '创建日期';
