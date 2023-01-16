@@ -37,8 +37,8 @@ $lang->workflowdatasource->langList['testcaseStage']  = '测试用例阶段';
 $lang->workflowdatasource->langList['testcaseStatus'] = '测试用例状态';
 $lang->workflowdatasource->langList['testcaseResult'] = '测试用例结果';
 
-$lang->workflowdatasource->langList['testtaskStatus'] = '测试单状态';
-$lang->workflowdatasource->langList['testtaskPri']    = '测试单优先级';
+$lang->workflowdatasource->langList['testtaskStatus'] = '测试集状态';
+$lang->workflowdatasource->langList['testtaskPri']    = '测试集优先级';
 
 $lang->workflowdatasource->langList['todoStatus'] = '待办状态';
 $lang->workflowdatasource->langList['todoPri']    = '待办优先级';

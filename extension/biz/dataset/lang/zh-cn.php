@@ -42,7 +42,7 @@ $lang->dataset->objects['task']        = $lang->task->common;
 $lang->dataset->objects['team']        = '团队';
 $lang->dataset->objects['execution']   = '阶段';
 $lang->dataset->objects['user']        = $lang->user->common;
-$lang->dataset->objects['testtask']    = '测试单';
+$lang->dataset->objects['testtask']    = '测试集';
 $lang->dataset->objects['testrun']     = '测试执行';
 $lang->dataset->objects['testcase']    = '测试用例';
 $lang->dataset->objects['testresult']  = '执行结果';
@@ -63,9 +63,9 @@ $lang->dataset->tables['bugbuild']    = array('name' => '版本Bug数据', 'desc
 $lang->dataset->tables['story']       = array('name' => '需求数据', 'desc' => '包括需求优先级、创建人、所属产品、状态、阶段等');
 $lang->dataset->tables['testcase']    = array('name' => '用例数据', 'desc' => '包括用例优先级、创建人、所属产品、状态、看护人等');
 $lang->dataset->tables['casestep']    = array('name' => '用例步骤数据', 'desc' => '包括所属用例、用例步骤、期望结果等');
-$lang->dataset->tables['testtask']    = array('name' => '测试单列表', 'desc' => '包括用例优先级、创建人、所属产品、状态等');
-$lang->dataset->tables['testrun']     = array('name' => '测试单用例执行情况', 'desc' => '包括所属测试单、所属用例、用例编号、用例版本、指派人、最后执行人等');
-$lang->dataset->tables['testresult']  = array('name' => '测试单用例每次执行结果', 'desc' => '包括用例编号、用例版本、执行人、执行结果等');
+$lang->dataset->tables['testtask']    = array('name' => '测试集列表', 'desc' => '包括用例优先级、创建人、所属产品、状态等');
+$lang->dataset->tables['testrun']     = array('name' => '测试集用例执行情况', 'desc' => '包括所属测试集、所属用例、用例编号、用例版本、指派人、最后执行人等');
+$lang->dataset->tables['testresult']  = array('name' => '测试集用例每次执行结果', 'desc' => '包括用例编号、用例版本、执行人、执行结果等');
 
 $lang->dataset->typeList = array();
 $lang->dataset->typeList['internal'] = '内置数据';

@@ -116,9 +116,9 @@ class testtaskModel extends model
                             $parent_copy->createdDate = helper::now();
                             $parent_copy->status = 'wait';
                             $parent_copy->name = $parent->name . '-子测试集';
-                            $parent_copy->realFinishedDate = '0000-00-00 00:00:00';
-                            $parent_copy->$testreport = 0;
-                            unset($parent_copy->id, $parent_copy->report);
+                            //$parent_copy->realFinishedDate = '0000-00-00 00:00:00';
+                            //$parent_copy->$testreport = 0;
+                            unset($parent_copy->id);
                             $this->dao->insert(TABLE_TESTTASK)->data($parent_copy)->exec();
 
                             $sonTaskID = $this->dao->lastInsertID();
@@ -2587,5 +2587,50 @@ class testtaskModel extends model
                 ->fetchAll('id');
         }
         return $ans;        
+    }
+
+    public function getSonsAndName($taskID){
+        $task = $this->dao->select('*')->from(TABLE_TESTTASK)
+            ->where('id')->eq($taskID)
+            ->fetch();
+        if(!$task) return false;
+        $parents = $this->getParentList();
+        $childs = $this->dao->select('id,name')->from(TABLE_TESTTASK)
+            ->where('deleted')->eq(0)
+            ->andWhere('id')->notin($parents)
+            ->fetchPairs('id','name');
+        $ans = array();
+        if(isset($childs[$taskID])){
+            $task->relativeName = '.';
+            $ans[0] = $task;
+        }else{
+            $ans = $this->dfsGetSons('.', $taskID,$childs);
+        }
+        return $ans;        
+    }
+
+    public function dfsGetSons($path,$taskID,$childs){                              //path为包含taskID指向任务的名字的相对路径
+        $ans = array();
+        if(isset($childs[$taskID])){
+            $task = $this->dao->select('*')->from(TABLE_TESTTASK)
+                ->where('deleted')->eq(0)
+                ->andWhere('id')->eq($taskID)
+                ->fetch();
+            if($task){
+                $task->relativeName = $path;
+                $ans[0] = $task;
+            }
+        }else{
+            $childList = $this->dao->select('id,name')->from(TABLE_TESTTASK)
+                ->where('deleted')->eq(0)
+                ->andWhere('parent')->eq($taskID)
+                ->fetchPairs('id','name');
+            foreach($childList as $key => $value){
+                $sonAns = $this->dfsGetSons($path.'/'.$value,$key,$childs);
+                foreach($sonAns as $son)
+                    array_push($ans,$son);
+            }
+        }
+        return $ans;
     }
 }
