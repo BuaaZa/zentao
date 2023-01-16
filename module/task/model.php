@@ -1961,8 +1961,10 @@ class taskModel extends model
             if($changes) $allChanges = array_merge($allChanges, $changes);
             $task = $newTask;
 
-            //进度计算
-            //如果任务是子任务
+            // 开始反馈工时
+
+            // 进度计算
+            // 任务可能是子任务
             if($task->parent >0){
                 $parentTask = $this->dao->select()->from(TABLE_TASK)
                     ->where('id')->eq($task->parent)
@@ -1983,9 +1985,16 @@ class taskModel extends model
                 $progress = round($consumed / ($consumed + $left) * 100);
             }
 
-            $feedbackData = new stdclass();
-            $feedbackData->createUserCode = $task->assignedTo;
+            // 获取用户
+            $user = $task->assignedTo;
             $realname = $this->loadModel('user')->getRealNameByAccount($task->assignedTo);
+            if($task->mode == 'multi'){
+                $user = $this->app->user->account;
+                $realname = $this->app->user->realname;
+            }
+
+            $feedbackData = new stdclass();
+            $feedbackData->createUserCode = $user;
             $feedbackData->createUserName = $realname;
             $feedbackData->currentProgress = $progress;
             $feedbackData->feedbackContent = $estimate->work;
@@ -2017,6 +2026,20 @@ class taskModel extends model
         }
 
         return $allChanges;
+    }
+
+    /**
+     * Return task feedback to WBS.
+     *
+     * @param  object    $data
+     * @access public
+     * @return object
+     */
+    public function taskFeedback($data)
+    {
+        $url = $this->config->task->sync2wbsApi;
+        $response = common::http($url,$data,array(), array(), 'json');
+        return json_decode($response);
     }
 
     /**
@@ -2925,7 +2948,10 @@ class taskModel extends model
      */
     public function canOperateEffort($task, $effort = null)
     {
-        if(empty($task->team)) return true;
+        if(empty($task->team)) {
+            if($this->app->user->account != $task->assignedTo) return false;
+            return true;
+        }
 
         /* Check for add effort. */
         if(empty($effort))
@@ -3720,20 +3746,6 @@ class taskModel extends model
         $this->dao->insert(TABLE_EFFORT)->data($effort)->autoCheck()->exec();
 
         return $this->dao->lastInsertID();
-    }
-
-    /**
-     * Return task feedback to WBS.
-     *
-     * @param  object    $data
-     * @access public
-     * @return object
-     */
-    public function taskFeedback($data)
-    {
-        $url = $this->config->task->sync2wbsApi;
-        $response = common::http($url,$data,array(), array(), 'json');
-        return json_decode($response);
     }
 
     /**
