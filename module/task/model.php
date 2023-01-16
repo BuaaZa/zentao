@@ -1691,12 +1691,12 @@ class taskModel extends model
     /**
      * Start a task.
      *
-     * @param  int    $taskID
-     * @param  string $extra
+     * @param int $taskID
+     * @param string $extra
      * @access public
-     * @return void
+     * @return array|bool
      */
-    public function start($taskID, $extra = '')
+    public function start(int $taskID, string $extra = ''): bool|array
     {
         $extra = str_replace(array(',', ' '), array('&', ''), $extra);
         parse_str($extra, $output);
@@ -1716,7 +1716,8 @@ class taskModel extends model
         if(dao::isError()) return false;
 
         $editorIdList = $this->config->task->editor->start['id'];
-        if($this->app->getMethodName() == 'restart') $editorIdList = $this->config->task->editor->restart['id'];
+        if($this->app->getMethodName() == 'restart')
+            $editorIdList = $this->config->task->editor->restart['id'];
         $now  = helper::now();
         $task = fixer::input('post')
             ->add('id', $taskID)
@@ -1731,7 +1732,8 @@ class taskModel extends model
         $task = $this->loadModel('file')->processImgURL($task, $editorIdList, $this->post->uid);
         if($this->post->left == 0)
         {
-            if(isset($task->consumed) and $task->consumed == 0) return dao::$errors[] = sprintf($this->lang->error->notempty, $this->lang->task->consumed);
+            if(isset($task->consumed) and $task->consumed == 0)
+                return dao::$errors[] = sprintf($this->lang->error->notempty, $this->lang->task->consumed);
             if(empty($oldTask->team))
             {
                 $task->status       = 'done';
@@ -1775,7 +1777,6 @@ class taskModel extends model
             {
                 $task->status       = 'done';
                 $task->finishedBy   = $this->app->user->account;
-                $task->finishedDate = $task->finishedDate;
             }
         }
 
@@ -1795,7 +1796,9 @@ class taskModel extends model
         if(!isset($output['toColID']) or $task->status == 'done') $this->kanban->updateLane($oldTask->execution, 'task', $taskID);
         if(isset($output['toColID']) and $task->status == 'doing') $this->kanban->moveCard($taskID, $output['fromColID'], $output['toColID'], $output['fromLaneID'], $output['toLaneID']);
         if(($this->config->edition == 'biz' || $this->config->edition == 'max') && $oldTask->feedback) $this->loadModel('feedback')->updateStatus('task', $oldTask->feedback, $task->status, $oldTask->status);
-        if(!dao::isError()) return common::createChanges($oldTask, $task);
+        if(!dao::isError())
+            return common::createChanges($oldTask, $task);
+        return true;
     }
 
     /**
