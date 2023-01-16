@@ -246,7 +246,7 @@ class baseRouter
      * @var array
      * @access public
      */
-    public array $params;
+    public $params;
 
     /**
      * 视图类型。
