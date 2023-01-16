@@ -91,9 +91,15 @@ class feedbackAction extends actionModel
             {
                 $desc = $this->lang->action->desc->$actionType;
             }
-            elseif($action->objectType == 'feedback' and $action->action == 'tostory')
+            // 增加处理反馈的action类型为processed的数据 chenjj 230115
+            elseif($action->objectType == 'feedback')
             {
-                $desc = $action->extra ? $this->lang->feedback->action->tostory.$this->lang->action->desc->extra : $this->lang->action->desc->common;
+                if($action->action == 'tostory'){
+                    $desc = $action->extra ? $this->lang->feedback->action->tostory.$this->lang->action->desc->extra : $this->lang->action->desc->common;
+                }elseif($action->action == 'processed'){
+                    $processed = $this->lang->action->desc->processed;
+                    $desc = $processed ? $processed : $this->lang->action->desc->common;
+                }
             }
             elseif($action->action == 'fromfeedback')
             {

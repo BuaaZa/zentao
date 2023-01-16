@@ -137,7 +137,8 @@ function create($productID = 0, $branch = 0, $moduleID = 0, $storyID = 0, $objec
             $this->dao->update(TABLE_TODO)->set('status')->eq('done')->where('id')->eq($todoID)->exec();
             $this->action->create('todo', $todoID, 'finished', '', "STORY:$storyID");
 
-            if($this->config->edition == 'biz' || $this->config->edition == 'max')
+            // ifÔö¼Ó $this->config->edition == 'open' chenjj 230115
+            if($this->config->edition == 'biz' || $this->config->edition == 'max' || $this->config->edition == 'open')
             {
                 $todo = $this->dao->select('type, idvalue')->from(TABLE_TODO)->where('id')->eq($todoID)->fetch();
                 if($todo->type == 'feedback' && $todo->idvalue) $this->loadModel('feedback')->updateStatus('todo', $todo->idvalue, 'done');

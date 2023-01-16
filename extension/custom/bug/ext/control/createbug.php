@@ -105,7 +105,8 @@ class bug extends control
                 $this->dao->update(TABLE_TODO)->set('status')->eq('done')->where('id')->eq($output['todoID'])->exec();
                 $this->action->create('todo', $output['todoID'], 'finished', '', "BUG:$bugID");
 
-                if ($this->config->edition == 'biz' || $this->config->edition == 'max') {
+                // if增加 $this->config->edition == 'open' chenjj 230115
+                if ($this->config->edition == 'biz' || $this->config->edition == 'max' || $this->config->edition == 'open') {
                     $todo = $this->dao->select('type, idvalue')->from(TABLE_TODO)->where('id')->eq($output['todoID'])->fetch();
                     if ($todo->type == 'feedback' && $todo->idvalue) {
                         $this->loadModel('feedback')->updateStatus('todo', $todo->idvalue, 'done');
@@ -114,7 +115,12 @@ class bug extends control
             }
 
             if ($feedbackID > 0) {
-                $this->dao->update(TABLE_FEEDBACK)->set('status')->eq('commenting')->where('id')->eq($feedbackID)->exec();
+                // 反馈转bug后的属性更新修改 chenjj 230115
+                $this->dao->update(TABLE_FEEDBACK)
+                ->set('status')->eq('commenting')
+                ->set('solution')->eq('tobug')
+                ->set('result')->eq($bugID)
+                ->where('id')->eq($feedbackID)->exec();
                 // feedback的action
                 $this->action->create('feedback', $feedbackID, 'tobug', '', $bugID);
             }
