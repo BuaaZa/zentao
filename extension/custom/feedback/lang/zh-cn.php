@@ -181,9 +181,9 @@ $lang->feedback->closedReasonList['refuse']    = '不予采纳';
 $lang->feedback->solutionList['']            = '';
 $lang->feedback->solutionList['tobug']       = '转Bug';
 $lang->feedback->solutionList['tostory']     = '转' . $lang->SRCommon;
-$lang->feedback->solutionList['touserstory'] = '转' . $lang->URCommon;
+// $lang->feedback->solutionList['touserstory'] = '转' . $lang->URCommon;
 $lang->feedback->solutionList['totask']      = '转任务';
-$lang->feedback->solutionList['totodo']      = '转待办';
+// $lang->feedback->solutionList['totodo']      = '转待办';
 
 $lang->feedback->publicList['']  = '';
 $lang->feedback->publicList['0'] = '不公开';
@@ -225,13 +225,14 @@ $lang->feedback->featureBar['admin']['review']     = '待预审';
 $lang->feedback->featureBar['admin']['clarify']    = '待完善';
 $lang->feedback->featureBar['admin']['commenting'] = '处理中';
 $lang->feedback->featureBar['admin']['closed']     = '已关闭';
+$lang->feedback->featureBar['admin']['replied']     = '已处理';
 
 $lang->feedback->featureBar['admin']['more']['tostory']       = "已转{$lang->SRCommon}";
-$lang->feedback->featureBar['admin']['more']['touserstory']   = "已转{$lang->URCommon}";
+// $lang->feedback->featureBar['admin']['more']['touserstory']   = "已转{$lang->URCommon}";
 $lang->feedback->featureBar['admin']['more']['totask']        = '已转任务';
 $lang->feedback->featureBar['admin']['more']['tobug']         = '已转Bug';
-$lang->feedback->featureBar['admin']['more']['totodo']        = '已转待办';
-$lang->feedback->featureBar['admin']['more']['toticket']      = '已转工单';
+// $lang->feedback->featureBar['admin']['more']['totodo']        = '已转待办';
+// $lang->feedback->featureBar['admin']['more']['toticket']      = '已转工单';
 
 $lang->feedback->notifyList['']  = '';
 $lang->feedback->notifyList['0'] = '否';

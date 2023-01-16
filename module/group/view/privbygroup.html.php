@@ -64,7 +64,7 @@
         if($i >= $config->group->maxToolBarCount) echo '<li>';
         echo html::a(inlink('managePriv', sprintf($params, $module)), "<span class='text'>" . strip_tags(substr($title, 0, strpos($title, '|'))) . '</span>', '', "class='btn btn-link $active'");
         if($i >= $config->group->maxToolBarCount) echo '</li>';
-        if($i == count($lang->mainNav->menuOrder) and $i >= $config->group->maxToolBarCount) echo '</ul></div>';
+        if($i == count($lang->mainNav->menuOrder) + 1 and $i >= $config->group->maxToolBarCount) echo '</ul></div>';
     }
     ?>
 
