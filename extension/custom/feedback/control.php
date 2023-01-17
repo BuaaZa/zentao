@@ -202,10 +202,18 @@ class feedback extends control
             $changes = array();
             $files   = array();
             if ($comment == false) {
+                if(!empty($_POST['expectDate']) && !$this->feedback->isDatetime($_POST['expectDate'])){
+                    return $this->send(array('result' => 'fail', 'message' => $this->lang->feedback->expectDate . $this->lang->feedback->wrongDatetime));
+                }
+                if (!empty($_POST['contactWay']) && !$this->feedback->isMobTel($_POST['contactWay'])) {
+                    return $this->send(array('result' => 'fail', 'message' => $this->lang->feedback->contactWay . $this->lang->feedback->wrongContactWay));
+                }
                 $changes = $this->feedback->update($feedbackID);
                 if (dao::isError()) {
                     if (defined('RUN_MODE') && RUN_MODE == 'api') return $this->send(array('status' => 'error', 'message' => dao::getError()));
-                    return print(js::error(dao::getError()));
+                    $response['result']  = 'fail';
+                    $response['message'] = dao::getError();
+                    return $this->send($response);
                 }
             }
 

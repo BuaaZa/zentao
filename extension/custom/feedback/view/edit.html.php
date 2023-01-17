@@ -13,6 +13,7 @@
 <?php include $app->getModuleRoot() . 'common/view/header.html.php';?>
 <?php include $app->getModuleRoot() . 'common/view/chosen.html.php';?>
 <?php include $app->getModuleRoot() . 'common/view/kindeditor.html.php';?>
+<?php include $app->getModuleRoot() . 'common/view/datepicker.html.php';?>
 <?php js::set('browseType', $browseType);?>
 <div id='mainContent' class='main-content'>
   <div class='main-header'>
@@ -85,6 +86,24 @@
         </td>
       </tr>
       <tr>
+        <th><?php echo $lang->feedback->productVersion;?></th>
+        <td><?php echo html::input('productVersion', $feedback->productVersion, "class='form-control'");?></td>
+      </tr>
+      <tr>
+        <th><?php echo $lang->feedback->usedProject;?></th>
+        <td><?php echo html::input('usedProject', $feedback->usedProject, "class='form-control'");?></td>
+      </tr>
+      <tr>
+        <th><?php echo $lang->feedback->expectDate;?></th>
+        <td id='expectDateTd'>
+            <span><?php echo html::input('expectDate', helper::isZeroDate($feedback->expectDate) ? '' : $feedback->expectDate, "class='form-control form-datetimes'");?></span>
+        </td>
+      </tr>
+      <tr>
+        <th><?php echo $lang->feedback->contactWay;?></th>
+        <td><?php echo html::input('contactWay', $feedback->contactWay, "class='form-control'");?></td>
+      </tr>
+      <tr>
         <td colspan='3' class='text-center form-actions'>
           <?php echo html::submitButton();?>
           <?php echo html::backButton();?>
@@ -94,3 +113,23 @@
   </form>
 </div>
 <?php include $app->getModuleRoot() . 'common/view/footer.html.php';?>
+<script>
+// 修改日期控件使之支持秒 chenjj 230117
+$(function()
+{
+    var options = 
+    {
+        language: '<?php echo $this->app->getClientLang(); ?>',
+        weekStart: 1,
+        todayBtn:  1,
+        autoclose: 1,
+        todayHighlight: 1,
+        startView: 2,
+        forceParse: 0,
+        showMeridian: 1,
+        format: 'yyyy-mm-dd hh:ii:ss'
+    }
+
+    $('.form-datetimes').datetimepicker(options);
+});
+</script>
