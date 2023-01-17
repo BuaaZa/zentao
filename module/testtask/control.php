@@ -120,7 +120,6 @@ class testtask extends control
         else
             $sonTree = $this->testtask->getSonsObject("testtask", "browse", $thisParam, $productID);
         $taskTree = $this->loadModel("tree")->buildMyTree($sonTree, "testtask");
-        
         if($openId>0){
             $this->view->openTask = $this->testtask->getById($openId);
             $this->view->openTask->backURL = $this->createLink("testtask", "browse", $thisParam);
