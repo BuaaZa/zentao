@@ -89,6 +89,13 @@ class feedbackModel extends model
             // 删除enternalId chenjj 221230
             ->remove('enternalId')
             ->get();
+            
+        if(!empty($feedback->expectDate) && !$this->isDatetime($feedback->expectDate)){
+            return array('result' => 'fail', 'message' => $this->lang->feedback->expectDate . $this->lang->feedback->wrongDatetime);
+        }
+        if (!empty($feedback->contactWay) && !$this->isMobTel($feedback->contactWay)) {
+            return array('result' => 'fail', 'message' => $this->lang->feedback->contactWay . $this->lang->feedback->wrongContactWay);
+        }
 
         $feedback->status = 'noreview';// 暂时默认需要预审
         //if($bug->execution != 0) $bug->project = $this->dao->select('project')->from(TABLE_EXECUTION)->where('id')->eq($bug->execution)->fetch('project');
@@ -1200,6 +1207,28 @@ class feedbackModel extends model
             $feedbacksQuery .= ' AND `story` != 0';
         }
         return $feedbacksQuery;
+    }
+
+    /**
+     * 验证是不是手机号码或电话号码
+     */
+    function isMobTel($numberstr)
+    {
+        $isMob="/^1[3-9]{1}[0-9]{9}$/";
+        $isTel="/^([0-9]{3,4}-?)?[0-9]{7,8}$/";
+        if (!preg_match($isMob, $numberstr) && !preg_match($isTel, $numberstr)) {
+            return false;
+        } else {
+            return true;
+        }
+    }
+
+    /**
+     * 验证是不是datetime日期格式
+     */
+    function isDatetime($str)
+    {
+        return DateTime::createFromFormat('Y-m-d H:i:s', $str) !== FALSE;
     }
 
 

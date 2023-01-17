@@ -113,6 +113,10 @@ $lang->feedback->deleted        = '已删除';
 $lang->feedback->project        = '选择项目';
 $lang->feedback->execution      = '选择' . $lang->execution->common;
 $lang->feedback->createdAt      = '创建于';
+$lang->feedback->productVersion = '产品版本';
+$lang->feedback->usedProject    = '使用项目名称';
+$lang->feedback->expectDate     = '期望交付时间';
+$lang->feedback->contactWay     = '联系方式';
 
 $lang->feedback->lblBasic       = '基本信息';
 $lang->feedback->lblTrace       = '追溯关系图';
@@ -250,6 +254,8 @@ $lang->feedback->clarifyclose = '无法关闭待完善的反馈';
 $lang->feedback->externallyDelete = '无法删除外部创建的反馈';
 $lang->feedback->notFoundDeleted = '数据未找到或者已经被删除';
 $lang->feedback->idnotempty = '反馈ID不能为空';
+$lang->feedback->wrongContactWay = '请输入正确的手机号码或电话号码';
+$lang->feedback->wrongDatetime = '错误的日期时间格式';
 
 
 $lang->feedback->exportTypeList["all"] = "全量";

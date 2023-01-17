@@ -113,6 +113,10 @@ $lang->feedback->deleted        = 'Deleted';
 $lang->feedback->project        = 'Select project';
 $lang->feedback->execution      = 'Select ' . $lang->execution->common;
 $lang->feedback->createdAt      = 'Created At';
+$lang->feedback->productVersion = 'Product Version';
+$lang->feedback->usedProject    = 'Used Project';
+$lang->feedback->expectDate     = 'Expect Date';
+$lang->feedback->contactWay     = 'Contact Way';
 
 $lang->feedback->lblBasic       = 'Basic Info';
 $lang->feedback->lblTrace       = 'Traceability Diagram';
@@ -245,3 +249,5 @@ $lang->feedback->clarifyclose = 'Unable to close feedback to be clarified';
 $lang->feedback->externallyDelete = 'Unable to delete feedback externally created';
 $lang->feedback->notFoundDeleted = 'Data not found or deleted';
 $lang->feedback->idnotempty = 'FeedbackID can not be empty';
+$lang->feedback->wrongContactWay = 'Please enter the correct mobile number or phone number';
+$lang->feedback->wrongDatetime = 'Wrong datetime format';
