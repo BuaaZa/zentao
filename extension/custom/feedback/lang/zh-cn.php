@@ -117,6 +117,15 @@ $lang->feedback->productVersion = '产品版本';
 $lang->feedback->usedProject    = '使用项目名称';
 $lang->feedback->expectDate     = '期望交付时间';
 $lang->feedback->contactWay     = '联系方式';
+// 产品使用环境表（反馈信息补充表） chenjj 230117
+$lang->feedback->projectUseInfo = '产品使用环境';
+$lang->feedback->projectUseInfoList['serverOS']         = '服务器OS版本';
+$lang->feedback->projectUseInfoList['serverCPU']        = '服务器CPU型号';
+$lang->feedback->projectUseInfoList['middleware']       = '中间件名称及版本';
+$lang->feedback->projectUseInfoList['database']         = '数据库名称及版本';
+$lang->feedback->projectUseInfoList['terminalOS']       = '终端OS版本';
+$lang->feedback->projectUseInfoList['terminalCPU']      = '终端CPU型号';
+$lang->feedback->projectUseInfoList['browser']          = '浏览器版本';
 
 $lang->feedback->lblBasic       = '基本信息';
 $lang->feedback->lblTrace       = '追溯关系图';

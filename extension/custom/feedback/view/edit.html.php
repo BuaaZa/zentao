@@ -26,19 +26,19 @@
   <form class='main-form form-ajax' method='post' enctype='multipart/form-data'>
     <table class='table table-form'>
       <tr>
-        <th class='w-80px'><?php echo $lang->feedback->product?></th>
+        <th class='w-120px'><?php echo $lang->feedback->product?></th>
         <td><?php echo html::select('product', $products, $feedback->product, "class='form-control chosen'")?></td>
         <td></td>
       </tr>
       <tr>
-        <th class='w-80px'><?php echo $lang->feedback->module?></th>
+        <th class='w-120px'><?php echo $lang->feedback->module?></th>
         <td>
           <?php echo html::select('module', $modules ? $modules : array(), $feedback->module, "class='form-control chosen'")?>
         </td>
         <td></td>
       </tr>
       <tr>
-        <th class='w-80px'><?php echo $lang->feedback->type;?></th>
+        <th class='w-120px'><?php echo $lang->feedback->type;?></th>
         <td><?php echo html::select('type', $lang->feedback->typeList, $feedback->type, "class='form-control chosen'")?></td>
       </tr>
       <tr>
@@ -102,6 +102,34 @@
       <tr>
         <th><?php echo $lang->feedback->contactWay;?></th>
         <td><?php echo html::input('contactWay', $feedback->contactWay, "class='form-control'");?></td>
+      </tr>
+      <tr>
+        <th><?php echo $lang->feedback->projectUseInfoList['serverOS'];?></th>
+        <td><?php echo html::input('serverOS', $feedback->projectUseInfo->serverOS, "class='form-control'");?></td>
+      </tr>
+      <tr>
+        <th><?php echo $lang->feedback->projectUseInfoList['serverCPU'];?></th>
+        <td><?php echo html::input('serverCPU', $feedback->projectUseInfo->serverCPU, "class='form-control'");?></td>
+      </tr>
+      <tr>
+        <th><?php echo $lang->feedback->projectUseInfoList['middleware'];?></th>
+        <td><?php echo html::input('middleware', $feedback->projectUseInfo->middleware, "class='form-control'");?></td>
+      </tr>
+      <tr>
+        <th><?php echo $lang->feedback->projectUseInfoList['database'];?></th>
+        <td><?php echo html::input('database', $feedback->projectUseInfo->database, "class='form-control'");?></td>
+      </tr>
+      <tr>
+        <th><?php echo $lang->feedback->projectUseInfoList['terminalOS'];?></th>
+        <td><?php echo html::input('terminalOS', $feedback->projectUseInfo->terminalOS, "class='form-control'");?></td>
+      </tr>
+      <tr>
+        <th><?php echo $lang->feedback->projectUseInfoList['terminalCPU'];?></th>
+        <td><?php echo html::input('terminalCPU', $feedback->projectUseInfo->terminalCPU, "class='form-control'");?></td>
+      </tr>
+      <tr>
+        <th><?php echo $lang->feedback->projectUseInfoList['browser'];?></th>
+        <td><?php echo html::input('browser', $feedback->projectUseInfo->browser, "class='form-control'");?></td>
       </tr>
       <tr>
         <td colspan='3' class='text-center form-actions'>

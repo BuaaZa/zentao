@@ -117,6 +117,15 @@ $lang->feedback->productVersion = 'Product Version';
 $lang->feedback->usedProject    = 'Used Project';
 $lang->feedback->expectDate     = 'Expect Date';
 $lang->feedback->contactWay     = 'Contact Way';
+// 产品使用环境表（反馈信息补充表） chenjj 230117
+$lang->feedback->projectUseInfo = 'Project Information';
+$lang->feedback->projectUseInfoList['serverOS']         = 'Server OS';
+$lang->feedback->projectUseInfoList['serverCPU']        = 'Server CPU';
+$lang->feedback->projectUseInfoList['middleware']       = 'Middleware';
+$lang->feedback->projectUseInfoList['database']         = 'Database';
+$lang->feedback->projectUseInfoList['terminalOS']       = 'Terminal OS';
+$lang->feedback->projectUseInfoList['terminalCPU']      = 'Terminal CPU';
+$lang->feedback->projectUseInfoList['browser']          = 'Browser';
 
 $lang->feedback->lblBasic       = 'Basic Info';
 $lang->feedback->lblTrace       = 'Traceability Diagram';
