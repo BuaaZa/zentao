@@ -192,7 +192,8 @@ class feedbackModel extends model
       if(strpos($sort, 'severity_') !== false) $sort = str_replace('severity_', 'severityOrder_', $sort);
       $feedbacks = array();
       if($browseType == 'all')          $feedbacks = $this->getAllFeedbacks($productIDList, $keyword, $modules, $types, $sort, $pager, $projectID);
-      elseif($browseType == 'wait')     $feedbacks = $this->getByStatus($productIDList, $keyword, $modules, $types, array($browseType,'noreview','clarify'), $sort, $pager, $projectID);
+      // 待处理的就只返回待处理的，不再返回'noreview'和'clarify' chenjj 230117
+      elseif($browseType == 'wait')     $feedbacks = $this->getByStatus($productIDList, $keyword, $modules, $types, array($browseType), $sort, $pager, $projectID);
       elseif($browseType == 'review')   $feedbacks = $this->getByStatus($productIDList, $keyword, $modules, $types, array('noreview'), $sort, $pager, $projectID);
       elseif($browseType == 'unclosed') $feedbacks = $this->unClosedFeedbacks($productIDList, $keyword, $modules, $types, array('closed'), $sort, $pager, $projectID);
       elseif($browseType == 'public')   $feedbacks = $this->publicFeedbacks($productIDList, $keyword, $modules, $types, array(), $sort, $pager, $projectID);
