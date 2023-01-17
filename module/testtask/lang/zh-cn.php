@@ -222,3 +222,5 @@ $lang->testtask->handle0 = "转移到当前测试集下";
 $lang->testtask->handle1 = "直接删除";
 $lang->testtask->handle2 = "创建默认子测试集，并转移到该测试集下";
 $lang->testtask->parentNoCase = "所属测试集均未绑定用例。\n非叶子结点，无法直接绑定用例。";
+$lang->testtask->allTestTask = "所有测试集";
+$lang->testtask->noTestTask = "无测试集";

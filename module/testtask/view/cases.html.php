@@ -12,7 +12,66 @@
 ?>
 <?php include '../../common/view/header.html.php';?>
 <?php include '../../common/view/datatable.fix.html.php';?>
-<?php include './caseheader.html.php';?>
+<div id='mainMenu' class='clearfix'>
+  <div id="sidebarHeader">
+    <div class="title" title="<?php echo $moduleName;?>">
+      <?php
+        echo $task->name;
+      ?>
+    </div>
+  </div>
+  <div class='btn-toolbar pull-left'>
+    <?php
+    $hasCasesPriv = common::hasPriv('testtask', 'cases');
+    $hasGroupPriv = common::hasPriv('testtask', 'groupcase');
+    ?>
+    <?php
+    if($hasCasesPriv) echo html::a($this->inlink('cases', "taskID=$taskID&browseType=all&param=0"), "<span class='text'>{$lang->testtask->allCases}</span>", '', "id='allTab' class='btn btn-link' data-app='{$app->tab}'");
+    if($hasCasesPriv) echo html::a($this->inlink('cases', "taskID=$taskID&browseType=assignedtome&param=0"), "<span class='text'>{$lang->testtask->assignedToMe}</span>", '', "id='assignedtomeTab' class='btn btn-link' data-app='{$app->tab}'");
+
+    if($hasGroupPriv)
+    {
+        $groupBy  = isset($groupBy)  ? $groupBy : '';
+        $active   = !empty($groupBy) ? 'btn-active-text' : '';
+
+        echo "<div id='groupTab' class='btn-group'>";
+        echo html::a($this->createLink('testtask', 'groupCase', "taskID=$taskID&groupBy=story"), "<span class='text'>{$lang->testcase->groupByStories}</span>", '', "class='btn btn-link $active' data-app='{$app->tab}'");
+        echo '</div>';
+    }
+    ?>
+
+    <?php if($this->methodName == 'cases'):?>
+    <div class='btn-group'>
+      <?php $active = $suiteName == $lang->testtask->browseBySuite ? '' : 'btn-active-text';?>
+      <a href='javascript:;' class='btn btn-link btn-limit <?php echo $active;?>' data-toggle='dropdown'><span class='text' title='<?php echo $suiteName;?>'><?php echo $suiteName;?></span> <span class='caret'></span></a>
+      <ul class='dropdown-menu' style='max-height:240px; max-width: 300px; overflow-y:auto'>
+        <?php
+          foreach($suites as $key => $name) echo "<li>" . html::a(inlink('cases', "taskID=$taskID&browseType=bysuite&param=$key"), $name) . "</li>";
+        ?>
+      </ul>
+    </div>
+    <?php echo "<a class='btn btn-link querybox-toggle' id='bysearchTab'><i class='icon icon-search muted'></i> {$lang->testcase->bySearch}</a>";?>
+    <?php endif;?>
+  </div>
+  <div class='btn-toolbar pull-right'>
+    <?php
+    if(!$task->isParent){
+      common::printIcon('testtask', 'linkCase', "taskID=$task->id", $task, 'button', 'link');
+    }
+    common::printIcon('testcase', 'export', "productID=$productID&orderBy=case_desc&taskID=$task->id", '', 'button', '', '', 'export');
+    common::printIcon('testtask', 'report', "productID=$productID&taskID=$task->id&browseType=$browseType&branchID=$task->branch&moduleID=" . (empty($moduleID) ? '' : $moduleID));
+    common::printIcon('testtask',   'view',     "taskID=$task->id", '', 'button', 'list-alt');
+    common::printBack($this->session->testtaskList, 'btn btn-link');
+    ?>
+  </div>
+</div>
+<?php
+$headerHooks = glob(dirname(dirname(__FILE__)) . "/ext/view/featurebar.*.html.hook.php");
+if(!empty($headerHooks))
+{
+    foreach($headerHooks as $fileName) include($fileName);
+}
+?>
 <?php js::set('confirmUnlink', $lang->testtask->confirmUnlinkCase)?>
 <?php js::set('taskCaseBrowseType', ($browseType == 'bymodule' and $this->session->taskCaseBrowseType == 'bysearch') ? 'all' : $this->session->taskCaseBrowseType);?>
 <?php js::set('browseType', $browseType);?>
@@ -20,7 +79,7 @@
 <div id='mainContent' class='main-row fade'>
   <div class='side-col' id='sidebar'>
     <div class="sidebar-toggle"><i class="icon icon-angle-left"></i></div>
-    <div class='cell'><?php echo $moduleTree;?></div>
+    <div class='cell'><?php echo $taskTree;?></div>
   </div>
   <div class='main-col'>
     <div class="cell" id="queryBox" data-module='testtask'></div>

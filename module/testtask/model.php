@@ -165,7 +165,7 @@ class testtaskModel extends model
      * @access public
      * @return array
      */
-    public function getProductTasks($productID, $branch = 'all', $orderBy = 'id_desc', $pager = null, $scopeAndStatus = array(), $beginTime = 0, $endTime = 0)
+    public function getProductTasks($productID, $branch = 'all', $orderBy = 'id_desc', $pager = null, $scopeAndStatus = array(), $beginTime = 0, $endTime = 0, $openId = 0)
     {
         $products = $scopeAndStatus[0] == 'all' ? $this->app->user->view->products : array();
         $branch   = $scopeAndStatus[0] == 'all' ? 'all' : $branch;
@@ -189,6 +189,7 @@ class testtaskModel extends model
             ->beginIF($beginTime)->andWhere('t1.begin')->ge($beginTime)->fi()
             ->beginIF($endTime)->andWhere('t1.end')->le($endTime)->fi()
             ->beginIF($branch == BRANCH_MAIN)
+            ->beginIF($openId)->andWhere('t1.parent')->eq($openId)->fi()
             ->orWhere('(t1.build')->eq('trunk')
             ->andWhere('t1.product')->eq((int)$productID)
             ->markRight(1)
@@ -2620,5 +2621,36 @@ class testtaskModel extends model
             }
         }
         return $ans;
+    }
+
+    public function getSonsObject($m, $f, $param, $productID = 0, $taskID = 0){
+        $task = new stdclass();
+        $task->id = 0;
+        if($taskID > 0){
+            $sonTask = $this->dao->select('id,name')->from(TABLE_TESTTASK)
+                ->where('deleted')->eq(0)
+                ->andWhere('id')->eq($taskID)
+                ->beginIF($productID > 0)->andWhere('product')->eq((int)$productID)->fi()
+                ->fetch();
+            if(!$sonTask)
+                return false;
+            $task->childs = array($taskID => $sonTask);
+            $this->dfsGetSonObject($sonTask, $m, $f, $param, $productID);
+        }else{
+            $this->dfsGetSonObject($task, $m, $f, $param, $productID);
+        }
+        return $task;        
+    }
+
+    public function dfsGetSonObject($taskObj, $m, $f, $param, $productID){                        //path为包含taskID指向任务的名字的相对路径
+        $taskObj->href = helper::createLink($m, $f,$param."&openId=$taskObj->id");
+        $taskObj->childs = $this->dao->select('id,name')->from(TABLE_TESTTASK)
+            ->where('deleted')->eq(0)
+            ->andWhere('parent')->eq($taskObj->id)
+            ->beginIF($productID > 0)->andWhere('product')->eq((int)$productID)->fi()
+            ->fetchAll('id');
+        foreach($taskObj->childs as $key => $value){
+            $this->dfsGetSonObject($value, $m, $f, $param, $productID);
+        }
     }
 }
