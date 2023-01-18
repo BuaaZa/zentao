@@ -4,7 +4,7 @@ $lang->execution->webMenu->task     = array('link' => "任务|execution|task|exe
 $lang->execution->webMenu->story    = "{$lang->SRCommon}|execution|story|executionID=%s";
 $lang->execution->webMenu->bug      = "Bug|execution|bug|executionID=%s";
 $lang->execution->webMenu->build    = array('link' => "版本|execution|build|executionID=%s", 'subModule' => 'build');
-$lang->execution->webMenu->testtask = "测试单|execution|testtask|executionID=%s";
+$lang->execution->webMenu->testtask = "测试集|execution|testtask|executionID=%s";
 $lang->execution->webMenu->team     = "团队|execution|team|executionID=%s";
 $lang->execution->webMenu->action   = "动态|execution|dynamic|executionID=%s";
 $lang->execution->webMenu->view     = "概况|execution|view|executionID=%s";

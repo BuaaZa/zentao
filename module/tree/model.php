@@ -581,6 +581,45 @@ class treeModel extends model
         return $menu;
     }
 
+    public function buildMyTree($object, $name)
+    {
+        if(!$object)
+            return false;
+        $menu = "<ul id='modules' class='tree' data-ride='tree' data-name='tree-$name'>";
+
+        if(empty($object->childs))
+            return false;
+        foreach($object->childs as $ch){
+            $menu = $menu.$this->dfsGetLi($ch, $name);
+        }
+
+        $menu .= '</ul>';
+        return $menu;
+    }
+
+    public function dfsGetLi($object ,$name){
+        if(!$object||!isset($object->id))
+            return "";
+        $li = "";
+        if(isset($object->href)){
+            $con = html::a($object->href, $object->name, '_self', "id='$name$object->id' title=$object->name");
+        }else{
+            $con = $object->name;
+        }
+
+        if(!empty($object->childs)){
+            $li = $li."<li class='closed'>".$con."<ul>";
+            foreach($object->childs as $ch){
+                $li = $li.$this->dfsGetLi($ch, $name);
+            }
+            $li = $li."</ul>";
+        }else{
+            $li = $li."<li>".$con;
+        }
+        $li = $li."</li>";
+        return $li;
+    }
+
     /**
      * Get full task tree
      * @param  integer $executionID, common value is execution id

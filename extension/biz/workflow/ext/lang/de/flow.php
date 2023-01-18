@@ -22,7 +22,7 @@ $lang->workflow->flowList['产品']   = 'Product';
 $lang->workflow->flowList['需求']   = 'Demand';
 $lang->workflow->flowList['项目集'] = 'Program';
 $lang->workflow->flowList['用例库'] = 'Usecase library';
-$lang->workflow->flowList['测试单'] = 'Test sheet';
+$lang->workflow->flowList['测试集'] = 'Test sheet';
 
 $lang->workflow->flowList['产品计划'] = 'Product plan';
 $lang->workflow->flowList['产品发布'] = 'Product release';
