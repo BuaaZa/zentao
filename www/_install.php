@@ -19,7 +19,7 @@ include '../framework/model.class.php';
 include '../framework/helper.class.php';
 
 /* Instance the app. */
-$app = router::createApp('pms', dirname(dirname(__FILE__)), 'router');
+$app = router::createApp('pms', dirname(__FILE__, 2), 'router');
 
 /* Check installed or not. */
 if(!isset($_SESSION['installing']) and isset($config->installed) and $config->installed) die(header('location: index.php'));
