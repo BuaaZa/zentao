@@ -13,6 +13,8 @@
 <?php
 class taskModel extends model
 {
+    public kanbanModel $kanban;
+
     /**
      * Create a task.
      *
@@ -761,7 +763,8 @@ class taskModel extends model
                     $this->action->logHistory($actionID, $changes);
                 }
 
-                if(($this->config->edition == 'biz' || $this->config->edition == 'max') && $oldParentTask->feedback) $this->loadModel('feedback')->updateStatus('task', $oldParentTask->feedback, $newParentTask->status, $oldParentTask->status);
+                // if增加 $this->config->edition == 'open' chenjj 230115
+                if(($this->config->edition == 'biz' || $this->config->edition == 'max' || $this->config->edition == 'open') && $oldParentTask->feedback) $this->loadModel('feedback')->updateStatus('task', $oldParentTask->feedback, $newParentTask->status, $oldParentTask->status);
             }
         }
         else
@@ -1258,7 +1261,8 @@ class taskModel extends model
             unset($oldTask->parent);
             unset($task->parent);
 
-            if(($this->config->edition == 'biz' || $this->config->edition == 'max') && $oldTask->feedback) $this->loadModel('feedback')->updateStatus('task', $oldTask->feedback, $task->status, $oldTask->status);
+            // if增加 $this->config->edition == 'open' chenjj 230115
+            if(($this->config->edition == 'biz' || $this->config->edition == 'max' || $this->config->edition == 'open') && $oldTask->feedback) $this->loadModel('feedback')->updateStatus('task', $oldTask->feedback, $task->status, $oldTask->status);
             if(isset($oldTask->team))
             {
                 $users = $this->loadModel('user')->getPairs('noletter|noempty');
@@ -1487,6 +1491,8 @@ class taskModel extends model
 
         $isBiz = $this->config->edition == 'biz';
         $isMax = $this->config->edition == 'max';
+        // if增加 $this->config->edition == 'open' chenjj 230115
+        $isOpen = $this->config->edition == 'open';
         foreach($tasks as $taskID => $task)
         {
             if(strpos(',doing,pause,', $task->status) && empty($teams) && $task->parent >= 0 && empty($task->left))
@@ -1546,7 +1552,8 @@ class taskModel extends model
                 if($task->status == 'done')   $this->loadModel('score')->create('task', 'finish', $taskID);
                 if($task->status == 'closed') $this->loadModel('score')->create('task', 'close', $taskID);
                 if($task->status != $oldTask->status) $this->loadModel('kanban')->updateLane($oldTask->execution, 'task', $oldTask->id);
-                if(($isBiz || $isMax) && $oldTask->feedback && !isset($feedbacks[$oldTask->feedback]))
+                // if增加 $this->config->edition == 'open' chenjj 230115
+                if(($isBiz || $isMax || $isOpen) && $oldTask->feedback && !isset($feedbacks[$oldTask->feedback]))
                 {
                     $feedbacks[$oldTask->feedback] = $oldTask->feedback;
                     $this->loadModel('feedback')->updateStatus('task', $oldTask->feedback, $task->status, $oldTask->status);
@@ -1689,12 +1696,12 @@ class taskModel extends model
     /**
      * Start a task.
      *
-     * @param  int    $taskID
-     * @param  string $extra
+     * @param int $taskID
+     * @param string $extra
      * @access public
-     * @return void
+     * @return array|bool
      */
-    public function start($taskID, $extra = '')
+    public function start(int $taskID, string $extra = ''): bool|array
     {
         $extra = str_replace(array(',', ' '), array('&', ''), $extra);
         parse_str($extra, $output);
@@ -1714,7 +1721,8 @@ class taskModel extends model
         if(dao::isError()) return false;
 
         $editorIdList = $this->config->task->editor->start['id'];
-        if($this->app->getMethodName() == 'restart') $editorIdList = $this->config->task->editor->restart['id'];
+        if($this->app->getMethodName() == 'restart')
+            $editorIdList = $this->config->task->editor->restart['id'];
         $now  = helper::now();
         $task = fixer::input('post')
             ->add('id', $taskID)
@@ -1729,7 +1737,8 @@ class taskModel extends model
         $task = $this->loadModel('file')->processImgURL($task, $editorIdList, $this->post->uid);
         if($this->post->left == 0)
         {
-            if(isset($task->consumed) and $task->consumed == 0) return dao::$errors[] = sprintf($this->lang->error->notempty, $this->lang->task->consumed);
+            if(isset($task->consumed) and $task->consumed == 0)
+                return dao::$errors[] = sprintf($this->lang->error->notempty, $this->lang->task->consumed);
             if(empty($oldTask->team))
             {
                 $task->status       = 'done';
@@ -1773,7 +1782,6 @@ class taskModel extends model
             {
                 $task->status       = 'done';
                 $task->finishedBy   = $this->app->user->account;
-                $task->finishedDate = $task->finishedDate;
             }
         }
 
@@ -1792,7 +1800,8 @@ class taskModel extends model
         $this->loadModel('kanban');
         if(!isset($output['toColID']) or $task->status == 'done') $this->kanban->updateLane($oldTask->execution, 'task', $taskID);
         if(isset($output['toColID']) and $task->status == 'doing') $this->kanban->moveCard($taskID, $output['fromColID'], $output['toColID'], $output['fromLaneID'], $output['toLaneID']);
-        if(($this->config->edition == 'biz' || $this->config->edition == 'max') && $oldTask->feedback) $this->loadModel('feedback')->updateStatus('task', $oldTask->feedback, $task->status, $oldTask->status);
+        // if增加 $this->config->edition == 'open' chenjj 230115
+        if(($this->config->edition == 'biz' || $this->config->edition == 'max' || $this->config->edition == 'open') && $oldTask->feedback) $this->loadModel('feedback')->updateStatus('task', $oldTask->feedback, $task->status, $oldTask->status);
         if(!dao::isError()) return common::createChanges($oldTask, $task);
     }
 
@@ -1953,8 +1962,10 @@ class taskModel extends model
             if($changes) $allChanges = array_merge($allChanges, $changes);
             $task = $newTask;
 
-            //进度计算
-            //如果任务是子任务
+            // 开始反馈工时
+
+            // 进度计算
+            // 任务可能是子任务
             if($task->parent >0){
                 $parentTask = $this->dao->select()->from(TABLE_TASK)
                     ->where('id')->eq($task->parent)
@@ -1975,13 +1986,21 @@ class taskModel extends model
                 $progress = round($consumed / ($consumed + $left) * 100);
             }
 
-            $feedbackData = new stdclass();
-            $feedbackData->createUserCode = $task->assignedTo;
+            // 获取用户
+            $user = $task->assignedTo;
             $realname = $this->loadModel('user')->getRealNameByAccount($task->assignedTo);
+            if($task->mode == 'multi'){
+                $user = $this->app->user->account;
+                $realname = $this->app->user->realname;
+            }
+
+            $feedbackData = new stdclass();
+            $feedbackData->createUserCode = $user;
             $feedbackData->createUserName = $realname;
             $feedbackData->currentProgress = $progress;
             $feedbackData->feedbackContent = $estimate->work;
             $feedbackData->workHours = intval($estimate->consumed);
+            $feedbackData->planWorkHours = strval($consumed + $left);
             $feedbackData->zenTaoTaskId = strval(($task->parent >0)?$task->parent:$taskID);
 
             ChromePhp::log($feedbackData);
@@ -2008,6 +2027,20 @@ class taskModel extends model
         }
 
         return $allChanges;
+    }
+
+    /**
+     * Return task feedback to WBS.
+     *
+     * @param  object    $data
+     * @access public
+     * @return object
+     */
+    public function taskFeedback($data)
+    {
+        $url = $this->config->task->sync2wbsApi;
+        $response = common::http($url,$data,array(), array(), 'json');
+        return json_decode($response);
     }
 
     /**
@@ -2127,7 +2160,8 @@ class taskModel extends model
                 if(isset($output['toColID'])) $this->kanban->moveCard($taskID, $output['fromColID'], $output['toColID'], $output['fromLaneID'], $output['toLaneID']);
             }
 
-            if(($this->config->edition == 'biz' || $this->config->edition == 'max') && $oldTask->feedback) $this->loadModel('feedback')->updateStatus('task', $oldTask->feedback, $task->status, $oldTask->status);
+            // if增加 $this->config->edition == 'open' chenjj 230115
+            if(($this->config->edition == 'biz' || $this->config->edition == 'max' || $this->config->edition == 'open') && $oldTask->feedback) $this->loadModel('feedback')->updateStatus('task', $oldTask->feedback, $task->status, $oldTask->status);
 
             return common::createChanges($oldTask, $task);
         }
@@ -2213,7 +2247,8 @@ class taskModel extends model
             if(!isset($output['toColID'])) $this->kanban->updateLane($oldTask->execution, 'task', $taskID);
             if(isset($output['toColID'])) $this->kanban->moveCard($taskID, $output['fromColID'], $output['toColID'], $output['fromLaneID'], $output['toLaneID']);
 
-            if(($this->config->edition == 'biz' || $this->config->edition == 'max') && $oldTask->feedback) $this->loadModel('feedback')->updateStatus('task', $oldTask->feedback, $task->status, $oldTask->status);
+            // if增加 $this->config->edition == 'open' chenjj 230115
+            if(($this->config->edition == 'biz' || $this->config->edition == 'max' || $this->config->edition == 'open') && $oldTask->feedback) $this->loadModel('feedback')->updateStatus('task', $oldTask->feedback, $task->status, $oldTask->status);
 
             return common::createChanges($oldTask, $task);
         }
@@ -2914,7 +2949,10 @@ class taskModel extends model
      */
     public function canOperateEffort($task, $effort = null)
     {
-        if(empty($task->team)) return true;
+        if(empty($task->team)) {
+            if($this->app->user->account != $task->assignedTo) return false;
+            return true;
+        }
 
         /* Check for add effort. */
         if(empty($effort))
@@ -2949,6 +2987,7 @@ class taskModel extends model
         $estimate    = fixer::input('post')
             ->setIF(is_numeric($this->post->consumed), 'consumed', (float)$this->post->consumed)
             ->setIF(is_numeric($this->post->left), 'left', (float)$this->post->left)
+            ->setDefault('syncStatus','0')
             ->get();
 
         if(helper::isZeroDate($estimate->date)) return dao::$errors[] = $this->lang->task->error->dateEmpty;
@@ -3708,20 +3747,6 @@ class taskModel extends model
         $this->dao->insert(TABLE_EFFORT)->data($effort)->autoCheck()->exec();
 
         return $this->dao->lastInsertID();
-    }
-
-    /**
-     * Return task feedback to WBS.
-     *
-     * @param  object    $data
-     * @access public
-     * @return object
-     */
-    public function taskFeedback($data)
-    {
-        $url = $this->config->task->sync2wbsApi;
-        $response = common::http($url,$data,array(), array(), 'json');
-        return json_decode($response);
     }
 
     /**

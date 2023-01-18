@@ -9,8 +9,8 @@
  * @version     $Id: install.php 4677 2013-04-26 06:23:58Z chencongzhi520@gmail.com $
  * @link        http://www.zentao.net
  */
-error_reporting(0);
-define('IN_INSTALL', true);
+error_reporting(E_ALL);
+const IN_INSTALL = true;
 
 /* Load the framework. */
 include '../framework/router.class.php';

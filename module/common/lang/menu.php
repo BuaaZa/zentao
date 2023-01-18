@@ -61,7 +61,7 @@ $lang->mainNav->menuOrder[15] = 'product';
 if($config->systemMode == 'new') $lang->mainNav->menuOrder[20] = 'project';
 $lang->mainNav->menuOrder[21] = 'execution';
 $lang->mainNav->menuOrder[23] = 'qa';
-$lang->mainNav->menuOrder[25] = 'devops';
+// $lang->mainNav->menuOrder[25] = 'devops';
 $lang->mainNav->menuOrder[30] = 'kanban';
 $lang->mainNav->menuOrder[35] = 'doc';
 $lang->mainNav->menuOrder[40] = 'report';

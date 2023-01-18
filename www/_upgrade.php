@@ -44,7 +44,7 @@ if(file_exists("{$basePath}/config/ext/secret.php") and !unlink("{$basePath}/con
     exit;
 }
 
-error_reporting(0);
+error_reporting(E_ALL);
 
 /* Load the framework. */
 include '../framework/router.class.php';

@@ -11,6 +11,8 @@
  */
 class company extends control
 {
+    public actionModel $action;
+
     /**
      * Construct function, load dept and user models auto.
      *
@@ -21,6 +23,8 @@ class company extends control
     {
         parent::__construct($moduleName, $methodName);
         $this->loadModel('dept');
+        $this->loadModel('action');
+        $this->app->loadClass('date');
     }
 
     /**
@@ -303,6 +307,31 @@ class company extends control
         $this->view->param        = $param;
         $this->view->dateGroups   = $this->action->buildDateGroup($actions, $direction, $browseType, $orderBy);
         $this->view->direction    = $direction;
+        $this->display();
+    }
+
+    /**
+     * .
+     *
+     * @access public
+     * @return void
+     */
+    public function archiveaction()
+    {
+        if(!empty($_POST))
+        {
+            $this->action->archiveaction($this->post->beginDate,$this->post->endDate);
+
+            js::import($this->config->webRoot.'js/message.js');
+            if(dao::isError()) {
+                $js ="showFailMessage('归档失败','parent');";
+                return print(js::execute($js));
+            }
+
+            $js ="showSuccessMessage('归档成功','parent.parent');";
+            return print(js::execute($js));
+
+        }
         $this->display();
     }
 

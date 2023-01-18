@@ -196,12 +196,12 @@ class baseEntry
      * 发送请求的响应数据
      * Send response data
      *
-     * @param  int   $code
-     * @param  mixed $data
+     * @param int $code
+     * @param mixed $data
      * @access public
      * @return void
      */
-    public function send($code, $data = '')
+    public function send(int $code, mixed $data = '')
     {
         header("Access-Control-Allow-Origin: *");
         header("Access-Control-Allow-Credentials: true");
@@ -280,7 +280,7 @@ class baseEntry
      * @access public
      * @return object
      */
-    public function loadController($moduleName, $methodName)
+    public function loadController($moduleName, $methodName): object
     {
         ob_start();
 
@@ -423,12 +423,12 @@ class baseEntry
      * 批量添加$_POST全局变量.
      * Batch set data to $_POST.
      *
-     * @param  string $fields
+     * @param string $fields
      * @param  mixed  $object
      * @access public
      * @return void
      */
-    public function batchSetPost($fields, $object = '')
+    public function batchSetPost(string $fields, mixed $object = '')
     {
         $fields = explode(',', $fields);
         foreach($fields as $field)

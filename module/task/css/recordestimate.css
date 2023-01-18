@@ -22,13 +22,6 @@
 .table.has-sort-head thead>tr>th>a:after, .table.has-sort-head thead>tr>th>a:before {top: -7px;}
 .table.has-sort-head thead>tr>th>a:hover, .table.has-sort-head thead>tr>th>a:hover:after, .table.has-sort-head thead>tr>th>a:hover:before {color: #000;}
 
-.messager-content {
-    padding: 10px 15px;
-}
-
-.messager-actions>.action.close {
-    padding-bottom: 0px;
-}
 .c-actions-2 {
     width: 95px;
 }

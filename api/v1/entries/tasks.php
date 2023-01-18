@@ -69,7 +69,7 @@ class tasksEntry extends entry
         $this->setPost('execution', $executionID);
 
         $control = $this->loadController('task', 'create');
-        $this->requireFields('name,assignedTo,type,estStarted,deadline');
+        $this->requireFields('name,assignedTo,estimate,type,estStarted,deadline');
 
         $control->create($executionID, $this->request('storyID', 0), $this->request('moduleID', 0), $this->request('copyTaskID', 0), $this->request('copyTodoID', 0));
 

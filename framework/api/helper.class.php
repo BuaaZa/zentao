@@ -10,7 +10,7 @@
  *  May you find forgiveness for yourself and forgive others.
  *  May you share freely, never taking more than you give.
  */
-include dirname(dirname(__FILE__)) . '/base/helper.class.php';
+include dirname(__FILE__, 2) . '/base/helper.class.php';
 class helper extends baseHelper
 {
     public static function getViewType($source = false)

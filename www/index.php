@@ -13,7 +13,7 @@
  */
 /* Set the error reporting. */
 error_reporting(E_ALL);
-define('IN_USE', true);
+const IN_USE = true;
 
 /* Start output buffer. */
 ob_start();
@@ -33,7 +33,9 @@ require '../module/common/ChromePhp.php';
 $startTime = getTime();
 
 /* Instance the app. */
-$app = router::createApp('pms', dirname(dirname(__FILE__)), 'router');
+//$app = router::createApp('pms', dirname(__FILE__, 2), 'router');
+
+$app = new router("pms", dirname(__FILE__, 2));
 
 /* installed or not. */
 if(!isset($config->installed) or !$config->installed) die(header('location: install.php'));

@@ -9,14 +9,18 @@
  * @version     $Id: zh-cn.php 4714 2013-05-02 08:10:58Z chencongzhi520@gmail.com $
  * @link        http://www.zentao.net
  */
-$lang->company->common   = '组织视图';
-$lang->company->index    = "组织视图首页";
-$lang->company->create   = "添加公司";
-$lang->company->edit     = "编辑公司";
-$lang->company->view     = "公司信息";
-$lang->company->browse   = "用户列表";
-$lang->company->dynamic  = "组织动态";
-$lang->company->orgView  = '组织视图';
+$lang->company->common          = '组织视图';
+$lang->company->index           = "组织视图首页";
+$lang->company->create          = "添加公司";
+$lang->company->edit            = "编辑公司";
+$lang->company->view            = "公司信息";
+$lang->company->browse          = "用户列表";
+$lang->company->dynamic         = "组织动态";
+$lang->company->orgView         = '组织视图';
+$lang->company->archiveaction   = '动态归档';
+
+$lang->company->beginDay = '开始日期';
+$lang->company->endDay   = '截止日期';
 
 $lang->company->id       = '编号';
 $lang->company->name     = '公司名称';
