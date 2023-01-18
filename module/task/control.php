@@ -20,6 +20,7 @@ class task extends control
 
     public treeModel $tree;
     public actionModel $action;
+    public storyModel $story;
 
     /**
      * Construct function, load model of project and story modules.
@@ -563,9 +564,9 @@ class task extends control
      * @param  string $kanbanGroup
      * @param  string $from
      * @access public
-     * @return void
+     * @return int
      */
-    public function edit($taskID, $comment = false, $kanbanGroup = 'default', $from = '')
+    public function edit($taskID, $comment = false, $kanbanGroup = 'default', $from = ''): int
     {
         $this->commonAction($taskID);
         $task = $this->task->getById($taskID);
@@ -607,8 +608,8 @@ class task extends control
             if(isonlybody())
             {
                 $execution    = $this->execution->getByID($task->execution);
-                $execLaneType = $this->session->execLaneType ? $this->session->execLaneType : 'all';
-                $execGroupBy  = $this->session->execGroupBy ? $this->session->execGroupBy : 'default';
+                $execLaneType = $this->session->execLaneType ?: 'all';
+                $execGroupBy  = $this->session->execGroupBy ?: 'default';
                 if(($this->app->tab == 'execution' or ($this->config->vision == 'lite' and $this->app->tab == 'project')) and $execution->type == 'kanban')
                 {
                     $rdSearchValue = $this->session->rdSearchValue ? $this->session->rdSearchValue : '';
@@ -674,10 +675,11 @@ class task extends control
         $this->view->stories       = $this->story->getExecutionStoryPairs($this->view->execution->id, 0, 'all', '', 'full', 'active');
         $this->view->tasks         = $tasks;
         $this->view->users         = $this->loadModel('user')->getPairs('nodeleted|noclosed', "{$this->view->task->openedBy},{$this->view->task->canceledBy},{$this->view->task->closedBy}");
-        $this->view->showAllModule = isset($this->config->execution->task->allModule) ? $this->config->execution->task->allModule : '';
+        $this->view->showAllModule = $this->config->execution->task->allModule ?? '';
         $this->view->modules       = $this->tree->getTaskOptionMenu($this->view->task->execution, 0, 0, $this->view->showAllModule ? 'allModule' : '');
         $this->view->executions    = $this->config->systemMode == 'classic' ? $this->execution->getPairs() : $executions;
         $this->display();
+        return 0;
     }
 
     /**
@@ -1175,9 +1177,9 @@ class task extends control
      * @param  string $from
      * @param  string $orderBy
      * @access public
-     * @return void
+     * @return int
      */
-    public function recordEstimate($taskID, $from = '', $orderBy = '')
+    public function recordEstimate($taskID, $from = '', $orderBy = ''): int
     {
         $this->commonAction($taskID);
 
@@ -1258,6 +1260,7 @@ class task extends control
         $this->view->efforts = $this->task->getTaskEstimate($taskID, '', '', $orderBy);
         $this->view->users   = $this->loadModel('user')->getPairs('noclosed|noletter');
         $this->display();
+        return 0;
     }
 
     /**
@@ -2463,14 +2466,14 @@ class task extends control
     /**
      * Update assign of multi task.
      *
-     * @param  int    $requestID
-     * @param  object $taskID
+     * @param  int    $executionID
+     * @param  object|int $taskID
      * @param  string $kanbanGroup
      * @param  string $from
      * @access public
-     * @return void
+     * @return int
      */
-    public function editTeam($executionID, $taskID, $kanbanGroup = 'default', $from = '')
+    public function editTeam($executionID, $taskID, $kanbanGroup = 'default', $from = ''): int
     {
         $task = $this->task->getById($taskID);
         $this->commonAction($taskID);
@@ -2498,7 +2501,7 @@ class task extends control
 
                 if(($this->app->tab == 'execution' or ($this->config->vision == 'lite' and $this->app->tab == 'project' and $this->session->kanbanview == 'kanban')) and $execution->type == 'kanban')
                 {
-                    $rdSearchValue = $this->session->rdSearchValue ? $this->session->rdSearchValue : '';
+                    $rdSearchValue = $this->session->rdSearchValue ?: '';
                     $kanbanData    = $this->loadModel('kanban')->getRDKanban($task->execution, $execLaneType, 'id_desc', 0, $execGroupBy, $rdSearchValue);
                     $kanbanData    = json_encode($kanbanData);
 
@@ -2523,5 +2526,6 @@ class task extends control
         $this->view->members = $this->loadModel('user')->getTeamMemberPairs($executionID, 'execution', 'nodeleted');
         $this->view->users   = $this->loadModel('user')->getPairs();
         $this->display('', 'editTeam');
+        return 0;
     }
 }

@@ -14,6 +14,9 @@
 class taskModel extends model
 {
     public kanbanModel $kanban;
+    public storyModel $story;
+    public fileModel $file;
+    public actionModel $action;
 
     /**
      * Create a task.
@@ -880,17 +883,18 @@ class taskModel extends model
     /**
      * Manage multitask team members.
      *
-     * @param string $mode
+     * @param string|null $mode
      * @param int $taskID
      * @param string $taskStatus
-     * @access public
      * @return array
+     * @access public
      */
-    public function manageTaskTeam(string $mode = null, int $taskID, string $taskStatus)
+    public function manageTaskTeam(string|null $mode, int $taskID, string $taskStatus): array
     {
         $oldTeams   = $this->dao->select()->from(TABLE_TASKTEAM)->where('task')->eq($taskID)->fetchAll();
         $oldMembers = array_map(function($team){return $team->account;}, $oldTeams);
 
+        // 为nm啥要先删再加
         $this->dao->delete()->from(TABLE_TASKTEAM)->where('task')->eq($taskID)->exec();
 
         if($taskStatus == 'doing')
@@ -909,7 +913,8 @@ class taskModel extends model
         $changeUsers = array();
         foreach($this->post->team as $row => $account)
         {
-            if(empty($account)) continue;
+            if(empty($account))
+                continue;
 
             $teamSource = $this->post->teamSource[$row];
             $member = new stdClass();
@@ -959,6 +964,137 @@ class taskModel extends model
             if($mode == 'linear' and isset($oldTeams[$row]) and $oldTeams[$row]->account != $account) $changeUsers[] = $oldTeams[$row]->account;
 
             $teams[$account] = $account;
+        }
+
+        /* Set effort left = 0 when multi task members be removed. */
+        if($mode == 'multi' and $oldMembers)
+        {
+            $removedMembers = array_diff($oldMembers, $teams);
+            $changeUsers    = array_merge($changeUsers, $removedMembers);
+        }
+        if($changeUsers) $this->resetEffortLeft($taskID, $changeUsers);
+
+        return $teams;
+    }
+
+    public function updateManageTeamMember(string|null $mode, int $taskID, string $taskStatus): array
+    {
+        $oldTeams   = $this->dao->select()->from(TABLE_TASKTEAM)->where('task')->eq($taskID)->fetchAll();
+        $oldMembers = array_map(function($team){return $team->account;}, $oldTeams);
+
+        $oldEstimate = array_map(function($team){return $team->estimate;}, $oldTeams);
+        $oldConsumed = array_map(function($team){return $team->consumed;}, $oldTeams);
+        $oldLeft = array_map(function($team){return $team->left;}, $oldTeams);
+
+//        $file = fopen("lalala.txt", "a+");
+//        fwrite($file, "$mode \n");
+//        fwrite($file, "isset(_POST of team Estimate ): " . (isset($_POST['teamEstimate']) ? "true" : "false"));
+//        foreach ($oldEstimate as $row => $obj)
+//        {
+//            fwrite($file, __LINE__ . ": " . $row . ": " . json_encode($obj) . "\n");
+//        }
+//        foreach ($_POST['teamEstimate'] as $row => $obj)
+//        {
+//            fwrite($file, __LINE__ . ": " . $row . ": " . json_encode($obj) . "\n");
+//        }
+//        fwrite($file, __LINE__ . " ==============");
+//        foreach ($this->post->team as $row => $obj)
+//        {
+//            fwrite($file, __LINE__ . ": " . $row . ": " . json_encode($obj) . "\n");
+//        }
+//        foreach ($_POST['team'] as $row => $obj)
+//        {
+//            fwrite($file, __LINE__ . ": " . $row . ": " . json_encode($obj) . "\n");
+//        }
+//        fwrite($file, "==============");
+//        fclose($file);
+        // 为nm啥要先删再加
+//        $this->dao->delete()->from(TABLE_TASKTEAM)->where('task')->eq($taskID)->exec();
+
+        if($taskStatus == 'doing')
+        {
+            $efforts    = $this->getTaskEstimate($taskID);
+            $doingUsers = array();
+            foreach($efforts as $_i => $effort)
+            {
+                if($effort->left != 0) $doingUsers[$effort->account] = $effort->account;
+                if($effort->left == 0) unset($doingUsers[$effort->account]);
+            }
+        }
+
+        $teams       = array();
+        $minStatus   = 'done';
+        $changeUsers = array();
+        foreach($this->post->team as $row => $account)
+        {
+            if(empty($account))
+                continue;
+            $teams[$account] = $account;
+
+            $teamSource = $this->post->teamSource[$row];
+            $member = new stdClass();
+            $member->task     = $taskID;
+            $member->order    = $row;
+            $member->account  = $account;
+
+            if (isset($_POST['teamEstimate']))
+                $member->estimate = zget($this->post->teamEstimate, $row, 0);
+            else
+                $member->estimate = $oldEstimate[$row];
+
+            if (isset($_POST['teamConsumed']))
+                $member->consumed = zget($this->post->teamConsumed, $row, 0);
+            else
+                $member->consumed = 0;
+
+            if (isset($_POST['teamLeft']))
+                $member->left = zget($this->post->teamLeft, $row, 0);
+            else
+                $member->left = $oldLeft[$row];
+
+//            $member->estimate = zget($this->post->teamEstimate, $row, 0);
+//            $member->left = zget($this->post->teamLeft, $row, 0);
+//            $member->consumed = zget($this->post->teamConsumed, $row, 0);
+
+            $member->status   = 'wait';
+            if($taskStatus == 'wait' and $member->estimate > 0 and $member->left == 0)
+                $member->left = $member->estimate;
+            if($taskStatus == 'done') $member->left = 0;
+
+            if($member->left == 0 and $member->consumed > 0)
+                $member->status = 'done';
+            elseif($taskStatus == 'doing')
+            {
+                if(!empty($teamSource) and $teamSource != $account and isset($doingUsers[$teamSource]))
+                    $member->transfer = $teamSource;
+                if(isset($doingUsers[$account]) and ($mode == 'multi' or ($mode == 'linear' and $minStatus != 'wait')))
+                    $member->status = 'doing';
+            }
+            if($minStatus != 'wait' and $member->status == 'doing')
+                $minStatus = 'doing';
+            if($member->status == 'wait')
+                $minStatus = 'wait';
+
+            /* Doing status is only one in linear task. */
+            if($mode == 'linear' and $member->status == 'doing') $minStatus = 'wait';
+            if($member->status == 'wait') $minStatus = 'wait';
+            if($minStatus != 'wait' and $member->status == 'doing') $minStatus = 'doing';
+
+            /* 不删除直接更新团队成员信息 */
+            if($mode == 'multi')
+            {
+                $this->dao->update(TABLE_TASKTEAM)->set("estimate = $member->estimate")
+                    ->set("`left` = $member->left")
+                    ->set("`consumed` = `consumed` + $member->consumed")
+                    ->where('task')->eq($member->task)
+                    ->andWhere('account')->eq($member->account)
+                    ->exec();
+            }
+
+            /* Set effort left = 0 when linear task members be changed. */
+            if($mode == 'linear' and isset($oldTeams[$row]) and $oldTeams[$row]->account != $account)
+                $changeUsers[] = $oldTeams[$row]->account;
+
         }
 
         /* Set effort left = 0 when multi task members be removed. */
@@ -1048,11 +1184,24 @@ class taskModel extends model
      *
      * @param  int    $taskID
      * @access public
-     * @return void
+     * @return bool
      */
     public function update($taskID)
     {
-        if($taskID <= 0) return;
+//        $file = fopen("lalala.txt", "a+");
+//        fwrite($file, __LINE__ . " ==============");
+//        foreach ($this->post->team as $row => $obj)
+//        {
+//            fwrite($file, __LINE__ . ": " . $row . ": " . json_encode($obj) . "\n");
+//        }
+//        foreach ($_POST['team'] as $row => $obj)
+//        {
+//            fwrite($file, __LINE__ . ": " . $row . ": " . json_encode($obj) . "\n");
+//        }
+//        fwrite($file, "==============");
+//        fclose($file);
+
+        if($taskID <= 0) return false;
 
         $oldTask = $this->getByID($taskID);
         if($this->post->estimate < 0 or $this->post->left < 0 or $this->post->consumed < 0)
@@ -1068,16 +1217,15 @@ class taskModel extends model
         }
 
         /* If a multiple task is assigned to a team member who is not the task, assign to the team member instead. */
-        if(!$this->post->assignedTo and !empty($oldTask->team) and !empty($_POST['team'])) $_POST['assignedTo'] = $this->getAssignedTo4Multi($_POST['team'], $oldTask);
+        if(!$this->post->assignedTo and !empty($oldTask->team) and !empty($_POST['team']))
+            $_POST['assignedTo'] = $this->getAssignedTo4Multi($_POST['team'], $oldTask);
 
         /* When the selected parent task is a common task and has consumption, select other parent tasks. */
         if($this->post->parent > 0)
         {
-            $taskConsumed = 0;
             $taskConsumed = $this->dao->select('consumed')->from(TABLE_TASK)->where('id')->eq($this->post->parent)->andWhere('parent')->eq(0)->fetch('consumed');
             if($taskConsumed > 0) return print(js::error($this->lang->task->error->alreadyConsumed));
         }
-
         $now  = helper::now();
         $task = fixer::input('post')
             ->add('id', $taskID)
@@ -1089,12 +1237,12 @@ class taskModel extends model
             ->setIF(is_numeric($this->post->consumed), 'consumed', (float)$this->post->consumed)
             ->setIF(is_numeric($this->post->left),     'left',     (float)$this->post->left)
             ->setIF($oldTask->parent == 0 && $this->post->parent == '', 'parent', 0)
-            ->setIF(strpos($this->config->task->edit->requiredFields, 'estStarted') !== false, 'estStarted', $this->post->estStarted)
-            ->setIF(strpos($this->config->task->edit->requiredFields, 'deadline') !== false, 'deadline', $this->post->deadline)
-            ->setIF(strpos($this->config->task->edit->requiredFields, 'estimate') !== false, 'estimate', $this->post->estimate)
-            ->setIF(strpos($this->config->task->edit->requiredFields, 'left') !== false,     'left',     $this->post->left)
-            ->setIF(strpos($this->config->task->edit->requiredFields, 'consumed') !== false, 'consumed', $this->post->consumed)
-            ->setIF(strpos($this->config->task->edit->requiredFields, 'story') !== false,    'story',    $this->post->story)
+            ->setIF(str_contains($this->config->task->edit->requiredFields, 'estStarted'), 'estStarted', $this->post->estStarted)
+            ->setIF(str_contains($this->config->task->edit->requiredFields, 'deadline'), 'deadline', $this->post->deadline)
+            ->setIF(str_contains($this->config->task->edit->requiredFields, 'estimate'), 'estimate', $this->post->estimate)
+            ->setIF(str_contains($this->config->task->edit->requiredFields, 'left'),     'left',     $this->post->left)
+            ->setIF(str_contains($this->config->task->edit->requiredFields, 'consumed'), 'consumed', $this->post->consumed)
+            ->setIF(str_contains($this->config->task->edit->requiredFields, 'story'),    'story',    $this->post->story)
             ->setIF($this->post->story != false and $this->post->story != $oldTask->story, 'storyVersion', $this->loadModel('story')->getVersion($this->post->story))
 
             ->setIF($this->post->status == 'done', 'left', 0)
@@ -1127,7 +1275,8 @@ class taskModel extends model
             ->remove('comment,files,labels,uid,multiple,team,teamEstimate,teamConsumed,teamLeft,teamSource,contactListMenu')
             ->get();
 
-        if($task->consumed < $oldTask->consumed) return print(js::error($this->lang->task->error->consumedSmall));
+        if($task->consumed < $oldTask->consumed)
+            return print(js::error($this->lang->task->error->consumedSmall));
 
         /* Fix bug#1388, Check children task executionID and moduleID. */
         if(isset($task->execution) and $task->execution != $oldTask->execution)
@@ -1139,14 +1288,19 @@ class taskModel extends model
 
         $task = $this->loadModel('file')->processImgURL($task, $this->config->task->editor->edit['id'], $this->post->uid);
 
-        if(count(array_filter($this->post->team)) > 1)
+        if(isset($_POST['team']) && count(array_filter($this->post->team)) > 1)
         {
-            $teams = $this->manageTaskTeam($oldTask->mode, $taskID, $task->status);
-            if(!empty($teams)) $task = $this->computeHours4Multiple($oldTask, $task, array(), $autoStatus = false);
+//            $file = fopen("lalala.txt", "a+");
+//            fwrite($file,  "hello" . "\n");
+//            fclose($file);
+            $teams = $this->updateManageTeamMember($oldTask->mode, $taskID, $task->status);
+            if(!empty($teams))
+                $task = $this->computeHours4Multiple($oldTask, $task, array(), $autoStatus = false);
         }
-        if(empty($teams)) $task->mode = '';
+        if(empty($teams))
+            $task->mode = '';
 
-        $execution      = $this->dao->select('*')->from(TABLE_PROJECT)->where('id')->eq($task->execution)->fetch();
+        $execution      = $this->dao->select()->from(TABLE_PROJECT)->where('id')->eq($task->execution)->fetch();
         $requiredFields = "," . $this->config->task->edit->requiredFields . ",";
         if($execution->lifetime == 'ops' or $execution->attribute == 'request' or $execution->attribute == 'review')
         {
@@ -1154,7 +1308,7 @@ class taskModel extends model
             $task->story = 0;
         }
 
-        if($task->status != 'cancel' and strpos($requiredFields, ',estimate,') !== false)
+        if($task->status != 'cancel' and str_contains($requiredFields, ',estimate,'))
         {
             if(strlen(trim($task->estimate)) == 0) dao::$errors['estimate'] = sprintf($this->lang->error->notempty, $this->lang->task->estimate);
             $requiredFields = str_replace(',estimate,', ',', $requiredFields);
@@ -1268,7 +1422,8 @@ class taskModel extends model
                 $users = $this->loadModel('user')->getPairs('noletter|noempty');
                 $oldTeams = $oldTask->team;
                 $oldTask->team = '';
-                foreach($oldTeams as $team) $oldTask->team .= "{$this->lang->task->teamMember}: " . zget($users, $team->account) . ", {$this->lang->task->estimateAB}: " . (float)$team->estimate . ", {$this->lang->task->consumedAB}: " . (float)$team->consumed . ", {$this->lang->task->leftAB}: " . (float)$team->left . "\n";
+                foreach($oldTeams as $team)
+                    $oldTask->team .= "{$this->lang->task->teamMember}: " . zget($users, $team->account) . ", {$this->lang->task->estimateAB}: " . (float)$team->estimate . ", {$this->lang->task->consumedAB}: " . (float)$team->consumed . ", {$this->lang->task->leftAB}: " . (float)$team->left . "\n";
                 $task->team = '';
                 foreach($this->post->team as $i => $account)
                 {
@@ -1870,7 +2025,7 @@ class taskModel extends model
             }
         }
 
-        if(empty($estimates)) return;
+        if(empty($estimates)) return false;
 
         $this->loadModel('action');
 
