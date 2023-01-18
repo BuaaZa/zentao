@@ -12,6 +12,36 @@
 class action extends control
 {
     /**
+     * @var executionModel
+     */
+    public executionModel $execution;
+
+    public actionModel $action;
+
+    /**
+     * Construct function, load model.
+     *
+     * @access public
+     * @return void
+     */
+    public function __construct()
+    {
+        parent::__construct();
+    }
+
+    /**
+     * 动态定时归档.
+     *
+     * @access public
+     * @return void
+     */
+    public function cronarchiveaction()
+    {
+        $this->view->actions = $this->action->cronarchiveaction();
+        $this->display();
+    }
+
+    /**
      * Create a action or delete all patch actions, this method is used by the Ztools.
      *
      * @param  string $objectType

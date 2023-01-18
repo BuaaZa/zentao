@@ -20,7 +20,11 @@ class feedbackCloseEntry extends Entry
      */
     public function post($feedbackID)
     {
-        $feedback = $this->loadModel('feedback')->getById($feedbackID);
+        $this->loadModel('feedback');
+        $oldFeedback = $this->feedback->getByIdNotDeleted($feedbackID);
+        if (!$oldFeedback) {
+            return $this->sendError(400, $this->lang->feedback->notFoundDeleted);
+        }
 
         $fields = 'closedReason,comment';
         $this->batchSetPost($fields);
@@ -34,8 +38,8 @@ class feedbackCloseEntry extends Entry
         if(!$data) return $this->send400('error');
         if(isset($data->status) and $data->status == 'fail') return $this->sendError(zget($data, 'code', 400), $data->message);
 
-        $feedback = $this->loadModel('feedback')->getById($feedbackID);
-
+        $feedback = $this->feedback->getById($feedbackID);
+        $this->feedback->processPropertity($feedback);
         $this->send(200, $feedback);
     }
 }

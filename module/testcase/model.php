@@ -9,6 +9,9 @@
  * @version     $Id: model.php 5108 2013-07-12 01:59:04Z chencongzhi520@gmail.com $
  * @link        http://www.zentao.net
  */
+
+use PhpOffice\PhpWord\TemplateProcessor;
+use PhpOffice\PhpWord\IOFactory;
 ?>
 <?php
 class testcaseModel extends model
@@ -61,7 +64,7 @@ class testcaseModel extends model
             ->setIF($this->config->systemMode == 'new' and $this->app->tab == 'project', 'project', $this->session->project)
             ->setIF($this->app->tab == 'execution', 'execution', $this->session->execution)
             ->setIF($this->post->story != false, 'storyVersion', $this->loadModel('story')->getVersion((int)$this->post->story))
-            ->remove('steps,expects,files,labels,stepType,forceNotReview,inputs,goal_actions,eval_criterias')
+            ->remove('steps,expects,files,labels,stepType,forceNotReview,inputs,goal_actions,eval_criterias,stepIoType')
             ->setDefault('story', 0)
             ->cleanInt('story,product,branch,module')
             ->join('stage', ',')
@@ -102,6 +105,8 @@ class testcaseModel extends model
                 $step->expect  = $judge ? '' : rtrim(htmlSpecialString($data->expects[$stepID]));
                 $step->eval_criteria  = $judge ? '' : rtrim(htmlSpecialString($data->eval_criterias[$stepID]));
                 $step->eval_criteria = strlen($step->eval_criteria) == 0 ? $step->expect : $step->eval_criteria;
+                $stepIoType      = $this->post->stepIoType;
+                $step->is_out = $stepIoType[$stepID];
                 $this->dao->insert(TABLE_CASESTEP)->data($step)->autoCheck()->exec();
                 if($step->type == 'group') $parentStepID = $this->dao->lastInsertID();
                 if($step->type == 'step')  $parentStepID = 0;
@@ -460,10 +465,15 @@ class testcaseModel extends model
         $case->currentVersion = $version ? $version : $case->version;
 
         $case->steps = $this->dao->select('*')->from(TABLE_CASESTEP)->where('`case`')->eq($caseID)->andWhere('version')->eq($version)->orderBy('id')->fetchAll('id');
+
         foreach($case->steps as $key => $step)
         {
             $step->desc   = html_entity_decode($step->desc);
+            $step->input = html_entity_decode($step->input);
+            $step->goal_action = html_entity_decode($step->goal_action);
             $step->expect = html_entity_decode($step->expect);
+            $step->eval_criteria = html_entity_decode($step->eval_criteria);
+            $step->iotype = $step->is_out;
         }
 
         return $case;
@@ -779,6 +789,7 @@ class testcaseModel extends model
         $expects = $this->post->expects;
         foreach($expects as $key => $value)
         {
+            //error_log($steps[$key] . " " . $value);
             if(!empty($value) and empty($steps[$key]))
             {
                 dao::$errors[] = sprintf($this->lang->testcase->stepsEmpty, $key);
@@ -794,7 +805,11 @@ class testcaseModel extends model
 
         list($stepChanged, $status) = $result;
 
+        //判断步骤是否修改仅判断了已有的三个字段，会出bug，暂时改为调用update即必定修改了
+        //$stepChanged = true;
+
         $version = $stepChanged ? $oldCase->version + 1 : $oldCase->version;
+
 
         $case = fixer::input('post')
             ->add('id', $caseID)
@@ -811,7 +826,7 @@ class testcaseModel extends model
             ->setForce('status', $status)
             ->cleanInt('story,product,branch,module')
             ->stripTags($this->config->testcase->editor->edit['id'], $this->config->allowedTags)
-            ->remove('comment,steps,expects,files,labels,linkBug,stepType,inputs,goal_actions,eval_criterias')
+            ->remove('comment,steps,expects,files,labels,linkBug,stepType,inputs,goal_actions,eval_criterias,stepIoType')
             ->get();
 
         $requiredFields = $this->config->testcase->edit->requiredFields;
@@ -858,6 +873,8 @@ class testcaseModel extends model
                         $step->expect  = $judge ? '' : rtrim(htmlSpecialString($data->expects[$stepID]));
                         $step->eval_criteria  = $judge ? '' : rtrim(htmlSpecialString($data->eval_criterias[$stepID]));
                         $step->eval_criteria = strlen($step->eval_criteria) == 0 ? $step->expect : $step->eval_criteria;
+                        $stepIoType      = $this->post->stepIoType;
+                        $step->is_out = $stepIoType[$stepID];
                         $this->dao->insert(TABLE_CASESTEP)->data($step)->autoCheck()->exec();
                         if($step->type == 'group') $parentStepID = $this->dao->lastInsertID();
                         if($step->type == 'step')  $parentStepID = 0;
@@ -1727,6 +1744,226 @@ class testcaseModel extends model
             return print(js::error(sprintf($this->lang->testcase->importedCases, $imported)));
         }
     }
+    /**
+     * Export case to word with only one table.
+     * @param  int    $caseID
+     * @access public
+     * @return void
+     */
+    public function exportToWord_1table($caseID){
+        $case = $this->getById($caseID);
+        $document = new TemplateProcessor('templateWord/case_template.docx');
+        $steps = $case->steps;
+        $rows = count($steps);
+        $document->cloneRow('stepID',$rows);
+        $id = 0;
+        foreach($steps as $step){
+            if($step->type=='item')continue;
+            else $id++;
+            $document->setValue("stepID#".$id,$id);
+            $document->setValue("precondition#".$id,$case->precondition);
+            $document->setValue("step_input#".$id,$step->input);
+            $document->setValue("step_goal_action#".$id,$step->goal_action);
+            $document->setValue("stepExpect#".$id,$step->expect);
+            $document->setValue("step_eval_criteria#".$id,$step->eval_criteria);
+        }
+        if($id<$rows){
+            for($i = $id+1;$i<=$rows;$i++){
+                $document->setValue("stepID#".$i,"");
+                $document->setValue("precondition#".$i,"");
+                $document->setValue("step_input#".$i,"");
+                $document->setValue("step_goal_action#".$i,"");
+                $document->setValue("stepExpect#".$i,"");
+                $document->setValue("step_eval_criteria#".$i,"");
+            }
+        }
+        $filepath = 'tmp_case/' . $caseID . '_1.docx';
+        $document->saveAs($filepath);//另存为
+        $this->loadModel('file')->sendDownHeader($caseID . '_1.docx', 'docx', realpath($filepath), 'file', false);
+        //$this->downfile('tmp_case/' . $caseID . '_1.docx', $caseID . '_1');
+    }
+    /**
+     * Export a case to word.
+     *
+     * @param  int    $caseID
+     * @param  array  $sample_data_all
+     * @param  \PhpOffice\PhpWord\PhpWord  $PHPWord
+     * @access public
+     * @return \PhpOffice\PhpWord\PhpWord
+     */
+    public function exportToWord($caseID, $sample_data_all, $PHPWord){
+        $cellRowSpan = ['vMerge' => 'restart', 'valign' => 'center']; // 设置可跨行，且文字在居中
+        $cellRowContinue = ['vMerge' => 'continue']; //使行连接，且无边框线
+        $cellHCentered = ['align' => 'center']; //段落居中
+        $cellLeft = ['align' => 'left'];//段落居左对齐
+        //定义样式数组
+        $styleTable = [
+            'borderSize'=>6,
+            'borderColor'=>'070707',
+            'cellMargin'=>80
+        ];
+        $SignTableStyle = [
+            'borderSize'=>6,
+            'borderColor'=>'070707',
+            'cellMargin'=>80,
+        ];
+        //定义第一行的样式
+        $styleFirstRow = [
+            'borderBottomSize'=>18,
+            'borderBottomColor'=>'070707',
+            'bgColor'=>'c3bcbb'
+        ];
+        //定义第一行的字体
+        $fontStyle = ['bold'=>true,'align'=>'center','size' => 10];
+
+        //定义单元格样式数组  居中
+        $styleCell = ['valign'=>'center'];
+        $styleCellBTLR = ['valign'=>'center'];
+        $sectionStyle = array('orientation' => 'landscape',
+            'marginLeft' => 2.54*567,
+            'marginRight' => 2.54*567,
+            'marginTop' => 3.18*567,
+            'marginBottom' => 3.18*567);
+        $section = $PHPWord->addSection($sectionStyle);
+        $section->addTitle("用例ID：" . $caseID,2);
+        $section->addTextBreak(1);
+        $PHPWord->addTableStyle('myOwnTableStyle',$styleTable,$styleFirstRow);
+        $SignTable1 = $section->addTable('myOwnTableStyle');
+        $SignTable1->addRow(250);
+        $SignTable1->addCell(2800)->addText('测试要点名称/标识',$fontStyle,$cellHCentered);
+        $SignTable1->addCell(4800)->addText('XXXX/XXXX-GN-XXXX（需求或者功能点）',$fontStyle,$cellHCentered);
+        $SignTable1->addCell(3800)->addText('测试用例名称/标识',$fontStyle,$cellHCentered);
+        $SignTable1->addCell(3800)->addText('XXXX/XXXX-GN-XXXX-XXXX',$fontStyle,$cellHCentered);
+        $SignTable2 = $section->addTable('myOwnTableStyle');
+        $SignTable2->addRow(250);
+        $SignTable2->addCell(1280)->addText('测试步骤',$fontStyle,$cellHCentered);
+        $SignTable2->addCell(2320)->addText('前提和约束',$fontStyle,$cellHCentered);
+        $SignTable2->addCell(2320)->addText('输入',$fontStyle,$cellHCentered);
+        $SignTable2->addCell(2320)->addText('目的和动作',$fontStyle,$cellHCentered);
+        $SignTable2->addCell(2320)->addText('预期结果',$fontStyle,$cellHCentered);
+        $SignTable2->addCell(2320)->addText('评价准则',$fontStyle,$cellHCentered);
+        $SignTable2->addCell(2320)->addText('实际结果',$fontStyle,$cellHCentered);
+        $case = $this->getById($caseID);
+        $steps = $case->steps;
+        $id = 0;
+        foreach($steps as $step){
+            if($step->type=='item')continue;
+            else $id++;
+            $SignTable2->addRow(250);
+            $SignTable2->addCell(1280)->addText($id,$fontStyle,$cellHCentered);
+            $SignTable2->addCell(2320)->addText($case->precondition,$fontStyle,$cellHCentered);
+            $SignTable2->addCell(2320)->addText($step->input,$fontStyle,$cellHCentered);
+            $SignTable2->addCell(2320)->addText($step->goal_action,$fontStyle,$cellHCentered);
+            $SignTable2->addCell(2320)->addText($step->expect,$fontStyle,$cellHCentered);
+            $SignTable2->addCell(2320)->addText($step->eval_criteria,$fontStyle,$cellHCentered);
+            $SignTable2->addCell(2320)->addText('',$fontStyle,$cellHCentered);
+        }
+        $section->addTextBreak(1);
+        $sample_num = count($sample_data_all);
+        if($sample_num>0){
+            $SignTable3 = $section->addTable('myOwnTableStyle');
+            $SignTable3->addRow(250);
+            $SignTable3->addCell(2800)->addText('数据样本名称/标识',$fontStyle,$cellHCentered);
+            $SignTable3->addCell(4*3800-2800)->addText('XXXXX数据样本/XXXX-GN-MMMM-BBBB-D1',$fontStyle,$cellHCentered);
+            $SignTable4 = $section->addTable('myOwnTableStyle');
+            $SignTable4->addRow(250);
+            $SignTable4->addCell(2000)->addText('输入/输出项',$fontStyle,$cellHCentered);
+            $SignTable4->addCell(2000)->addText('输入/输出项名称',$fontStyle,$cellHCentered);
+
+            $sample_width = (4*3800-4000)/($sample_num+1);
+            $comment_width = 4*3800-4000-$sample_width*$sample_num;
+            for($i = 1;$i <= $sample_num;$i++){
+                $SignTable4->addCell($sample_width)->addText('样本'.$i,$fontStyle,$cellHCentered);
+            }
+            $SignTable4->addCell($comment_width)->addText('备注',$fontStyle,$cellHCentered);
+            $reference_io = $sample_data_all[0];
+            $reference_in_num = count($reference_io['sample_in']);
+            $reference_out_num = count($reference_io['sample_out']);
+            $reference_result_num = $reference_out_num;
+            $reference_in_steps = array("");
+            $reference_out_steps = array("");
+            $reference_result_steps = array("");
+            foreach($reference_io['sample_in'] as $step_id => $sample_in_data){
+                array_push($reference_in_steps, $steps[$step_id]);
+            }
+            foreach($reference_io['sample_out'] as $step_id => $sample_out_data){
+                array_push($reference_out_steps, $steps[$step_id]);
+            }
+            $reference_result_steps = $reference_out_steps;
+            if($reference_in_num > 0){
+                for($i = 1;$i <= $reference_in_num;$i++){
+                    $SignTable4->addRow(250);
+                    if($i==1){
+                        if($reference_in_num>1)
+                            $SignTable4->addCell(2000,$cellRowSpan)->addText('输入项',$fontStyle,$cellHCentered);
+                        else
+                            $SignTable4->addCell(2000)->addText('输入项',$fontStyle,$cellHCentered);
+                    }else{
+                        $SignTable4->addCell(2000, $cellRowContinue);
+                    }
+                    $SignTable4->addCell(2000)->addText($reference_in_steps[$i]->desc,$fontStyle,$cellHCentered);
+                    for($j = 1;$j<=$sample_num;$j++){
+                        $SignTable4->addCell($sample_width)->addText($sample_data_all[$j-1]['sample_in'][$reference_in_steps[$i]->id],$fontStyle,$cellHCentered);
+                    }
+                    $SignTable4->addCell($comment_width)->addText('',$fontStyle,$cellHCentered);
+                }
+            }
+            if($reference_out_num > 0){
+                for($i = 1;$i <= $reference_out_num;$i++){
+                    $SignTable4->addRow(250);
+                    if($i==1){
+                        if($reference_out_num>1)
+                            $SignTable4->addCell(2000,$cellRowSpan)->addText('预期输出',$fontStyle,$cellHCentered);
+                        else
+                            $SignTable4->addCell(2000)->addText('预期输出',$fontStyle,$cellHCentered);
+                    }else{
+                        $SignTable4->addCell(2000, $cellRowContinue);
+                    }
+                    $SignTable4->addCell(2000)->addText($reference_out_steps[$i]->desc,$fontStyle,$cellHCentered);
+                    for($j = 1;$j<=$sample_num;$j++){
+                        $SignTable4->addCell($sample_width)->addText($sample_data_all[$j-1]['sample_out'][$reference_out_steps[$i]->id],$fontStyle,$cellHCentered);
+                    }
+                    $SignTable4->addCell($comment_width)->addText('',$fontStyle,$cellHCentered);
+                }
+            }
+            if($reference_result_num > 0){
+                for($i = 1;$i <= $reference_result_num;$i++){
+                    $SignTable4->addRow(250);
+                    if($i==1){
+                        if($reference_result_num>1)
+                            $SignTable4->addCell(2000,$cellRowSpan)->addText('实际结果',$fontStyle,$cellHCentered);
+                        else
+                            $SignTable4->addCell(2000)->addText('实际结果',$fontStyle,$cellHCentered);
+                    }else{
+                        $SignTable4->addCell(2000, $cellRowContinue);
+                    }
+                    $SignTable4->addCell(2000)->addText($reference_result_steps[$i]->desc,$fontStyle,$cellHCentered);
+                    for($j = 1;$j<=$sample_num;$j++){
+                        $SignTable4->addCell($sample_width)->addText($sample_data_all[$j-1]['sample_result'][$reference_result_steps[$i]->id],$fontStyle,$cellHCentered);
+                    }
+                    $SignTable4->addCell($comment_width)->addText('',$fontStyle,$cellHCentered);
+                }
+            }
+        }else{
+            $section->addTitle("该用例无数据样本信息",2);
+        }
+        $section->addTextBreak(1);
+        return $PHPWord;
+    }
+    public function downfile($filepath,$downloadName = 'notset')
+    {
+        $filename=realpath($filepath); //文件名
+        if($downloadName == 'notset'){
+            $downloadName=date("Ymd-H:i:m");
+        }
+        Header( "Content-type: application/octet-stream ");
+        Header( "Accept-Ranges: bytes ");
+        Header( "Accept-Length: " .filesize($filename));
+        header( "Content-Disposition: attachment; filename= {$downloadName}.docx");
+        echo file_get_contents($filename);
+        readfile($filename);
+        exit;
+    }
 
     /**
      * Import cases to lib.
@@ -2463,7 +2700,8 @@ class testcaseModel extends model
         {
             $menu .= $this->buildMenu('testcase', 'confirmstorychange', $params, $case, 'view', 'confirm', 'hiddenwin', '', '', '', $this->lang->confirm);
         }
-
+        #导出为word
+        $menu .= $this->buildMenu('testcase', 'exportToWord', $params, $case, 'view', 'export', '', 'showinonlybody iframe', true, "data-width='500px'");
         $menu .= "<div class='divider'></div>";
         $menu .= $this->buildFlowMenu('testcase', $case, 'view', 'direct');
         $menu .= "<div class='divider'></div>";

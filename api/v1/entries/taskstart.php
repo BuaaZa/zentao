@@ -11,6 +11,8 @@
  */
 class taskStartEntry extends Entry
 {
+
+    public task $taskControl;
     /**
      * POST method.
      *
@@ -25,9 +27,9 @@ class taskStartEntry extends Entry
         $fields = 'assignedTo,realStarted,consumed,left,comment';
         $this->batchSetPost($fields);
 
-        $control = $this->loadController('task', 'start');
+        $this->taskControl = $this->loadController('task', 'start');
         $this->requireFields('left');
-        $control->start($taskID);
+        $this->taskControl->start($taskID);
 
         $data = $this->getData();
         if(!$data) return $this->send400('error');

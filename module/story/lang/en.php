@@ -341,6 +341,7 @@ $lang->story->action->subdividestory        = array('main' => '$date, decomposed
 $lang->story->action->unlinkrelatedstory    = array('main' => '$date, unlinked by <strong>$actor</strong> from Story <strong>$extra</strong>.');
 $lang->story->action->unlinkchildstory      = array('main' => '$date, unlinked by <strong>$actor</strong> Decomposed Story <strong>$extra</strong>.');
 $lang->story->action->recalledchange        = array('main' => '$date, Undo changes by <strong>\$actor</strong>.');
+$lang->story->action->fromfeedback          = array('main' => '$date, created by <strong>$actor</strong> from <strong>feedback</strong>, the ID which was <strong>$extra</strong>.');
 
 /* Statistical statement. */
 $lang->story->report = new stdclass();

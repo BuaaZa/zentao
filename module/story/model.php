@@ -393,7 +393,8 @@ class storyModel extends model
                 $this->loadModel('action')->create('bug', $bugID, 'ToStory', '', $storyID);
                 $this->action->create('bug', $bugID, 'Closed');
 
-                if(($this->config->edition == 'biz' || $this->config->edition == 'max') && !dao::isError() && $oldBug->feedback) $this->loadModel('feedback')->updateStatus('bug', $oldBug->feedback, 'closed', $oldBug->status);
+                // if增加 $this->config->edition == 'open' chenjj 230115
+                if(($this->config->edition == 'biz' || $this->config->edition == 'max' || $this->config->edition == 'open') && !dao::isError() && $oldBug->feedback) $this->loadModel('feedback')->updateStatus('bug', $oldBug->feedback, 'closed', $oldBug->status);
 
                 /* add files to story from bug. */
                 $files = $this->dao->select('*')->from(TABLE_FILE)
@@ -1049,7 +1050,8 @@ class storyModel extends model
 
             unset($oldStory->parent);
             unset($story->parent);
-            if(($this->config->edition == 'biz' || $this->config->edition == 'max') && $oldStory->feedback) $this->loadModel('feedback')->updateStatus('story', $oldStory->feedback, $story->status, $oldStory->status);
+            // if增加 $this->config->edition == 'open' chenjj 230115
+            if(($this->config->edition == 'biz' || $this->config->edition == 'max' || $this->config->edition == 'open') && $oldStory->feedback) $this->loadModel('feedback')->updateStatus('story', $oldStory->feedback, $story->status, $oldStory->status);
 
             $linkStoryField = $oldStory->type == 'story' ? 'linkStories' : 'linkRequirements';
             $linkStories    = explode(',', $story->{$linkStoryField});
@@ -1194,7 +1196,8 @@ class storyModel extends model
                     $this->action->logHistory($actionID, $changes);
                 }
 
-                if(($this->config->edition == 'biz' || $this->config->edition == 'max') && $oldParentStory->feedback) $this->loadModel('feedback')->updateStatus('story', $oldParentStory->feedback, $newParentStory->status, $oldParentStory->status);
+                // if增加 $this->config->edition == 'open' chenjj 230115
+                if(($this->config->edition == 'biz' || $this->config->edition == 'max' || $this->config->edition == 'open') && $oldParentStory->feedback) $this->loadModel('feedback')->updateStatus('story', $oldParentStory->feedback, $newParentStory->status, $oldParentStory->status);
             }
         }
         else
@@ -1430,7 +1433,8 @@ class storyModel extends model
                     if($story->closedReason == 'done') $this->loadModel('score')->create('story', 'close');
                     $allChanges[$storyID] = common::createChanges($oldStory, $story);
 
-                    if(($this->config->edition == 'biz' || $this->config->edition == 'max') && $oldStory->feedback && !isset($feedbacks[$oldStory->feedback]))
+                    // if增加 $this->config->edition == 'open' chenjj 230115
+                    if(($this->config->edition == 'biz' || $this->config->edition == 'max' || $this->config->edition == 'open') && $oldStory->feedback && !isset($feedbacks[$oldStory->feedback]))
                     {
                         $feedbacks[$oldStory->feedback] = $oldStory->feedback;
                         $this->loadModel('feedback')->updateStatus('story', $oldStory->feedback, $story->status, $oldStory->status);
@@ -1819,7 +1823,8 @@ class storyModel extends model
             $this->setStage($storyID);
             $this->loadModel('score')->create('story', 'close', $storyID);
 
-            if(($this->config->edition == 'biz' || $this->config->edition == 'max') && $oldStory->feedback) $this->loadModel('feedback')->updateStatus('story', $oldStory->feedback, $story->status, $oldStory->status);
+            // if增加 $this->config->edition == 'open' chenjj 230115
+            if(($this->config->edition == 'biz' || $this->config->edition == 'max' || $this->config->edition == 'open') && $oldStory->feedback) $this->loadModel('feedback')->updateStatus('story', $oldStory->feedback, $story->status, $oldStory->status);
         }
         return common::createChanges($oldStory, $story);
     }
@@ -1884,7 +1889,8 @@ class storyModel extends model
                 $this->setStage($storyID);
                 $allChanges[$storyID] = common::createChanges($oldStory, $story);
 
-                if(($this->config->edition == 'biz' || $this->config->edition == 'max') && $oldStory->feedback && !isset($feedbacks[$oldStory->feedback]))
+                // if增加 $this->config->edition == 'open' chenjj 230115
+                if(($this->config->edition == 'biz' || $this->config->edition == 'max' || $this->config->edition == 'open') && $oldStory->feedback && !isset($feedbacks[$oldStory->feedback]))
                 {
                     $feedbacks[$oldStory->feedback] = $oldStory->feedback;
                     $this->loadModel('feedback')->updateStatus('story', $oldStory->feedback, $story->status, $oldStory->status);

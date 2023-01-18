@@ -17,6 +17,7 @@ class actionModel extends model
     const CAN_UNDELETED = 1;    // The deleted object can be undeleted.
     const BE_HIDDEN     = 2;    // The deleted object has been hidded.
 
+
     /**
      * Create a action.
      *
@@ -459,6 +460,26 @@ class actionModel extends model
                 $title = $this->dao->select('title')->from(TABLE_STORY)->where('id')->eq($action->extra)->fetch('title');
                 if($title) $action->extra = common::hasPriv('story', 'view') ? html::a(helper::createLink('story', 'view', "storyID=$action->extra"), "#$action->extra " . $title) : "#$action->extra " . $title;
             }
+            elseif($action->objectType == 'feedback')
+            {
+                if($actionName == 'tostory'){
+                    $title = $this->dao->select('title')->from(TABLE_STORY)->where('id')->eq($action->extra)->fetch('title');
+                    if($title) $action->extra = common::hasPriv('story', 'view') ? html::a(helper::createLink('story', 'view', "storyID=$action->extra"), "#$action->extra " . $title) : "#$action->extra " . $title;
+                }elseif($actionName == 'tobug'){
+                    $title = $this->dao->select('title')->from(TABLE_BUG)->where('id')->eq($action->extra)->fetch('title');
+                    if($title) $action->extra = common::hasPriv('bug', 'view') ? html::a(helper::createLink('bug', 'view', "bugID=$action->extra"), "#$action->extra " . $title) : "#$action->extra " . $title;
+                }elseif($actionName == 'totask'){
+                    $title = $this->dao->select('name')->from(TABLE_TASK)->where('id')->eq($action->extra)->fetch('name');
+                    if($title) $action->extra = common::hasPriv('task', 'view') ? html::a(helper::createLink('task', 'view', "taskID=$action->extra"), "#$action->extra " . $title) : "#$action->extra " . $title;
+                }
+            }
+            elseif($actionName == 'fromfeedback')
+            {
+                if($action->objectType == 'story'||$action->objectType == 'bug'||$action->objectType == 'task'){
+                    $title = $this->dao->select('title')->from(TABLE_FEEDBACK)->where('id')->eq($action->extra)->fetch('title');
+                    if($title) $action->extra = common::hasPriv('feedback', 'view') ? html::a(helper::createLink('feedback', 'view', "feedbackID=$action->extra"), "#$action->extra " . $title) : "#$action->extra " . $title;
+                }
+            }
             elseif($actionName == 'importedcard')
             {
                 $title = $this->dao->select('name')->from(TABLE_KANBAN)->where('id')->eq($action->extra)->fetch('name');
@@ -880,6 +901,20 @@ class actionModel extends model
             {
                 $desc = $this->lang->action->desc->$actionType;
             }
+            elseif($action->objectType == 'feedback' and $action->action == 'tostory')
+            {
+                $desc = $action->extra ? $this->lang->feedback->action->tostory.$this->lang->action->desc->extra : $this->lang->action->desc->common;
+            }
+            elseif($action->action == 'fromfeedback')
+            {
+                if($action->objectType == 'story'){
+                    $desc = $action->extra ? $this->lang->story->action->fromfeedback.$this->lang->action->desc->extra : $this->lang->action->desc->common;
+                }elseif($action->objectType == 'bug'){
+                    $desc = $action->extra ? $this->lang->bug->action->fromfeedback.$this->lang->action->desc->extra : $this->lang->action->desc->common;
+                }elseif($action->objectType == 'task'){
+                    $desc = $action->extra ? $this->lang->task->action->fromfeedback.$this->lang->action->desc->extra : $this->lang->action->desc->common;
+                }
+            }
             else
             {
                 $desc = $action->extra ? $this->lang->action->desc->extra : $this->lang->action->desc->common;
@@ -891,7 +926,8 @@ class actionModel extends model
         /* Cycle actions, replace vars. */
         foreach($action as $key => $value)
         {
-            if($key == 'history') continue;
+            // 修改此处让评论可以返回更多用户信息 -> chenjj 221225
+            if($key == 'history' || $key == 'openedBy') continue;
 
             /* Desc can be an array or string. */
             if(is_array($desc))
@@ -1099,6 +1135,80 @@ class actionModel extends model
 
         $this->loadModel('common')->saveQueryCondition($this->dao->get(), 'action');
         return $this->transformActions($actions);
+    }
+
+    /**
+     * 动态手动归档.
+     *
+     * @param  string $beginDate 起始日期，格式 'Y-m-d'
+     * @param  string $endDate 终止日期，同上
+     * @access public
+     * @return array 归档的动态数组
+     */
+    public function archiveaction($beginDate,$endDate): array
+    {
+        $begin = $beginDate . ' 00:00:00';
+        $end = $endDate . ' 23:59:59';
+
+        $actions = $this->dao->select('*')->from(TABLE_ACTION)
+            ->where('date')->ge($begin)
+            ->andWhere('date')->le($end)
+            ->fetchAll();
+
+        foreach ($actions as $action){
+            $this->dao->replace(TABLE_ACTIONARCHIVE)->data($action)->autoCheck()->exec();
+        }
+        $this->dao->delete()->from(TABLE_ACTION)->where('id')->in(array_column($actions,'id'))->exec();
+
+        return $actions;
+    }
+
+    /**
+     * 归档动态恢复.
+     *
+     * @param  string $beginDate 起始日期，格式 'Y-m-d'
+     * @param  string $endDate 终止日期，同上
+     * @access public
+     * @return array 恢复的动态数组
+     */
+    public function recoveraction($beginDate,$endDate): array
+    {
+        $begin = $beginDate . ' 00:00:00';
+        $end = $endDate . ' 23:59:59';
+
+        $actions = $this->dao->select('*')->from(TABLE_ACTIONARCHIVE)
+            ->where('date')->ge($begin)
+            ->andWhere('date')->le($end)
+            ->fetchAll();
+
+        foreach ($actions as $action){
+            $this->dao->replace(TABLE_ACTION)->data($action)->autoCheck()->exec();
+        }
+        $this->dao->delete()->from(TABLE_ACTIONARCHIVE)->where('id')->in(array_column($actions,'id'))->exec();
+
+        return $actions;
+    }
+
+    /**
+     * 动态定时归档.(归档上月1日之前的所有动态)
+     *
+     * @access public
+     * @return array
+     */
+    public function cronarchiveaction()
+    {
+        //上个月1日之前的
+        $end = date('Y-m-01 00:00:00', strtotime('-1 month')) ;
+        $actions = $this->dao->select('*')->from(TABLE_ACTION)
+            ->where('date')->lt($end)
+            ->fetchAll();
+
+        foreach ($actions as $action){
+            $this->dao->replace(TABLE_ACTIONARCHIVE)->data($action)->autoCheck()->exec();
+        }
+        $this->dao->delete()->from(TABLE_ACTION)->where('id')->in(array_column($actions,'id'))->exec();
+
+        return $actions;
     }
 
     /**
@@ -2063,8 +2173,16 @@ class actionModel extends model
     public function processActionForAPI($actions, $users = array(), $objectLang = array())
     {
         $actions = (array)$actions;
+        // 修改此处让评论可以返回附件信息 -> chenjj 221225
+        $commentIDs = array();
+        // 修改此处让评论可以返回更多用户信息 -> chenjj 221225
+        $userInfoList=$this->getuserinfo();
         foreach($actions as $action)
         {
+            // 修改此处让评论可以返回更多用户信息 -> chenjj 221225
+            $this->setuserinfo($action,$userInfoList);
+            // 修改此处让评论可以返回附件信息 -> chenjj 221225
+            array_push($commentIDs, $action->id);
             $action->actor = zget($users, $action->actor);
             if($action->action == 'assigned') $action->extra = zget($users, $action->extra);
             if(strpos($action->actor, ':') !== false) $action->actor = substr($action->actor, strpos($action->actor, ':') + 1);
@@ -2083,6 +2201,10 @@ class actionModel extends model
                 }
             }
         }
+
+        // 修改此处让评论可以返回附件信息 -> chenjj 221225
+        $this->setfileinfo($actions, $commentIDs);
+
         return array_values($actions);
     }
 

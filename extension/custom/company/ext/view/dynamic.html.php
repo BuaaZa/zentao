@@ -39,6 +39,13 @@
         <a class="btn btn-link querybox-toggle" id="bysearchTab"><i
                     class="icon icon-search muted"></i> <?php echo $lang->action->dynamic->search; ?></a>
     </div>
+    <div class='pull-right'>
+        <?php if(common::hasPriv('company', 'archiveaction'))
+            common::printLink('company', 'archiveaction',
+                "", $lang->company->archiveaction,
+                '', "id='archive' class='btn btn-primary iframe' data-width='75%' data-app='company'",
+                '', 'true');?>
+    </div>
 </div>
 
 <div id='queryBox' data-module='action' class='cell <?php if ($browseType == 'bysearch') echo 'show'; ?>'></div>

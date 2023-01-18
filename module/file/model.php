@@ -183,7 +183,7 @@ class fileModel extends model
     public function getUpload($htmlTagName = 'files', $labelsName = 'labels')
     {
         $files = array();
-        if(!isset($_FILES[$htmlTagName])) return $files;
+        if(!isset($_FILES[$htmlTagName])) return $this->getUploadMultip($labelsName);
 
         if(!is_array($_FILES[$htmlTagName]['error']) and $_FILES[$htmlTagName]['error'] != 0) return $_FILES[$htmlTagName];
 
@@ -225,6 +225,35 @@ class fileModel extends model
             $file['tmpname']   = $tmp_name;
             return array($file);
         }
+        return $files;
+    }
+
+    // 处理file1,file2,file3.....fileN的特殊需求 chenjj 221226
+    public function getUploadMultip($labelsName = 'labels')
+    {
+        $files = array();
+        if(empty($_FILES)) return $files;
+
+        $this->app->loadClass('purifier', true);
+        $config   = HTMLPurifier_Config::createDefault();
+        $config->set('Cache.DefinitionImpl', null);
+        $purifier = new HTMLPurifier($config);
+
+        foreach($_FILES as $fileObj){
+            if(!is_array($fileObj['error']) and $fileObj['error'] != 0) continue;
+            if(empty($fileObj['name'])) return $files;
+            extract($fileObj);
+            if(!validater::checkFileName($name)) return array();;
+            $title             = isset($_POST[$labelsName][0]) ? $_POST[$labelsName][0] : '';
+            $file['extension'] = $this->getExtension($name);
+            $file['pathname']  = $this->setPathName(0, $file['extension']);
+            $file['title']     = (!empty($title) and $title != $name) ? htmlSpecialString($title) : $name;
+            $file['title']     = $purifier->purify($file['title']);
+            $file['size']      = $size;
+            $file['tmpname']   = $tmp_name;
+            array_push($files,$file);
+        }
+        
         return $files;
     }
 
@@ -1037,7 +1066,7 @@ class fileModel extends model
      * @access public
      * @return void
      */
-    public function sendDownHeader($fileName, $fileType, $content, $type = 'content')
+    public function sendDownHeader($fileName, $fileType, $content, $type = 'content', $otherFile_notavailable = true)
     {
         /* Clean the ob content to make sure no space or utf-8 bom output. */
         $obLevel = ob_get_level();
@@ -1047,7 +1076,7 @@ class fileModel extends model
         setcookie('downloading', 1, 0, $this->config->webRoot, '', $this->config->cookieSecure, false);
 
         /* Only download upload file that is in zentao. */
-        if($type == 'file' and stripos($content, $this->savePath) !== 0) helper::end();
+        if($otherFile_notavailable and $type == 'file' and stripos($content, $this->savePath) !== 0) helper::end();
 
         /* Append the extension name auto. */
         $extension = '.' . $fileType;
