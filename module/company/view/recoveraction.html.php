@@ -3,19 +3,20 @@
 <div id='mainContent' class='main-content'>
     <div class='center-block'>
         <div class='main-header'>
-            <h2><?php echo $lang->company->recover; ?></h2>
+            <h2><?php echo $lang->company->recoveraction; ?></h2>
         </div>
-        <h4><?php echo $lang->company->archivedDates; ?></h4>
+        <h4><?php echo $lang->company->archivedDays; ?></h4>
         <form method='post' target='hiddenwin' id='dataform'>
             <table class='table table-form' border = '1'>
                 <tr>
-                    <td><?php echo $lang->company->beginDate; ?></td>
-                    <td><?php echo $lang->company->endDate; ?></td>
+                    <td><?php echo $lang->company->beginDay; ?></td>
+                    <td><?php echo $lang->company->endDay; ?></td>
                 </tr>
-                <?php foreach ($dates as $date): ?>
+<!--                <tr>--><?php //print_r($ranges); ?><!--</tr>-->
+                <?php foreach ($ranges as $range): ?>
                 <tr>
-                <td><?php echo $date->beginDate; ?></td>
-                <td><?php echo $date->endDate; ?></td>
+                <td><?php echo $range->start; ?></td>
+                <td><?php echo $range->end; ?></td>
                 </tr>
                 <?php endforeach; ?>
             </table><br><br><br>

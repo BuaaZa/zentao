@@ -41,12 +41,6 @@ class action extends control
         $this->display();
     }
 
-    public function recoverAction()
-    {
-        $this->view->dates = $this->action->getArchivedDates() ;
-        $this->display();
-    }
-
     /**
      * Create a action or delete all patch actions, this method is used by the Ztools.
      *

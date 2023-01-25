@@ -1163,38 +1163,65 @@ class actionModel extends model
         return $actions;
     }
 
-    public function getArchivedDates()
+    /**
+     * 已归档动态的日期范围.
+     *
+     * @access public
+     * @return array 日期范围数组
+     */
+    public function archivedranges(): array
     {
-        $dates = $this->dao->select('date')->from(TABLE_ACTIONARCHIVE)
+        $data = $this->dao->select('date')->from(TABLE_ACTIONARCHIVE)
             ->orderBy('date')
             ->fetchAll();
-        foreach ($dates as $date){
-            $tmp = $date->format("Y-m-d H:i:s");
-            $date = date("Y-m-d",substr($tmp, -9));
-        }
-        echo $dates;
-        $length = count($dates);
-        $archivedDates = array();
-        $beginDate = $dates[0];
-        for($x=0;$x<$length;$x++)
+        $dates = array();
+        foreach($data as $d)
         {
-            $date1 = $dates[$x];
-            $date2 = $dates[$x+1];
-            $diff = date_diff($date2,$date1);
-            if($diff <= 1)
-            {
-                continue;
-            }
-            else
-            {
-                $dateRange = new stdClass();
-                $dateRange->beginDate = $beginDate;
-                $dateRange->endDate = $date1;
-                $beginDate = $date2;
-                array_push($archivedDates, $dateRange);
-            }
+            $dates[] = substr($d->date,0,10);
         }
-        return $archivedDates;
+        $dates = array_filter(array_unique($dates));
+        $tmp = array();
+        foreach ($dates as $date)
+        {
+            $tmp[]=$date;
+        }
+        $dates = $tmp;
+        $length = count($dates);
+        $archivedRanges = array();
+        $s = $dates[0];
+        $x = 0;
+        if ($length == 1)
+        {
+            $e = $dates[0];
+            $archivedRanges[$x] = new stdClass();
+            $archivedRanges[$x]->start = $s;
+            $archivedRanges[$x++]->end = $e;
+        }
+        else
+        {
+            for($i=0;$i<$length-1;$i++)
+            {
+                $diff = date_diff(date_create($dates[$i+1]),date_create($dates[$i]))->days;
+                if($diff == 1)
+                {
+                    continue;
+                }
+                else
+                {
+                    $e = $dates[$i];
+                    $archivedRanges[$x] = new stdClass();
+                    $archivedRanges[$x]->start = $s;
+                    $archivedRanges[$x++]->end = $e;
+                    $s = $dates[$i+1];
+                }
+            }
+            $e = $dates[$i];
+            $archivedRanges[$x] = new stdClass();
+            $archivedRanges[$x]->start = $s;
+            $archivedRanges[$x]->end = $e;
+        }
+        return $archivedRanges;
+        //return $dates;
     }
 
     /**
