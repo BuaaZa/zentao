@@ -202,10 +202,18 @@ class feedback extends control
             $changes = array();
             $files   = array();
             if ($comment == false) {
+                if(!empty($_POST['expectDate']) && !$this->feedback->isDatetime($_POST['expectDate'])){
+                    return $this->send(array('result' => 'fail', 'message' => $this->lang->feedback->expectDate . $this->lang->feedback->wrongDatetime));
+                }
+                if (!empty($_POST['contactWay']) && !$this->feedback->isMobTel($_POST['contactWay'])) {
+                    return $this->send(array('result' => 'fail', 'message' => $this->lang->feedback->contactWay . $this->lang->feedback->wrongContactWay));
+                }
                 $changes = $this->feedback->update($feedbackID);
                 if (dao::isError()) {
                     if (defined('RUN_MODE') && RUN_MODE == 'api') return $this->send(array('status' => 'error', 'message' => dao::getError()));
-                    return print(js::error(dao::getError()));
+                    $response['result']  = 'fail';
+                    $response['message'] = dao::getError();
+                    return $this->send($response);
                 }
             }
 
@@ -218,8 +226,25 @@ class feedback extends control
         }
         $feedback             = $this->feedback->getById($feedbackID);
 
+        $this->setProjectUseInfo($feedback);
         $this->view->feedback = $feedback;
         $this->display();
+    }
+
+    function setProjectUseInfo($feedback){
+        if(!$feedback){
+            return;
+        }
+        // 产品使用环境信息
+        $projectUseInfo = $this->dao->select('*')
+            ->from(TABLE_PROJECTUSEINFO)
+            ->where('feedback')->eq($feedback->id)
+            ->fetch();
+        if ($projectUseInfo) {
+            $feedback->projectUseInfo = $projectUseInfo;
+        } else {
+            $feedback->projectUseInfo = new stdclass();
+        }
     }
 
     public function view($feedbackID, $browseType = '')
@@ -227,7 +252,9 @@ class feedback extends control
         $feedback             = $this->feedback->getById($feedbackID);
         if ($feedback) {
             $feedback->files = $this->loadModel('file')->getByObject('feedback', $feedbackID);
+            $this->setProjectUseInfo($feedback);
         }
+
         $this->view->feedback = $feedback;
         $this->view->browseType      = $browseType;
         $this->view->actions     = $this->action->getList('feedback', $feedbackID);

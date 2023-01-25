@@ -89,6 +89,13 @@ class feedbackModel extends model
             // 删除enternalId chenjj 221230
             ->remove('enternalId')
             ->get();
+            
+        if(!empty($feedback->expectDate) && !$this->isDatetime($feedback->expectDate)){
+            return array('result' => 'fail', 'message' => $this->lang->feedback->expectDate . $this->lang->feedback->wrongDatetime);
+        }
+        if (!empty($feedback->contactWay) && !$this->isMobTel($feedback->contactWay)) {
+            return array('result' => 'fail', 'message' => $this->lang->feedback->contactWay . $this->lang->feedback->wrongContactWay);
+        }
 
         $feedback->status = 'noreview';// 暂时默认需要预审
         //if($bug->execution != 0) $bug->project = $this->dao->select('project')->from(TABLE_EXECUTION)->where('id')->eq($bug->execution)->fetch('project');
@@ -192,7 +199,8 @@ class feedbackModel extends model
       if(strpos($sort, 'severity_') !== false) $sort = str_replace('severity_', 'severityOrder_', $sort);
       $feedbacks = array();
       if($browseType == 'all')          $feedbacks = $this->getAllFeedbacks($productIDList, $keyword, $modules, $types, $sort, $pager, $projectID);
-      elseif($browseType == 'wait')     $feedbacks = $this->getByStatus($productIDList, $keyword, $modules, $types, array($browseType,'noreview','clarify'), $sort, $pager, $projectID);
+      // 待处理的就只返回待处理的，不再返回'noreview'和'clarify' chenjj 230117
+      elseif($browseType == 'wait')     $feedbacks = $this->getByStatus($productIDList, $keyword, $modules, $types, array($browseType), $sort, $pager, $projectID);
       elseif($browseType == 'review')   $feedbacks = $this->getByStatus($productIDList, $keyword, $modules, $types, array('noreview'), $sort, $pager, $projectID);
       elseif($browseType == 'unclosed') $feedbacks = $this->unClosedFeedbacks($productIDList, $keyword, $modules, $types, array('closed'), $sort, $pager, $projectID);
       elseif($browseType == 'public')   $feedbacks = $this->publicFeedbacks($productIDList, $keyword, $modules, $types, array(), $sort, $pager, $projectID);
@@ -205,7 +213,29 @@ class feedbackModel extends model
       // commenting->处理中 替换原有的 doing
       elseif($browseType == 'commenting')   $feedbacks = $this->getByStatus($productIDList, $keyword, $modules, $types, array('commenting'), $sort, $pager, $projectID);
       elseif ($browseType == 'bysearch') $feedbacks = $this->getBySearch($productIDList, $queryID, $sort, $pager, $projectID);
+      elseif($browseType == 'tostory') $feedbacks = $this->getBySolution($productIDList,$keyword,array('tostory'), $sort, $pager, $projectID);
+      elseif($browseType == 'tobug') $feedbacks = $this->getBySolution($productIDList,$keyword,array('tobug'), $sort, $pager, $projectID);
+      elseif($browseType == 'totask') $feedbacks = $this->getBySolution($productIDList,$keyword,array('totask'), $sort, $pager, $projectID);
+      elseif($browseType == 'replied') $feedbacks = $this->getByStatus($productIDList, $keyword, $modules, $types, array('replied'), $sort, $pager, $projectID);
       return $feedbacks;
+    }
+
+    public function getBySolution($productIDList,$keyword,$solution=array(), $orderBy, $pager, $projectID)
+    {
+        $openedBy = $_GET['openedBy'];
+        return $this->dao->select("*, IF(`pri` = 0, {$this->config->maxPriValue}, `pri`) as priOrder")->from(TABLE_FEEDBACK)
+            ->where('product')->in($productIDList)
+            ->beginIF(!empty($openedBy))->andWhere('openedBy')->eq($openedBy)->fi()
+            ->andWhere('solution')->in($solution)
+            ->andWhere('deleted')->eq(0)
+            ->beginIF(!empty($keyword))->andWhere()
+            ->markLeft(1)
+            ->where('title')->like($keyword)
+            ->orWhere('`desc`')->like($keyword)
+            ->markRight(1)
+            ->fi()
+            ->orderBy($orderBy)->page($pager)
+            ->fetchAll();
     }
 
      /**
@@ -792,7 +822,7 @@ class feedbackModel extends model
             //$menu .= $this->buildMenu($moduleName, 'toTask' , $toStoryParams, $feedback, 'browse', $this->lang->icons['task'],'','iframe btn-action',false,'',$this->lang->feedback->toTask);
             $menu .= '<a href="#toTask" data-toggle="modal" data-id="'.$feedback->id.'" data-product="'.$feedback->product.'" onclick="getFeedbackID(this)" class="btn btn-action" title="转任务"><i class="icon icon-check-sign"></i> </a>';
             $menu .= $this->buildMenu($moduleName, 'toBug' , $toStoryParams, $feedback, 'browse', $this->lang->icons['bug'],'','btn-action',false,'',$this->lang->feedback->toBug);
-            $menu .= $this->buildMenu($moduleName, 'toTodo' , $toStoryParams, $feedback, 'browse', $this->lang->icons['todo'],'','btn-action',false,'',$this->lang->feedback->toTodo);
+            // $menu .= $this->buildMenu($moduleName, 'toTodo' , $toStoryParams, $feedback, 'browse', $this->lang->icons['todo'],'','btn-action',false,'',$this->lang->feedback->toTodo);
             $menu .= "</ul>";
             $menu .= "</div>";
         }
@@ -1177,6 +1207,28 @@ class feedbackModel extends model
             $feedbacksQuery .= ' AND `story` != 0';
         }
         return $feedbacksQuery;
+    }
+
+    /**
+     * 验证是不是手机号码或电话号码
+     */
+    function isMobTel($numberstr)
+    {
+        $isMob="/^1[3-9]{1}[0-9]{9}$/";
+        $isTel="/^([0-9]{3,4}-?)?[0-9]{7,8}$/";
+        if (!preg_match($isMob, $numberstr) && !preg_match($isTel, $numberstr)) {
+            return false;
+        } else {
+            return true;
+        }
+    }
+
+    /**
+     * 验证是不是datetime日期格式
+     */
+    function isDatetime($str)
+    {
+        return DateTime::createFromFormat('Y-m-d H:i:s', $str) !== FALSE;
     }
 
 

@@ -13,6 +13,7 @@
 <?php include $app->getModuleRoot() . 'common/view/header.html.php';?>
 <?php include $app->getModuleRoot() . 'common/view/chosen.html.php';?>
 <?php include $app->getModuleRoot() . 'common/view/kindeditor.html.php';?>
+<?php include $app->getModuleRoot() . 'common/view/datepicker.html.php';?>
 <?php js::set('browseType', $browseType);?>
 <div id='mainContent' class='main-content'>
   <div class='main-header'>
@@ -25,19 +26,19 @@
   <form class='main-form form-ajax' method='post' enctype='multipart/form-data'>
     <table class='table table-form'>
       <tr>
-        <th class='w-80px'><?php echo $lang->feedback->product?></th>
+        <th class='w-120px'><?php echo $lang->feedback->product?></th>
         <td><?php echo html::select('product', $products, $feedback->product, "class='form-control chosen'")?></td>
         <td></td>
       </tr>
       <tr>
-        <th class='w-80px'><?php echo $lang->feedback->module?></th>
+        <th class='w-120px'><?php echo $lang->feedback->module?></th>
         <td>
           <?php echo html::select('module', $modules ? $modules : array(), $feedback->module, "class='form-control chosen'")?>
         </td>
         <td></td>
       </tr>
       <tr>
-        <th class='w-80px'><?php echo $lang->feedback->type;?></th>
+        <th class='w-120px'><?php echo $lang->feedback->type;?></th>
         <td><?php echo html::select('type', $lang->feedback->typeList, $feedback->type, "class='form-control chosen'")?></td>
       </tr>
       <tr>
@@ -85,6 +86,52 @@
         </td>
       </tr>
       <tr>
+        <th><?php echo $lang->feedback->productVersion;?></th>
+        <td><?php echo html::input('productVersion', $feedback->productVersion, "class='form-control'");?></td>
+      </tr>
+      <tr>
+        <th><?php echo $lang->feedback->usedProject;?></th>
+        <td><?php echo html::input('usedProject', $feedback->usedProject, "class='form-control'");?></td>
+      </tr>
+      <tr>
+        <th><?php echo $lang->feedback->expectDate;?></th>
+        <td id='expectDateTd'>
+            <span><?php echo html::input('expectDate', helper::isZeroDate($feedback->expectDate) ? '' : $feedback->expectDate, "class='form-control form-datetimes'");?></span>
+        </td>
+      </tr>
+      <tr>
+        <th><?php echo $lang->feedback->contactWay;?></th>
+        <td><?php echo html::input('contactWay', $feedback->contactWay, "class='form-control'");?></td>
+      </tr>
+      <tr>
+        <th><?php echo $lang->feedback->projectUseInfoList['serverOS'];?></th>
+        <td><?php echo html::input('serverOS', $feedback->projectUseInfo->serverOS, "class='form-control'");?></td>
+      </tr>
+      <tr>
+        <th><?php echo $lang->feedback->projectUseInfoList['serverCPU'];?></th>
+        <td><?php echo html::input('serverCPU', $feedback->projectUseInfo->serverCPU, "class='form-control'");?></td>
+      </tr>
+      <tr>
+        <th><?php echo $lang->feedback->projectUseInfoList['middleware'];?></th>
+        <td><?php echo html::input('middleware', $feedback->projectUseInfo->middleware, "class='form-control'");?></td>
+      </tr>
+      <tr>
+        <th><?php echo $lang->feedback->projectUseInfoList['database'];?></th>
+        <td><?php echo html::input('database', $feedback->projectUseInfo->database, "class='form-control'");?></td>
+      </tr>
+      <tr>
+        <th><?php echo $lang->feedback->projectUseInfoList['terminalOS'];?></th>
+        <td><?php echo html::input('terminalOS', $feedback->projectUseInfo->terminalOS, "class='form-control'");?></td>
+      </tr>
+      <tr>
+        <th><?php echo $lang->feedback->projectUseInfoList['terminalCPU'];?></th>
+        <td><?php echo html::input('terminalCPU', $feedback->projectUseInfo->terminalCPU, "class='form-control'");?></td>
+      </tr>
+      <tr>
+        <th><?php echo $lang->feedback->projectUseInfoList['browser'];?></th>
+        <td><?php echo html::input('browser', $feedback->projectUseInfo->browser, "class='form-control'");?></td>
+      </tr>
+      <tr>
         <td colspan='3' class='text-center form-actions'>
           <?php echo html::submitButton();?>
           <?php echo html::backButton();?>
@@ -94,3 +141,23 @@
   </form>
 </div>
 <?php include $app->getModuleRoot() . 'common/view/footer.html.php';?>
+<script>
+// 修改日期控件使之支持秒 chenjj 230117
+$(function()
+{
+    var options = 
+    {
+        language: '<?php echo $this->app->getClientLang(); ?>',
+        weekStart: 1,
+        todayBtn:  1,
+        autoclose: 1,
+        todayHighlight: 1,
+        startView: 2,
+        forceParse: 0,
+        showMeridian: 1,
+        format: 'yyyy-mm-dd hh:ii:ss'
+    }
+
+    $('.form-datetimes').datetimepicker(options);
+});
+</script>

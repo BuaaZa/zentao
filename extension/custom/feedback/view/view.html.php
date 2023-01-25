@@ -109,7 +109,7 @@
         <div class='detail-title'><?php echo $lang->feedback->lblBasic;?></div>
         <table class='table table-data table-condensed table-borderless'>
           <tr>
-            <th class='w-80px'><?php echo $lang->feedback->product?></th>
+            <th class='w-90px'><?php echo $lang->feedback->product?></th>
             <td><?php echo (common::hasPriv('product', 'view') and $config->vision == 'rnd' and isset($products[$feedback->product])) ? html::a($this->createLink('product', 'view', "id={$feedback->product}"), zget($products, $feedback->product)) : $product;?></td>
           </tr>
           <tr>
@@ -208,6 +208,22 @@
             <th><?php echo $lang->feedback->closedReason?></th>
             <td><?php echo zget($lang->feedback->closedReasonList, $feedback->closedReason);?></td>
           </tr>
+          <tr>
+            <th><?php echo $lang->feedback->productVersion;?></th>
+            <td><?php echo $feedback->productVersion;?></td>
+          </tr>
+          <tr>
+            <th><?php echo $lang->feedback->usedProject;?></th>
+            <td><?php echo $feedback->usedProject;?></td>
+          </tr>
+          <tr>
+            <th><?php echo $lang->feedback->expectDate;?></th>
+            <td><?php echo helper::isZeroDate($feedback->expectDate) ? '' : $feedback->expectDate;?></td>
+          </tr>
+          <tr>
+            <th><?php echo $lang->feedback->contactWay;?></th>
+            <td><?php echo $feedback->contactWay;?></td>
+          </tr>
         </table>
       </div>
     </div>
@@ -216,6 +232,7 @@
         <ul class='nav nav-tabs'>
           <li class='active'><a href='#source' data-toggle='tab'><?php echo $lang->feedback->sourceInfo;?></a></li>
           <li><a href='#internalContact' data-toggle='tab'><?php echo $lang->feedback->internalContact;?></a></li>
+          <li><a href='#projectUseInfo' data-toggle='tab'><?php echo $lang->feedback->projectUseInfo;?></a></li>
         </ul>
         <div class='tab-content'>
           <div class='tab-pane active' id='source'>
@@ -252,6 +269,40 @@
                 </td>
               </tr>
               <?php endforeach;?>
+            </table>
+          </div>
+          <div class='tab-pane' id='projectUseInfo'>
+            <table class="table table-data table-condensed">
+              <tbody>
+                <tr class="has-top-line">
+                  <th class='thWidth' style='width:120px'><?php echo $lang->feedback->projectUseInfoList['serverOS'];?></th>
+                  <td><?php echo $feedback->projectUseInfo->serverOS;?></td>
+                </tr>
+                <tr>
+                  <th class='thWidth' style='width:120px'><?php echo $lang->feedback->projectUseInfoList['serverCPU'];?></th>
+                  <td><?php echo $feedback->projectUseInfo->serverCPU;?></td>
+                </tr>
+                <tr>
+                  <th class='thWidth' style='width:120px'><?php echo $lang->feedback->projectUseInfoList['middleware'];?></th>
+                  <td><?php echo $feedback->projectUseInfo->middleware;?></td>
+                </tr>
+                <tr>
+                  <th class='thWidth' style='width:120px'><?php echo $lang->feedback->projectUseInfoList['database'];?></th>
+                  <td><?php echo $feedback->projectUseInfo->database;?></td>
+                </tr>
+                <tr>
+                  <th class='thWidth' style='width:120px'><?php echo $lang->feedback->projectUseInfoList['terminalOS'];?></th>
+                  <td><?php echo $feedback->projectUseInfo->terminalOS;?></td>
+                </tr>
+                <tr>
+                  <th class='thWidth' style='width:120px'><?php echo $lang->feedback->projectUseInfoList['terminalCPU'];?></th>
+                  <td><?php echo $feedback->projectUseInfo->terminalCPU;?></td>
+                </tr>
+                <tr>
+                  <th class='thWidth' style='width:120px'><?php echo $lang->feedback->projectUseInfoList['browser'];?></th>
+                  <td><?php echo $feedback->projectUseInfo->browser;?></td>
+                </tr>
+              </tbody>
             </table>
           </div>
         </div>

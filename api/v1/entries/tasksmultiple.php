@@ -11,6 +11,8 @@
  */
 class tasksMultipleEntry extends entry
 {
+    public task $taskController;
+    public taskModel $task;
 
     /**
      * 支持多人任务的创建
@@ -40,5 +42,42 @@ class tasksMultipleEntry extends entry
         $task = $this->loadModel('task')->getByID($data->id);
 
         $this->send(201, $this->format($task, 'deadline:date,openedBy:user,openedDate:time,assignedTo:user,assignedDate:time,realStarted:time,finishedBy:user,finishedDate:time,closedBy:user,closedDate:time,canceledBy:user,canceledDate:time,lastEditedBy:user,lastEditedDate:time,deleted:bool,mailto:userList'));
+    }
+
+    public function put($taskID) {
+        $oldTask = $this->loadModel('task')->getByID($taskID);
+
+        /* Set $_POST variables. */
+//        if (isset($this->requestBody->team))
+            $fields = 'name,type,desc,assignedTo,pri,story,parent,execution,module,closedReason,status,estStarted,deadline,team,teamEstimate,teamConsumed,teamLeft,multiple,mailto,uid';
+//        else
+//            $fields = 'name,type,desc,assignedTo,pri,story,parent,execution,module,closedReason,status,estStarted,deadline,teamEstimate,teamConsumed,teamLeft,multiple,mailto,uid';
+//
+//        $file = fopen("lalala.txt", "a+");
+//        fwrite($file, "team: " . (isset($_POST['team']) ? "true" : "false") . "\n");
+//        fclose($file);
+        $this->batchSetPost($fields, $oldTask);
+        $this->setPost('mode', 'multi');
+
+//        $file = fopen("lalala.txt", "a+");
+//        fwrite($file, __LINE__ . " ==============");
+//        foreach ($this->post->team as $row => $obj)
+//        {
+//            fwrite($file, __LINE__ . ": " . $row . ": " . json_encode($obj) . "\n");
+//        }
+//        foreach ($_POST['team'] as $row => $obj)
+//        {
+//            fwrite($file, __LINE__ . ": " . $row . ": " . json_encode($obj) . "\n");
+//        }
+//        fwrite($file, "==============");
+//        fclose($file);
+
+        $this->taskController = $this->loadController('task', 'edit');
+        $this->taskController->edit($taskID);
+
+        $data = $this->getData();
+        if(isset($data->status) and $data->status == 'fail') return $this->sendError(zget($data, 'code', 400), $data->message);
+        $task = $this->task->getByID($taskID);
+        $this->send(200, $this->format($task, 'deadline:date,openedBy:user,openedDate:time,assignedTo:user,assignedDate:time,realStarted:time,finishedBy:user,finishedDate:time,closedBy:user,closedDate:time,canceledBy:user,canceledDate:time,lastEditedBy:user,lastEditedDate:time,deleted:bool,mailto:userList'));
     }
 }
