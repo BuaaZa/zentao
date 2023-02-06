@@ -18,7 +18,10 @@ $lang->company->browse          = "用户列表";
 $lang->company->dynamic         = "组织动态";
 $lang->company->orgView         = '组织视图';
 $lang->company->archiveaction   = '动态归档';
+$lang->company->recoveraction = '动态恢复';
 
+$lang->company->archivedDays = '已归档日期';
+$lang->company->recoverRange = '请输入恢复范围';
 $lang->company->beginDay = '开始日期';
 $lang->company->endDay   = '截止日期';
 
@@ -45,3 +48,5 @@ $lang->company->guestOptions[1] = '允许';
 
 $lang->company->order['date_desc'] = '倒序排列';
 $lang->company->order['date_asc']  = '正序排列';
+
+

@@ -5,7 +5,7 @@
  * @copyright   Copyright 2009-2012 青岛易软天创网络科技有限公司 (QingDao Nature Easy Soft Network Technology Co,LTD www.cnezsoft.com)
  * @author      Wang Yidong, Zhu Jinyong
  * @package     repo
- * @version     $Id: log.html.php $
+ * @version     $Id: logbackup.html.php $
  */
 ?>
 <?php include '../../common/view/header.html.php';?>

@@ -45,6 +45,11 @@
                 "", $lang->company->archiveaction,
                 '', "id='archive' class='btn btn-primary iframe' data-width='75%' data-app='company'",
                 '', 'true');?>
+        <?php if(common::hasPriv('company', 'recoveraction'))
+            common::printLink('company', 'recoveraction',
+                "", $lang->company->recoveraction,
+                '', "id='recover' class='btn btn-primary iframe' data-width='75%' data-app='company'",
+                '', 'true');?>
     </div>
 </div>
 
