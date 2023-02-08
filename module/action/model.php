@@ -1164,6 +1164,67 @@ class actionModel extends model
     }
 
     /**
+     * 已归档动态的日期范围.
+     *
+     * @access public
+     * @return array 日期范围数组
+     */
+    public function archivedranges(): array
+    {
+        $data = $this->dao->select('date')->from(TABLE_ACTIONARCHIVE)
+            ->orderBy('date')
+            ->fetchAll();
+        $dates = array();
+        foreach($data as $d)
+        {
+            $dates[] = substr($d->date,0,10);
+        }
+        $dates = array_filter(array_unique($dates));
+        $tmp = array();
+        foreach ($dates as $date)
+        {
+            $tmp[]=$date;
+        }
+        $dates = $tmp;
+        $length = count($dates);
+        $archivedRanges = array();
+        $s = $dates[0];
+        $x = 0;
+        if ($length == 1)
+        {
+            $e = $dates[0];
+            $archivedRanges[$x] = new stdClass();
+            $archivedRanges[$x]->start = $s;
+            $archivedRanges[$x++]->end = $e;
+        }
+        else
+        {
+            for($i=0;$i<$length-1;$i++)
+            {
+                $diff = date_diff(date_create($dates[$i+1]),date_create($dates[$i]))->days;
+                if($diff == 1)
+                {
+                    continue;
+                }
+                else
+                {
+                    $e = $dates[$i];
+                    $archivedRanges[$x] = new stdClass();
+                    $archivedRanges[$x]->start = $s;
+                    $archivedRanges[$x++]->end = $e;
+                    $s = $dates[$i+1];
+                }
+            }
+            $e = $dates[$i];
+            $archivedRanges[$x] = new stdClass();
+            $archivedRanges[$x]->start = $s;
+            $archivedRanges[$x]->end = $e;
+        }
+        return $archivedRanges;
+        //return $dates;
+    }
+
+    /**
      * 归档动态恢复.
      *
      * @param  string $beginDate 起始日期，格式 'Y-m-d'

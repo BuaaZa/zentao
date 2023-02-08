@@ -336,6 +336,33 @@ class company extends control
     }
 
     /**
+     * .
+     *
+     * @access public
+     * @return void
+     */
+    public function recoveraction()
+    {
+        $this->view->ranges = $this->action->archivedranges();
+        if(!empty($_POST))
+        {
+            $this->action->recoveraction($this->post->beginDate,$this->post->endDate);
+
+            js::import($this->config->webRoot.'js/message.js');
+            if(dao::isError()) {
+                $js ="showFailMessage('恢复失败','parent');";
+                return print(js::execute($js));
+            }
+
+            $js ="showSuccessMessage('恢复成功','parent.parent');";
+            return print(js::execute($js));
+
+        }
+        $this->display();
+    }
+
+
+    /**
      * Ajax get outside company.
      *
      * @access public

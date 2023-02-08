@@ -92,6 +92,7 @@ $routes['/tasks/batchCreate']                = 'taskBatchCreate';
 
 $routes['/executions/:id/tasks'] = 'tasks';
 $routes['/executions/:id/tasksMultiple'] = 'tasksMultiple';
+$routes['/tasksMultiple/:id'] = 'tasksMultiple';
 $routes['/tasks']                = 'tasks';
 $routes['/tasks/:id']            = 'task';
 $routes['/tasks/:id/assignto']   = 'taskAssignTo';
