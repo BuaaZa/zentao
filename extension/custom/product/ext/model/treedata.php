@@ -1,7 +1,10 @@
 <?php
 
 // 只有一层的就只是产品，两层的第一次是产品集，第二层是产品
-public function getProductsTree()
+/**
+ * @param boolean $allowFeedback 是否过来可以添加反馈的产品
+ */
+public function getProductsTree($allowFeedback = false)
 {
     $programMap  = $this->loadModel('program')->getPairs(true);
     $this->loadModel('product');
@@ -12,6 +15,10 @@ public function getProductsTree()
     $productsByProgram = array();
     if (!empty($productList)) {
         foreach ($productList as $product) {
+            if($allowFeedback && $product->allowFeedback == '0') {
+                // 需要过滤出允许添加反馈的产品
+                continue;
+            }
             if (!array_key_exists($product->program, $productsByProgram)) {
                 $productsByProgram[$product->program] = array();
             }
