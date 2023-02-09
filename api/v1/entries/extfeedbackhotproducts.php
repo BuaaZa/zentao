@@ -35,6 +35,7 @@ class extFeedbackHotProductsEntry extends Entry
         ->leftJoin(TABLE_ACTION)->alias('zta')->on('zta.objectID = ztf.id')
         ->where('zta.objectType')->eq('feedback')
         ->andWhere('zta.action')->eq('commented')
+        ->andWhere('ztp.allowFeedback')->eq('1')
         ->groupBy('ztp.id')
         ->orderBy('count_desc')
         ->fetchAll();
