@@ -38,7 +38,7 @@ class api extends router
      * @var array
      * @access public
      */
-    public array $params = array();
+    public $params = array();
 
     /**
      * 请求API的参数名
