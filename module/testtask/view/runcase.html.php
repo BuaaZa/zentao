@@ -25,14 +25,20 @@
     <table class='table table-bordered' style='word-break:break-all' id='steps'>
       <thead>
         <tr>
-          <td colspan='5' style='word-break: break-all;'><strong><?php echo $lang->testcase->precondition;?></strong><br/><?php echo nl2br($run->case->precondition);?></td>
+          <td colspan='10' style='word-break: break-all;'><strong><?php echo $lang->testcase->precondition;?></strong><br/><?php echo nl2br($run->case->precondition);?></td>
         </tr>
         <tr>
           <th class='w-50px'><?php echo $lang->testcase->stepID;?></th>
-          <th class='w-p30'><?php  echo $lang->testcase->stepDesc;?></th>
-          <th class='w-p30'><?php  echo $lang->testcase->stepExpect;?></th>
+          <th class='w-p15'><?php  echo $lang->testcase->stepDesc;?></th>
+            <th class='w-p10'><?php  echo $lang->testcase->stepinput;?></th>
+            <th class='w-p10'><?php  echo $lang->testcase->step_goal_action;?></th>
+          <th class='w-p10'><?php  echo $lang->testcase->stepExpect;?></th>
+            <th class='w-p10'><?php  echo $lang->testcase->step_eval_criteria;?></th>
           <th class='w-100px'><?php echo $lang->testcase->result;?></th>
-          <th><?php echo $lang->testcase->real;?></th>
+            <!-- <th><?php #echo $lang->testcase->real;?></th> -->
+            <th class='w-p10'><?php  echo $lang->testcase->sample_in;?></th>
+            <th class='w-p10'><?php  echo $lang->testcase->sample_out;?></th>
+            <th class='w-100px'><?php echo $lang->testcase->sample_result;?></th>
         </tr>
       </thead>
       <?php
@@ -59,30 +65,53 @@
       }
       ?>
       <tr class='step <?php echo $stepClass?>'>
-        <th class='step-id'><?php echo $stepId;?></th>
-        <td class='text-left' <?php if($step->type == 'group') echo "colspan='4'"?>>
+          <?php
+                if($step->type != 'item'){
+                    echo "<th class='step-id'>$stepId</th>";
+                }else{
+                    if($step->is_out=='0'){
+                        echo "<th class='step-iotype'>输入项</th>";
+                    }else{
+                        echo "<th class='step-iotype'>输出项</th>";
+                    }
+                }
+          ?>
+        <td class='text-left' <?php if($step->type == 'group') echo "colspan='1'"?>>
           <div class='input-group'>
-          <?php if($step->type == 'item') echo "<span class='step-item-id'>{$stepId}.{$childId}</span>";?>
+          <?php /*if($step->type == 'item') echo "<span class='step-item-id'>{$stepId}.{$childId}</span>";*/?>
           <?php echo nl2br($step->desc);?>
           </div>
         </td>
-        <?php if($step->type != 'group'):?>
+        <?php if($step->type == 'step'):?>
+            <td class='text-left'><?php echo nl2br($step->input);?></td>
+            <td class='text-left'><?php echo nl2br($step->goal_action);?></td>
         <td class='text-left'><?php echo nl2br($step->expect);?></td>
+            <td class='text-left'><?php echo nl2br($step->eval_criteria);?></td>
         <td class='text-center'><?php echo html::select("steps[$step->id]", $lang->testcase->resultList, 'pass', "class='form-control' onchange='checkStepValue(this.value)'");?></td>
-        <td>
+            <!-- <td>
           <table class='w-p100'>
             <tr>
-              <td class='no-padding bd-0'><?php echo html::textarea("reals[$step->id]", '', "rows=1 class='form-control autosize'");?></td>
-              <td class='no-padding bd-0 w-50px text-right'><button type='button' title='<?php echo $lang->testtask->files?>' class='btn' data-toggle='modal' data-target='#fileModal<?php echo $step->id?>'><i class='icon icon-paper-clip'></i></button></td>
+              <td class='no-padding bd-0'><?php #echo html::textarea("reals[$step->id]", '', "rows=1 class='form-control autosize'");?></td>
+              <td class='no-padding bd-0 w-50px text-right'><button type='button' title='<?php #echo $lang->testtask->files?>' class='btn' data-toggle='modal' data-target='#fileModal<?php #echo $step->id?>'><i class='icon icon-paper-clip'></i></button></td>
             </tr>
           </table>
-        </td>
+        </td> -->
+
         <?php endif;?>
+          <?php if($step->type == 'item' && $step->is_out == '0'):?>
+              <td></td><td></td><td></td><td></td><td></td>
+              <td class='no-padding bd-0'><?php echo html::textarea("sample_in[$step->id]", '', "rows=1 class='form-control autosize'");?></td>
+          <?php endif;?>
+          <?php if($step->type == 'item' && $step->is_out == '1'):?>
+              <td></td><td></td><td></td><td></td><td></td><td></td>
+              <td class='no-padding bd-0'><?php echo html::textarea("sample_out[$step->id]", '', "rows=1 class='form-control autosize'");?></td>
+              <td class='text-center'><?php echo html::select("sample_result[$step->id]", $lang->testcase->resultList, 'pass', "class='form-control'");?></td>
+          <?php endif;?>
       </tr>
       <?php $childId ++;?>
       <?php endforeach;?>
       <tr class='text-center'>
-        <td colspan='5' class='form-actions'>
+        <td colspan='10' class='form-actions'>
           <?php
           if($preCase)  echo html::a(inlink('runCase', "runID={$preCase['runID']}&caseID={$preCase['caseID']}&version={$preCase['version']}"), $lang->testtask->pre, '', "id='pre' class='btn btn-wide'");
           if($run->case->status != 'wait') echo html::submitButton();

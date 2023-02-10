@@ -418,6 +418,7 @@ $lang->bug->action->linked2release      = array('main' => '$date, 由 <strong>$a
 $lang->bug->action->unlinkedfromrelease = array('main' => '$date, 由 <strong>$actor</strong> 从发布 <strong>$extra</strong> 移除。');
 $lang->bug->action->linkrelatedbug      = array('main' => '$date, 由 <strong>$actor</strong> 关联相关Bug <strong>$extra</strong>。');
 $lang->bug->action->unlinkrelatedbug    = array('main' => '$date, 由 <strong>$actor</strong> 移除相关Bug <strong>$extra</strong>。');
+$lang->bug->action->fromfeedback        = array('main' => "\$date, 由 <strong>\$actor</strong> 从<strong>{$lang->feedback->common}</strong>转化而来，反馈编号为 <strong>\$extra</strong>。");
 
 $lang->bug->placeholder = new stdclass();
 $lang->bug->placeholder->chooseBuilds = '选择相关版本...';

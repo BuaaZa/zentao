@@ -11,6 +11,8 @@
  */
 class taskEntry extends Entry
 {
+
+    public task $taskController;
     /**
      * GET method.
      *
@@ -22,8 +24,8 @@ class taskEntry extends Entry
     {
         $this->resetOpenApp($this->param('tab', 'execution'));
 
-        $control = $this->loadController('task', 'view');
-        $control->view($taskID);
+        $this->taskController = $this->loadController('task', 'view');
+        $this->taskController->view($taskID);
 
         $data = $this->getData();
 
@@ -108,8 +110,8 @@ class taskEntry extends Entry
         $fields = 'name,type,desc,assignedTo,pri,estimate,left,consumed,story,parent,execution,module,closedReason,status,estStarted,deadline,team,teamEstimate,teamConsumed,teamLeft,multiple,mailto,uid';
         $this->batchSetPost($fields, $oldTask);
 
-        $control = $this->loadController('task', 'edit');
-        $control->edit($taskID);
+        $this->taskController = $this->loadController('task', 'edit');
+        $this->taskController->edit($taskID);
 
         $data = $this->getData();
         if(isset($data->status) and $data->status == 'fail') return $this->sendError(zget($data, 'code', 400), $data->message);

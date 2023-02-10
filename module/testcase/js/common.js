@@ -180,7 +180,6 @@ function initSteps(selector)
     var updateStepType = function($step, type, defaultText)
     {
         $step.attr('data-type', type).find('.step-steps').addClass('autosize').attr('placeholder', defaultText);
-
     };
     var getStepsElements = function()
     {
@@ -236,7 +235,12 @@ function initSteps(selector)
             $step.find('[name^="goal_actions["]').attr('name', "goal_actions[" +stepID + ']');
             $step.find('[name^="expects["]').attr('name', "expects[" +stepID + ']');
             $step.find('[name^="eval_criterias["]').attr('name', "eval_criterias[" +stepID + ']');
-
+            $step.find('[name^="stepIoType["]').attr('name', "stepIoType[" +stepID + ']');
+            if($step.find('.step-group-toggle2').is(':checked')){
+                $step.find('.step-iotype').val('1');
+            }else{
+                $step.find('.step-iotype').val('0');
+            }
             updateStepType($step, type, defaultText);
         });
 
@@ -327,8 +331,10 @@ function initSteps(selector)
             var $prevStep = $step.prev('.step:not(.drag-shadow)');
             var suggestChild = $prevStep.length && $prevStep.is('.step-group') && $step.next('.step:not(.drag-shadow)').length;
             suggestType = suggestChild ? 'item' : 'step';
+            $steps.find('.step-group-toggle2').prop("checked",false);
         }
         $step.find('.step-type').val(suggestType);
+
 
         /* Auto insert step to group without any steps */
         if(suggestType === 'group')

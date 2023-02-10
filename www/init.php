@@ -13,7 +13,7 @@
  * @link        http://www.zentao.net
  */
 /* Set the error reporting. */
-error_reporting(0);
+error_reporting(E_ALL);
 
 /* Load the framework. */
 include '../framework/router.class.php';

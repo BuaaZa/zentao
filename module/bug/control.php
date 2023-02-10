@@ -506,7 +506,8 @@ class bug extends control
                 $this->dao->update(TABLE_TODO)->set('status')->eq('done')->where('id')->eq($output['todoID'])->exec();
                 $this->action->create('todo', $output['todoID'], 'finished', '', "BUG:$bugID");
 
-                if ($this->config->edition == 'biz' || $this->config->edition == 'max') {
+                // if增加 $this->config->edition == 'open' chenjj 230115
+                if ($this->config->edition == 'biz' || $this->config->edition == 'max' || $this->config->edition == 'open') {
                     $todo = $this->dao->select('type, idvalue')->from(TABLE_TODO)->where('id')->eq($output['todoID'])->fetch();
                     if ($todo->type == 'feedback' && $todo->idvalue) $this->loadModel('feedback')->updateStatus('todo', $todo->idvalue, 'done');
                 }
@@ -2615,6 +2616,7 @@ class bug extends control
                 }
                 else
                 {
+                    error_log("there");
                     return print(js::closeModal('parent.parent'));
                 }
             }
@@ -2739,6 +2741,7 @@ class bug extends control
                 }
                 else
                 {
+                    error_log("here");
                     return print(js::closeModal('parent.parent'));
                 }
             }

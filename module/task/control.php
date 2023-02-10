@@ -19,6 +19,9 @@ class task extends control
     public taskModel $task;
 
     public treeModel $tree;
+    public actionModel $action;
+    public storyModel $story;
+
     /**
      * Construct function, load model of project and story modules.
      *
@@ -186,7 +189,8 @@ class task extends control
                 $this->dao->update(TABLE_TODO)->set('status')->eq('done')->where('id')->eq($todoID)->exec();
                 $this->action->create('todo', $todoID, 'finished', '', "TASK:$taskID");
 
-                if(($this->config->edition == 'biz' || $this->config->edition == 'max') && $todo->type == 'feedback' && $todo->idvalue) $this->loadModel('feedback')->updateStatus('todo', $todo->idvalue, 'done');
+                // if增加 $this->config->edition == 'open' chenjj 230115
+                if(($this->config->edition == 'biz' || $this->config->edition == 'max' || $this->config->edition == 'open') && $todo->type == 'feedback' && $todo->idvalue) $this->loadModel('feedback')->updateStatus('todo', $todo->idvalue, 'done');
             }
 
             $message = $this->executeHooks($taskID);
@@ -560,9 +564,9 @@ class task extends control
      * @param  string $kanbanGroup
      * @param  string $from
      * @access public
-     * @return void
+     * @return int
      */
-    public function edit($taskID, $comment = false, $kanbanGroup = 'default', $from = '')
+    public function edit($taskID, $comment = false, $kanbanGroup = 'default', $from = ''): int
     {
         $this->commonAction($taskID);
         $task = $this->task->getById($taskID);
@@ -604,8 +608,8 @@ class task extends control
             if(isonlybody())
             {
                 $execution    = $this->execution->getByID($task->execution);
-                $execLaneType = $this->session->execLaneType ? $this->session->execLaneType : 'all';
-                $execGroupBy  = $this->session->execGroupBy ? $this->session->execGroupBy : 'default';
+                $execLaneType = $this->session->execLaneType ?: 'all';
+                $execGroupBy  = $this->session->execGroupBy ?: 'default';
                 if(($this->app->tab == 'execution' or ($this->config->vision == 'lite' and $this->app->tab == 'project')) and $execution->type == 'kanban')
                 {
                     $rdSearchValue = $this->session->rdSearchValue ? $this->session->rdSearchValue : '';
@@ -671,10 +675,11 @@ class task extends control
         $this->view->stories       = $this->story->getExecutionStoryPairs($this->view->execution->id, 0, 'all', '', 'full', 'active');
         $this->view->tasks         = $tasks;
         $this->view->users         = $this->loadModel('user')->getPairs('nodeleted|noclosed', "{$this->view->task->openedBy},{$this->view->task->canceledBy},{$this->view->task->closedBy}");
-        $this->view->showAllModule = isset($this->config->execution->task->allModule) ? $this->config->execution->task->allModule : '';
+        $this->view->showAllModule = $this->config->execution->task->allModule ?? '';
         $this->view->modules       = $this->tree->getTaskOptionMenu($this->view->task->execution, 0, 0, $this->view->showAllModule ? 'allModule' : '');
         $this->view->executions    = $this->config->systemMode == 'classic' ? $this->execution->getPairs() : $executions;
         $this->display();
+        return 0;
     }
 
     /**
@@ -1071,17 +1076,18 @@ class task extends control
     /**
      * Start a task.
      *
-     * @param  int    $taskID
-     * @param  string $extra
+     * @param int $taskID
+     * @param string $extra
      * @access public
-     * @return void
+     * @return int
      */
-    public function start($taskID, $extra = '')
+    public function start(int $taskID, string $extra = ''): int
     {
         $this->commonAction($taskID);
-
+        ChromePhp::log($extra);
         $extra = str_replace(array(',', ' '), array('&', ''), $extra);
         parse_str($extra, $output);
+
 
         $task = $this->task->getById($taskID);
 
@@ -1092,7 +1098,8 @@ class task extends control
 
             if(dao::isError())
             {
-                if($this->viewType == 'json' or (defined('RUN_MODE') && RUN_MODE == 'api')) return $this->send(array('result' => 'fail', 'message' => dao::getError()));
+                if($this->viewType == 'json' or (defined('RUN_MODE') && RUN_MODE == 'api'))
+                    return $this->send(array('result' => 'fail', 'message' => dao::getError()));
                 return print(js::error(dao::getError()));
             }
 
@@ -1118,7 +1125,8 @@ class task extends control
                 }
             }
 
-            if($this->viewType == 'json' or (defined('RUN_MODE') && RUN_MODE == 'api')) return $this->send(array('result' => 'success'));
+            if($this->viewType == 'json' or (defined('RUN_MODE') && RUN_MODE == 'api'))
+                return $this->send(array('result' => 'success'));
 
             if(isonlybody())
             {
@@ -1159,6 +1167,7 @@ class task extends control
         $this->view->members    = $this->loadModel('user')->getTeamMemberPairs($task->execution, 'execution', 'nodeleted');
         $this->view->assignedTo = $assignedTo;
         $this->display();
+        return 0;
     }
 
     /**
@@ -1168,9 +1177,9 @@ class task extends control
      * @param  string $from
      * @param  string $orderBy
      * @access public
-     * @return void
+     * @return int
      */
-    public function recordEstimate($taskID, $from = '', $orderBy = '')
+    public function recordEstimate($taskID, $from = '', $orderBy = ''): int
     {
         $this->commonAction($taskID);
 
@@ -1251,6 +1260,7 @@ class task extends control
         $this->view->efforts = $this->task->getTaskEstimate($taskID, '', '', $orderBy);
         $this->view->users   = $this->loadModel('user')->getPairs('noclosed|noletter');
         $this->display();
+        return 0;
     }
 
     /**
@@ -1293,13 +1303,13 @@ class task extends control
     {
         $estimate = $this->task->getEstimateById($estimateID);
 
-        //获取任务
+        // 获取任务
         $task = $this->dao->select()->from(TABLE_TASK)
             ->where('id')->eq($estimate->objectID)
             ->fetch();
 
-        //进度计算
-        //如果任务是子任务
+        // 进度计算
+        // 任务可能是子任务
         if($task->parent >0){
             $oldParentTask = $this->dao->select()->from(TABLE_TASK)
                 ->where('id')->eq($task->parent)
@@ -1320,30 +1330,41 @@ class task extends control
             $progress = round($consumed / ($consumed + $left ) * 100);
         }
 
+        // 获取用户
+        $user = $task->assignedTo;
+        $realname= $this->loadModel('user')->getRealNameByAccount($task->assignedTo);
+        if($task->mode == 'multi'){
+            $user = $this->app->user->account;
+            $realname = $this->app->user->realname;
+        }
+
         $feedbackData = new stdclass();
-        $feedbackData->createUserCode =$this->app->user->account;
-        $feedbackData->createUserName =$this->app->user->realname;
-        $feedbackData->currentProgress =$progress;
-        $feedbackData->feedbackContent =$estimate->work;
-        $feedbackData->workHours=$estimate->consumed;
-        $feedbackData->zenTaoTaskId=strval(($task->parent >0)?$task->parent:$estimate->objectID);
+        $feedbackData->createUserCode = $user;
+        $feedbackData->createUserName = $realname;
+        $feedbackData->currentProgress = $progress;
+        $feedbackData->feedbackContent = $estimate->work;
+        $feedbackData->workHours = intval($estimate->consumed);
+        $feedbackData->planWorkHours = strval($consumed + $left);
+        $feedbackData->zenTaoTaskId = strval(($task->parent >0)?$task->parent:$estimate->objectID);
+
+        ChromePhp::log($feedbackData);
 
         $responseObject = $this->task->taskFeedback($feedbackData);
 
         // 导入自定义js,显示提示信息
         $webRoot = $this->config->webRoot;
         $jsRoot = str_replace('www/','module/task/js/',$webRoot);
-        js::import($jsRoot.'syncmessage.js');
+        js::import($this->config->webRoot.'js/message.js');
         if($responseObject->httpCode == 200 && $responseObject->msg == '操作成功'){
             $this->dao->update(TABLE_EFFORT)
                 ->set('syncStatus')->eq('1')
                 ->where('id')->eq($estimateID)
                 ->exec();
 
-            $js ="showSuccessMessage();";
+            $js ="showSuccessMessage('同步成功','parent');";
 
         }else{
-            $js ="showFailMessage();";
+            $js ="showFailMessage('同步失败','parent');";
         }
 
         print(js::execute($js));
@@ -2445,14 +2466,14 @@ class task extends control
     /**
      * Update assign of multi task.
      *
-     * @param  int    $requestID
-     * @param  object $taskID
+     * @param  int    $executionID
+     * @param  object|int $taskID
      * @param  string $kanbanGroup
      * @param  string $from
      * @access public
-     * @return void
+     * @return int
      */
-    public function editTeam($executionID, $taskID, $kanbanGroup = 'default', $from = '')
+    public function editTeam($executionID, $taskID, $kanbanGroup = 'default', $from = ''): int
     {
         $task = $this->task->getById($taskID);
         $this->commonAction($taskID);
@@ -2480,7 +2501,7 @@ class task extends control
 
                 if(($this->app->tab == 'execution' or ($this->config->vision == 'lite' and $this->app->tab == 'project' and $this->session->kanbanview == 'kanban')) and $execution->type == 'kanban')
                 {
-                    $rdSearchValue = $this->session->rdSearchValue ? $this->session->rdSearchValue : '';
+                    $rdSearchValue = $this->session->rdSearchValue ?: '';
                     $kanbanData    = $this->loadModel('kanban')->getRDKanban($task->execution, $execLaneType, 'id_desc', 0, $execGroupBy, $rdSearchValue);
                     $kanbanData    = json_encode($kanbanData);
 
@@ -2505,5 +2526,6 @@ class task extends control
         $this->view->members = $this->loadModel('user')->getTeamMemberPairs($executionID, 'execution', 'nodeleted');
         $this->view->users   = $this->loadModel('user')->getPairs();
         $this->display('', 'editTeam');
+        return 0;
     }
 }

@@ -82,12 +82,17 @@ $routes['/projects/:id/executions'] = 'executions';
 $routes['/projects/:id/executionsWithMember'] = 'executionsWithMember';
 $routes['/executions']              = 'executions';
 $routes['/executions/:id']          = 'execution';
+$routes['/executions/:id/start']          = 'executionStart';
+$routes['/executions/:id/suspend']          = 'executionSuspend';
+$routes['/executions/:id/close']          = 'executionClose';
+$routes['/executions/:id/activate']          = 'executionActivate';
 
 $routes['/executions/:id/tasks/batchCreate'] = 'taskBatchCreate';
 $routes['/tasks/batchCreate']                = 'taskBatchCreate';
 
 $routes['/executions/:id/tasks'] = 'tasks';
 $routes['/executions/:id/tasksMultiple'] = 'tasksMultiple';
+$routes['/tasksMultiple/:id'] = 'tasksMultiple';
 $routes['/tasks']                = 'tasks';
 $routes['/tasks/:id']            = 'task';
 $routes['/tasks/:id/assignto']   = 'taskAssignTo';
@@ -98,7 +103,7 @@ $routes['/tasks/:id/close']      = 'taskClose';
 $routes['/tasks/:id/estimate']   = 'taskRecordEstimate';
 $routes['/tasks/:id/active']     = 'taskActive';
 $routes['/tasks/:id/batchDelete']    = 'taskBatchDelete';
-$routes['/tasks/:id/batchStart']    = 'taskBatchStart';
+$routes['/taskBatchStart']    = 'taskBatchStart';
 
 $routes['/users']     = 'users';
 $routes['/users/:id'] = 'user';
@@ -179,5 +184,7 @@ $routes['/teamAccount/:id']  = 'teams';
 $routes['/projects/:id/teams/batchCreate'] = 'teamBatchCreate';
 $routes['/teamAccount/:id/user']  = 'teamaccountuser';
 $routes['/getparenthtml/:id']  = 'getparenthtml';
+
+$routes['/hello'] = '';
 
 $config->routes = $routes;

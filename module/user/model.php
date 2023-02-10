@@ -203,6 +203,19 @@ class userModel extends model
     }
 
     /**
+     * Get user real name.
+     *
+     * @param  string $account
+     * @access public
+     * @return string
+     */
+    public function getRealNameByAccount($account)
+    {
+        $realname = $this->dao->select('realname')->from(TABLE_USER)->where('account')->eq($account)->fetch('realname');
+        return $realname;
+    }
+
+    /**
      * Get roles for some users.
      *
      * @param  string    $users

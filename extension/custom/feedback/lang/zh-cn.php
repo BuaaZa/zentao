@@ -4,6 +4,7 @@ $lang->feedback->common            = '反馈';
 $lang->feedback->module            = '所属模块';
 $lang->feedback->moduleAB          = '模块';
 $lang->feedback->allModule         = '所有模块';
+$lang->feedback->allProduct        = '所有产品';
 $lang->feedback->manageCate        = '维护模块';
 $lang->feedback->index             = '反馈首页';
 $lang->feedback->create            = '创建反馈';
@@ -111,6 +112,20 @@ $lang->feedback->reviewOpinion  = '评审意见';
 $lang->feedback->deleted        = '已删除';
 $lang->feedback->project        = '选择项目';
 $lang->feedback->execution      = '选择' . $lang->execution->common;
+$lang->feedback->createdAt      = '创建于';
+$lang->feedback->productVersion = '产品版本';
+$lang->feedback->usedProject    = '使用项目名称';
+$lang->feedback->expectDate     = '期望交付时间';
+$lang->feedback->contactWay     = '联系方式';
+// 产品使用环境表（反馈信息补充表） chenjj 230117
+$lang->feedback->projectUseInfo = '产品使用环境';
+$lang->feedback->projectUseInfoList['serverOS']         = '服务器OS版本';
+$lang->feedback->projectUseInfoList['serverCPU']        = '服务器CPU型号';
+$lang->feedback->projectUseInfoList['middleware']       = '中间件名称及版本';
+$lang->feedback->projectUseInfoList['database']         = '数据库名称及版本';
+$lang->feedback->projectUseInfoList['terminalOS']       = '终端OS版本';
+$lang->feedback->projectUseInfoList['terminalCPU']      = '终端CPU型号';
+$lang->feedback->projectUseInfoList['browser']          = '浏览器版本';
 
 $lang->feedback->lblBasic       = '基本信息';
 $lang->feedback->lblTrace       = '追溯关系图';
@@ -144,16 +159,18 @@ $lang->feedback->tabList['all']      = '全部';
 $lang->feedback->tabList['public']   = '公开';
 
 $lang->feedback->typeList[''] = '';
-$lang->feedback->typeList['story']       = '需求';
-$lang->feedback->typeList['task']        = '任务';
-$lang->feedback->typeList['bug']         = 'Bug';
-$lang->feedback->typeList['todo']        = '待办';
-$lang->feedback->typeList['advice']      = '建议';
+
+$lang->feedback->typeList['advice']      = '产品咨询';
+$lang->feedback->typeList['story']       = '需求建议';
+// $lang->feedback->typeList['task']        = '任务';
+$lang->feedback->typeList['bug']         = '功能缺陷';
+// $lang->feedback->typeList['todo']        = '待办';
+$lang->feedback->typeList['other']      = '其它';
 if($this->config->systemMode == 'new')
 {
-    $lang->feedback->typeList['issue']       = '问题';
-    $lang->feedback->typeList['risk']        = '风险';
-    $lang->feedback->typeList['opportunity'] = '机会';
+    // $lang->feedback->typeList['issue']       = '问题';
+    // $lang->feedback->typeList['risk']        = '风险';
+    // $lang->feedback->typeList['opportunity'] = '机会';
 }
 
 $lang->feedback->reviewResultList['']        = '';
@@ -161,7 +178,7 @@ $lang->feedback->reviewResultList['pass']    = '确认通过';
 $lang->feedback->reviewResultList['clarify'] = '继续完善';
 
 $lang->feedback->statusList['']           = '';
-$lang->feedback->statusList['noreview']   = '待评审';
+$lang->feedback->statusList['noreview']   = '待预审';
 $lang->feedback->statusList['clarify']    = '待完善';
 $lang->feedback->statusList['wait']       = '待处理';
 $lang->feedback->statusList['commenting'] = '处理中';
@@ -177,9 +194,9 @@ $lang->feedback->closedReasonList['refuse']    = '不予采纳';
 $lang->feedback->solutionList['']            = '';
 $lang->feedback->solutionList['tobug']       = '转Bug';
 $lang->feedback->solutionList['tostory']     = '转' . $lang->SRCommon;
-$lang->feedback->solutionList['touserstory'] = '转' . $lang->URCommon;
+// $lang->feedback->solutionList['touserstory'] = '转' . $lang->URCommon;
 $lang->feedback->solutionList['totask']      = '转任务';
-$lang->feedback->solutionList['totodo']      = '转待办';
+// $lang->feedback->solutionList['totodo']      = '转待办';
 
 $lang->feedback->publicList['']  = '';
 $lang->feedback->publicList['0'] = '不公开';
@@ -202,22 +219,33 @@ $lang->feedback->mustInputComment['asked']     = '必须填写追问内容';
 $lang->feedback->action = new stdclass();
 $lang->feedback->action->closed   = array('main' => '$date, 由 <strong>$actor</strong> 关闭，原因为 <strong>$extra</strong>。', 'extra' => 'closedReasonList');
 $lang->feedback->action->reviewed = array('main' => '$date, 由 <strong>$actor</strong> 记录评审结果，结果为 <strong>$extra</strong>。', 'extra' => 'reviewResultList');
+$lang->feedback->action->tostory = array('main' => '$date, 由 <strong>$actor</strong> 转为研发需求 <strong>$extra</strong>。');
+$lang->feedback->action->tobug = array('main' => '$date, 由 <strong>$actor</strong> 转为Bug <strong>$extra</strong>。');
+$lang->feedback->action->totask = array('main' => '$date, 由 <strong>$actor</strong> 转为任务 <strong>$extra</strong>。');
 
+// $lang->feedback->featureBar['admin']['all']        = '全部';
+// $lang->feedback->featureBar['admin']['wait']       = '待处理';
+// $lang->feedback->featureBar['admin']['doing']      = '处理中';
+// // $lang->feedback->featureBar['admin']['toclosed']   = '待关闭';
+// $lang->feedback->featureBar['admin']['closed']   = '已关闭';
+// $lang->feedback->featureBar['admin']['review']     = '待预审';
+// $lang->feedback->featureBar['admin']['assigntome'] = '指派给我';
+// $lang->feedback->featureBar['admin']['openedbyme'] = '由我反馈';
+// $lang->feedback->featureBar['admin']['public']     = '公开';
 $lang->feedback->featureBar['admin']['all']        = '全部';
 $lang->feedback->featureBar['admin']['wait']       = '待处理';
-$lang->feedback->featureBar['admin']['doing']      = '处理中';
-$lang->feedback->featureBar['admin']['toclosed']   = '待关闭';
-$lang->feedback->featureBar['admin']['review']     = '待评审';
-$lang->feedback->featureBar['admin']['assigntome'] = '指派给我';
-$lang->feedback->featureBar['admin']['openedbyme'] = '由我反馈';
-$lang->feedback->featureBar['admin']['public']     = '公开';
+$lang->feedback->featureBar['admin']['review']     = '待预审';
+$lang->feedback->featureBar['admin']['clarify']    = '待完善';
+$lang->feedback->featureBar['admin']['commenting'] = '处理中';
+$lang->feedback->featureBar['admin']['closed']     = '已关闭';
+$lang->feedback->featureBar['admin']['replied']     = '已处理';
 
 $lang->feedback->featureBar['admin']['more']['tostory']       = "已转{$lang->SRCommon}";
-$lang->feedback->featureBar['admin']['more']['touserstory']   = "已转{$lang->URCommon}";
+// $lang->feedback->featureBar['admin']['more']['touserstory']   = "已转{$lang->URCommon}";
 $lang->feedback->featureBar['admin']['more']['totask']        = '已转任务';
 $lang->feedback->featureBar['admin']['more']['tobug']         = '已转Bug';
-$lang->feedback->featureBar['admin']['more']['totodo']        = '已转待办';
-$lang->feedback->featureBar['admin']['more']['toticket']      = '已转工单';
+// $lang->feedback->featureBar['admin']['more']['totodo']        = '已转待办';
+// $lang->feedback->featureBar['admin']['more']['toticket']      = '已转工单';
 
 $lang->feedback->notifyList['']  = '';
 $lang->feedback->notifyList['0'] = '否';
@@ -228,3 +256,17 @@ $lang->feedback->priList[1] = '1';
 $lang->feedback->priList[2] = '2';
 $lang->feedback->priList[3] = '3';
 $lang->feedback->priList[4] = '4';
+
+$lang->feedback->notFound = '数据未找到';
+$lang->feedback->accessDenied = '您无权操作该反馈！';
+$lang->feedback->clarifyclose = '无法关闭待完善的反馈';
+$lang->feedback->externallyDelete = '无法删除外部创建的反馈';
+$lang->feedback->notFoundDeleted = '数据未找到或者已经被删除';
+$lang->feedback->idnotempty = '反馈ID不能为空';
+$lang->feedback->wrongContactWay = '请输入正确的手机号码或电话号码';
+$lang->feedback->wrongDatetime = '错误的日期时间格式';
+
+
+$lang->feedback->exportTypeList["all"] = "全量";
+$lang->feedback->exportTypeList["inc"] = "增量";
+$lang->feedback->export="天唧数据导出";

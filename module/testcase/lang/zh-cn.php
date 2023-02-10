@@ -108,6 +108,9 @@ $lang->testcase->stepExpect  = '预期结果';
 $lang->testcase->step_eval_criteria  = '评价准则';
 $lang->testcase->stepVersion = '版本';
 $lang->testcase->noticegroupnum = '最多使一个步骤绑定输入输出项！';
+$lang->testcase->sample_in     = "样本输入";
+$lang->testcase->sample_out    = "样本输出";
+$lang->testcase->sample_result = "样本结果";
 
 
 $lang->testcase->common                  = '用例';
@@ -152,6 +155,7 @@ $lang->testcase->step                    = '步骤';
 $lang->testcase->stepChild               = '子步骤';
 $lang->testcase->viewAll                 = '查看所有';
 $lang->testcase->importToLib             = "导入用例库";
+$lang->testcase->exportToWord             = "导出用例";
 
 $lang->testcase->new = '新增';
 
@@ -230,6 +234,8 @@ $lang->testcase->resultList['n/a']     = '忽略';
 $lang->testcase->resultList['pass']    = '通过';
 $lang->testcase->resultList['fail']    = '失败';
 $lang->testcase->resultList['blocked'] = '阻塞';
+
+$lang->testcase->exportCaseTypetList['word'] = 'Word';
 
 $lang->testcase->buttonToList = '返回';
 

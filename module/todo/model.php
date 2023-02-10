@@ -305,7 +305,8 @@ class todoModel extends model
         {
             $this->file->updateObjectID($this->post->uid, $todoID, 'todo');
             if(!empty($oldTodo->cycle)) $this->createByCycle(array($todoID => $todo));
-            if(($this->config->edition == 'biz' || $this->config->edition == 'max') && $todo->type == 'feedback' && $todo->idvalue) $this->loadModel('feedback')->updateStatus('todo', $todo->idvalue, $todo->status);
+            // if增加 $this->config->edition == 'open' chenjj 230115
+            if(($this->config->edition == 'biz' || $this->config->edition == 'max' || $this->config->edition == 'open') && $todo->type == 'feedback' && $todo->idvalue) $this->loadModel('feedback')->updateStatus('todo', $todo->idvalue, $todo->status);
             return common::createChanges($oldTodo, $todo);
         }
     }
@@ -373,7 +374,8 @@ class todoModel extends model
 
                 if(!dao::isError())
                 {
-                    if(($this->config->edition == 'biz' || $this->config->edition == 'max') && $todo->type == 'feedback' && $todo->idvalue && !isset($feedbacks[$todo->idvalue]))
+                    // if增加 $this->config->edition == 'open' chenjj 230115
+                    if(($this->config->edition == 'biz' || $this->config->edition == 'max' || $this->config->edition == 'open') && $todo->type == 'feedback' && $todo->idvalue && !isset($feedbacks[$todo->idvalue]))
                     {
                         $feedbacks[$todo->idvalue] = $todo->idvalue;
                         $this->loadModel('feedback')->updateStatus('todo', $todo->idvalue, $todo->status);
@@ -425,7 +427,8 @@ class todoModel extends model
         {
             $this->loadModel('action')->create('todo', $todoID, 'finished', '', 'done');
 
-            if(($this->config->edition == 'biz' || $this->config->edition == 'max'))
+            // if增加 $this->config->edition == 'open' chenjj 230115
+            if(($this->config->edition == 'biz' || $this->config->edition == 'max' || $this->config->edition == 'open'))
             {
                 $feedbackID = $this->dao->select('idvalue')->from(TABLE_TODO)->where('id')->eq($todoID)->andWhere('type')->eq('feedback')->fetch('idvalue');
                 if($feedbackID) $this->loadModel('feedback')->updateStatus('todo', $feedbackID, 'done');
@@ -794,7 +797,8 @@ class todoModel extends model
         {
             $this->loadModel('action')->create('todo', $todoID, 'closed', '', 'closed');
 
-            if(($this->config->edition == 'biz' || $this->config->edition == 'max'))
+            // if增加 $this->config->edition == 'open' chenjj 230115
+            if(($this->config->edition == 'biz' || $this->config->edition == 'max' || $this->config->edition == 'open'))
             {
                 $feedbackID = $this->dao->select('idvalue')->from(TABLE_TODO)->where('id')->eq($todoID)->andWhere('type')->eq('feedback')->fetch('idvalue');
                 if($feedbackID) $this->loadModel('feedback')->updateStatus('todo', $feedbackID, 'closed');

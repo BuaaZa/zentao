@@ -12,7 +12,7 @@
  * @link        http://www.zentao.net
  */
 error_reporting(E_ALL ^ E_NOTICE ^ E_STRICT);
-define('IN_SHELL', true);
+const IN_SHELL = true;
 
 /* Judge the args. */
 if($argc < 2 or $argc > 3) die('Usage: ' . basename(__FILE__) . " <request>\n");
@@ -23,14 +23,14 @@ $_SERVER['HTTP_HOST']   = $request['host'];
 $_SERVER['SCRIPT_NAME'] = $request['path'];
 
 /* Load the framework. */
-chdir(dirname(dirname(__FILE__)));
+chdir(dirname(__FILE__, 2));
 include './framework/router.class.php';
 include './framework/control.class.php';
 include './framework/model.class.php';
 include './framework/helper.class.php';
 
 /* Instance the app and run it. */
-$app    = router::createApp('pms', dirname(dirname(__FILE__)), 'router');
+$app    = router::createApp('pms', dirname(__FILE__, 2), 'router');
 $common = $app->loadCommon();
 
 /* Set the PATH_INFO request. */
