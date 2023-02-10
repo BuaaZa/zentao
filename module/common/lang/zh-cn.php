@@ -176,9 +176,9 @@ $lang->system->common     = '组织';
 $lang->admin->common      = '后台';
 $lang->story->common      = $lang->SRCommon;
 $lang->task->common       = '任务';
-$lang->bug->common        = 'Bug';
-$lang->testcase->common   = '用例';
-$lang->testtask->common   = '测试单';
+$lang->bug->common        = '缺陷（原Bug）';
+$lang->testcase->common   = '测试用例';
+$lang->testtask->common   = '测试计划（原测试单）';
 $lang->score->common      = '我的积分';
 $lang->build->common      = '版本';
 $lang->testreport->common = '测试报告';
@@ -282,8 +282,8 @@ $lang->report->annual       = '年度总结';
 $lang->report->notice       = new stdclass();
 $lang->report->notice->help = '注：统计报表的数据来源于列表页面的检索结果，生成统计报表前请先在列表页面进行检索。比如列表页面我们检索的是%tab%，那么报表就是基于之前检索的%tab%的结果集进行统计。';
 
-$lang->testcase->case      = '用例';
-$lang->testcase->testsuite = '套件';
+$lang->testcase->case      = '测试用例';
+$lang->testcase->testsuite = '测试套件';
 $lang->testcase->caselib   = '用例库';
 
 $lang->devops->compile  = '构建';
@@ -309,15 +309,15 @@ $lang->searchAB   = '搜索';
 
 /* 查询中可以选择的对象列表。*/
 $lang->searchObjects['all']         = '全部';
-$lang->searchObjects['bug']         = 'Bug';
+$lang->searchObjects['bug']         = '缺陷（原Bug）';
 $lang->searchObjects['story']       = '需求';
 $lang->searchObjects['task']        = '任务';
-$lang->searchObjects['testcase']    = '用例';
+$lang->searchObjects['testcase']    = '测试用例';
 $lang->searchObjects['product']     = $lang->productCommon;
 $lang->searchObjects['build']       = '版本';
 $lang->searchObjects['release']     = '发布';
 $lang->searchObjects['productplan'] = $lang->productCommon . '计划';
-$lang->searchObjects['testtask']    = '测试单';
+$lang->searchObjects['testtask']    = '测试计划（原测试单）';
 $lang->searchObjects['doc']         = '文档';
 $lang->searchObjects['caselib']     = '用例库';
 $lang->searchObjects['testreport']  = '测试报告';
@@ -346,7 +346,7 @@ $lang->visionList['lite'] = '迅捷界面';
 
 $lang->createObjects['todo']        = '待办';
 $lang->createObjects['effort']      = '日志';
-$lang->createObjects['bug']         = 'Bug';
+$lang->createObjects['bug']         = '缺陷（原Bug）';
 $lang->createObjects['story']       = '需求';
 $lang->createObjects['task']        = '任务';
 $lang->createObjects['testcase']    = '用例';
