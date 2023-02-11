@@ -9,3 +9,4 @@ source zt_testcase_io.sql;
 source zt_data_sample.sql;
 source casestepChange.sql;
 source zt_testtask_parent.sql;
+source testresultChange.sql;
