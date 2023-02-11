@@ -93,10 +93,6 @@ class story extends control
                 $this->view->lanePairs     = $lanePairs;
             }
         }
-        else if($this->app->tab == 'qa'){
-            $products = $this->product->getProductPairsByProject(0, 'noclosed');
-            $this->loadModel('qa')->setMenu($products, $story->product);
-        }
 
         foreach($output as $paramKey => $paramValue)
         {
@@ -156,6 +152,9 @@ class story extends control
                     $param              = $execution->type != 'execution' ? "storyID={$thisStory->parent}&version=0&param=0&storyType=story" : "storyID={$thisStory->parent}&executionID={$objectID}";
                     $response['locate'] = $this->createLink($moduleName, $funcName, $param);
                 }
+                if($this->app->tab == 'qa'){
+                    $response['locate'] = $this->createLink('story', 'view', "storyID={$thisStory->parent}&version=0&param=0&storyType=story").'#app=qa';
+                }
                 return $this->send($response);
             }
 
@@ -174,7 +173,7 @@ class story extends control
                     $response['locate'] = $this->createLink($moduleName, 'story', $param);
                 }
                 if($this->app->tab == 'qa'){
-                    $response['locate'] = $this->createLink('qastory', 'story', 'productID=$productID');
+                    $response['locate'] = $this->createLink('qastory', 'story', 'productID=$productID').'#app=qa';
                 }
                 return $this->send($response);
             }
