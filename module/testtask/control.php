@@ -81,8 +81,9 @@ class testtask extends control
      * @access public
      * @return void
      */
-    public function browse($productID = 0, $branch = '', $type = 'local,totalStatus', $orderBy = 'id_desc', $recTotal = 0, $recPerPage = 20, $pageID = 1, $beginTime = 0, $endTime = 0)
+    public function browse($productID = 0, $branch = '', $type = 'local,totalStatus', $orderBy = 'id_desc', $recTotal = 0, $recPerPage = 20, $pageID = 1, $beginTime = 0, $endTime = 0, $openId = 0)
     {
+        $thisParam = "productID=$productID&branch=$branch&type=$type&orderBy=$orderBy&recTotal=$recTotal&recPerPage=$recPerPage&pageID=1&beginTime=$beginTime&endTime=$endTime";
         /* Save session. */
         $uri = $this->app->getURI(true);
         $this->session->set('testtaskList', $uri, 'qa');
@@ -112,7 +113,17 @@ class testtask extends control
         /* Get tasks. */
         $product = $this->product->getById($productID);
         if($product->type == 'normal') $branch = 'all';
-        $tasks = $this->testtask->getProductTasks($productID, $branch, $sort, $pager, $scopeAndStatus, $beginTime, $endTime);
+        $tasks = $this->testtask->getProductTasks($productID, $branch, $sort, $pager, $scopeAndStatus, $beginTime, $endTime, $openId);
+
+        if($scopeAndStatus[0] == 'all')
+            $sonTree = $this->testtask->getSonsObject("testtask", "browse", $thisParam);
+        else
+            $sonTree = $this->testtask->getSonsObject("testtask", "browse", $thisParam, $productID);
+        $taskTree = $this->loadModel("tree")->buildMyTree($sonTree, "testtask");
+        if($openId>0){
+            $this->view->openTask = $this->testtask->getById($openId);
+            $this->view->openTask->backURL = $this->createLink("testtask", "browse", $thisParam);
+        }
 
         $this->view->title      = $this->products[$productID] . $this->lang->colon . $this->lang->testtask->common;
         $this->view->position[] = html::a($this->createLink('testtask', 'browse', "productID=$productID"), $this->products[$productID]);
@@ -128,6 +139,8 @@ class testtask extends control
         $this->view->beginTime   = $beginTime;
         $this->view->endTime     = $endTime;
         $this->view->product     = $this->product->getByID($productID);
+
+        $this->view->taskTree = $taskTree;
 
         $this->display();
     }
@@ -214,7 +227,6 @@ class testtask extends control
     {
         if(!empty($_POST))
         {
-            #include "../common/ChromePhp.php";
             $taskID = $this->testtask->create($projectID);
             if(dao::isError()){
                 return $this->send(array('result' => 'fail', 'message' =>  dao::getError()));
@@ -458,8 +470,17 @@ class testtask extends control
      * @access public
      * @return void
      */
-    public function cases($taskID, $browseType = 'all', $param = 0, $orderBy = 'id_desc', $recTotal = 0, $recPerPage = 20, $pageID = 1)
+    public function cases($taskID, $browseType = 'all', $param = 0, $orderBy = 'id_desc', $recTotal = 0, $recPerPage = 20, $pageID = 1, $openId = 0)
     {
+        $thisParam = "taskID=$taskID&browseType=$browseType&param=$param&orderBy=$orderBy&recTotal=$recTotal&recPerPage=$recPerPage&pageID=1";
+        if(!$openId){
+            $openId = $taskID;
+        }else{
+            $temp = $taskID;
+            $taskID = $openId;
+            $openId = $temp;
+        }
+
         /* Load modules. */
         $this->loadModel('datatable');
         $this->loadModel('testcase');
@@ -533,8 +554,29 @@ class testtask extends control
         /* Append id for secend sort. */
         $sort = common::appendOrder($orderBy, 't2.id');
 
+        //测试计划树
+        $sonTree = $this->testtask->getSonsObject("testtask", "cases", $thisParam, 0, $openId);
+        $taskTree = $this->loadModel("tree")->buildMyTree($sonTree, "testtask");
+        if($taskID>0){
+            $this->view->backURL = $this->createLink("testtask", "cases", $thisParam);
+        }
+
         /* Get test cases. */
         $runs = $this->testtask->getTaskCases($productID, $browseType, $queryID, $moduleID, $sort, $pager, $task);
+        $allSons = $this->testtask->getSonsAndName($task->id);
+        if($task->isParent){
+            foreach($allSons as $key => $son){
+                $son->runs = $this->testtask->getTaskCases($productID, $browseType, $queryID, $moduleID, $sort, $pager, $son);
+                if(!empty($son->runs)){
+                    foreach($son->runs as $r){
+                        $r->title = $son->relativeName.'-'.$r->title;
+                        array_push($runs, $r);
+                    }
+                }else{
+                    unset($allSons[$key]);
+                }
+            }
+        }
         $this->loadModel('common')->saveQueryCondition($this->dao->get(), 'testcase', false);
 
         /* Build the search form. */
@@ -556,6 +598,11 @@ class testtask extends control
 
         /* Append bugs and results. */
         $runs = $this->testcase->appendData($runs, 'run');
+        // if($task->isParent){
+        //     foreach($allSons as $son){
+        //         $son->runs = $this->testcase->appendData($son->runs, 'run');
+        //     }
+        // }
 
         $this->view->title      = $this->products[$productID] . $this->lang->colon . $this->lang->testtask->cases;
         $this->view->position[] = html::a($this->createLink('testtask', 'browse', "productID=$productID"), $this->products[$productID]);
@@ -582,6 +629,8 @@ class testtask extends control
         $this->view->suites         = $this->loadModel('testsuite')->getSuitePairs($productID);
         $this->view->suiteName      = isset($suiteName) ? $suiteName : $this->lang->testtask->browseBySuite;
         $this->view->canBeChanged   = $canBeChanged;
+        $this->view->taskTree = $taskTree;
+        $this->view->allSons = $allSons;
 
         $this->display();
     }

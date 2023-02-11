@@ -256,3 +256,8 @@ $config->story->datatable->fieldList['actions']['title']    = 'actions';
 $config->story->datatable->fieldList['actions']['fixed']    = 'right';
 $config->story->datatable->fieldList['actions']['width']    = $app->tab == 'project' ? '220' : '210';
 $config->story->datatable->fieldList['actions']['required'] = 'yes';
+
+$config->story->fromObjects=array();
+$config->story->fromObjects['feedback']['name'] = 'feedback';
+$config->story->fromObjects['feedback']['action'] = 'fromfeedback';
+

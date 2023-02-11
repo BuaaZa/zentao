@@ -67,7 +67,8 @@ js::set('sessionObjectID', $this->session->objectID);
   </div>
   <div class='btn-toolbar pull-right'>
     <?php
-    if(common::hasPriv('feedback', 'export')) echo html::a($this->createLink('feedback', 'export', "browseType=$browseType&orderBy=$orderBy"), "<i class='icon-export muted'></i> " . $this->lang->export, '', "class='btn btn-link export'");
+    if(common::hasPriv('feedback', 'import')) echo html::a($this->createLink('feedback', 'import', ""), "<i class='icon-import muted'></i> " . $this->lang->import, '', "class='btn btn-link export'");
+    if(common::hasPriv('feedback', 'export')) echo html::a($this->createLink('feedback', 'export', "browseType=$browseType&orderBy=$orderBy"), "<i class='icon-export muted'></i> " . $this->lang->export, '', "class='btn btn-link export'");  
     if(common::hasPriv('feedback', 'create')) echo html::a($this->createLink('feedback', 'create', "extras=moduleID=$moduleID"), "<i class='icon-plus'></i> " . $this->lang->feedback->create, '', "class='btn btn-primary'");
     ?>
   </div>
@@ -83,13 +84,14 @@ js::set('sessionObjectID', $this->session->objectID);
       <hr class="space">
       <?php endif;?>
       <?php echo $moduleTree;?>
-      <div class="text-center">
+      <!-- 暂时注释维护模块功能 -->
+      <!-- <div class="text-center">
         <?php if($productID != 'all'):?>
         <?php $productID = $this->session->feedbackProduct;?>
         <?php common::printLink('tree', 'browse', "productID=$productID&view=feedback", $lang->feedback->manageCate, '', "class='btn btn-info btn-wide' data-group='feedback'");?>
         <?php endif;?>
         <hr class="space-sm" />
-      </div>
+      </div> -->
     </div>
   </div>
   <div class="main-col">

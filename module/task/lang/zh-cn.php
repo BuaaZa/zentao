@@ -120,6 +120,7 @@ $lang->task->batchAssignTo     = '批量指派';
 $lang->task->assignedTo        = '指派给';
 $lang->task->assignedToAB      = '指派给';
 $lang->task->assignedDate      = '指派日期';
+$lang->task->assigner          = '指派人';
 $lang->task->openedBy          = '由谁创建';
 $lang->task->openedByAB        = '创建者';
 $lang->task->openedDate        = '创建日期';
@@ -373,3 +374,7 @@ $lang->taskestimate->consumed = '工时';
 
 $lang->task->overEsStartDate = '已超出%s计划开始时间，请先修改%s计划开始时间';
 $lang->task->overEsEndDate   = '已超出%s计划结束时间，请先修改%s计划结束时间';
+
+/* Operating record. */
+$lang->task->action = new stdclass();
+$lang->task->action->fromfeedback        = array('main' => "\$date, 由 <strong>\$actor</strong> 从<strong>{$lang->feedback->common}</strong>转化而来，反馈编号为 <strong>\$extra</strong>。");

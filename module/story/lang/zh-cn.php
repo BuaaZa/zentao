@@ -341,6 +341,7 @@ $lang->story->action->subdividestory        = array('main' => "\$date, 由 <stro
 $lang->story->action->unlinkrelatedstory    = array('main' => "\$date, 由 <strong>\$actor</strong> 移除相关{$lang->SRCommon} <strong>\$extra</strong>。");
 $lang->story->action->unlinkchildstory      = array('main' => "\$date, 由 <strong>\$actor</strong> 移除细分{$lang->SRCommon} <strong>\$extra</strong>。");
 $lang->story->action->recalledchange        = array('main' => "\$date, 由 <strong>\$actor</strong> 撤销变更。");
+$lang->story->action->fromfeedback          = array('main' => "\$date, 由 <strong>\$actor</strong> 从<strong>{$lang->feedback->common}</strong>转化而来，反馈编号为 <strong>\$extra</strong>。");
 
 /* 统计报表。*/
 $lang->story->report = new stdclass();

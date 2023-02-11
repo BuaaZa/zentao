@@ -101,9 +101,11 @@ $config->feedback->datatable->fieldList['title']['fixed']    = 'left';
 $config->feedback->datatable->fieldList['title']['width']    = 'auto';
 $config->feedback->datatable->fieldList['title']['required'] = 'yes';
 
-$config->feedback->datatable->fieldList['pri']['title']    = 'P';
+// $config->feedback->datatable->fieldList['pri']['title']    = 'P';
+$config->feedback->datatable->fieldList['pri']['title']    = '优先级';
 $config->feedback->datatable->fieldList['pri']['fixed']    = 'left';
-$config->feedback->datatable->fieldList['pri']['width']    = '50';
+// $config->feedback->datatable->fieldList['pri']['width']    = '50';
+$config->feedback->datatable->fieldList['pri']['width']    = '65';
 $config->feedback->datatable->fieldList['pri']['required'] = 'no';
 $config->feedback->datatable->fieldList['pri']['name']     = $lang->feedback->pri;
 

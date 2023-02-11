@@ -1,0 +1,36 @@
+<?php
+global $app;
+/* Feedback */
+$lang->resource->feedback = new stdclass();
+$lang->resource->feedback->index             = 'index';
+$lang->resource->feedback->create            = 'create';
+$lang->resource->feedback->edit              = 'edit';
+$lang->resource->feedback->editOthers        = 'editOthers';
+$lang->resource->feedback->view              = 'view';
+$lang->resource->feedback->admin             = 'browse';
+$lang->resource->feedback->adminView         = 'adminView';
+//$lang->resource->feedback->browse          = 'nonRDBrowse';
+$lang->resource->feedback->assignTo          = 'assignAction';
+$lang->resource->feedback->toTask            = 'toTask';
+$lang->resource->feedback->toTodo            = 'toTodo';
+$lang->resource->feedback->toBug             = 'toBug';
+$lang->resource->feedback->toStory           = 'toStory';
+$lang->resource->feedback->toTicket          = 'toTicket';
+if($config->URAndSR) $lang->resource->feedback->toUserStory = 'toUserStory';
+$lang->resource->feedback->review            = 'reviewAction';
+$lang->resource->feedback->comment           = 'comment';
+$lang->resource->feedback->reply             = 'reply';
+$lang->resource->feedback->ask               = 'ask';
+$lang->resource->feedback->close             = 'closeAction';
+$lang->resource->feedback->delete            = 'delete';
+$lang->resource->feedback->export            = 'exportAction';
+$lang->resource->feedback->batchEdit         = 'batchEdit';
+$lang->resource->feedback->batchClose        = 'batchClose';
+$lang->resource->feedback->batchReview       = 'batchReview';
+$lang->resource->feedback->batchAssignTo     = 'batchAssignTo';
+$lang->resource->feedback->batchChangeModule = 'batchChangeModule';
+$lang->resource->feedback->products          = 'products';
+$lang->resource->feedback->manageProduct     = 'manageProduct';
+$lang->resource->feedback->import            = 'import';
+$lang->resource->feedback->exportTemplate    = 'exportTemplate';
+$lang->resource->feedback->syncProduct       = 'syncProduct';
