@@ -93,6 +93,10 @@ class story extends control
                 $this->view->lanePairs     = $lanePairs;
             }
         }
+        else if($this->app->tab == 'qa'){
+            $products = $this->product->getProductPairsByProject(0, 'noclosed');
+            $this->loadModel('qa')->setMenu($products, $story->product);
+        }
 
         foreach($output as $paramKey => $paramValue)
         {
@@ -142,14 +146,14 @@ class story extends control
                 $response['message'] = $this->lang->saveSuccess;
                 if($objectID == 0)
                 {
-                    $response['locate'] = $this->createLink('story', 'view', "storyID={$thisStory->parent}&version=0&param=0&storyType=$thisStory->type");
+                    $response['locate'] = $this->createLink('story', 'view', "storyID={$thisStory->parent}&version=0&param=0&storyType=story");
                 }
                 else
                 {
                     $execution          = $this->dao->findById((int)$objectID)->from(TABLE_EXECUTION)->fetch();
                     $moduleName         = $execution->type != 'execution' ? 'story' : 'execution';
                     $funcName           = $execution->type != 'execution' ? 'view' : 'storyView';
-                    $param              = $execution->type != 'execution' ? "storyID={$thisStory->parent}&version=0&param=0&storyType=$thisStory->type" : "storyID={$thisStory->parent}&executionID={$objectID}";
+                    $param              = $execution->type != 'execution' ? "storyID={$thisStory->parent}&version=0&param=0&storyType=story" : "storyID={$thisStory->parent}&executionID={$objectID}";
                     $response['locate'] = $this->createLink($moduleName, $funcName, $param);
                 }
                 return $this->send($response);
@@ -168,6 +172,9 @@ class story extends control
                     $moduleName         = $execution->type == 'project' ? 'projectstory' : 'execution';
                     $param              = $execution->type == 'project' ? "projectID=$objectID&productID=$productID" : "executionID=$objectID";
                     $response['locate'] = $this->createLink($moduleName, 'story', $param);
+                }
+                if($this->app->tab == 'qa'){
+                    $response['locate'] = $this->createLink('qastory', 'story', 'productID=$productID');
                 }
                 return $this->send($response);
             }
@@ -1276,7 +1283,6 @@ class story extends control
     {
         if($storyType = "taskPoint")
             $storyType = "story";
-
         $uri        = $this->app->getURI(true);
         $tab        = $this->app->tab;
         $buildApp   = $tab == 'product' ?   'project' : $tab;
