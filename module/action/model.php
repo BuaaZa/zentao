@@ -460,6 +460,26 @@ class actionModel extends model
                 $title = $this->dao->select('title')->from(TABLE_STORY)->where('id')->eq($action->extra)->fetch('title');
                 if($title) $action->extra = common::hasPriv('story', 'view') ? html::a(helper::createLink('story', 'view', "storyID=$action->extra"), "#$action->extra " . $title) : "#$action->extra " . $title;
             }
+            elseif($action->objectType == 'feedback')
+            {
+                if($actionName == 'tostory'){
+                    $title = $this->dao->select('title')->from(TABLE_STORY)->where('id')->eq($action->extra)->fetch('title');
+                    if($title) $action->extra = common::hasPriv('story', 'view') ? html::a(helper::createLink('story', 'view', "storyID=$action->extra"), "#$action->extra " . $title) : "#$action->extra " . $title;
+                }elseif($actionName == 'tobug'){
+                    $title = $this->dao->select('title')->from(TABLE_BUG)->where('id')->eq($action->extra)->fetch('title');
+                    if($title) $action->extra = common::hasPriv('bug', 'view') ? html::a(helper::createLink('bug', 'view', "bugID=$action->extra"), "#$action->extra " . $title) : "#$action->extra " . $title;
+                }elseif($actionName == 'totask'){
+                    $title = $this->dao->select('name')->from(TABLE_TASK)->where('id')->eq($action->extra)->fetch('name');
+                    if($title) $action->extra = common::hasPriv('task', 'view') ? html::a(helper::createLink('task', 'view', "taskID=$action->extra"), "#$action->extra " . $title) : "#$action->extra " . $title;
+                }
+            }
+            elseif($actionName == 'fromfeedback')
+            {
+                if($action->objectType == 'story'||$action->objectType == 'bug'||$action->objectType == 'task'){
+                    $title = $this->dao->select('title')->from(TABLE_FEEDBACK)->where('id')->eq($action->extra)->fetch('title');
+                    if($title) $action->extra = common::hasPriv('feedback', 'view') ? html::a(helper::createLink('feedback', 'view', "feedbackID=$action->extra"), "#$action->extra " . $title) : "#$action->extra " . $title;
+                }
+            }
             elseif($actionName == 'importedcard')
             {
                 $title = $this->dao->select('name')->from(TABLE_KANBAN)->where('id')->eq($action->extra)->fetch('name');
@@ -881,6 +901,20 @@ class actionModel extends model
             {
                 $desc = $this->lang->action->desc->$actionType;
             }
+            elseif($action->objectType == 'feedback' and $action->action == 'tostory')
+            {
+                $desc = $action->extra ? $this->lang->feedback->action->tostory.$this->lang->action->desc->extra : $this->lang->action->desc->common;
+            }
+            elseif($action->action == 'fromfeedback')
+            {
+                if($action->objectType == 'story'){
+                    $desc = $action->extra ? $this->lang->story->action->fromfeedback.$this->lang->action->desc->extra : $this->lang->action->desc->common;
+                }elseif($action->objectType == 'bug'){
+                    $desc = $action->extra ? $this->lang->bug->action->fromfeedback.$this->lang->action->desc->extra : $this->lang->action->desc->common;
+                }elseif($action->objectType == 'task'){
+                    $desc = $action->extra ? $this->lang->task->action->fromfeedback.$this->lang->action->desc->extra : $this->lang->action->desc->common;
+                }
+            }
             else
             {
                 $desc = $action->extra ? $this->lang->action->desc->extra : $this->lang->action->desc->common;
@@ -892,7 +926,8 @@ class actionModel extends model
         /* Cycle actions, replace vars. */
         foreach($action as $key => $value)
         {
-            if($key == 'history') continue;
+            // 修改此处让评论可以返回更多用户信息 -> chenjj 221225
+            if($key == 'history' || $key == 'openedBy') continue;
 
             /* Desc can be an array or string. */
             if(is_array($desc))
@@ -1126,6 +1161,67 @@ class actionModel extends model
         $this->dao->delete()->from(TABLE_ACTION)->where('id')->in(array_column($actions,'id'))->exec();
 
         return $actions;
+    }
+
+    /**
+     * 已归档动态的日期范围.
+     *
+     * @access public
+     * @return array 日期范围数组
+     */
+    public function archivedranges(): array
+    {
+        $data = $this->dao->select('date')->from(TABLE_ACTIONARCHIVE)
+            ->orderBy('date')
+            ->fetchAll();
+        $dates = array();
+        foreach($data as $d)
+        {
+            $dates[] = substr($d->date,0,10);
+        }
+        $dates = array_filter(array_unique($dates));
+        $tmp = array();
+        foreach ($dates as $date)
+        {
+            $tmp[]=$date;
+        }
+        $dates = $tmp;
+        $length = count($dates);
+        $archivedRanges = array();
+        $s = $dates[0];
+        $x = 0;
+        if ($length == 1)
+        {
+            $e = $dates[0];
+            $archivedRanges[$x] = new stdClass();
+            $archivedRanges[$x]->start = $s;
+            $archivedRanges[$x++]->end = $e;
+        }
+        else
+        {
+            for($i=0;$i<$length-1;$i++)
+            {
+                $diff = date_diff(date_create($dates[$i+1]),date_create($dates[$i]))->days;
+                if($diff == 1)
+                {
+                    continue;
+                }
+                else
+                {
+                    $e = $dates[$i];
+                    $archivedRanges[$x] = new stdClass();
+                    $archivedRanges[$x]->start = $s;
+                    $archivedRanges[$x++]->end = $e;
+                    $s = $dates[$i+1];
+                }
+            }
+            $e = $dates[$i];
+            $archivedRanges[$x] = new stdClass();
+            $archivedRanges[$x]->start = $s;
+            $archivedRanges[$x]->end = $e;
+        }
+        return $archivedRanges;
+        //return $dates;
     }
 
     /**
@@ -2138,8 +2234,16 @@ class actionModel extends model
     public function processActionForAPI($actions, $users = array(), $objectLang = array())
     {
         $actions = (array)$actions;
+        // 修改此处让评论可以返回附件信息 -> chenjj 221225
+        $commentIDs = array();
+        // 修改此处让评论可以返回更多用户信息 -> chenjj 221225
+        $userInfoList=$this->getuserinfo();
         foreach($actions as $action)
         {
+            // 修改此处让评论可以返回更多用户信息 -> chenjj 221225
+            $this->setuserinfo($action,$userInfoList);
+            // 修改此处让评论可以返回附件信息 -> chenjj 221225
+            array_push($commentIDs, $action->id);
             $action->actor = zget($users, $action->actor);
             if($action->action == 'assigned') $action->extra = zget($users, $action->extra);
             if(strpos($action->actor, ':') !== false) $action->actor = substr($action->actor, strpos($action->actor, ':') + 1);
@@ -2158,6 +2262,10 @@ class actionModel extends model
                 }
             }
         }
+
+        // 修改此处让评论可以返回附件信息 -> chenjj 221225
+        $this->setfileinfo($actions, $commentIDs);
+
         return array_values($actions);
     }
 

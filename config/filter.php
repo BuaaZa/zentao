@@ -70,6 +70,7 @@ $filter->ci           = new stdclass();
 $filter->tree         = new stdclass();
 $filter->productplan  = new stdclass();
 $filter->kanban       = new stdclass();
+$filter->feedback     = new stdclass();
 
 $filter->index->index             = new stdclass();
 $filter->block->default           = new stdclass();
@@ -173,6 +174,7 @@ $filter->productplan->browse      = new stdclass();
 $filter->kanban->space            = new stdclass();
 $filter->execution->kanban        = new stdclass();
 $filter->execution->all           = new stdclass();
+$filter->feedback->admin          = new stdclass();
 
 $filter->index->index->get['open'] = 'reg::base64';
 
@@ -438,3 +440,5 @@ $filter->tree->browse->cookie['preProductID'] = 'int';
 $filter->tree->browse->cookie['preBranch']    = 'reg::word';
 
 $filter->kanban->space->cookie['showClosed'] = 'code';
+
+$filter->feedback->admin->cookie['qaFeedbackOrder']     = 'reg::orderBy';

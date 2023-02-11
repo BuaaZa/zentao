@@ -443,7 +443,8 @@ class baseEntry
             }
             else
             {
-                if(!$object or !isset($object->$field)) continue;
+                if(!$object or !isset($object->$field))
+                    continue;
                 $value = $object->$field;
             }
 

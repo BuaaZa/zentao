@@ -1132,13 +1132,13 @@ class baseDAO
         $skipFields = ",$skipFields,";
 
         foreach ($fields as $fieldName => $validater) {
-            if (strpos($skipFields, $fieldName) !== false) continue; // skip it.
+            if (str_contains($skipFields, $fieldName)) continue; // skip it.
             if (!isset($this->sqlobj->data->$fieldName)) continue;
             if ($validater['rule'] == 'skip') continue;
             $options = array();
             if (isset($validater['options'])) $options = array_values($validater['options']);
             for ($i = 0; $i < VALIDATER::MAX_ARGS; $i++) {
-                ${"arg$i"} = isset($options[$i]) ? $options[$i] : null;
+                ${"arg$i"} = $options[$i] ?? null;
             }
             $this->check($fieldName, $validater['rule'], $arg0, $arg1, $arg2);
         }

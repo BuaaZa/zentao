@@ -47,7 +47,8 @@ unset($lang->feedback->statusList['commenting']);
         <tbody>
           <?php foreach($feedbacks as $feedback):?>
           <tr>
-            <td><?php echo $feedback->id;?></td>
+            <!-- 修改使保存提交时参数带feedbackIDList chenjj 230116 -->
+            <td><?php echo $feedback->id . html::hidden("feedbackIDList[$feedback->id]", $feedback->id);?></td>
             <td style='overflow:visible'><?php echo html::select("products[$feedback->id]", $products, $feedback->product, "class='form-control chosen' onchange='changeModule(this.value, $feedback->id)'")?></td>
             <td style='overflow:visible'><?php echo html::select("module[$feedback->id]",  $moduleList[$feedback->product], $feedback->module, "class='form-control chosen'")?></td>
             <td title='<?php echo $feedback->title;?>'><?php echo html::input("titles[$feedback->id]", $feedback->title, "class='form-control' autocomplete='off'");?></td>

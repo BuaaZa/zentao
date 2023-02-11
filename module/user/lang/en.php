@@ -257,6 +257,8 @@ $lang->user->error->errorEmail       = 'The account does not match the email. Pl
 $lang->user->error->emailSetting     = 'No email is configured in the system. Contact the admin to reset the email.';
 $lang->user->error->sendMailFail     = 'Message sending failed, please try again!';
 $lang->user->error->loginTimeoutTip  = 'Login failed, please check if the proxy service is normal.';
+$lang->user->error->noavatar         = "The user has not uploaded his avatar";
+$lang->user->error->avatarlost       = "Avatar is lost";
 
 $lang->user->contactFieldList['phone']    = $lang->user->phone;
 $lang->user->contactFieldList['mobile']   = $lang->user->mobile;

@@ -27,4 +27,4 @@ $lang->side->risk        = '风险';
 $lang->side->issue       = '问题';
 $lang->side->more        = '更多';
 $lang->side->review      = '评审';
-$lang->side->testtask    = '测试单';
+$lang->side->testtask    = '测试集';

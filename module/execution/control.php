@@ -38,7 +38,10 @@ class execution extends control
     public productModel $product;
 
     public productplanModel $productplan;
+
     public actionModel $action;
+
+    public taskModel $task;
 
     /**
      * Construct function, Set executions.

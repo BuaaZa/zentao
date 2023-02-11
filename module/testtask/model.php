@@ -72,13 +72,16 @@ class testtaskModel extends model
                     switch((int)$handle){
                         case 0:
                             foreach($pCases as $case){
-                                $row = new stdclass();
-                                $row->task       = $taskID;
-                                $row->case       = $case->case;
-                                $row->version    = $case->version;
-                                $row->assignedTo = $case->assignedTo;
-                                $row->status     = $case->status;
-                                $this->dao->insert(TABLE_TESTRUN)->data($row)->exec();
+                                // $row = new stdclass();
+                                // $row->task       = $taskID;
+                                // $row->case       = $case->case;
+                                // $row->version    = $case->version;
+                                // $row->assignedTo = $case->assignedTo;
+                                // $row->status     = $case->status;
+                                $this->dao->update(TABLE_TESTRUN)
+                                    ->where('id')->eq($case->id)
+                                    ->set('task')->eq($taskID)
+                                    ->exec();
 
                                 // if($this->app->tab != 'qa')
                                 // {
@@ -94,9 +97,9 @@ class testtaskModel extends model
                                 //     $this->dao->replace(TABLE_PROJECTCASE)->data($data)->exec();
                                 // }
 
-                                $this->dao->delete()->from(TABLE_TESTRUN)
-                                    ->where('id')->eq($case->id)
-                                    ->exec();
+                                // $this->dao->delete()->from(TABLE_TESTRUN)
+                                //     ->where('id')->eq($case->id)
+                                //     ->exec();
                             }
                             break;
                         case 1:
@@ -113,24 +116,28 @@ class testtaskModel extends model
                             $parent_copy->createdDate = helper::now();
                             $parent_copy->status = 'wait';
                             $parent_copy->name = $parent->name . '-子测试集';
-                            $parent_copy->realFinishedDate = '0000-00-00 00:00:00';
-                            $parent_copy->$testreport = 0;
-                            unset($parent_copy->id, $parent_copy->report);
+                            //$parent_copy->realFinishedDate = '0000-00-00 00:00:00';
+                            //$parent_copy->$testreport = 0;
+                            unset($parent_copy->id);
                             $this->dao->insert(TABLE_TESTTASK)->data($parent_copy)->exec();
 
-                            $taskID = $this->dao->lastInsertID();
+                            $sonTaskID = $this->dao->lastInsertID();
 
                             foreach($pCases as $case){
-                                $row = new stdclass();
-                                $row->task       = $taskID;
-                                $row->case       = $case->case;
-                                $row->version    = $case->version;
-                                $row->assignedTo = $case->assignedTo;
-                                $row->status     = $case->status;
-                                $this->dao->insert(TABLE_TESTRUN)->data($row)->exec();
+                                // $row = new stdclass();
+                                // $row->task       = $taskID;
+                                // $row->case       = $case->case;
+                                // $row->version    = $case->version;
+                                // $row->assignedTo = $case->assignedTo;
+                                // $row->status     = $case->status;
+                                // $this->dao->insert(TABLE_TESTRUN)->data($row)->exec();
 
-                                $this->dao->delete()->from(TABLE_TESTRUN)
+                                // $this->dao->delete()->from(TABLE_TESTRUN)
+                                //     ->where('id')->eq($case->id)
+                                //     ->exec();
+                                $this->dao->update(TABLE_TESTRUN)
                                     ->where('id')->eq($case->id)
+                                    ->set('task')->eq($sonTaskID)
                                     ->exec();
                             }
                             break;
@@ -158,13 +165,13 @@ class testtaskModel extends model
      * @access public
      * @return array
      */
-    public function getProductTasks($productID, $branch = 'all', $orderBy = 'id_desc', $pager = null, $scopeAndStatus = array(), $beginTime = 0, $endTime = 0)
+    public function getProductTasks($productID, $branch = 'all', $orderBy = 'id_desc', $pager = null, $scopeAndStatus = array(), $beginTime = 0, $endTime = 0, $openId = 0)
     {
         $products = $scopeAndStatus[0] == 'all' ? $this->app->user->view->products : array();
         $branch   = $scopeAndStatus[0] == 'all' ? 'all' : $branch;
 
         $executionNameField = $this->config->systemMode == 'new' ? "IF(t5.id IS NOT NULL, CONCAT(t5.name, ' / ', t3.name), t3.name)" : 't3.name';
-        return $this->dao->select("t1.*, t2.name AS productName, $executionNameField AS executionName, t4.name AS buildName, t4.branch AS branch")
+        $tasks =  $this->dao->select("t1.*, t2.name AS productName, $executionNameField AS executionName, t4.name AS buildName, t4.branch AS branch")
             ->from(TABLE_TESTTASK)->alias('t1')
             ->leftJoin(TABLE_PRODUCT)->alias('t2')->on('t1.product = t2.id')
             ->leftJoin(TABLE_EXECUTION)->alias('t3')->on('t1.execution = t3.id')
@@ -182,6 +189,7 @@ class testtaskModel extends model
             ->beginIF($beginTime)->andWhere('t1.begin')->ge($beginTime)->fi()
             ->beginIF($endTime)->andWhere('t1.end')->le($endTime)->fi()
             ->beginIF($branch == BRANCH_MAIN)
+            ->beginIF($openId)->andWhere('t1.parent')->eq($openId)->fi()
             ->orWhere('(t1.build')->eq('trunk')
             ->andWhere('t1.product')->eq((int)$productID)
             ->markRight(1)
@@ -193,6 +201,14 @@ class testtaskModel extends model
             ->orderBy($orderBy)
             ->page($pager)
             ->fetchAll('id');
+        $parentList = $this->getParentList($proudctID);
+        foreach($tasks as $task){
+            if(isset($parentList[$task->id]))
+                $task->isParent = true;
+            else
+                $task->isParent = false;
+        }
+        return $tasks;
     }
 
     /**
@@ -261,7 +277,7 @@ class testtaskModel extends model
      */
     public function getProjectTasks($projectID, $orderBy = 'id_desc', $pager = null)
     {
-        return $this->dao->select('t1.*, t2.name AS buildName')
+        $tasks = $this->dao->select('t1.*, t2.name AS buildName')
             ->from(TABLE_TESTTASK)->alias('t1')
             ->leftJoin(TABLE_BUILD)->alias('t2')->on('t1.build = t2.id')
             ->where('t1.project')->eq((int)$projectID)
@@ -270,6 +286,14 @@ class testtaskModel extends model
             ->orderBy($orderBy)
             ->page($pager)
             ->fetchAll('id');
+        $parentList = $this->getParentList($proudctID);
+        foreach($tasks as $task){
+            if(isset($parentList[$task->id]))
+                $task->isParent = true;
+            else
+                $task->isParent = false;
+        }
+        return $tasks;
     }
 
     /**
@@ -283,7 +307,7 @@ class testtaskModel extends model
      */
     public function getExecutionTasks($executionID, $orderBy = 'id_desc', $pager = null)
     {
-        return $this->dao->select('t1.*, t2.name AS buildName')
+        $tasks = $this->dao->select('t1.*, t2.name AS buildName')
             ->from(TABLE_TESTTASK)->alias('t1')
             ->leftJoin(TABLE_BUILD)->alias('t2')->on('t1.build = t2.id')
             ->where('t1.execution')->eq((int)$executionID)
@@ -292,6 +316,14 @@ class testtaskModel extends model
             ->orderBy($orderBy)
             ->page($pager)
             ->fetchAll('id');
+        $parentList = $this->getParentList($proudctID);
+        foreach($tasks as $task){
+            if(isset($parentList[$task->id]))
+                $task->isParent = true;
+            else
+                $task->isParent = false;
+        }
+        return $tasks;
     }
 
     /**
@@ -371,6 +403,11 @@ class testtaskModel extends model
         $task = $this->loadModel('file')->replaceImgURL($task, 'desc');
         if($setImgSize) $task->desc = $this->loadModel('file')->setImgSize($task->desc);
         $task->files = $this->loadModel('file')->getByObject('testtask', $task->id);
+        $parentList = $this->getParentList();
+        if(isset($parentList[$task->id]))
+                $task->isParent = true;
+            else
+                $task->isParent = false;
         return $task;
     }
 
@@ -2374,7 +2411,11 @@ class testtaskModel extends model
         $menu .= $this->buildMenu('testtask', 'block',    $params, $task, 'view', 'pause', '', 'iframe showinonlybody', true);
         $menu .= $this->buildMenu('testtask', 'activate', $params, $task, 'view', 'magic', '', 'iframe showinonlybody', true);
         $menu .= $this->buildMenu('testtask', 'cases',    $params, $task, 'view', 'sitemap');
-        $menu .= $this->buildMenu('testtask', 'linkCase', $params, $task, 'view', 'link');
+        if(!$task->isParent){
+            $menu .= $this->buildMenu('testtask', 'linkCase', $params, $task, 'view', 'link');
+        }else{
+            $menu .= $this->buildMenu('testtask', 'linkCase', $params, $task, 'view', 'link','', '',false, "disabled='disabled'");
+        }
 
         $menu  .= "<div class='divider'></div>";
         $menu  .= $this->buildFlowMenu('testtask', $task, 'view', 'direct');
@@ -2400,7 +2441,11 @@ class testtaskModel extends model
 
         $menu .= '<div id="action-divider">';
         $menu .= $this->buildMenu('testtask',   'cases',    $params, $task, 'browse', 'sitemap');
-        $menu .= $this->buildMenu('testtask',   'linkCase', "$params&type=all&param=myQueryID", $task, 'browse', 'link');
+        if(!$task->isParent){
+            $menu .= $this->buildMenu('testtask',   'linkCase', "$params&type=all&param=myQueryID", $task, 'browse', 'link');
+        }else{
+            $menu .= $this->buildMenu('testtask',   'linkCase', "$params&type=all&param=myQueryID", $task, 'browse', 'link','', '',false, "disabled='disabled'");
+        }
         $menu .= $this->buildMenu('testreport', 'browse',   "objectID=$task->product&objectType=product&extra=$task->id", $task, 'browse', 'summary');
         $menu .= '</div>';
         $menu .= $this->buildMenu('testtask',   'view',     $params, $task, 'browse', 'list-alt', '', 'iframe', true, "data-width='90%'");
@@ -2503,5 +2548,121 @@ class testtaskModel extends model
             ->where('task')->eq($taskID)
             ->fetchAll();
         return $cases;
+    }
+    
+    public function getParentList($productID = -1){
+        $parents = $this->dao->select('DISTINCT parent')->from(TABLE_TESTTASK)
+            ->where('deleted')->eq(0)
+            ->beginIF(!empty($productID) && $productID > 0)->andWhere('product')->eq($productID)->fi()
+            ->fetchPairs('parent','parent');
+        return $parents;        
+    }
+
+    public function getAllSons($taskID){
+        $task = $this->dao->select('*')->from(TABLE_TESTTASK)
+            ->where('id')->eq($taskID)
+            ->fetch();
+        if(!$task) return false;
+        $parents = $this->getParentList();
+        $childs = $this->dao->select('id')->from(TABLE_TESTTASK)
+            ->where('deleted')->eq(0)
+            ->andWhere('id')->notin($parents)
+            ->fetchPairs('id','id');
+        $ans = array();
+        if(isset($childs[$taskID])){
+            $ans[$taskID] = $task;
+        }else{
+            $list = array($taskID => $taskID);
+            while(count($list)>0){
+                $list = $this->dao->select('id')->from(TABLE_TESTTASK)
+                    ->where('deleted')->eq(0)
+                    ->andWhere('parent')->in($list)
+                    ->fetchPairs('id','id');
+                $inter = array_intersect_assoc($list,$childs);
+                $ans = $ans + $inter;
+                $list = array_diff($list,$inter);
+            }
+            $ans = $this->dao->select('*')->from(TABLE_TESTTASK)
+                ->where('deleted')->eq(0)
+                ->andWhere('id')->in($ans)
+                ->fetchAll('id');
+        }
+        return $ans;        
+    }
+
+    public function getSonsAndName($taskID){
+        $task = $this->dao->select('*')->from(TABLE_TESTTASK)
+            ->where('id')->eq($taskID)
+            ->fetch();
+        if(!$task) return false;
+        $parents = $this->getParentList();
+        $childs = $this->dao->select('id,name')->from(TABLE_TESTTASK)
+            ->where('deleted')->eq(0)
+            ->andWhere('id')->notin($parents)
+            ->fetchPairs('id','name');
+        $ans = array();
+        if(isset($childs[$taskID])){
+            $task->relativeName = '.';
+            $ans[0] = $task;
+        }else{
+            $ans = $this->dfsGetSons('.', $taskID,$childs);
+        }
+        return $ans;        
+    }
+
+    public function dfsGetSons($path,$taskID,$childs){                              //path为包含taskID指向任务的名字的相对路径
+        $ans = array();
+        if(isset($childs[$taskID])){
+            $task = $this->dao->select('*')->from(TABLE_TESTTASK)
+                ->where('deleted')->eq(0)
+                ->andWhere('id')->eq($taskID)
+                ->fetch();
+            if($task){
+                $task->relativeName = $path;
+                $ans[0] = $task;
+            }
+        }else{
+            $childList = $this->dao->select('id,name')->from(TABLE_TESTTASK)
+                ->where('deleted')->eq(0)
+                ->andWhere('parent')->eq($taskID)
+                ->fetchPairs('id','name');
+            foreach($childList as $key => $value){
+                $sonAns = $this->dfsGetSons($path.'/'.$value,$key,$childs);
+                foreach($sonAns as $son)
+                    array_push($ans,$son);
+            }
+        }
+        return $ans;
+    }
+
+    public function getSonsObject($m, $f, $param, $productID = 0, $taskID = 0){
+        $task = new stdclass();
+        $task->id = 0;
+        if($taskID > 0){
+            $sonTask = $this->dao->select('id,name')->from(TABLE_TESTTASK)
+                ->where('deleted')->eq(0)
+                ->andWhere('id')->eq($taskID)
+                ->beginIF($productID > 0)->andWhere('product')->eq((int)$productID)->fi()
+                ->fetch();
+            if(!$sonTask)
+                return false;
+            $task->childs = array($taskID => $sonTask);
+            $this->dfsGetSonObject($sonTask, $m, $f, $param, $productID);
+        }else{
+            $this->dfsGetSonObject($task, $m, $f, $param, $productID);
+        }
+        return $task;        
+    }
+
+    public function dfsGetSonObject($taskObj, $m, $f, $param, $productID){                        //path为包含taskID指向任务的名字的相对路径
+        $taskObj->href = helper::createLink($m, $f,$param."&openId=$taskObj->id");
+        $taskObj->childs = $this->dao->select('id,name')->from(TABLE_TESTTASK)
+            ->where('deleted')->eq(0)
+            ->andWhere('parent')->eq($taskObj->id)
+            ->beginIF($productID > 0)->andWhere('product')->eq((int)$productID)->fi()
+            ->fetchAll('id');
+        foreach($taskObj->childs as $key => $value){
+            $this->dfsGetSonObject($value, $m, $f, $param, $productID);
+        }
     }
 }

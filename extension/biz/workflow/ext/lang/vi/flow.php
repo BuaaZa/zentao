@@ -13,7 +13,7 @@ $lang->workflow->flowList['版本']   = 'Version';
 $lang->workflow->flowList['产品']   = 'Produit';
 $lang->workflow->flowList['需求']   = 'Besoin';
 $lang->workflow->flowList['项目集'] = 'Programme';
-$lang->workflow->flowList['测试单'] = 'Feuille de test';
+$lang->workflow->flowList['测试集'] = 'Feuille de test';
 $lang->workflow->flowList['用例库'] = 'Usecase library';
 
 $lang->workflow->flowList['产品计划'] = 'Plan de produit';
