@@ -19,7 +19,7 @@ class extFeedbackProductsEntry extends Entry
      */
     public function get()
     {
-        $ret = $this->loadModel('product')->getProductsTree();
+        $ret = $this->loadModel('product')->getProductsTree(true);
         $this->send(200, $ret);
     }
 }
