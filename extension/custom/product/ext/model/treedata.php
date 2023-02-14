@@ -15,7 +15,7 @@ public function getProductsTree($allowFeedback = false)
     $productsByProgram = array();
     if (!empty($productList)) {
         foreach ($productList as $product) {
-            if($allowFeedback && $product->allowFeedback == '0') {
+            if($allowFeedback && $product->allowFeedback != '1') {
                 // 需要过滤出允许添加反馈的产品
                 continue;
             }
