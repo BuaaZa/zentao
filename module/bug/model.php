@@ -3513,7 +3513,11 @@ class bugModel extends model
                     break;
                 case 'status':
                     echo "<span class='status-bug status-{$bug->status}'>";
-                    echo $this->processStatus('bug', $bug);
+                    if($bug->status == 'active' && $bug->activatedCount == 0){
+                        echo $this->lang->bug->statusList['firstactive'];
+                    }else{
+                        echo $this->processStatus('bug', $bug);
+                    }
                     echo  '</span>';
                     break;
                 case 'activatedCount':

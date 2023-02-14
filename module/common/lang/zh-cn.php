@@ -176,7 +176,7 @@ $lang->system->common     = '组织';
 $lang->admin->common      = '后台';
 $lang->story->common      = $lang->SRCommon;
 $lang->task->common       = '任务';
-$lang->bug->common        = 'Bug';
+$lang->bug->common        = '缺陷';
 $lang->testcase->common   = '用例';
 $lang->testtask->common   = '测试集';
 $lang->score->common      = '我的积分';
@@ -309,7 +309,7 @@ $lang->searchAB   = '搜索';
 
 /* 查询中可以选择的对象列表。*/
 $lang->searchObjects['all']         = '全部';
-$lang->searchObjects['bug']         = 'Bug';
+$lang->searchObjects['bug']         = '缺陷';
 $lang->searchObjects['story']       = '需求';
 $lang->searchObjects['task']        = '任务';
 $lang->searchObjects['testcase']    = '用例';
@@ -346,7 +346,7 @@ $lang->visionList['lite'] = '迅捷界面';
 
 $lang->createObjects['todo']        = '待办';
 $lang->createObjects['effort']      = '日志';
-$lang->createObjects['bug']         = 'Bug';
+$lang->createObjects['bug']         = '缺陷';
 $lang->createObjects['story']       = '需求';
 $lang->createObjects['task']        = '任务';
 $lang->createObjects['testcase']    = '用例';

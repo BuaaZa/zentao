@@ -448,10 +448,11 @@ class testcaseModel extends model
 
         if($case->story)
         {
-            $story = $this->dao->findById($case->story)->from(TABLE_STORY)->fields('title, status, version')->fetch();
+            $story = $this->dao->findById($case->story)->from(TABLE_STORY)->fields('title, status, version, assignedTo')->fetch();
             $case->storyTitle         = $story->title;
             $case->storyStatus        = $story->status;
             $case->latestStoryVersion = $story->version;
+            $case->story_assignedTo   = $story->assignedTo;
         }
         if($case->fromBug) $case->fromBugTitle      = $this->dao->findById($case->fromBug)->from(TABLE_BUG)->fields('title')->fetch('title');
 
