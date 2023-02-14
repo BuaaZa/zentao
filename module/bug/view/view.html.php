@@ -195,7 +195,15 @@
                 </tr>
                 <tr>
                   <th><?php echo $lang->bug->status;?></th>
-                  <td><span class='status-bug status-<?php echo $bug->status?>'><?php echo $this->processStatus('bug', $bug);?></span></td>
+                  <td><span class='status-bug status-<?php echo $bug->status?>'>
+                          <?php
+                          if($bug->status == 'active' && $bug->activatedCount == 0){
+                              echo $lang->bug->statusList['firstactive'];
+                          }else{
+                              echo $this->processStatus('bug', $bug);
+                          }
+                          ?>
+                      </span></td>
                 </tr>
                 <tr>
                   <th><?php echo $lang->bug->activatedCount;?></th>

@@ -145,7 +145,11 @@ if($this->app->tab == 'project')   js::set('objectID', $bug->project);
                   <th><?php echo $lang->bug->status;?></th>
                   <td>
                     <?php
-                    echo zget($lang->bug->statusList, $bug->status);
+                    if($bug->status == 'active' && $bug->activatedCount == 0){
+                        echo zget($lang->bug->statusList, 'firstactive');
+                    }else{
+                        echo zget($lang->bug->statusList, $bug->status);
+                    }
                     echo html::hidden('status', $bug->status);
                     ?>
                  </td>

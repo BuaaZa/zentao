@@ -136,6 +136,7 @@ $lang->bug->deleted            = '已删除';
 $lang->bug->confirmStoryChange = "确认{$lang->SRCommon}变动";
 $lang->bug->copy               = '复制缺陷';
 $lang->bug->search             = '搜索';
+$lang->bug->firstActivate      = '打开';
 
 /* 查询条件列表。*/
 $lang->bug->assignToMe         = '指派给我';
@@ -280,10 +281,11 @@ $lang->bug->typeList['automation']   = '测试脚本';
 $lang->bug->typeList['designdefect'] = '设计缺陷';
 $lang->bug->typeList['others']       = '其他';
 
-$lang->bug->statusList['']         = '';
-$lang->bug->statusList['active']   = '重新打开';
-$lang->bug->statusList['resolved'] = '已解决';
-$lang->bug->statusList['closed']   = '已关闭';
+$lang->bug->statusList['']              = '';
+$lang->bug->statusList['active']        = '重新打开';
+$lang->bug->statusList['resolved']      = '已解决';
+$lang->bug->statusList['closed']        = '已关闭';
+$lang->bug->statusList['firstactive']   = '打开';
 
 $lang->bug->confirmedList[''] = '';
 $lang->bug->confirmedList[1]  = '已确认';
