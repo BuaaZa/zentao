@@ -115,6 +115,7 @@ $lang->product->typeAB         = "类型";
 $lang->product->status         = '状态';
 $lang->product->subStatus      = '子状态';
 $lang->product->desc           = "{$lang->productCommon}描述";
+$lang->product->allowFeedback  = '是否反馈';
 $lang->product->manager        = '负责人';
 $lang->product->PO             = "{$lang->productCommon}负责人";
 $lang->product->QD             = '测试负责人';
@@ -186,6 +187,9 @@ $lang->product->branchName['platform'] = '平台';
 
 $lang->product->statusList['normal'] = '正常';
 $lang->product->statusList['closed'] = '结束';
+
+$lang->product->yesOrNo[0] = '否';
+$lang->product->yesOrNo[1] = '是';
 
 global $config;
 if($config->systemMode == 'new')

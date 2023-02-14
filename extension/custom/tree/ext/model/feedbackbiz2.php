@@ -7,7 +7,7 @@ public function getProductsTreeMenu($rootID, $productListId =array(), $startModu
     $extra += array('executionID' => $rootID, 'projectID' => $rootID, 'productID' => $productID, 'tip' => true);
     $tab    = $this->app->tab;
     
-    $productTreeDatas = $this->loadModel('product')->getProductsTree();
+    $productTreeDatas = $this->loadModel('product')->getProductsTree(true);
     // /* If createdVersion <= 4.1, go to getTreeMenu(). */
     // $products      = $this->loadModel('product')->getByIdList($productListId);  
     /* createdVersion > 4.1. */

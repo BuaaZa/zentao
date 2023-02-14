@@ -1,4 +1,4 @@
-# 如果表 zt_casestep 不存在字段 input、goal_action、eval_criteria ，则添加字段。
+# 如果表 zt_casestep 不存在字段 input、goal_action、eval_criteria、is_out，则添加字段。
 
 DELIMITER //
 CREATE PROCEDURE addColumnAtCasestep()
@@ -20,6 +20,12 @@ BEGIN
                       WHERE COLUMN_NAME = 'eval_criteria' AND TABLE_NAME = 'zt_casestep')
     THEN
         alter table `zt_casestep` add `eval_criteria` text not null;
+    END IF;
+
+    IF NOT EXISTS(SELECT * FROM information_schema.COLUMNS
+                      WHERE COLUMN_NAME = 'is_out' AND TABLE_NAME = 'zt_casestep')
+    THEN
+        alter table `zt_casestep` add `is_out` enum('0','1') NOT NULL default '0';
     END IF;
 END//
 
