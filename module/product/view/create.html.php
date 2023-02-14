@@ -103,6 +103,10 @@
             </td>
           </tr>
           <tr>
+            <th><?php echo $lang->product->allowFeedback;?></th>
+            <td><?php echo html::radio('allowFeedback', (array)$lang->product->yesOrNo, '0');?></td>
+          </tr>
+          <tr>
             <th><?php echo $lang->product->acl;?></th>
             <td colspan='2'><?php echo nl2br(html::radio('acl', $lang->product->aclList, 'private', "onclick='setWhite(this.value);'", 'block'));?></td>
           </tr>

@@ -9,7 +9,7 @@ BEGIN
         WHERE COLUMN_NAME = 'allowFeedback' AND TABLE_NAME = 'zt_product';
     IF (num = 0)
     THEN
-        alter table `zt_product` add `allowFeedback` enum('0', '1') NOT NULL DEFAULT '1' after `deleted`;
+        alter table `zt_product` add `allowFeedback` enum('0', '1') NOT NULL DEFAULT '0' after `deleted`;
     END IF;
 END//
 

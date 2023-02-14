@@ -87,6 +87,10 @@
             <td colspan='2'><?php echo html::textarea('desc', htmlSpecialString($product->desc), "rows='8' class='form-control'");?></td>
           </tr>
           <tr>
+            <th><?php echo $lang->product->allowFeedback;?></th>
+            <td><?php echo html::radio('allowFeedback', (array)$lang->product->yesOrNo, $product->allowFeedback);?></td>
+          </tr>
+          <tr>
             <th><?php echo $lang->product->acl;?></th>
             <td colspan='2'><?php echo nl2br(html::radio('acl', $lang->product->aclList, $product->acl, "onclick='setWhite(this.value);'", 'block'));?></td>
           </tr>
