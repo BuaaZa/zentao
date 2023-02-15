@@ -47,7 +47,7 @@ else
     $lang->mainNav->execution = "{$lang->navIcons['project']} {$lang->execution->common}|$executionModule|$executionMethod|";
 }
 $lang->mainNav->qa     = "{$lang->navIcons['qa']} {$lang->qa->common}|qa|index|";
-$lang->mainNav->devops = "{$lang->navIcons['devops']} DevOps|repo|browse|";
+$lang->mainNav->devops = "{$lang->navIcons['devops']} 集成|repo|browse|";
 $lang->mainNav->kanban = "{$lang->navIcons['kanban']} {$lang->kanban->common}|kanban|space|";
 $lang->mainNav->doc    = "{$lang->navIcons['doc']} {$lang->doc->common}|doc|index|";
 $lang->mainNav->report = "{$lang->navIcons['report']} {$lang->report->common}|report|productSummary|";
