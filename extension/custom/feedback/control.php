@@ -38,6 +38,24 @@ class feedback extends control
             // $mode     = (empty($this->config->CRProduct)) ? 'noclosed' : '';
             $products = $this->product->getPairs('', 0, 'program_asc');
         }
+
+        // 反馈的产品下拉选过滤allowFeedback
+        $ids = array();
+        foreach ($products as $id=>$productEle) {
+            array_push($ids, $id);
+        }
+        $products = array();
+        $queryRet=$this->dao->select('id,name')
+            ->from(TABLE_PRODUCT)
+            ->where('id')->in($ids)
+            ->andWhere('allowFeedback')->eq('1')
+            ->fetchAll();
+        if (!empty($queryRet)) {
+            foreach ($queryRet as $p) {
+                $products[$p->id]=$p->name;
+            }
+        }
+
         $this->view->products = $this->products = $products;
         $this->view->allProducts = $this->allProducts = $products;
 
