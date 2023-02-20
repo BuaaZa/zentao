@@ -14,7 +14,7 @@
     var lastOpenedApp;        // Last opened app code
 
     /**
-     * Init apps menu list
+     * Init apps menu list 渲染主菜单
      */
     function initAppsMenu()
     {
@@ -44,16 +44,57 @@
                 .attr('data-toggle', 'tooltip')
                 .attr('class', 'show-in-app')
                 .html(item.title);
+            //example: item.title: "<i class='icon icon-menu-my'></i> 首页 "
 
             item.icon = ($link.find('.icon').attr('class') || '').replace('icon ', '');
             item.text = $link.text().trim();
-            $link.html('<i class="icon ' + item.icon + '"></i><span class="text">' + item.text + '</span>');
+            $link.html('<i class="icon ' + item.icon + '"></i>' +
+                '<span class="text">' + item.text + '</span>' );
+
             if(item.code === 'devops') $link.find('.text').addClass('num');
             appsMap[item.code] = item;
 
-            $('<li></li>').attr('data-app', item.code)
+            $li = $('<li></li>').attr('data-app', item.code)
+                .attr('class','dropdown dropdown-hover')
                 .append($link)
                 .appendTo($menuMainNav);
+
+            if(item.code == 'qa'){
+                $li.append('<ul class=\'more-list dropdown-menu fade \'></ul>');
+
+                var url = '/zentaopms/www/index.php?m=testcase&f=browse';
+                url = $.tabSession.convertUrlWithTid(url);
+                var $link= $('<a></a>')
+                    .attr('href',url)
+                    .attr('data-app', 'qa')
+                    .attr('data-toggle', 'tooltip')
+                    .html('<i class=\'icon icon-usecase\'></i> 用例');
+                $('<li></li>')
+                    .append($link)
+                    .appendTo($li.find("ul"));
+
+                url = '/zentaopms/www/index.php?m=testtask&f=browse';
+                url = $.tabSession.convertUrlWithTid(url);
+                $link= $('<a></a>')
+                    .attr('href',url)
+                    .attr('data-app', 'qa')
+                    .attr('data-toggle', 'tooltip')
+                    .html('<i class=\'icon icon-list\'></i> 测试计划');
+                $('<li></li>')
+                    .append($link)
+                    .appendTo($li.find("ul"));
+
+                url = '/zentaopms/www/index.php?m=bug&f=browse';
+                url = $.tabSession.convertUrlWithTid(url);
+                $link= $('<a></a>')
+                    .attr('href',url)
+                    .attr('data-app', 'qa')
+                    .attr('data-toggle', 'tooltip')
+                    .html('<i class=\'icon icon-bug\'></i> bug');
+                $('<li></li>')
+                    .append($link)
+                    .appendTo($li.find("ul"));
+            }
 
             $link.tooltip({title: item.text, container: 'body', placement: 'right', tipClass: 'menu-tip'});
 

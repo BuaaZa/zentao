@@ -10,6 +10,8 @@
  */
 class repo extends control
 {
+
+    public repoModel $repo;
     /**
      * Construct.
      *
