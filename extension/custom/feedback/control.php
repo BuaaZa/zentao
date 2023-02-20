@@ -322,6 +322,11 @@ class feedback extends control
         }
     }
 
+    public function ajaxGetExecutionLang($projectId = 0 )
+    {
+        return print('选择执行');
+    }
+
     public function toTask($executionID = '', $storyID = 0, $moduleID = 0, $taskID = 0, $todoID = 0, $extra = '', $bugID = 0)
     {
         $params = 'executionID=' . $executionID . '&storyID=0&moduleID=0&taskID=0&todoID=0&extra=' . $extra;
