@@ -1,4 +1,6 @@
 <?php
+$config->repo->getCodeLineApi = 'http://172.24.112.1:8088/gitlabCount/getCodeLine';
+
 $config->program = new stdclass();
 $config->program->suffix['c']    = "cpp";
 $config->program->suffix['cpp']  = "cpp";

@@ -1693,7 +1693,7 @@ class repoModel extends model
      * @access public
      * @return void
      */
-    public function saveAction2PMS($objects, $log, $repoRoot = '', $encodings = 'utf-8', $scm = 'svn', $gitlabAccountPairs = array())
+    public function saveAction2PMS($objects, $log, $repoRoot = '', $encodings = 'utf-8', $scm = 'svn', $gitlabAccountPairs = array(),$repo = null)
     {
         if(isset($gitlabAccountPairs[$log->author]) and $gitlabAccountPairs[$log->author])
         {
@@ -1855,7 +1855,9 @@ class repoModel extends model
 
         if($objects['tasks'])
         {
+            $this->loadModel('task');
             $productsAndExecutions = $this->getTaskProductsAndExecutions($objects['tasks']);
+            ChromePhp::log($action);
             foreach($objects['tasks'] as $taskID)
             {
                 $taskID = (int)$taskID;
@@ -1867,6 +1869,22 @@ class repoModel extends model
                 $action->execution  = $productsAndExecutions[$taskID]['execution'];
 
                 $this->saveRecord($action, $changes);
+
+                if($repo){
+                    $data = new stdclass();
+                    $data->message = $log->comment;
+                    $data->name = $repo->name;
+
+                    ChromePhp::log($data);
+
+                    $response = $this->getCommitWorkCodeLine($data);
+
+                    if($response->message == 'success'){
+                        $lines = $response->data;
+                        $this->task->updateCommitCodeLine($taskID,$lines);
+                    }
+                }
+
             }
         }
 
@@ -1888,6 +1906,13 @@ class repoModel extends model
         }
 
         if(isset($this->app->user)) $this->app->user->account = $account;
+    }
+
+    public function getCommitWorkCodeLine($data)
+    {
+        $url = $this->config->repo->getCodeLineApi;
+        $response = common::http( $url, $data, array(), array("Content-Type: multipart/form-data"),'data','GET');
+        return json_decode($response);
     }
 
     /**

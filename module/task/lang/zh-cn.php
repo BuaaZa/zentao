@@ -9,6 +9,9 @@
  * @version     $Id: zh-cn.php 5040 2013-07-06 06:22:18Z zhujinyonging@gmail.com $
  * @link        http://www.zentao.net
  */
+
+$lang->task->workcodeline        = '代码提交量';
+
 $lang->task->sync2WbsStatus      = '状态';
 $lang->task->syncEstimate        = '同步工时信息';
 $lang->task->sync2WbsSuccess     = '同步成功';
