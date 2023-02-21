@@ -2198,6 +2198,13 @@ class taskModel extends model
         return json_decode($response);
     }
 
+    public function updateCommitCodeLine($taskID, $lines)
+    {
+        $this->dao->update(TABLE_TASK)->set('`workcodelines`')->eq($lines)
+            ->where('id')->eq($taskID)
+            ->exec();
+    }
+
     /**
      * Set effort left to 0.
      *
@@ -4008,6 +4015,11 @@ class taskModel extends model
                 break;
             case 'left':
                 echo round($task->left, 1)     . $this->lang->execution->workHourUnit;
+                break;
+            case 'workcodeline':
+                if ($task->workcodelines>0){
+                    echo $task->workcodelines . ' 行';
+                }
                 break;
             case 'progress':
                 echo round($task->progress, 2) . '%';

@@ -14330,3 +14330,5 @@ create index objectID
 create index project
     on zt_actionarchive (project);
 
+alter table zt_task
+    add workcodelines int unsigned default 0 null after fromIssue;

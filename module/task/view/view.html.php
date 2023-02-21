@@ -288,8 +288,12 @@
                   <td><span class='status-task status-<?php echo $task->status;?>'><span class="label label-dot"></span> <?php echo $this->processStatus('task', $task);?></td>
                 </tr>
                 <tr>
-                  <th><?php echo $lang->task->progress;?></th>
-                  <td><?php echo $task->progress . '%';?></td>
+                  <th><?php echo $lang->task->workcodeline;?></th>
+                  <td><?php echo $task->workcodelines . ' 行';?></td>
+                </tr>
+                <tr>
+                    <th><?php echo $lang->task->progress;?></th>
+                    <td><?php echo $task->progress . '%';?></td>
                 </tr>
                 <tr>
                   <th><?php echo $lang->task->pri;?></th>
