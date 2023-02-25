@@ -1,5 +1,6 @@
 <?php
-$config->repo->getCodeLineApi = 'http://172.24.112.1:8088/gitlabCount/getCodeLine';
+$config->repo->getCodeLineApi = 'http://172.22.240.1:8088/gitlabCount/getCodeLine';
+$config->repo->syncWorkCodeLine2WbsApi = 'http://localhost/syncToWbs/addCodeNumberByZenTao';
 
 $config->program = new stdclass();
 $config->program->suffix['c']    = "cpp";
