@@ -3237,6 +3237,7 @@ EOD;
         {
             fwrite($fh, "\n". date('Ymd H:i:s') . ": " . $app->getURI() . "\n");
             fwrite($fh, "url:    " . $url . "\n");
+            fwrite($fh, "method:    " . $method . "\n");
             if(!empty($data)) fwrite($fh, "data:   " . print_r($data, true) . "\n");
             fwrite($fh, "results:" . print_r($response, true) . "\n");
             if(!empty($errors)) fwrite($fh, "errors: " . $errors . "\n");

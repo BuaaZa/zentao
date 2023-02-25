@@ -1871,6 +1871,7 @@ class repoModel extends model
                 $this->saveRecord($action, $changes);
 
                 if($repo){
+                    // api : /gitlabCount/getCodeLine
                     $data = new stdclass();
                     $data->message = $log->comment;
                     $data->name = $repo->name;
@@ -1882,6 +1883,15 @@ class repoModel extends model
                     if($response->message == 'success'){
                         $lines = $response->data;
                         $this->task->updateCommitCodeLine($taskID,$lines);
+
+                        // api : /syncToWbs/addCodeNumberByZenTao
+                        $data2 = new stdclass();
+                        $data2-> zenTaoTaskId = strval($taskID);
+                        $data2-> count = strval($lines);
+
+                        ChromePhp::log($data2);
+
+                        $this->syncWorkCodeLine2Wbs($data2);
                     }
                 }
 
@@ -1912,6 +1922,13 @@ class repoModel extends model
     {
         $url = $this->config->repo->getCodeLineApi;
         $response = common::http( $url, $data, array(), array("Content-Type: multipart/form-data"),'data','GET');
+        return json_decode($response);
+    }
+
+    public function syncWorkCodeLine2Wbs($data)
+    {
+        $url = $this->config->repo->syncWorkCodeLine2WbsApi;
+        $response = common::http( $url, $data, array(), array(), 'json','PUT');
         return json_decode($response);
     }
 
