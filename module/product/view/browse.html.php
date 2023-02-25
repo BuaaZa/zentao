@@ -149,27 +149,29 @@ $projectIDParam = $isProjectStory ? "projectID=$projectID&" : '';
     <?php if(common::canModify('product', $product)):?>
     <div class='btn-group dropdown'>
       <?php
-      $createStoryLink = $this->createLink('story', 'create', "product=$productID&branch=$branch&moduleID=$moduleID&storyID=0&projectID=$projectID&bugID=0&planID=0&todoID=0&extra=&storyType=$storyType");
-      $batchCreateLink = $this->createLink('story', 'batchCreate', "productID=$productID&branch=$branch&moduleID=$moduleID&storyID=0&project=$projectID&plan=0&storyType=$storyType");
+      if($from!='qa'){
+        $createStoryLink = $this->createLink('story', 'create', "product=$productID&branch=$branch&moduleID=$moduleID&storyID=0&projectID=$projectID&bugID=0&planID=0&todoID=0&extra=&storyType=$storyType");
+        $batchCreateLink = $this->createLink('story', 'batchCreate', "productID=$productID&branch=$branch&moduleID=$moduleID&storyID=0&project=$projectID&plan=0&storyType=$storyType");
+      
+        $buttonLink  = '';
+        $buttonTitle = '';
+        $buttonType  = $from == 'project' ? 'btn-secondary' : 'btn-primary';
+        if(common::hasPriv($storyType, 'batchCreate'))
+        {
+            $buttonLink  = empty($productID) ? '' : $batchCreateLink;
+            $buttonTitle = $lang->story->batchCreate;
+        }
+        if(common::hasPriv($storyType, 'create'))
+        {
+            $buttonLink  = $createStoryLink;
+            $buttonTitle = $lang->story->create;
+        }
 
-      $buttonLink  = '';
-      $buttonTitle = '';
-      $buttonType  = $from == 'project' ? 'btn-secondary' : 'btn-primary';
-      if(common::hasPriv($storyType, 'batchCreate'))
-      {
-          $buttonLink  = empty($productID) ? '' : $batchCreateLink;
-          $buttonTitle = $lang->story->batchCreate;
+        $hidden = empty($buttonLink) ? 'hidden' : '';
+        echo html::a($buttonLink, "<i class='icon icon-plus'></i> $buttonTitle", '', "class='btn $buttonType $hidden create-story-btn' data-app='$tab'");
       }
-      if(common::hasPriv($storyType, 'create'))
-      {
-          $buttonLink  = $createStoryLink;
-          $buttonTitle = $lang->story->create;
-      }
-
-      $hidden = empty($buttonLink) ? 'hidden' : '';
-      echo html::a($buttonLink, "<i class='icon icon-plus'></i> $buttonTitle", '', "class='btn $buttonType $hidden create-story-btn' data-app='$tab'");
       ?>
-      <?php if(!empty($productID) and common::hasPriv($storyType, 'batchCreate') and common::hasPriv($storyType, 'create')): ?>
+      <?php if($from!='qa' and !empty($productID) and common::hasPriv($storyType, 'batchCreate') and common::hasPriv($storyType, 'create')): ?>
       <button type='button' class="btn <?php echo $buttonType?> dropdown-toggle" data-toggle='dropdown'><span class='caret'></span></button>
       <ul class='dropdown-menu pull-right'>
         <li>

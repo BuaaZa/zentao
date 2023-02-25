@@ -299,7 +299,12 @@ class testreport extends control
             $this->view->reportTitle = date('Y-m-d') . " EXECUTION#{$execution->id} {$execution->name} {$this->lang->testreport->common}";
         }
 
-        $cases = $this->testreport->getTaskCases($tasks, $begin, $end);
+        $leaftasks = array();
+        foreach($tasks as $taskID => $task)
+        {
+            $leaftasks = $leaftasks + $this->testtask->getAllSons($taskID);
+        }
+        $cases = $this->testreport->getTaskCases($leaftasks, $begin, $end);
 
         list($bugInfo, $bugSummary) = $this->testreport->getBug4Report($tasks, $productIdList, $begin, $end, $builds);
 

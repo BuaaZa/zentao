@@ -1164,7 +1164,11 @@ class product extends control
 
         foreach($products as $product) $programProducts[$product->program][] = $product;
 
-        $this->view->link      = $this->product->getProductLink($module, $method, $extra);
+        if($module == 'product'&& $method = 'browse' && $from = 'qa'){
+            $this->view->link  = $this->product->getProductLink('qastory', 'story', $extra);
+        }else{
+            $this->view->link      = $this->product->getProductLink($module, $method, $extra);
+        }
         $this->view->productID = $productID;
         $this->view->module    = $module;
         $this->view->method    = $method;

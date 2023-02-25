@@ -2323,6 +2323,10 @@ class productModel extends model
         {
             return helper::createLink('ticket', 'browse', "browseType=byProduct&productID=%s");
         }
+        elseif($module == 'qastory')
+        {
+            return helper::createLink('qastory', 'story', "productID=%s");
+        }
 
         return $link;
     }
