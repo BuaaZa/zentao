@@ -48,8 +48,10 @@ class extFeedbackUpdateEntry extends Entry
         if (isset($_POST['publicType'])) {
             $public = $_POST['publicType'];
             unset($_POST['publicType']);
+            $this->setPost('public', (int)$public);
+        } else {
+            $this->setPost('public', $oldFeedback->public);
         }
-        $this->setPost('public', (int)$public);
         // ************ publicType 转 public ************ chenjj 221226
 
         // ************ notify 处理 ************ chenjj 221227

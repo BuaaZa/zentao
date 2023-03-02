@@ -1540,7 +1540,11 @@ class bugModel extends model
         }
 
         // if增加 $this->config->edition == 'open' chenjj 230115
-        if(($this->config->edition == 'biz' || $this->config->edition == 'max' || $this->config->edition == 'open') && $oldBug->feedback) $this->loadModel('feedback')->updateStatus('bug', $oldBug->feedback, $bug->status, $oldBug->status);
+        if (($this->config->edition == 'biz' || $this->config->edition == 'max' || $this->config->edition == 'open') && $oldBug->feedback) {
+            $this->loadModel('feedback')->updateStatus('bug', $oldBug->feedback, $bug->status, $oldBug->status);
+            // 关闭关联的反馈 chenjj 230301
+            $this->loadModel('feedback')->feedbackRelationsClose($oldBug->feedback);
+        }
 
         return common::createChanges($oldBug, $bug);
     }

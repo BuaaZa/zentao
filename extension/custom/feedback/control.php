@@ -152,6 +152,10 @@ class feedback extends control
         $this->display();
     }
 
+    public function ajaxGetExecutionLang($projectID = 0){
+        return print("选择执行");
+    }
+
     /**
      * Create a bug.
      *
@@ -276,6 +280,8 @@ class feedback extends control
         $this->view->feedback = $feedback;
         $this->view->browseType      = $browseType;
         $this->view->actions     = $this->action->getList('feedback', $feedbackID);
+        // 查找反馈转化的任务需求缺陷等关联数据
+        $this->view->relations = $this->feedback->feedbackRelations($feedbackID);
         $this->display();
     }
 
@@ -320,11 +326,6 @@ class feedback extends control
             $misc           = $from == 'showImport' ? "class='form-control' onchange='loadImportExecutionRelated(this.value, $number)'" : "class='form-control' onchange='loadExecutionBuilds($productID, this.value, $number)'";
             return print(html::select($executionsName, $executions, '', $misc));
         }
-    }
-
-    public function ajaxGetExecutionLang($projectId = 0 )
-    {
-        return print('选择执行');
     }
 
     public function toTask($executionID = '', $storyID = 0, $moduleID = 0, $taskID = 0, $todoID = 0, $extra = '', $bugID = 0)
