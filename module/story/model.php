@@ -1824,7 +1824,11 @@ class storyModel extends model
             $this->loadModel('score')->create('story', 'close', $storyID);
 
             // if增加 $this->config->edition == 'open' chenjj 230115
-            if(($this->config->edition == 'biz' || $this->config->edition == 'max' || $this->config->edition == 'open') && $oldStory->feedback) $this->loadModel('feedback')->updateStatus('story', $oldStory->feedback, $story->status, $oldStory->status);
+            if (($this->config->edition == 'biz' || $this->config->edition == 'max' || $this->config->edition == 'open') && $oldStory->feedback) {
+                $this->loadModel('feedback')->updateStatus('story', $oldStory->feedback, $story->status, $oldStory->status);
+                // 关闭关联的反馈 chenjj 230301
+                $this->loadModel('feedback')->feedbackRelationsClose($oldStory->feedback);
+            }
         }
         return common::createChanges($oldStory, $story);
     }

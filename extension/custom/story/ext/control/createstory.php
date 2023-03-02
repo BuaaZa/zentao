@@ -222,6 +222,10 @@ class story extends control
             if ($this->app->getViewType() == 'xhtml') {
                 $response['locate'] = $this->createLink('story', 'view', "storyID=$storyID", 'html');
             }
+            if ($this->app->tab == 'feedback') {
+                $response['message'] = $this->lang->saveSuccess;
+                $response['locate'] = $this->createLink('feedback', 'adminView', "feedbackID=$feedbackID", 'html');
+            }
             return $this->send($response);
         }
 
