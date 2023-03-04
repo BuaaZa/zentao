@@ -16,7 +16,7 @@ build-job:       # This job runs in the build stage, which runs first.
     - docker run --privileged --rm tonistiigi/binfmt --install arm64
     - docker buildx create --name gitlab_builder --use
     - docker buildx build --tag $PROJECT/zentaopms-arm64v8:$(date "+%Y-%m-%d") --platform linux/arm64 --load .
-    - docker buildx build --tag $PROJECT/zentaopms-amd64:$(date "+%Y-%m-%d") --platform linux/mad64 --load .
+    - docker buildx build --tag $PROJECT/zentaopms-amd64:$(date "+%Y-%m-%d") --platform linux/amd64 --load .
     - docker tag $PROJECT/zentaopms-arm64v8:$(date "+%Y-%m-%d") $PROJECT/zentaopms-arm64v8:latest
     - docker tag $PROJECT/zentaopms-amd64:$(date "+%Y-%m-%d") $PROJECT/zentaopms-amd64:latest
     - docker push $PROJECT/zentaopms-arm64v8:$(date "+%Y-%m-%d")
