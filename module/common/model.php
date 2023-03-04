@@ -88,7 +88,7 @@ class commonModel extends model
         }
     }
 
-   /**
+    /**
      * Set the status of the program to which theproject is linked as Ongoing.
      *
      * @param  object   $project
@@ -130,10 +130,10 @@ class commonModel extends model
         if($project->status == 'wait')
         {
             $this->dao->update(TABLE_PROJECT)
-                 ->set('status')->eq('doing')
-                 ->beginIf(helper::isZeroDate($project->realBegan))->set('realBegan')->eq($today)->fi()
-                 ->where('id')->eq($projectID)
-                 ->exec();
+                ->set('status')->eq('doing')
+                ->beginIf(helper::isZeroDate($project->realBegan))->set('realBegan')->eq($today)->fi()
+                ->where('id')->eq($projectID)
+                ->exec();
 
             $this->loadModel('action')->create('project', $projectID, 'syncproject');
         }
@@ -158,10 +158,10 @@ class commonModel extends model
         if($execution->deleted == '0' and $execution->status == 'doing' and in_array($parentExecution->status, array('wait', 'closed')))
         {
             $this->dao->update(TABLE_EXECUTION)
-                 ->set('status')->eq('doing')
-                 ->beginIf(helper::isZeroDate($parentExecution->realBegan))->set('realBegan')->eq($today)->fi()
-                 ->where('id')->eq($parentExecutionID)
-                 ->exec();
+                ->set('status')->eq('doing')
+                ->beginIf(helper::isZeroDate($parentExecution->realBegan))->set('realBegan')->eq($today)->fi()
+                ->where('id')->eq($parentExecutionID)
+                ->exec();
             $this->loadModel('action')->create('execution', $parentExecutionID, 'syncexecutionbychild');
         }
 
@@ -2493,18 +2493,18 @@ EOD;
         $module = $this->app->getModuleName();
         $method = $this->app->getMethodName();
         if($module == 'index' or
-           $module == 'tutorial' or
-           $module == 'install' or
-           $module == 'upgrade' or
-           $module == 'sso' or
-          ($module == 'user' and strpos('|login|deny|logout|reset|forgetpassword|resetpassword|', "|{$method}|") !== false) or
-          ($module == 'my' and strpos('|changepassword|preference|', "|{$method}|") !== false) or
-          ($module == 'file' and strpos('|read|download|uploadimages|ajaxwopifiles|', "|{$method}|") !== false) or
-          ($module == 'report' && $method == 'annualdata') or
-          ($module == 'misc' && $method == 'captcha') or
-          ($module == 'execution' and $method == 'printkanban') or
-          ($module == 'traincourse' and $method == 'ajaxuploadlargefile') or
-          ($module == 'traincourse' and $method == 'playvideo'))
+            $module == 'tutorial' or
+            $module == 'install' or
+            $module == 'upgrade' or
+            $module == 'sso' or
+            ($module == 'user' and strpos('|login|deny|logout|reset|forgetpassword|resetpassword|', "|{$method}|") !== false) or
+            ($module == 'my' and strpos('|changepassword|preference|', "|{$method}|") !== false) or
+            ($module == 'file' and strpos('|read|download|uploadimages|ajaxwopifiles|', "|{$method}|") !== false) or
+            ($module == 'report' && $method == 'annualdata') or
+            ($module == 'misc' && $method == 'captcha') or
+            ($module == 'execution' and $method == 'printkanban') or
+            ($module == 'traincourse' and $method == 'ajaxuploadlargefile') or
+            ($module == 'traincourse' and $method == 'playvideo'))
         {
             return;
         }
@@ -2681,7 +2681,7 @@ EOD;
         /* Limited execution. */
         $limitedExecution = false;
         if(!empty($module) and in_array($module, array('task', 'story')) and !empty($object->execution) or
-           !empty($module) and $module == 'execution' and !empty($object->id)
+            !empty($module) and $module == 'execution' and !empty($object->id)
         )
         {
             $objectID = '';
@@ -2905,14 +2905,21 @@ EOD;
         if($this->isOpenMethod($_GET[$this->config->moduleVar], $_GET[$this->config->methodVar])) return true;
 
         if(!$this->get->code)  $this->response('PARAM_CODE_MISSING');
-        if(!$this->get->token) $this->response('PARAM_TOKEN_MISSING');
+        if (!$this->get->key)
+            if(!$this->get->token) $this->response('PARAM_TOKEN_MISSING');
+        if (!$this->get->module)
+            $this->get->module = 'my';
+        if (!$this->get->method)
+            $this->get->method = 'index';
 
         $entry = $this->loadModel('entry')->getByCode($this->get->code);
 
         if(!$entry)                         $this->response('EMPTY_ENTRY');
         if(!$entry->key)                    $this->response('EMPTY_KEY');
         if(!$this->checkIP($entry->ip))     $this->response('IP_DENIED');
-        if(!$this->checkEntryToken($entry)) $this->response('INVALID_TOKEN');
+        if (!$this->get->key)
+            if(!$this->checkEntryToken($entry))
+                $this->response('INVALID_TOKEN');
         if($entry->freePasswd == 0 and empty($entry->account)) $this->response('ACCOUNT_UNBOUND');
 
         $isFreepasswd = ($_GET['m'] == 'user' and strtolower($_GET['f']) == 'apilogin' and $_GET['account'] and $entry->freePasswd);
@@ -3186,8 +3193,8 @@ EOD;
         global $lang, $app;
         if(!extension_loaded('curl'))
         {
-             if($dataType == 'json') return print($lang->error->noCurlExt);
-             return json_encode(array('result' => 'fail', 'message' => $lang->error->noCurlExt));
+            if($dataType == 'json') return print($lang->error->noCurlExt);
+            return json_encode(array('result' => 'fail', 'message' => $lang->error->noCurlExt));
         }
 
         commonModel::$requestErrors = array();
