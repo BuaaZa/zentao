@@ -11,6 +11,8 @@
  */
 class extension extends control
 {
+    public extensionModel $extension;
+
     /**
      * Construct function.
      *
@@ -323,7 +325,8 @@ class extension extends control
 
         /* The postInstall hook file. */
         $hook = $upgrade == 'yes' ? 'postupgrade' : 'postinstall';
-        if($postHookFile = $this->extension->getHookFile($extension, $hook)) include $postHookFile;
+        if($postHookFile = $this->extension->getHookFile($extension, $hook))
+            include $postHookFile;
 
         $this->display();
     }
