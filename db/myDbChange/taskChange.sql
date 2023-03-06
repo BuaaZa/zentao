@@ -1,7 +1,7 @@
 # 修改 zt_task 表
 
 DELIMITER //
-CREATE PROCEDURE add()
+CREATE PROCEDURE addChange()
 
 BEGIN
     IF NOT EXISTS(
@@ -16,6 +16,6 @@ BEGIN
 END//
 
 DELIMITER ';'
-CALL add();
-DROP PROCEDURE add;
+CALL addChange();
+DROP PROCEDURE addChange;
 
