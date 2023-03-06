@@ -40,3 +40,7 @@ CREATE TABLE `zt_projectuseinfo`  (
   `deleted` enum('0','1') CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`) USING BTREE
 ) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8 COLLATE = utf8_general_ci ROW_FORMAT = Dynamic;
+
+
+#20230306, 表 zt_product 增加字段 allowFeedback
+alter table `zt_product` add `allowFeedback` enum('0', '1') NOT NULL DEFAULT '0' after `deleted`;
