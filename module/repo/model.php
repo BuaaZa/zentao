@@ -35,7 +35,10 @@ class repoModel extends model
      */
     public function setMenu($repos, $repoID = '', $showSeleter = true)
     {
+        // $repoID : 如果为空 , 则从session 获取 ; 若session中也为空，则从$repos 取一个 , $repos 为空时为null
         if(empty($repoID)) $repoID = $this->session->repoID ? $this->session->repoID : key($repos);
+
+        // 检查 $repoID 是否在 $repos 的key中
         if(!isset($repos[$repoID])) $repoID = key($repos);
 
         /* Init switcher menu. */
@@ -61,6 +64,7 @@ class repoModel extends model
             if(count($repos) > 1) $this->lang->switcherMenu = $this->getSwitcher($repoID);
         }
 
+        // 设置顶部菜单url参数
         common::setMenuVars('devops', $repoID);
         if(!session_id()) session_start();
         $this->session->set('repoID', $repoID);
@@ -1932,13 +1936,6 @@ class repoModel extends model
         return json_decode($response);
     }
 
-    public function syncWorkCodeLine2Wbs($data)
-    {
-        $url = $this->config->repo->syncWorkCodeLine2WbsApi;
-        $response = common::http( $url, $data, array(), array(), 'json','PUT');
-        return json_decode($response);
-    }
-
     /**
      * Save an action to pms.
      *
@@ -2088,7 +2085,13 @@ class repoModel extends model
         $service = $this->loadModel('pipeline')->getByID($repo->serviceHost);
         if($repo->SCM == 'Gitlab')
         {
+//          当GitLab无法连接时,api 调用出错
             $project = $this->loadModel('gitlab')->apiGetSingleProject($repo->serviceHost, $repo->serviceProject);
+//            if(empty($project)) {
+//                $url = $this->createLink('create');
+//                header("location: $url");
+//                exit;
+//            }
 
             $repo->path     = $service ? sprintf($this->config->repo->{$service->type}->apiPath, $service->url, $repo->serviceProject) : '';
             $repo->client   = $service ? $service->url : '';
