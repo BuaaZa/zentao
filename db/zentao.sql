@@ -14332,3 +14332,20 @@ create index project
 
 alter table zt_task
     add workcodelines int unsigned default 0 null after fromIssue;
+
+DELIMITER //
+CREATE PROCEDURE addColumnAtTesttask()
+
+BEGIN
+    IF NOT EXISTS(SELECT * FROM information_schema.COLUMNS
+                  WHERE COLUMN_NAME = 'parent' AND TABLE_NAME = 'zt_testtask')
+    THEN
+        alter table `zt_testtask` add `parent` int not null;
+    END IF;
+END//
+
+DELIMITER ';'
+
+CALL addColumnAtTesttask();
+
+DROP PROCEDURE addColumnAtTesttask;
