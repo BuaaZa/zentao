@@ -52,7 +52,7 @@ class installModel extends model
     }
 
     /**
-     * Get latest release.
+     * Get the latest release.
      *
      * @access public
      * @return string or bool

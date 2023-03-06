@@ -45,7 +45,7 @@ $lang->install->howToUse            = "请问您计划如何使用【协同研�
 $lang->install->guideVideo          = 'https://dl.cnezsoft.com/vedio/program0716.mp4';
 $lang->install->introductionContent = <<<EOT
 <div>
-  <h4>尊敬的用户您好，欢迎您使用禅道项目管理系统。</h4>
+  <h4>尊敬的用户您好，欢迎您使用【协同研发平台】。</h4>
   <p> 【协同研发平台】开始提供了两种使用模式，一种是经典管理模式，功能较为精简，主要提供了产品和项目两个核心功能；另一种是全新项目集管理模式，增加了项目集和执行的概念。下面是全新项目集管理模式的介绍：</p>
   <div class='block-content'>
     <div class='block-details'><p class='block-title'><i class='icon icon-program'></i> <strong>项目集</strong></p><p>项目集用来管理一组相关的产品和项目，公司高层或者PMO可以用来做战略规划。</p></div>
