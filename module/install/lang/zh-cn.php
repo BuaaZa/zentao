@@ -1,6 +1,6 @@
 <?php
 /**
- * The install module zh-cn file of ZenTaoPMS.
+ * The installation module zh-cn file of ZenTaoPMS.
  *
  * @copyright   Copyright 2009-2015 青岛易软天创网络科技有限公司(QingDao Nature Easy Soft Network Technology Co,LTD, www.cnezsoft.com)
  * @license     ZPL(http://zpl.pub/page/zplv12.html) or AGPL(https://www.gnu.org/licenses/agpl-3.0.en.html)
@@ -17,17 +17,15 @@ $lang->install->pre    = '返回';
 $lang->install->reload = '刷新';
 $lang->install->error  = '错误 ';
 
-$lang->install->officeDomain = 'https://www.zentao.net';
+$lang->install->officeDomain = 'http://15.cetc.com.cn';
 
 $lang->install->start            = '开始安装';
 $lang->install->keepInstalling   = '继续安装当前版本';
 $lang->install->seeLatestRelease = '看看最新的版本';
-$lang->install->welcome          = '欢迎使用禅道项目管理软件！';
-$lang->install->license          = '禅道项目管理软件授权协议';
+$lang->install->welcome          = '欢迎使用【协同研发平台】！';
+$lang->install->license          = '【协同研发平台】/禅道项目管理软件授权协议';
 $lang->install->desc             = <<<EOT
-禅道项目管理软件(ZenTaoPMS)是一款国产的，基于<a href='http://zpl.pub/page/zplv12.html' target='_blank'>ZPL</a>或<a href='https://www.gnu.org/licenses/agpl-3.0.en.html' target='_blank'>AGPL</a>双授权协议，开源免费的项目管理软件，它集产品管理、项目管理、测试管理于一体，同时还包含了事务管理、组织管理等诸多功能，是中小型企业项目管理的首选。
-
-禅道项目管理软件使用PHP + MySQL开发，基于自主的PHP开发框架──ZenTaoPHP而成。第三方开发者或者企业可以非常方便的开发插件或者进行定制。
+【协同研发平台】是一款国产的、基于禅道项目管理软件(ZenTaoPMS)（<a href='http://zpl.pub/page/zplv12.html' target='_blank'>ZPL</a>或<a href='https://www.gnu.org/licenses/agpl-3.0.en.html' target='_blank'>AGPL</a>双授权协议）、开源免费的项目管理软件，它集产品管理、项目管理、测试管理于一体，同时还包含了事务管理、组织管理等诸多功能，是中小型企业项目管理的首选。
 EOT;
 $lang->install->links = <<<EOT
 禅道项目管理软件由<strong><a href='https://www.cnezsoft.com' target='_blank' class='text-danger'>青岛易软天创网络科技有限公司</a>开发</strong>。
@@ -40,13 +38,15 @@ $lang->install->links = <<<EOT
 您现在正在安装的版本是 <strong class='text-danger'>%s</strong>。
 EOT;
 
-$lang->install->introduction        = "禅道15系列功能介绍";
-$lang->install->howToUse            = "请问您计划如何使用禅道的新版本呢";
+$lang->install->links = '';
+
+$lang->install->introduction        = "【协同研发平台】功能介绍";
+$lang->install->howToUse            = "请问您计划如何使用【协同研发平台】呢";
 $lang->install->guideVideo          = 'https://dl.cnezsoft.com/vedio/program0716.mp4';
 $lang->install->introductionContent = <<<EOT
 <div>
-  <h4>尊敬的用户您好，欢迎您使用禅道项目管理系统。</h4>
-  <p> 禅道自15系列开始提供了两种使用模式，一种是经典管理模式，功能较为精简，主要提供了产品和项目两个核心功能；另一种是全新项目集管理模式，增加了项目集和执行的概念。下面是全新项目集管理模式的介绍：</p>
+  <h4>尊敬的用户您好，欢迎您使用【协同研发平台】。</h4>
+  <p> 【协同研发平台】开始提供了两种使用模式，一种是经典管理模式，功能较为精简，主要提供了产品和项目两个核心功能；另一种是全新项目集管理模式，增加了项目集和执行的概念。下面是全新项目集管理模式的介绍：</p>
   <div class='block-content'>
     <div class='block-details'><p class='block-title'><i class='icon icon-program'></i> <strong>项目集</strong></p><p>项目集用来管理一组相关的产品和项目，公司高层或者PMO可以用来做战略规划。</p></div>
     <div class='block-details block-right'>
@@ -281,13 +281,13 @@ $lang->install->cronList['moduleName=ci&methodName=exec']               = '执�
 $lang->install->cronList['moduleName=mr&methodName=syncMR']             = '定时同步GitLabMR信息';
 
 $lang->install->success  = "安装成功";
-$lang->install->login    = '登录禅道管理系统';
+$lang->install->login    = '登录【协同研发平台】';
 $lang->install->register = '禅道社区注册';
 
-$lang->install->successLabel       = "<p>您已经成功安装禅道管理系统%s。</p>";
-$lang->install->successNoticeLabel = "<p>您已经成功安装禅道管理系统%s，<strong class='text-danger'>请及时删除install.php</strong>。</p>";
+$lang->install->successLabel       = "<p>您已经成功安装【协同研发平台】%s。</p>";
+$lang->install->successNoticeLabel = "<p>您已经成功安装【协同研发平台】%s，<strong class='text-danger'>请及时删除install.php或_install.php</strong>。</p>";
 $lang->install->joinZentao         = <<<EOT
-<p>友情提示：为了您及时获得禅道的最新动态，请在禅道社区(<a href='https://www.zentao.net' class='alert-link' target='_blank'>www.zentao.net</a>)进行登记。</p>
+<p>友情提示：为了您及时获得【协同研发平台】底层平台禅道的最新动态，请在禅道社区(<a href='https://www.zentao.net' class='alert-link' target='_blank'>www.zentao.net</a>)进行登记。</p>
 EOT;
 
 $lang->install->product = array('chanzhi', 'zdoo', 'xuanxuan', 'ydisk', 'meshiot');
