@@ -167,7 +167,10 @@ class feedback extends control
      */
     public function create($productID, $branch = '', $extras = '')
     {
-        if (empty($this->products)) $this->locate($this->createLink('feedback', 'create'));
+        if (empty($this->products)) {
+            return $this->send(array('result' => 'success', 'message' => '没有产品可以反馈，如果有产品定义，请确认产品中【是否反馈】有没有选择【是】', 'closeModal' => true, 'locate' => inlink('admin','browseType=all')));
+            // $this->locate($this->createLink('product', 'create'));
+        }
         if (!empty($_POST)) {
             $response['result'] = 'success';
 
