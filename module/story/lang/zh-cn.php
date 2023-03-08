@@ -499,3 +499,4 @@ $lang->story->taskPointSpec = "功能点描述";
 $lang->story->taskPointVerify = "功能点验收标准";
 $lang->story->taskPointTitle = "功能点名称";
 $lang->story->decomposeTaskPoint = "分解功能点";
+$lang->story->createTaskPoint = "提功能点";
