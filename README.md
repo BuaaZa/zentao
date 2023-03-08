@@ -8,7 +8,8 @@
 
 基于[禅道开源版17.7](https://www.zentao.net/dynamic/zentaopms17.7-81744.html)
 
-访问地址：[15test](http://123.57.214.35:50000/product/zentaopms/www/index.php)
++ [production环境](http://123.57.214.35:50000/product/zentaopms/www/index.php)
++ [staging环境（需手动安装）](http://121.89.178.134:50001/zentaopms/www/index.php)
 
 ## Installation
 
