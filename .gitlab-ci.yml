@@ -23,6 +23,7 @@ build-job:       # This job runs in the build stage, which runs first.
     - docker push $PROJECT/zentaopms-arm64v8:latest
     - docker push $PROJECT/zentaopms-amd64:$(date "+%Y-%m-%d")
     - docker push $PROJECT/zentaopms-amd64:latest
+    - docker image prune -f
 
 deploy:    
   stage: deploy  
