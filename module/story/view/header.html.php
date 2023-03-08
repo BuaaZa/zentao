@@ -9,7 +9,7 @@
  * @access public
  * @return void
  */
-function loadProduct(productID)
+function loadProduct(productID, fromExecution=-1)
 {
     if(typeof parentStory != 'undefined' && parentStory)
     {
@@ -38,17 +38,17 @@ function loadProduct(productID)
     loadProductReviewers(productID);
     loadURS();
 
-    // if(typeof(storyType) == 'string' && storyType == 'story')
-    // {
-    //     var storyLink = createLink('story', 'ajaxGetParentStory', 'productID=' + productID + '&labelName=parent');
-    //     $.get(storyLink, function(data)
-    //     {
-    //         $('#parent').replaceWith(data);
-    //         $('#parent' + "_chosen").remove();
-    //         $('#parent').next('.picker').remove();
-    //         $('#parent').chosen();
-    //     });
-    // }
+    if(typeof(storyType) == 'string' && storyType == 'story')
+    {
+        var storyLink = createLink('story', 'ajaxGetParentStory', 'productID=' + productID + '&labelName=parent&fromExecution='+fromExecution);
+        $.get(storyLink, function(data)
+        {
+            $('#parent').replaceWith(data);
+            $('#parent' + "_chosen").remove();
+            $('#parent').next('.picker').remove();
+            $('#parent').chosen();
+        });
+    }
 
     if(typeof(storyType) == 'string' && storyType == 'taskPoint')
     {

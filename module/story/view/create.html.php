@@ -58,7 +58,9 @@ foreach(explode(',', $config->story->create->requiredFields) as $field)
               <div class='input-group'>
               <?php
                 $products[""] = "";
-                echo html::select('product', $products, '', "onchange=\"loadProduct(this.value);$('#parent_select1').load('/www/api.php/v1/getparenthtml/'+this.value+'?execution='+".$fromExecution.");$('#parent_select2').load('/www/api.php/v1/getparenthtml/'+this.value+'?execution='+".$fromExecution.");\" class='form-control chosen control-product' required");?>
+                if(!isset($fromExecution))
+                  $fromExecution = -1;
+                echo html::select('product', $products, '', "onchange=\"loadProduct(this.value,$fromExecution);\" class='form-control chosen control-product' required");?>
               <span class='input-group-addon fix-border fix-padding'></span>
               <?php if($branches) echo html::select('branch', $branches, $branch, "onchange='loadBranch();' class='form-control chosen control-branch'");?>
               </div>
