@@ -351,7 +351,7 @@ $projectIDParam = $isProjectStory ? "projectID=$projectID&" : '';
                   $this->story->printCell($value, $story, $users, $branchOption, $storyStages, $modulePairs, $storyTasks, $storyBugs, $storyCases, $useDatatable ? 'datatable' : 'table', $storyType);
                 }
             }?>
-            <?php else:?>
+            <?php else/*下面这行是输出需求的，删除后子需求还显示*/:?>
             <?php foreach($setting as $key => $value) $this->story->printCell($value, $story, $users, $branchOption, $storyStages, $modulePairs, $storyTasks, $storyBugs, $storyCases, $useDatatable ? 'datatable' : 'table', $storyType);?>
             <?php endif;?>
           </tr>

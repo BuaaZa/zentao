@@ -1102,7 +1102,7 @@ class commonModel extends model
         $isTutorialMode = commonModel::isTutorialMode();
         $currentModule = $app->rawModule;
         $currentMethod = $app->rawMethod;
-
+       
         if($isTutorialMode and defined('WIZARD_MODULE')) $currentModule  = WIZARD_MODULE;
         if($isTutorialMode and defined('WIZARD_METHOD')) $currentMethod  = WIZARD_METHOD;
 
@@ -1132,7 +1132,11 @@ class commonModel extends model
             if($subModule and in_array($currentModule, $subModule) and strpos(",$exclude,", ",$currentModule-$currentMethod,") === false)
             {
                 $activeMenu = $menuItem->name;
-                $active = 'active';
+                if($currentModule == 'story' and  $activeMenu == 'testcase')
+                {
+                    $active ='';
+                }
+                else $active = 'active';
             }
 
             if($menuItem->link['module'] == 'execution' and $menuItem->link['method'] == 'more')
@@ -1218,7 +1222,17 @@ class commonModel extends model
                     }
                     else
                     {
-                        echo "<li class='$class $active' data-id='$menuItem->name'>" . html::a($link, $label, $target, $misc) . "</li>\n";
+                        echo "<li class='$class $active $currentModule' data-id='$menuItem->name'> " . html::a($link, $label, $target, $misc) . "</li>\n";
+                       
+                        /*for($i=0; $i<4; $i++)
+                        {
+                            echo "数组第".($i+1)."个元素是：";
+                            echo $array[$i];
+                            echo "<br>";
+                        }*/
+                    
+                    
+                        //echo "<ul class='$currentModule'>\n";
                     }
                 }
                 else
@@ -1226,6 +1240,7 @@ class commonModel extends model
                     echo "<li class='$class $active' data-id='$menuItem->name'>$menuItem->text</li>\n";
                 }
             }
+            
         }
 
         echo "</ul>\n";
