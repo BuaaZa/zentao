@@ -3,8 +3,7 @@
 -- !!!!!!!!!!!写SQL的时候一定注意注释必须以分号结尾，重要的事情说三编!!!!!!!!!!!!!!!!;
 -- !!!!!!!!!!!写SQL的时候一定注意注释必须以分号结尾，重要的事情说三编!!!!!!!!!!!!!!!!;
 
--- 表 zt_action 增加字段 ip,commentExId;
-alter table `zt_action` add `ip` char(15) default '' not null after `actor`;
+-- 表 zt_action 增加字段 commentExId;
 alter table `zt_action` add `commentExId` varchar(36) default '' not null after `actor`;
 -- 导出的日期;
 alter table `zt_action` add `exportDate` DATETIME NOT NULL after `actor`; 
