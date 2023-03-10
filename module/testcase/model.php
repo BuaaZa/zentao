@@ -448,10 +448,11 @@ class testcaseModel extends model
 
         if($case->story)
         {
-            $story = $this->dao->findById($case->story)->from(TABLE_STORY)->fields('title, status, version')->fetch();
+            $story = $this->dao->findById($case->story)->from(TABLE_STORY)->fields('title, status, version, assignedTo')->fetch();
             $case->storyTitle         = $story->title;
             $case->storyStatus        = $story->status;
             $case->latestStoryVersion = $story->version;
+            $case->story_assignedTo   = $story->assignedTo;
         }
         if($case->fromBug) $case->fromBugTitle      = $this->dao->findById($case->fromBug)->from(TABLE_BUG)->fields('title')->fetch('title');
 
@@ -1877,8 +1878,8 @@ class testcaseModel extends model
             }
             $SignTable4->addCell($comment_width)->addText('备注',$fontStyle,$cellHCentered);
             $reference_io = $sample_data_all[0];
-            $reference_in_num = count($reference_io['sample_in']);
-            $reference_out_num = count($reference_io['sample_out']);
+            $reference_in_num = isset($reference_io['sample_in']) ? count($reference_io['sample_in']): 0;
+            $reference_out_num = isset($reference_io['sample_out']) ? count($reference_io['sample_out']): 0;
             $reference_result_num = $reference_out_num;
             $reference_in_steps = array("");
             $reference_out_steps = array("");

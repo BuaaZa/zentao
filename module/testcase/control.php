@@ -2363,7 +2363,9 @@ class testcase extends control
             }
             foreach($results as $result){
                 if($result->version != $version)continue;
-                array_push($sample_data_all, $result->sample_data);
+                if(isset($result->sample_data['sample_in']) or isset($result->sample_data['sample_out'])){
+                    array_push($sample_data_all, $result->sample_data);
+                }
             }
             $sample_data_all = array_reverse($sample_data_all);
             $PHPWord = new \PhpOffice\PhpWord\PhpWord();

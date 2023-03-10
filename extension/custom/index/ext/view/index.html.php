@@ -83,21 +83,24 @@ js::set('showFeatures', $showFeatures);
 </div>
 <div id='appsBar'>
   <ul id='bars' class='nav nav-default'></ul>
-  <div id='poweredBy' hidden>
+  <div id='poweredBy'>
     <div id="globalBarLogo">
       <?php if(trim($config->visions, ',') == 'lite'):?>
-      <?php $version     = $config->liteVersion;?>
+      <?php #$version     = $config->liteVersion;?>
+      <?php $brandname     = 'CETC';?>
       <?php $versionName = $lang->liteName . $config->liteVersion;?>
       <?php else:?>
-      <?php $version     = $config->version;?>
+      <?php #$version     = $config->version;?>
+      <?php $brandname     = 'CETC';?>
       <?php $versionName = $lang->pmsName . $config->version;?>
-      <a href='javascript:void(0)' id='bizLink' class='btn btn-link' style='color: #B57D4F;'><span class='upgrade'><?php echo $lang->bizName;?></span> <i class='text-danger icon-pro-version'></i></a>
+      <!-- <a href='javascript:void(0)' id='bizLink' class='btn btn-link' style='color: #B57D4F;'><span class='upgrade'><?php #echo $lang->bizName;?></span> <i class='text-danger icon-pro-version'></i></a> -->
       <?php endif;?>
-      <a href='<?php echo $lang->website;?>' class="btn btn-sm btn-link" target='_blank' title='<?php echo $version;?>'>
-        <i class="icon icon-zentao" style="font-size: 24px;"></i>
-        <span class='version'><?php echo $versionName;?></span>
+      <!--   <a href='<?php #echo $lang->website;?>' class="btn btn-sm btn-link" target='_blank' title='<?php #echo $version;?>'> -->
+      <a  class="btn btn-sm btn-link" target='_blank' title='<?php echo $brandname;?>'>
+        <img src='<?php echo $config->webRoot . 'theme/default/images/main/' . $lang->logoImg2;?>' />
+        <!-- <span class='version'><?php #echo $versionName;?></span> -->
       </a>
-      <div id="globalSearchDiv">
+      <div id="globalSearchDiv" hidden>
         <div class="input-group">
           <div id='searchbox'>
             <?php echo common::printSearchBox();?>

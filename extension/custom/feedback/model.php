@@ -223,6 +223,7 @@ class feedbackModel extends model
     public function getBySolution($productIDList,$keyword,$solution=array(), $orderBy, $pager, $projectID)
     {
         $openedBy = $_GET['openedBy'];
+        $isAdmin = common::hasPriv('feedback', $this->app->user->account);
         return $this->dao->select("*, IF(`pri` = 0, {$this->config->maxPriValue}, `pri`) as priOrder")->from(TABLE_FEEDBACK)
             ->where('product')->in($productIDList)
             ->beginIF(!empty($openedBy))->andWhere('openedBy')->eq($openedBy)->fi()
@@ -232,6 +233,12 @@ class feedbackModel extends model
             ->markLeft(1)
             ->where('title')->like($keyword)
             ->orWhere('`desc`')->like($keyword)
+            ->markRight(1)
+            ->fi()
+            ->beginIF(!$isAdmin)
+            ->andWhere()
+            ->markLeft(1)
+            ->Where('public')->eq(1)->orWhere("openedBy")->eq($this->app->user->account)
             ->markRight(1)
             ->fi()
             ->orderBy($orderBy)->page($pager)
@@ -354,7 +361,7 @@ class feedbackModel extends model
     public function getAllFeedbacks($productIDList, $keyword, $modules, $types, $orderBy, $pager = null, $projectID = 0)
     {
         $openedBy = $_GET['openedBy'];
-        // $isAdmin = common::hasPriv('feedback','admin');
+        $isAdmin = common::hasPriv('feedback', $this->app->user->account);
         $feedbacks = $this->dao->select("t1.*, t1.title as planTitle, IF(t1.`pri` = 0, {$this->config->maxPriValue}, t1.`pri`) as priOrder")->from(TABLE_FEEDBACK)->alias('t1')
             ->where('t1.product')->in($productIDList)
             ->beginIF($modules)->andWhere('t1.module')->in($modules)->fi()
@@ -365,7 +372,12 @@ class feedbackModel extends model
             ->orWhere('t1.`desc`')->like($keyword)
             ->markRight(1)
             ->fi()
-            // ->beginIF(!$isAdmin)->andWhere('t1.public')->eq(1)->orWhere("t1.openedBy")->eq($this->app->user->account)->fi()
+            ->beginIF(!$isAdmin)
+            ->andWhere()
+            ->markLeft(1)
+            ->Where('t1.public')->eq(1)->orWhere("t1.openedBy")->eq($this->app->user->account)
+            ->markRight(1)
+            ->fi()
             ->andWhere('t1.deleted')->eq(0)
             ->andWhere('t1.type')->in($types)
             ->beginIF(!empty($keyword))->andWhere()
@@ -423,6 +435,7 @@ class feedbackModel extends model
     public function getByStatus($productIDList, $keyword, $modules, $types, $status, $orderBy, $pager, $projectID)
     {
         $openedBy = $_GET['openedBy'];
+        $isAdmin = common::hasPriv('feedback', $this->app->user->account);
         return $this->dao->select("*, IF(`pri` = 0, {$this->config->maxPriValue}, `pri`) as priOrder")->from(TABLE_FEEDBACK)
             ->where('product')->in($productIDList)
             ->beginIF($modules)->andWhere('module')->in($modules)->fi()
@@ -434,6 +447,12 @@ class feedbackModel extends model
             ->markLeft(1)
             ->where('title')->like($keyword)
             ->orWhere('`desc`')->like($keyword)
+            ->markRight(1)
+            ->fi()
+            ->beginIF(!$isAdmin)
+            ->andWhere()
+            ->markLeft(1)
+            ->Where('public')->eq(1)->orWhere("openedBy")->eq($this->app->user->account)
             ->markRight(1)
             ->fi()
             ->orderBy($orderBy)->page($pager)
@@ -926,9 +945,11 @@ class feedbackModel extends model
         ->add('updateDate',$now) // 增加更新时间
         ->setDefault('editedBy', $this->app->user->account)
         ->setDefault('notifyEmail', '')
+        ->setDefault('public', 0) // 没有值默认设置为0
         ->setIF($this->post->assignedTo  != $oldFeedback->assignedTo, 'assignedDate', $now)
        // ->setIF($this->post->assignedTo  == '' and $oldFeedback->status == 'closed', 'assignedTo', 'closed')
         ->setIF($oldFeedback->status == 'clarify', 'status', 'noreview')
+        // ->setIF(empty($this->post->public),'public',$oldFeedback->public) // 如果前台没有传就使用数据库旧值
         ->stripTags($this->config->task->editor->edit['id'], $this->config->allowedTags)
         ->remove('comment,files,labels,uid,contactListMenu')
         // 删除点一些zt_projectuseinfo表的数据 chenjj 221226

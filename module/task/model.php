@@ -2198,6 +2198,13 @@ class taskModel extends model
         return json_decode($response);
     }
 
+    public function updateCommitCodeLine($taskID, $lines)
+    {
+        $this->dao->update(TABLE_TASK)->set('`workcodelines`')->eq($lines)
+            ->where('id')->eq($taskID)
+            ->exec();
+    }
+
     /**
      * Set effort left to 0.
      *
@@ -2403,7 +2410,11 @@ class taskModel extends model
             if(isset($output['toColID'])) $this->kanban->moveCard($taskID, $output['fromColID'], $output['toColID'], $output['fromLaneID'], $output['toLaneID']);
 
             // if增加 $this->config->edition == 'open' chenjj 230115
-            if(($this->config->edition == 'biz' || $this->config->edition == 'max' || $this->config->edition == 'open') && $oldTask->feedback) $this->loadModel('feedback')->updateStatus('task', $oldTask->feedback, $task->status, $oldTask->status);
+            if (($this->config->edition == 'biz' || $this->config->edition == 'max' || $this->config->edition == 'open') && $oldTask->feedback) {
+                $this->loadModel('feedback')->updateStatus('task', $oldTask->feedback, $task->status, $oldTask->status);
+                // 关闭关联的反馈 chenjj 230301
+                $this->loadModel('feedback')->feedbackRelationsClose($oldTask->feedback);
+            }
 
             return common::createChanges($oldTask, $task);
         }
@@ -4008,6 +4019,11 @@ class taskModel extends model
                 break;
             case 'left':
                 echo round($task->left, 1)     . $this->lang->execution->workHourUnit;
+                break;
+            case 'workcodeline':
+                if ($task->workcodelines>0){
+                    echo $task->workcodelines . ' 行';
+                }
                 break;
             case 'progress':
                 echo round($task->progress, 2) . '%';

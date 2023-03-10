@@ -112,7 +112,7 @@ $lang->convert->priType->task     = '优先级类型转换(Task状态)';
 
 $lang->convert->issue = new stdclass();
 $lang->convert->issue->redmine = 'Redmine';
-$lang->convert->issue->zentao  = '禅道';
+$lang->convert->issue->zentao  = '【协同研发平台】';
 $lang->convert->issue->goto    = '转换为';
 
 $lang->convert->jira = new stdclass();

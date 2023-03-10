@@ -35,7 +35,10 @@ class repoModel extends model
      */
     public function setMenu($repos, $repoID = '', $showSeleter = true)
     {
+        // $repoID : 如果为空 , 则从session 获取 ; 若session中也为空，则从$repos 取一个 , $repos 为空时为null
         if(empty($repoID)) $repoID = $this->session->repoID ? $this->session->repoID : key($repos);
+
+        // 检查 $repoID 是否在 $repos 的key中
         if(!isset($repos[$repoID])) $repoID = key($repos);
 
         /* Init switcher menu. */
@@ -61,6 +64,7 @@ class repoModel extends model
             if(count($repos) > 1) $this->lang->switcherMenu = $this->getSwitcher($repoID);
         }
 
+        // 设置顶部菜单url参数
         common::setMenuVars('devops', $repoID);
         if(!session_id()) session_start();
         $this->session->set('repoID', $repoID);
@@ -1693,7 +1697,7 @@ class repoModel extends model
      * @access public
      * @return void
      */
-    public function saveAction2PMS($objects, $log, $repoRoot = '', $encodings = 'utf-8', $scm = 'svn', $gitlabAccountPairs = array())
+    public function saveAction2PMS($objects, $log, $repoRoot = '', $encodings = 'utf-8', $scm = 'svn', $gitlabAccountPairs = array(),$repo = null)
     {
         if(isset($gitlabAccountPairs[$log->author]) and $gitlabAccountPairs[$log->author])
         {
@@ -1855,7 +1859,9 @@ class repoModel extends model
 
         if($objects['tasks'])
         {
+            $this->loadModel('task');
             $productsAndExecutions = $this->getTaskProductsAndExecutions($objects['tasks']);
+            ChromePhp::log($action);
             foreach($objects['tasks'] as $taskID)
             {
                 $taskID = (int)$taskID;
@@ -1867,6 +1873,32 @@ class repoModel extends model
                 $action->execution  = $productsAndExecutions[$taskID]['execution'];
 
                 $this->saveRecord($action, $changes);
+
+                if($repo){
+                    // api : /gitlabCount/getCodeLine
+                    $data = new stdclass();
+                    $data->message = $log->comment;
+                    $data->name = $repo->name;
+
+                    ChromePhp::log($data);
+
+                    $response = $this->getCommitWorkCodeLine($data);
+
+                    if($response->message == 'success'){
+                        $lines = $response->data;
+                        $this->task->updateCommitCodeLine($taskID,$lines);
+
+                        // api : /syncToWbs/addCodeNumberByZenTao
+                        $data2 = new stdclass();
+                        $data2-> zenTaoTaskId = strval($taskID);
+                        $data2-> count = strval($lines);
+
+                        ChromePhp::log($data2);
+
+                        $this->syncWorkCodeLine2Wbs($data2);
+                    }
+                }
+
             }
         }
 
@@ -1888,6 +1920,20 @@ class repoModel extends model
         }
 
         if(isset($this->app->user)) $this->app->user->account = $account;
+    }
+
+    public function getCommitWorkCodeLine($data)
+    {
+        $url = $this->config->repo->getCodeLineApi;
+        $response = common::http( $url, $data, array(CURLOPT_CUSTOMREQUEST => 'GET'), array("Content-Type: multipart/form-data"),'data','GET');
+        return json_decode($response);
+    }
+
+    public function syncWorkCodeLine2Wbs($data)
+    {
+        $url = $this->config->repo->syncWorkCodeLine2WbsApi . '?zenTaoTaskId=' .$data->zenTaoTaskId . '&count='.$data->count;
+        $response = common::http( $url, null, array(CURLOPT_CUSTOMREQUEST => 'PUT'), array(), 'json','PUT');
+        return json_decode($response);
     }
 
     /**
@@ -2039,7 +2085,13 @@ class repoModel extends model
         $service = $this->loadModel('pipeline')->getByID($repo->serviceHost);
         if($repo->SCM == 'Gitlab')
         {
+//          当GitLab无法连接时,api 调用出错
             $project = $this->loadModel('gitlab')->apiGetSingleProject($repo->serviceHost, $repo->serviceProject);
+//            if(empty($project)) {
+//                $url = $this->createLink('create');
+//                header("location: $url");
+//                exit;
+//            }
 
             $repo->path     = $service ? sprintf($this->config->repo->{$service->type}->apiPath, $service->url, $repo->serviceProject) : '';
             $repo->client   = $service ? $service->url : '';

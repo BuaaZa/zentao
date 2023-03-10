@@ -56,6 +56,7 @@
         <?php $params = isset($testtask) ? ",testtask=$testtask->id" : "";?>
         <?php $params = $params . ",buildID=" . (isset($testtask->build) ? $testtask->build : $result->build);?>
         <?php if($executionParam) $params .= ',' . $executionParam;?>
+        <?php if($case->story) $params .= ',' . 'storyAssignedTo=' . $case->story_assignedTo;?>
         <tr class='result-detail hide' id='tr-detail_<?php echo $trCount++; ?>'>
           <td colspan='7' class='pd-0'>
             <?php $projectParam = $this->app->tab == 'project' ? "projectID={$this->session->project}," : ''?>

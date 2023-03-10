@@ -762,6 +762,13 @@ class bug extends control
         $this->view->browser = $browser;
         $this->view->productMembers = $productMembers;
         $this->view->assignedTo = $assignedTo;
+        if(isset($output['storyAssignedTo'])){
+            $this->view->autoAssignedTo = $output['storyAssignedTo'];
+            $allUsers = $this->loadModel('user')->getPairs('devfirst');
+            $this->view->productMembers[$this->view->autoAssignedTo] = $allUsers[$this->view->autoAssignedTo];
+        }else{
+            $this->view->autoAssignedTo = $assignedTo;
+        }
         $this->view->deadline = $deadline;
         $this->view->mailto = $mailto;
         $this->view->keywords = $keywords;

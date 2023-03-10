@@ -11,6 +11,8 @@
  */
 class install extends control
 {
+    public installModel $install;
+
     /**
      * Construct function.
      *
@@ -32,7 +34,7 @@ class install extends control
      * @access public
      * @return void
      */
-    public function index()
+    public function index(): void
     {
         if(!isset($this->config->installed) or !$this->config->installed) $this->session->set('installing', true);
 
