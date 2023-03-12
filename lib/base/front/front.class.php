@@ -151,7 +151,7 @@ class baseHTML
      * @access public
      * @return string
      */
-    static public function select($name = '', array|string $options = array(), $selectedItems = "", $attrib = "", $append = false)
+    static public function select($name = '', array|string|null $options = array(), $selectedItems = "", $attrib = "", $append = false)
     {
         $options = (array)($options);
         if($append and !isset($options[$selectedItems])) $options[$selectedItems] = $selectedItems;
