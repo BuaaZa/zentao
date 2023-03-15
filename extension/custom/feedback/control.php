@@ -306,7 +306,7 @@ class feedback extends control
         $projects += $this->product->getProjectPairsByProduct($productID, $branch);
         if ($this->app->getViewType() == 'json') return print(json_encode($projects));
 
-        return print(html::select('project', $projects, $projectID, "class='form-control' onchange='loadProductExecutions({$productID}, this.value)'"));
+        return print(html::select('taskProjects', $projects, $projectID, "class='form-control' onchange='loadProductExecutions({$productID}, this.value)'"));
     }
 
     public function ajaxGetExecutions($productID, $projectID = 0, $branch = 0, $number = '', $executionID = 0, $from = '')
@@ -322,7 +322,7 @@ class feedback extends control
 
         if ($number === '') {
             $event = ''; //$from == 'bugToTask' ? '' : " onchange='loadExecutionRelated(this.value)'";
-            return print(html::select('execution', array('' => '') + $executions, $executionID, "class='form-control' $event"));
+            return print(html::select('executions', array('' => '') + $executions, $executionID, "class='form-control' $event"));
         } else {
             $executions     = empty($executions) ? array('' => '') : $executions;
             $executionsName = $from == 'showImport' ? "execution[$number]" : "executions[$number]";
