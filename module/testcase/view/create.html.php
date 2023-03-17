@@ -166,6 +166,7 @@ foreach(explode(',', $config->testcase->create->requiredFields) as $field)
                     <th><?php echo $lang->testcase->stepExpect;?></th>
                     <th><?php echo $lang->testcase->step_eval_criteria;?></th>
                     <th class='step-actions'><?php echo $lang->actions;?></th>
+                    <th class='step-actions text-center'><?php echo "数据样本";?></th>
                   </tr>
                 </thead>
                 <tbody id='steps' class='sortable' data-group-name='<?php echo $lang->testcase->groupName ?>'>
@@ -202,6 +203,16 @@ foreach(explode(',', $config->testcase->create->requiredFields) as $field)
                         <button type='button' class='btn btn-step-delete' tabindex='-1'><i class='icon icon-close'></i></button>
                       </div>
                     </td>
+                      <td class='step-actions'>
+
+                              <button type='button' class='btn btn-step-add-datasample' tabindex='-1'><i class='icon icon-plus'>
+                                      <?php
+                                      $Link = $this->createLink('testcase', 'datasample');
+                                      echo html::a($Link,'填写') ;
+                                      ?>
+                                  </i></button>
+
+                      </td>
                   </tr>
                   <?php foreach($steps as $stepID => $step):?>
                   <tr class='step'>
@@ -239,6 +250,14 @@ foreach(explode(',', $config->testcase->create->requiredFields) as $field)
                         <button type='button' class='btn btn-step-delete' tabindex='-1'><i class='icon icon-close'></i></button>
                       </div>
                     </td>
+                      <td class='step-actions'>
+                      <button type='button' class='btn btn-step-add-datasample' tabindex='-1'><i class='icon icon-plus'>
+                                      <?php
+                                      $Link = $this->createLink('testcase', 'datasample');
+                                      echo html::a($Link,'填写') ;
+                                      ?>
+                      </i></button>
+                      </td>
                   </tr>
                   <?php endforeach; ?>
                 </tbody>
