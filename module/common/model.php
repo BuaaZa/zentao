@@ -2986,6 +2986,63 @@ EOD;
     }
 
     /**
+     * 免密调用API方案，使用account + key + code的方式实现
+     * 使用前需要先在后台添加应用，使用时需要在Query参数中配置参数
+     *
+     * @return void
+     */
+    public function checkPasswordFreeAPIEntry(): void
+    {
+        $this->entryModel = $this->loadModel('entry');
+        $this->userModel = $this->loadModel('user');
+        $this->actionModel = $this->loadModel('action');
+        $this->scoreModel = $this->loadModel('score');
+
+        if (!$_GET['__account__'])
+            $this->response('PARAM_ACCOUNT_MISSING');
+        if (!$_GET['__key__'])
+            $this->response('PARAM_KEY_MISSING');
+        if (!$_GET['__code__'])
+            $this->response('PARAM_CODE_MISSING');
+
+        // 检查应用配置entry合法性，要求
+        //
+        // 1. 密钥选项为免密
+        // 2. IP不受限制
+        // 3. key正确匹配
+        $entry = $this->entryModel->getByCode($_GET['__code__']);
+        if ($entry) {
+            if (!$this->checkIP($entry->ip))
+                $this->response('ERROR_IP_DENIED');
+            if ($entry->freePasswd == 0)
+                $this->response('ERROR_PASSWORD_FREE');
+            if ($entry->key != $_GET['__key__'])
+                $this->response('ERROR_KEY_ERROR');
+        } else {
+            $this->response('EMPTY_CODE_ERROR');
+        }
+
+        // 检查用户user合法性，和checkEntry功能一致
+        $user = $this->dao->findByAccount($_GET['__account__'])->from(TABLE_USER)->andWhere('deleted')->eq(0)->fetch();
+        if (!$user)
+            $this->response('INVALID_ACCOUNT');
+        $user->last = time();
+        $user->rights = $this->userModel->authorize($user->account);
+        $user->groups = $this->userModel->getGroups($user->account);
+        $user->view = $this->userModel->grantUserView($user->account, $user->rights['acls']);
+        $user->admin = str_contains($this->app->company->admins, ",$user->account,");
+        $this->session->set('user', $user);
+        $this->app->user = $user;
+
+        $this->dao->update(TABLE_USER)->set('last')->eq($user->last)->where('account')->eq($user->account)->exec();
+        $this->actionModel->create('user', $user->id, 'login');
+        $this->scoreModel->create('user', 'login');
+
+        // 保存日志记录
+        $this->entryModel->saveLog($entry->id, $this->server->request_uri);
+    }
+
+    /**
      * Check token of an entry.
      *
      * @param  object $entry
