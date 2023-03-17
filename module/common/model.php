@@ -13,7 +13,13 @@ class commonModel extends model
 {
     static public $requestErrors = array();
 
-    public userModel $user;
+    public userModel $userModel;
+
+    public entryModel $entryModel;
+
+    public actionModel $actionModel;
+
+    public scoreModel $scoreModel;
 
     /**
      * The construc method, to do some auto things.
@@ -312,7 +318,7 @@ class commonModel extends model
             $user->rights     = $this->loadModel('user')->authorize('guest');
             $user->groups     = array('group');
             $user->visions    = $this->config->vision;
-            if(!defined('IN_UPGRADE')) $user->view = $this->user->grantUserView($user->account, $user->rights['acls']);
+            if(!defined('IN_UPGRADE')) $user->view = $this->userModel->grantUserView($user->account, $user->rights['acls']);
             $this->session->set('user', $user);
             $this->app->user = $this->session->user;
         }
@@ -415,7 +421,7 @@ class commonModel extends model
             /* Get authorize again. */
             $user = $this->app->user;
             $user->rights = $this->loadModel('user')->authorize($user->account);
-            $user->groups = $this->user->getGroups($user->account);
+            $user->groups = $this->userModel->getGroups($user->account);
             $user->admin  = strpos($this->app->company->admins, ",{$user->account},") !== false;
             $this->session->set('user', $user);
             $this->app->user = $this->session->user;
@@ -2450,8 +2456,8 @@ EOD;
             );
             if(!empty($this->app->user->modifyPassword) and (!isset($beforeValidMethods[$module]) or !in_array($method, $beforeValidMethods[$module]))) return print(js::locate(helper::createLink('my', 'changepassword')));
             if($this->isOpenMethod($module, $method)) return true;
-            if(!$this->loadModel('user')->isLogon() and $this->server->php_auth_user) $this->user->identifyByPhpAuth();
-            if(!$this->loadModel('user')->isLogon() and $this->cookie->za) $this->user->identifyByCookie();
+            if(!$this->loadModel('user')->isLogon() and $this->server->php_auth_user) $this->userModel->identifyByPhpAuth();
+            if(!$this->loadModel('user')->isLogon() and $this->cookie->za) $this->userModel->identifyByCookie();
 
             if(isset($this->app->user))
             {
@@ -2897,8 +2903,8 @@ EOD;
 
         $user->last   = time();
         $user->rights = $this->loadModel('user')->authorize($user->account);
-        $user->groups = $this->user->getGroups($user->account);
-        $user->view   = $this->user->grantUserView($user->account, $user->rights['acls']);
+        $user->groups = $this->userModel->getGroups($user->account);
+        $user->view   = $this->userModel->grantUserView($user->account, $user->rights['acls']);
         $user->admin  = str_contains($this->app->company->admins, ",{$user->account},");
         $this->session->set('user', $user);
         $this->app->user = $user;
@@ -2912,6 +2918,11 @@ EOD;
      */
     public function checkEntry()
     {
+        $this->entryModel = $this->loadModel('entry');
+        $this->userModel = $this->loadModel('user');
+        $this->actionModel = $this->loadModel('action');
+        $this->scoreModel = $this->loadModel('score');
+
         /* if the API is new version, goto checkNewEntry. */
         if($this->app->version) return $this->checkNewEntry();
 
@@ -2927,7 +2938,7 @@ EOD;
         if (!$this->get->method)
             $this->get->method = 'index';
 
-        $entry = $this->loadModel('entry')->getByCode($this->get->code);
+        $entry = $this->entryModel->getByCode($this->get->code);
 
         if(!$entry)                         $this->response('EMPTY_ENTRY');
         if(!$entry->key)                    $this->response('EMPTY_KEY');
@@ -2945,22 +2956,22 @@ EOD;
 
         $this->loadModel('user');
         $user->last   = time();
-        $user->rights = $this->user->authorize($user->account);
-        $user->groups = $this->user->getGroups($user->account);
-        $user->view   = $this->user->grantUserView($user->account, $user->rights['acls']);
+        $user->rights = $this->userModel->authorize($user->account);
+        $user->groups = $this->userModel->getGroups($user->account);
+        $user->view   = $this->userModel->grantUserView($user->account, $user->rights['acls']);
         $user->admin  = str_contains($this->app->company->admins, ",{$user->account},");
         $this->session->set('user', $user);
         $this->app->user = $user;
 
         $this->dao->update(TABLE_USER)->set('last')->eq($user->last)->where('account')->eq($user->account)->exec();
-        $this->loadModel('action')->create('user', $user->id, 'login');
-        $this->loadModel('score')->create('user', 'login');
+        $this->actionModel->create('user', $user->id, 'login');
+        $this->scoreModel->create('user', 'login');
 
         if($isFreepasswd) die(js::locate($this->config->webRoot));
 
         $this->session->set('ENTRY_CODE', $this->get->code);
         $this->session->set('VALID_ENTRY', md5(md5($this->get->code) . helper::getRemoteIp()));
-        $this->loadModel('entry')->saveLog($entry->id, $this->server->request_uri);
+        $this->entryModel->saveLog($entry->id, $this->server->request_uri);
 
         /* Add for task #5384. */
         if($_SERVER['REQUEST_METHOD'] == 'POST' and empty($_POST))
