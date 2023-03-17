@@ -4,7 +4,7 @@ ARG USER=www-data
 ARG GROUP=www-data
 ARG APACHE_DOCUMENT_ROOT=/var/www/html
 
-RUN apt-get update && apt-get install -y zlib1g-dev && apt-get install -y libzip-dev
+RUN apt-get install -y zlib1g-dev && apt-get install -y libzip-dev
 
 RUN docker-php-ext-install pdo pdo_mysql zip
 
