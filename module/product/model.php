@@ -57,6 +57,13 @@ class productModel extends model
         return $pageNav;
     }
 
+    public function getAllProduct()
+    {
+        return $this->dao->select('id')->from(TABLE_PRODUCT)
+            ->where('deleted')->eq(0)
+            ->fetchAll();
+    }
+
     /**
      * Create the select code of products.
      *

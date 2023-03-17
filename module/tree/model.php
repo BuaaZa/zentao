@@ -90,7 +90,8 @@ class treeModel extends model
             return $this->dao->select('*')->from(TABLE_MODULE)
                 ->where('root')->eq((int)$rootID)
                 ->beginIF($type == 'task')->andWhere('type')->eq('task')->fi()
-                ->beginIF($type != 'task')->andWhere('type')->in("story,$type")->fi()
+                ->beginIF($type == 'interface')->andWhere('type')->eq('interface')->fi()
+                ->beginIF(strpos('task,interface',$type)===false)->andWhere('type')->in("story,$type")->fi()
                 ->beginIF($startModulePath)->andWhere('path')->like($startModulePath)->fi()
                 ->beginIF($branch !== 'all' and $branch !== '' and $branch !== false)
                 ->andWhere("(branch")->eq(0)
@@ -1303,6 +1304,13 @@ class treeModel extends model
         $methodName = strpos(',project,execution,', ",{$this->app->tab},") !== false ? 'testcase' : 'browse';
         $param      = $this->app->tab == 'project' ? "projectID={$this->session->project}&" : "";
         $param      = $this->app->tab == 'execution' ? "executionID={$extra['executionID']}&" : $param;
+        return html::a(helper::createLink($moduleName, $methodName, $param . "root={$module->root}&branch={$extra['branchID']}&type=byModule&param={$module->id}"), $module->name, '_self', "id='module{$module->id}' data-app='{$this->app->tab}' title='{$module->name}'");
+    }
+
+    public function createInterfaceLink($type, $module, $extra = array())
+    {
+        $moduleName = 'ztInterface';
+        $methodName = 'browse';
         return html::a(helper::createLink($moduleName, $methodName, $param . "root={$module->root}&branch={$extra['branchID']}&type=byModule&param={$module->id}"), $module->name, '_self', "id='module{$module->id}' data-app='{$this->app->tab}' title='{$module->name}'");
     }
 
