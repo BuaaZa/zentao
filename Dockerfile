@@ -4,12 +4,7 @@ ARG USER=www-data
 ARG GROUP=www-data
 ARG APACHE_DOCUMENT_ROOT=/var/www/html
 
-RUN apt-get update && \
-    apt-get install -y \
-        libzip-dev \
-        zip
-
-RUN docker-php-ext-install pdo pdo_mysql zip
+RUN docker-php-ext-install pdo pdo_mysql
 
 ADD --chown=${USER}:${GROUP} . ${APACHE_DOCUMENT_ROOT}/zentaopms
 
