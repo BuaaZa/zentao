@@ -33,16 +33,10 @@
       <h1 class='text-center'><?php echo $title;?></h1>
       <div class='panel-body'>
         <?php echo $lang->install->introductionContent;?>
-<!--        <video class='hidden' src="--><?php //echo $lang->install->guideVideo;?><!--"  width="100%" controls ="controls"></video>-->
+        <video class='hidden' src="<?php echo $lang->install->guideVideo;?>"  width="100%" controls ="controls"></video>
         <div class='text-center'>
-<!--          <h2>--><?php //echo $lang->install->howToUse;?><!--</h2>-->
-<!--          --><?php //$systemMode = isset($lang->upgrade->to15Mode['classic']) ? 'classic' : 'new';?>
-<!--          --><?php //if($config->visions == ',lite,'):?>
-<!--          --><?php //unset($lang->install->modeList['classic']);?>
           <?php $systemMode = 'new';?>
-<!--          --><?php //endif;?>
-<!--          <div class='select-mode'>--><?php //echo html::radio('mode', $lang->install->modeList, $systemMode);?><!--</div>-->
-<!--          <div id='selectedModeTips' class='text-info'>--><?php //echo $lang->upgrade->selectedModeTips[$systemMode];?><!--</div>-->
+          <div class='select-mode' style="display: none"><?php echo html::radio('mode', $lang->install->modeList, $systemMode);?></div>
         </div>
       </div>
       <hr/>
