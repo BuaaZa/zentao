@@ -54,7 +54,7 @@
           <td colspan='3' class='text-center form-actions'>
             <?php echo html::hidden('id', $story->id);?>
             <?php echo html::submitButton();?>
-            <?php if(!isonlybody()) echo html::a($app->session->storyList ? $app->session->storyList : inlink('view', "storyID=$story->id"), $lang->goback, '', 'class="btn btn-wide"');?>
+            <?php echo html::linkButton($lang->goback, $this->session->storyList, '', '', 'btn btn-wide');?>
           </td>
         </tr>
       </table>
