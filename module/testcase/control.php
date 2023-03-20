@@ -2390,7 +2390,10 @@ class testcase extends control
      */
     public function datasample()
     {
-
+        if($this->server->request_method == 'POST')
+        {
+            return $this->send(array('result' => 'success', 'closeModal' => true));
+        }
         $this->display();
     }
     /**

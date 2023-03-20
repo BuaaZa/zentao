@@ -1,9 +1,28 @@
 
 
 <?php include '../../common/view/header.lite.html.php';?>
+<div id='mainContent' class='main-content'>
+    <div class='main-header'>
+        <h2>填写数据样本</h2>
+    </div>
+    <div style="text-align:center">
+        <form class='load-indicator main-form form-ajax' method='post' enctype='multipart/form-data' id='dataform' data-type='ajax'>
+    <table id="testTable" class='table table-form mg-0 table-bordered' style='border: 1px solid #ddd'>
+        <tr>
+            <td><b>输入输出项名称</b></td>
+            <td><b>样本1</b></td>
+        </tr>
+    </table>
+        <br><br>
+        <button class="btn" type="button"  onclick="addRow();"> 添加输入输出项</button>
+        <button class="btn" type="button"  onclick="addCol();"> 添加测试样本</button>
+        <button id='submit' class="btn btn-wide btn-primary " type="submit"  onclick="save_in_cookie();"> 保存</button>
+        <br><br>
+        </form>
+    <!-- <input type="button" value="保存" onclick="save_in_cookie();"/> -->
+    </div>
+</div>
 
-<head>
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <style type="text/css">
         .cl1{
             background-color:#FFFFFF;
@@ -14,11 +33,18 @@
     </style>
     <script type="text/javascript">
         var rowCount = 0;
-        var colCount = 2;
+        var colCount = 1;
         function addRow(){
 
             rowCount++;
-            var rowTemplate = '<tr class="tr_'+rowCount+'"><td>'+rowCount+'</td><td class="cl1">内容'+rowCount+'</td><td class="cl1"><a href="#" onclick=delRow('+rowCount+')>删除</a></td></tr>';
+            var rowTemplate_1 = "<td><textarea rows='1' class='form-control autosize step-expects' name='datasample[][]' placeholder=''></textarea></td>";
+            var rowTemplate_2 = '';
+            for(i = 1; i<=colCount; i++){
+                var tmp_template = "<td><textarea rows='1' class='form-control autosize step-expects' name='datasample[][]'></textarea></td>";
+                rowTemplate_2 += tmp_template;
+            }
+            var rowTemplate_3 = '</tr>';
+            var rowTemplate = rowTemplate_1 + rowTemplate_2 + rowTemplate_3;
             var testtable = $("#testTable").find("tbody");
             var tableHtml = testtable.html();
             tableHtml += rowTemplate;
@@ -31,10 +57,17 @@
         }
         function addCol(){
             colCount++;
+            var i = 1;
             $("#testTable tr").each(function(){
                 var trHtml = $(this).html();
-                trHtml += '<td onclick="delCol('+colCount+')">增加的td</td>';
+                if(i === 1){
+                    trHtml += '<td onclick="delCol('+colCount+')"><b>样本'+colCount+'</b></td>';
+                }else{
+                    trHtml += "<td><textarea rows='1' class='form-control autosize step-expects' name='datasample[][]'></textarea></td>";
+                }
+
                 $(this).html(trHtml);
+                i++;
             });
         }
         function delCol(_id){
@@ -55,20 +88,13 @@
                 $("td:eq("+_id+")",this).addClass("cl1");
             });
         }
+        function save_in_cookie(){
+            //history.go(-1)
+            //console.log("1");
+            //此处将表单数据存到cookie中
+
+        }
     </script>
-    <title>jquery操作表格测试</title>
-</head>
-<body>
-<table id="testTable" border="1" width="500">
-    <tr>
-        <td>序号</td>
-        <td onmouseover="mover(1);" onmouseout="mout(1);">内容</td>
-        <td onmouseover="mover(2);" onmouseout="mout(2);">操作</td>
-    </tr>
-</table>
-<input type="button" value="添加行" onclick="addRow();"/>
-<input type="button" value="添加列" onclick="addCol();"/>
-</body>
 
 
 
