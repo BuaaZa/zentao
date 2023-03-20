@@ -14332,3 +14332,5 @@ create index project
 
 alter table zt_task
     add workcodelines int unsigned default 0 null after fromIssue;
+
+alter table `zt_testtask` add `parent` int not null;

@@ -2381,6 +2381,18 @@ class testcase extends control
         #if(dao::isError()) return $this->send(array('result' => 'fail', 'message' => dao::getError()));
         $this->display();
     }
+
+    /**
+     * fill in datasample table in front end
+     *
+     * @access public
+     * @return void
+     */
+    public function datasample()
+    {
+
+        $this->display();
+    }
     /**
      * Case bugs.
      *

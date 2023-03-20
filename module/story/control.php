@@ -157,6 +157,27 @@ class story extends control
                 }
                 return $this->send($response);
             }
+            if($storyResult['status'] == 'created' && $thisStory->type == 'story')
+            {
+                $response['result'] = 'success';
+                $response['message'] = $this->lang->saveSuccess;
+                if($objectID == 0)
+                {
+                    $response['locate'] = $this->createLink('story', 'view', "storyID={$thisStory->id}&version=0&param=0&storyType=story");
+                }
+                else
+                {
+                    $execution          = $this->dao->findById((int)$objectID)->from(TABLE_EXECUTION)->fetch();
+                    $moduleName         = $execution->type != 'execution' ? 'story' : 'execution';
+                    $funcName           = $execution->type != 'execution' ? 'view' : 'storyView';
+                    $param              = $execution->type != 'execution' ? "storyID={$thisStory->id}&version=0&param=0&storyType=story" : "storyID={$thisStory->id}&executionID={$objectID}";
+                    $response['locate'] = $this->createLink($moduleName, $funcName, $param);
+                }
+                if($this->app->tab == 'qa'){
+                    $response['locate'] = $this->createLink('story', 'view', "storyID={$thisStory->id}&version=0&param=0&storyType=story").'#app=qa';
+                }
+                return $this->send($response);
+            }
 
             if($storyResult['status'] == 'exists')
             {
@@ -458,11 +479,8 @@ class story extends control
         $this->view->pri              = $pri;
         $this->view->branch           = $branch;
         $this->view->branches         = $branches;
-        if($stroyType == 'taskPoint'){
+        if($storyType == 'taskPoint'){
             $this->view->stories          = $this->story->getParentStoryPairsTaskPoint($productID);
-        }
-        else{
-            $this->view->stories          = $this->story->getParentStoryPairs($productID);
         }
         $this->view->productID        = $productID;
         $this->view->product          = $product;
@@ -2575,9 +2593,9 @@ class story extends control
      * @access public
      * @return string
      */
-    public function ajaxGetParentStory($productID, $labelName = '')
+    public function ajaxGetParentStory($productID, $labelName = '', $fromExecution = -1)
     {
-        $stories = $this->story->getParentStoryPairs($productID);
+        $stories = $this->story->getParentStoryPairs($productID, '',$fromExecution);
         return print(html::select($labelName, $stories, 0, 'class="form-control"'));
     }
 
