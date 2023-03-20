@@ -416,13 +416,14 @@ class commonModel extends model
      */
     public function deny($module, $method, $reload = true)
     {
+        $this->userModel = $this->loadModel('user');
         if($reload)
         {
             /* Get authorize again. */
             $user = $this->app->user;
-            $user->rights = $this->loadModel('user')->authorize($user->account);
+            $user->rights = $this->userModel->authorize($user->account);
             $user->groups = $this->userModel->getGroups($user->account);
-            $user->admin  = strpos($this->app->company->admins, ",{$user->account},") !== false;
+            $user->admin  = str_contains($this->app->company->admins, ",$user->account,");
             $this->session->set('user', $user);
             $this->app->user = $this->session->user;
             if(commonModel::hasPriv($module, $method)) return true;
@@ -437,7 +438,7 @@ class commonModel extends model
         $denyLink = helper::createLink('user', 'deny', $vars);
 
         /* Fix the bug of IE: use js locate, can't get the referer. */
-        if(strpos($this->server->http_user_agent, 'Trident') !== false)
+        if(str_contains($this->server->http_user_agent, 'Trident'))
         {
             echo "<a href='$denyLink' id='denylink' style='display:none'>deny</a>";
             echo "<script>document.getElementById('denylink').click();</script>";
