@@ -204,14 +204,7 @@ foreach(explode(',', $config->testcase->create->requiredFields) as $field)
                       </div>
                     </td>
                       <td class='step-actions'>
-
-                              <button type='button' class='btn btn-step-add-datasample' tabindex='-1'><i class='icon icon-plus'>
-                                      <?php
-                                      $Link = $this->createLink('testcase', 'datasample');
-                                      echo html::a($Link,'填写') ;
-                                      ?>
-                                  </i></button>
-
+                          <?php echo $this->loadModel('common')->buildMenu('testcase', 'datasample', "", '', 'button', 'plus', '', 'showinonlybody iframe', true);?>
                       </td>
                   </tr>
                   <?php foreach($steps as $stepID => $step):?>
@@ -251,12 +244,7 @@ foreach(explode(',', $config->testcase->create->requiredFields) as $field)
                       </div>
                     </td>
                       <td class='step-actions'>
-                      <button type='button' class='btn btn-step-add-datasample' tabindex='-1'><i class='icon icon-plus'>
-                                      <?php
-                                      $Link = $this->createLink('testcase', 'datasample');
-                                      echo html::a($Link,'填写') ;
-                                      ?>
-                      </i></button>
+                      <?php echo $this->loadModel('common')->buildMenu('testcase', 'datasample', "", '', 'button', 'plus', '', 'showinonlybody iframe', true);?>
                       </td>
                   </tr>
                   <?php endforeach; ?>
