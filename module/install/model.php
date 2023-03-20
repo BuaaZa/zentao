@@ -289,9 +289,9 @@ class installModel extends model
      * Check config ok or not.
      *
      * @access public
-     * @return array
+     * @return stdclass
      */
-    public function checkConfig()
+    public function checkConfig(): stdclass
     {
         $return = new stdclass();
         $return->result = 'ok';
@@ -299,7 +299,7 @@ class installModel extends model
         /* Connect to database. */
         $this->setDBParam();
         $this->dbh = $this->connectDB();
-        if(strpos($this->post->dbName, '.') !== false)
+        if(str_contains($this->post->dbName, '.'))
         {
             $return->result = 'fail';
             $return->error  = $this->lang->install->errorDBName;
@@ -315,7 +315,7 @@ class installModel extends model
         /* Get mysql version. */
         $version = $this->getMysqlVersion();
 
-        /* If database no exits, try create it. */
+        /* If database no exits, try to create it. */
         if(!$this->dbExists())
         {
             if(!$this->createDB($version))
@@ -458,17 +458,17 @@ class installModel extends model
                 $table = trim($table);
                 if(empty($table)) continue;
 
-                if(strpos($table, 'CREATE') !== false and $version <= 4.1)
+                if(str_contains($table, 'CREATE') and $version <= 4.1)
                 {
                     $table = str_replace('DEFAULT CHARSET=utf8', '', $table);
                 }
-                elseif(strpos($table, 'DROP') !== false and $this->post->clearDB != false)
+                elseif(str_contains($table, 'DROP') and $this->post->clearDB)
                 {
                     $table = str_replace('--', '', $table);
                 }
 
                 $tableToLower = strtolower($table);
-                if(strpos($tableToLower, 'fulltext') !== false and strpos($tableToLower, 'innodb') !== false and $version < 5.6)
+                if(str_contains($tableToLower, 'fulltext') and str_contains($tableToLower, 'innodb') and $version < 5.6)
                 {
                     $this->lang->install->errorCreateTable = $this->lang->install->errorEngineInnodb;
                     return false;
@@ -478,7 +478,7 @@ class installModel extends model
                 $table = str_replace('__TABLE__', $this->config->db->name, $table);
 
                 /* Skip sql that is note. */
-                if(strpos($table, '--') === 0) continue;
+                if(str_starts_with($table, '--')) continue;
 
                 $table = str_replace('`zt_', $this->config->db->name . '.`zt_', $table);
                 $table = str_replace('`ztv_', $this->config->db->name . '.`ztv_', $table);

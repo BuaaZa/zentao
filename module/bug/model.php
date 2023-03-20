@@ -376,7 +376,7 @@ class bugModel extends model
      * @param int|string $branch
      * @param string $browseType
      * @param int $moduleID
-     * @param int $queryID
+     * @param int|string $queryID
      * @param string $sort
      * @param object $pager
      * @param int $projectID
@@ -388,7 +388,7 @@ class bugModel extends model
                             int|string $branch,
                             string     $browseType,
                             int        $moduleID,
-                            int        $queryID,
+                            int|string $queryID,
                             string     $sort,
                             object     $pager,
                             int        $projectID): array {
