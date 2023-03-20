@@ -6,15 +6,19 @@
         <h2>填写数据样本</h2>
     </div>
     <div style="text-align:center">
+        <form class='load-indicator main-form form-ajax' method='post' enctype='multipart/form-data' id='dataform' data-type='ajax'>
     <table id="testTable" class='table table-form mg-0 table-bordered' style='border: 1px solid #ddd'>
         <tr>
             <td><b>输入输出项名称</b></td>
             <td><b>样本1</b></td>
         </tr>
     </table>
+        <br><br>
         <button class="btn" type="button"  onclick="addRow();"> 添加输入输出项</button>
         <button class="btn" type="button"  onclick="addCol();"> 添加测试样本</button>
-        <button class="btn btn-wide btn-primary" type="button"  onclick="save_in_cookie();"> 保存</button>
+        <button id='submit' class="btn btn-wide btn-primary " type="submit"  onclick="save_in_cookie();"> 保存</button>
+        <br><br>
+        </form>
     <!-- <input type="button" value="保存" onclick="save_in_cookie();"/> -->
     </div>
 </div>
@@ -86,6 +90,9 @@
         }
         function save_in_cookie(){
             //history.go(-1)
+            //console.log("1");
+            //此处将表单数据存到cookie中
+
         }
     </script>
 
