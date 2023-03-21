@@ -553,6 +553,9 @@ class story extends control
             }
             $this->view->execution = $execution;
         }
+        else if($this->app->tab == 'qa'){
+            $this->loadModel('qa')->setMenu('',$productID);
+        }
         else
         {
             $this->product->setMenu($productID, $branch);
@@ -568,7 +571,7 @@ class story extends control
         if($storyID)
         {
             $story = $this->story->getById($storyID);
-            if(($story->status != 'active' or $story->stage != 'wait' or $story->parent > 0) and $this->config->vision != 'lite') return print(js::alert($this->lang->story->errorNotSubdivide) . js::locate('back'));
+            if($storyType == 'story' && ($story->status != 'active' or $story->stage != 'wait' or $story->parent > 0) and $this->config->vision != 'lite') return print(js::alert($this->lang->story->errorNotSubdivide) . js::locate('back'));
         }
 
         if(!empty($_POST))
@@ -735,6 +738,7 @@ class story extends control
 
         $this->view->customFields = $customFields;
         $this->view->showFields   = $showFields;
+
 
         $this->view->title            = $product->name . $this->lang->colon . ($storyID ? $this->lang->story->subdivide : $this->lang->story->batchCreate);
         $this->view->productName      = $product->name;
