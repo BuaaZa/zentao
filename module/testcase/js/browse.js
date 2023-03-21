@@ -31,5 +31,14 @@ $(function()
             $('#caseIdList').val(storyIdList);
         });
     });
+    $('#exportToWord').on('click', function()
+    {
+        var storyIdList = '';
+        $("input[name^='caseIDList']:checked").each(function()
+        {
+            storyIdList += $(this).val() + ',';
+            $('#caseIdList2').val(storyIdList);
+        });
+    });
 });
 
