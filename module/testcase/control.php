@@ -402,6 +402,9 @@ class testcase extends control
                 //die($noticeStr);
             }
 
+            //获取数据样本表的填写内容
+            $datasample = json_decode($this->post->datasample, true);
+            //error_log(print_r($datasample, 1));
 
             $response['result'] = 'success';
 

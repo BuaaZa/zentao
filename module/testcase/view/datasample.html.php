@@ -37,10 +37,10 @@
         function addRow(){
 
             rowCount++;
-            var rowTemplate_1 = "<td><textarea rows='1' class='form-control autosize step-expects' name='datasample[][]' placeholder=''></textarea></td>";
+            var rowTemplate_1 = "<td><textarea rows='1' class='form-control autosize step-expects' name='datasample["+(rowCount-1)+"][0]' placeholder=''></textarea></td>";
             var rowTemplate_2 = '';
             for(i = 1; i<=colCount; i++){
-                var tmp_template = "<td><textarea rows='1' class='form-control autosize step-expects' name='datasample[][]'></textarea></td>";
+                var tmp_template = "<td><textarea rows='1' class='form-control autosize step-expects' name='datasample["+(rowCount-1)+"]["+i+"]'></textarea></td>";
                 rowTemplate_2 += tmp_template;
             }
             var rowTemplate_3 = '</tr>';
@@ -61,9 +61,9 @@
             $("#testTable tr").each(function(){
                 var trHtml = $(this).html();
                 if(i === 1){
-                    trHtml += '<td onclick="delCol('+colCount+')"><b>样本'+colCount+'</b></td>';
+                    trHtml += '<td><b>样本'+colCount+'</b></td>';
                 }else{
-                    trHtml += "<td><textarea rows='1' class='form-control autosize step-expects' name='datasample[][]'></textarea></td>";
+                    trHtml += "<td><textarea rows='1' class='form-control autosize step-expects' name='datasample["+(i-2)+"]["+colCount+"]'></textarea></td>";
                 }
 
                 $(this).html(trHtml);
@@ -96,18 +96,20 @@
             var matrix = []; // initialize empty array
             for (var i = 0; i < form.elements.length; i++) { // loop through each form element
                     var element = form.elements[i]; // get current element
-                    if (element.name.startsWith("matrix")) { // if element name starts with matrix
+                    if (element.name.startsWith("datasample")) { // if element name starts with matrix
                         var indices = element.name.match(/\d+/g); // get row and column indices from name
                         var row = parseInt(indices[0]); // get row index as number
                         var col = parseInt(indices[1]); // get column index as number
                         if (!matrix[row]) { // if row does not exist in array yet
                             matrix[row] = []; // create empty row array
                         }
-                        matrix[row][col] = parseInt(element.value); // assign element value to array position
+                        matrix[row][col] =element.value; // assign element value to array position
                     }
             }
             var matrixString = JSON.stringify(matrix); // convert array to string using JSON.stringify()
-            document.cookie = "datasam="+matrixString;
+            //document.cookie = "datasam="+matrixString;
+            $.cookie("datasample", matrixString);
+            //alert($.cookie('datasample'));
             //alert(matrixString);
         }
     </script>
