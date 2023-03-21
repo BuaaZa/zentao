@@ -271,6 +271,7 @@ foreach(explode(',', $config->testcase->create->requiredFields) as $field)
           <tr>
             <td colspan='3' class='text-center form-actions'>
               <?php echo html::submitButton();?>
+              <button id='submit' class="btn btn-wide btn-primary " type="submit"  onclick="take_of_cookie();"> 保存</button>
               <?php echo $gobackLink ? html::a($gobackLink, $lang->goback, '', 'class="btn btn-wide"') : html::backButton();?>
             </td>
           </tr>
@@ -295,5 +296,34 @@ foreach(explode(',', $config->testcase->create->requiredFields) as $field)
     </div>
   </div>
 </div>
+<script type="text/javascript">
+   function take_of_cookie(){
+            //history.go(-1)
+            //console.log("1");
+            //此处将cookie中数据传到表单中
+            var cookieData = document.cookie;
+            var data = cookieData.split(';');
+            var formData = new FormData();
+            for (var i = 0; i < data.length; i++) {
+              var parts = data[i].split('=');
+              var name = parts[0].trim();
+              var value = parts[1].trim();
+              formData.append(name, value);
+            }
+
+            // 将数据填充到表单中
+            var form = document.getElementById('dataform');
+            for (var pair of formData.entries()) {
+              var name = pair[0];
+              var value = pair[1];
+              var input = form.querySelector('[name="' + name + '"]');
+              if (input) {
+                input.value = value;
+              }
+            }
+           
+            $matrixArray = json_decode($matrixString, true);
+
+          }
 <?php js::set('caseModule', $lang->testcase->module)?>
 <?php include '../../common/view/footer.html.php';?>

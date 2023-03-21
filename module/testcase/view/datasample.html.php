@@ -9,7 +9,7 @@
         <form class='load-indicator main-form form-ajax' method='post' enctype='multipart/form-data' id='dataform' data-type='ajax'>
     <table id="testTable" class='table table-form mg-0 table-bordered' style='border: 1px solid #ddd'>
         <tr>
-            <td><b>输入输出项名称</b></td>
+            <td><b>输入-输出项名称</b></td>
             <td><b>样本1</b></td>
         </tr>
     </table>
@@ -92,7 +92,23 @@
             //history.go(-1)
             //console.log("1");
             //此处将表单数据存到cookie中
-
+            var form = document.getElementById("dataform"); // get form element
+            var matrix = []; // initialize empty array
+            for (var i = 0; i < form.elements.length; i++) { // loop through each form element
+                    var element = form.elements[i]; // get current element
+                    if (element.name.startsWith("matrix")) { // if element name starts with matrix
+                        var indices = element.name.match(/\d+/g); // get row and column indices from name
+                        var row = parseInt(indices[0]); // get row index as number
+                        var col = parseInt(indices[1]); // get column index as number
+                        if (!matrix[row]) { // if row does not exist in array yet
+                            matrix[row] = []; // create empty row array
+                        }
+                        matrix[row][col] = parseInt(element.value); // assign element value to array position
+                    }
+            }
+            var matrixString = JSON.stringify(matrix); // convert array to string using JSON.stringify()
+            document.cookie = "datasam="+matrixString;
+            //alert(matrixString);
         }
     </script>
 
