@@ -272,7 +272,6 @@ $lang->testcase->featureBar['browse']['browseunits'] = '单元测试';
 $lang->testcase->featureBar['browse']['suite']       = '套件';
 $lang->testcase->featureBar['groupcase']             = $lang->testcase->featureBar['browse'];
 
-$lang->ztInterface = new stdclass();
-$lang->ztInterface->common = "接口";
-$lang->ztInterface->summary   = "本页共 <strong>%s</strong> 个接口。";
-
+$lang->ztinterface->common = "接口";
+$lang->ztinterface->summary   = "本页共 <strong>%s</strong> 个接口。";
+$lang->ztinterface->noModule = '<div>您现在还没有模块信息</div><div>请维护接口模块</div>';

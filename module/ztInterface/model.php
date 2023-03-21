@@ -14,19 +14,25 @@ use PhpOffice\PhpWord\TemplateProcessor;
 use PhpOffice\PhpWord\IOFactory;
 ?>
 <?php
-class ztInterfaceModel extends model
+class ztinterfaceModel extends model
 {
     public function setMenu($productID)
     {
-        if($productID>=0)$product = $this->getByID($productID);
+        $this->loadModel('product');
+        if($productID>0)$product = $this->product->getByID($productID);
         if(!$productID||!$product) {
-            $products = $this->loadModel('product')->getAllProduct();
+            $products = $this->product->getlist();
             if(!$products){
                 $productID = 0;
-            }else
-                $productID = $products[0];
+            }else{
+                foreach($products as $p){
+                    if($productID == 0||$p->id<$productID)
+                        $productID = $p->id;
+                }
+            }
         }
-        common::setMenuVars('ztInterface', $productID);
+        $this->lang->switcherMenu = $this->product->getSwitcher($productID);
+        common::setMenuVars('ztinterface', $productID);
         return $productID;
     }
 

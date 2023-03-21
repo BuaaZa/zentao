@@ -24,20 +24,13 @@ js::set('productID',      $productID);
 js::set('branch',         $branch);
 js::set('suiteID',        $suiteID);
 ?>
-<?php if($this->app->tab == 'project'):?>
-<style>
-#subHeader #dropMenu .col-left .list-group {margin-bottom: 0px; padding-top: 10px;}
-#subHeader #dropMenu .col-left {padding-bottom: 0px;}
-</style>
-<?php endif;?>
-
 <div id="mainContent" class="main-row fade">
   <div class='side-col' id='sidebar'>
     <div class="sidebar-toggle"><i class="icon icon-angle-left"></i></div>
     <div class='cell'>
       <?php if(!$moduleTree):?>
       <hr class="space">
-      <div class="text-center text-muted"><?php echo $lang->testcase->noModule;?></div>
+      <div class="text-center text-muted"><?php echo $lang->ztinterface->noModule;?></div>
       <hr class="space">
       <?php endif;?>
       <?php echo $moduleTree;?>

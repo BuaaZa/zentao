@@ -12,7 +12,7 @@ $lang->navIcons['doc']       = "<i class='icon icon-doc'></i>";
 $lang->navIcons['report']    = "<i class='icon icon-statistic'></i>";
 $lang->navIcons['system']    = "<i class='icon icon-group'></i>";
 $lang->navIcons['admin']     = "<i class='icon icon-cog-outline'></i>";
-$lang->navIcons['ztInterface'] = "<i class='icon icon-college'></i>";
+$lang->navIcons['ztinterface'] = "<i class='icon icon-college'></i>";
 
 global $config;
 list($programModule, $programMethod) = explode('-', $config->programLink);
@@ -54,7 +54,7 @@ $lang->mainNav->doc    = "{$lang->navIcons['doc']} {$lang->doc->common}|doc|inde
 $lang->mainNav->report = "{$lang->navIcons['report']} {$lang->report->common}|report|productSummary|";
 $lang->mainNav->system = "{$lang->navIcons['system']} {$lang->system->common}|my|team|";
 $lang->mainNav->admin  = "{$lang->navIcons['admin']} {$lang->admin->common}|admin|index|";
-$lang->mainNav->ztInterface  = "{$lang->navIcons['ztInterface']} 接口|ztInterface|browse|";
+$lang->mainNav->ztinterface  = "{$lang->navIcons['ztinterface']} 接口|ztinterface|browse|";
 
 $lang->dividerMenu           = ',kanban,oa,admin,';
 $lang->mainNav->menuOrder[5] = 'my';
@@ -63,7 +63,7 @@ $lang->mainNav->menuOrder[15] = 'product';
 if($config->systemMode == 'new') $lang->mainNav->menuOrder[20] = 'project';
 $lang->mainNav->menuOrder[21] = 'execution';
 $lang->mainNav->menuOrder[23] = 'qa';
-$lang->mainNav->menuOrder[24] = 'ztInterface';
+$lang->mainNav->menuOrder[24] = 'ztinterface';
 $lang->mainNav->menuOrder[25] = 'devops';
 $lang->mainNav->menuOrder[30] = 'kanban';
 $lang->mainNav->menuOrder[35] = 'doc';
@@ -72,19 +72,19 @@ $lang->mainNav->menuOrder[45] = 'system';
 $lang->mainNav->menuOrder[65] = 'admin';
 
 
-/* ztInterface menu */
-$lang->ztInterface = new stdclass();
-$lang->ztInterface->menu             = new stdclass();
-$lang->ztInterface->menu->param      = array('link' => "接口信息|ztInterface|browse|productID=%s");
-$lang->ztInterface->menu->message        = array('link' => "接口报文|bug|browse|productID=%s", 'subModule' => 'bug');
-$lang->ztInterface->menu->character   = array('link' => "字符集|testcase|browse|productID=%s", 'subModule' => 'testcase,story');
-$lang->ztInterface->menu->instance   = array('link' => "字符集|testcase|browse|productID=%s", 'subModule' => 'testcase,story');
+/* ztinterface menu */
+$lang->ztinterface = new stdclass();
+$lang->ztinterface->menu             = new stdclass();
+$lang->ztinterface->menu->interParam      = array('link' => "接口信息|ztinterface|browse|productID=%s");
+$lang->ztinterface->menu->interMessage    = array('link' => "接口报文|bug|browse|productID=%s", 'subModule' => 'bug');
+$lang->ztinterface->menu->interCharacter  = array('link' => "字符集|testcase|browse|productID=%s", 'subModule' => 'testcase,story');
+$lang->ztinterface->menu->interInstance   = array('link' => "字符集|testcase|browse|productID=%s", 'subModule' => 'testcase,story');
 
 
-$lang->ztInterface->menuOrder[5]  = 'param';
-$lang->ztInterface->menuOrder[10] = 'message';
-$lang->ztInterface->menuOrder[15] = 'character';
-$lang->ztInterface->menuOrder[20] = 'instance';
+$lang->ztinterface->menuOrder[5]  = 'interParam';
+$lang->ztinterface->menuOrder[10] = 'interMessage';
+$lang->ztinterface->menuOrder[15] = 'interCharacter';
+$lang->ztinterface->menuOrder[20] = 'interInstance';
 
 
 /* My menu. */
@@ -421,7 +421,7 @@ $lang->qa->menuOrder[50] = 'automation';
 // $lang->qa->menu->automation['subMenu']->browse      = array('link' => "{$lang->intro}|automation|browse|productID=%s", 'alias' => '');
 // $lang->qa->menu->automation['subMenu']->framework   = array('link' => '框架|automation|framework|productID=%s', 'alias' => '');
 // $lang->qa->menu->automation['subMenu']->data        = array('link' => '数据|automation|date|productID=%s', 'alias' => '');
-// $lang->qa->menu->automation['subMenu']->ztInterface   = array('link' => '接口|automation|ztInterface|productID=%s', 'alias' => '');
+// $lang->qa->menu->automation['subMenu']->ztinterface   = array('link' => '接口|automation|ztinterface|productID=%s', 'alias' => '');
 // $lang->qa->menu->automation['subMenu']->environment = array('link' => '环境|automation|environment|productID=%s', 'alias' => '');
 
 //$lang->qa->dividerMenu = ',bug,testtask,caselib,';
@@ -664,6 +664,13 @@ $lang->navGroup->kanbancard   = 'kanban';
 $lang->navGroup->doc    = 'doc';
 $lang->navGroup->doclib = 'doc';
 $lang->navGroup->api    = 'doc';
+
+
+$lang->navGroup->interParam      = 'ztinterface';
+$lang->navGroup->interMessage    = 'ztinterface';
+$lang->navGroup->interCharacter  = 'ztinterface';
+$lang->navGroup->interInstance   = 'ztinterface';
+
 
 
 $lang->navGroup->report = 'report';

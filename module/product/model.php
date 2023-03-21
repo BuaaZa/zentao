@@ -60,7 +60,7 @@ class productModel extends model
     public function getAllProduct()
     {
         return $this->dao->select('id')->from(TABLE_PRODUCT)
-            ->where('deleted')->eq(0)
+            //->where('deleted')->eq(0)
             ->fetchAll();
     }
 
@@ -623,6 +623,7 @@ class productModel extends model
         if($currentModule == 'testcase' and strpos(',view,edit,', ",$currentMethod,") !== false) $currentMethod = 'browse';
         if($currentModule == 'bug' and $currentMethod == 'edit') $currentMethod = 'browse';
         if($currentMethod == 'report') $currentMethod = 'browse';
+        if($currentModule == 'ztinterface' and strpos(',view,edit,create,', ",$currentMethod,") !== false) $currentMethod = 'browse';
 
         $currentProductName = $this->lang->product->common;
         if($productID)
@@ -633,7 +634,7 @@ class productModel extends model
         }
 
         $fromModule   = $this->lang->navGroup->qa == 'qa' ? 'qa' : '';
-        $dropMenuLink = helper::createLink($this->app->tab == 'qa' ? 'product' : $this->app->tab, 'ajaxGetDropMenu', "objectID=$productID&module=$currentModule&method=$currentMethod&extra=$extra&from=$fromModule");
+        $dropMenuLink = helper::createLink(($this->app->tab == 'qa' or $this->app->tab == 'ztinterface') ? 'product' : $this->app->tab, 'ajaxGetDropMenu', "objectID=$productID&module=$currentModule&method=$currentMethod&extra=$extra&from=$fromModule");
 
         if($this->app->viewType == 'mhtml' and $productID) return $this->getModuleNav(array($productID => $currentProductName), $productID, $extra, $branch);
 
@@ -2333,6 +2334,9 @@ class productModel extends model
         elseif($module == 'qastory')
         {
             return helper::createLink('qastory', 'story', "productID=%s");
+        }
+        elseif($module == 'ztinterface'){
+            $link = helper::createLink($module, $methodName, "productID=%s");
         }
 
         return $link;

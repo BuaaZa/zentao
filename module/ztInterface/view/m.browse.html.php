@@ -18,7 +18,7 @@
 </div>
 
 <section id='page' class='section list-with-pager'>
-  <?php $refreshUrl = $this->createLink('ztInterface', 'browse', http_build_query($this->app->getParams()));?>
+  <?php $refreshUrl = $this->createLink('ztinterface', 'browse', http_build_query($this->app->getParams()));?>
   <div class='box' data-page='<?php echo $pager->pageID ?>' data-refresh-url='<?php echo $refreshUrl ?>'>
     <table class='table bordered no-margin'>
       <thead>

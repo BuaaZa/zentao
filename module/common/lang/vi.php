@@ -189,6 +189,9 @@ $lang->personnel->menu->invest     = array('link' => "Investment|personnel|inves
 $lang->personnel->menu->accessible = array('link' => "Accessible|personnel|accessible|program=%s");
 $lang->personnel->menu->whitelist  = array('link' => "Whitelist|personnel|whitelist|program=%s", 'alias' => 'addwhitelist');
 
+$lang->ztinterface = new stdclass();
+$lang->ztinterface->menu             = new stdclass();
+
 /* Scrum menu. */
 $lang->product = new stdclass();
 $lang->product->menu = new stdclass();

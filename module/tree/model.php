@@ -1309,7 +1309,7 @@ class treeModel extends model
 
     public function createInterfaceLink($type, $module, $extra = array())
     {
-        $moduleName = 'ztInterface';
+        $moduleName = 'ztinterface';
         $methodName = 'browse';
         return html::a(helper::createLink($moduleName, $methodName, $param . "root={$module->root}&branch={$extra['branchID']}&type=byModule&param={$module->id}"), $module->name, '_self', "id='module{$module->id}' data-app='{$this->app->tab}' title='{$module->name}'");
     }

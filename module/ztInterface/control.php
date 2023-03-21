@@ -9,7 +9,7 @@
  * @version     $Id: control.php 5112 2013-07-12 02:51:33Z chencongzhi520@gmail.com $
  * @link        http://www.zentao.net
  */
-class ztInterface extends control
+class ztinterface extends control
 {
     /**
      * All products.
@@ -40,7 +40,7 @@ class ztInterface extends control
         $this->loadModel('tree');
         $this->loadModel('user');
         $this->loadModel('qa');
-        $this->loadModel('ztInterface');
+        $this->loadModel('ztinterface');
 
         /* Get product data. */
         $products = array();
@@ -95,7 +95,8 @@ class ztInterface extends control
         $browseType = strtolower($browseType);
 
         /* Set browseType, productID, moduleID and queryID. */
-        $productID = $this->app->tab != 'project' ? $this->product->saveState($productID, $this->products) : $productID;
+        $productID = $this->ztinterface->setMenu($productID);
+        //$productID = $this->product->saveState($productID, $this->products);
         setcookie('preProductID', $productID, $this->config->cookieLife, $this->config->webRoot, '', $this->config->cookieSecure, true);
         
         if($this->cookie->preProductID != $productID)
@@ -106,8 +107,6 @@ class ztInterface extends control
         if($browseType == 'bymodule') setcookie('caseModule', (int)$param, 0, $this->config->webRoot, '', $this->config->cookieSecure, false);
         if($browseType != 'bymodule') $this->session->set('caseBrowseType', $browseType);
         $moduleID = ($browseType == 'bymodule') ? (int)$param : ($browseType == 'bysearch' ? 0 : ($this->cookie->caseModule ? $this->cookie->caseModule : 0));
-
-        $productID = $this->ztInterface->setMenu($productID);
 
         $uri = $this->app->getURI(true);
         $this->session->set('caseList', $uri, $this->app->tab);
@@ -123,11 +122,11 @@ class ztInterface extends control
         $sort  = common::appendOrder($orderBy);
 
         /* Get test cases. */
-        $interfaces = $this->ztInterface->getInterfaces($productID, $moduleID, $sort, $pager);
+        $interfaces = $this->ztinterface->getInterfaces($productID, $moduleID, $sort, $pager);
         if(empty($cases) and $pageID > 1)
         {
             $pager = pager::init(0, $recPerPage, 1);
-            $interfaces = $this->ztInterface->getInterfaces($productID, $moduleID, $sort, $pager);
+            $interfaces = $this->ztinterface->getInterfaces($productID, $moduleID, $sort, $pager);
         }
 
         /* Get module tree.*/
@@ -140,9 +139,9 @@ class ztInterface extends control
 
         /* Assign. */
         $tree = $moduleID ? $this->tree->getByID($moduleID) : '';
-        $this->view->title           = $this->products[$productID] . $this->lang->colon . $this->lang->ztInterface->common;
-        $this->view->position[]      = html::a($this->createLink('ztInterface', 'browse', "productID=$productID"), $this->products[$productID]);
-        $this->view->position[]      = $this->lang->ztInterface->common;
+        $this->view->title           = $this->products[$productID] . $this->lang->colon . $this->lang->ztinterface->common;
+        $this->view->position[]      = html::a($this->createLink('ztinterface', 'browse', "productID=$productID"), $this->products[$productID]);
+        $this->view->position[]      = $this->lang->ztinterface->common;
         $this->view->productID       = $productID;
         $this->view->product         = $product;
         $this->view->productName     = $this->products[$productID];
@@ -150,7 +149,7 @@ class ztInterface extends control
         $this->view->moduleTree      = $moduleTree;
         $this->view->moduleName      = $moduleID ? $tree->name : $this->lang->tree->all;
         $this->view->moduleID        = $moduleID;
-        $this->view->summary         = $this->ztInterface->summary($interfaces);
+        $this->view->summary         = $this->ztinterface->summary($interfaces);
         $this->view->pager           = $pager;
         $this->view->users           = $this->user->getPairs('noletter');
         $this->view->orderBy         = $orderBy;
@@ -159,7 +158,7 @@ class ztInterface extends control
         $this->view->interfaces      = $interfaces;
         $this->view->branchOption    = $branchOption;
         $this->view->branchTagOption = $branchTagOption;
-        $this->view->setModule       = true;
+        $this->view->setModule       = false;
         $this->view->modulePairs     = $this->tree->getModulePairs($productID, 'case', $showModule);
         $this->view->showBranch      = $showBranch;
 
