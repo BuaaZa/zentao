@@ -129,11 +129,11 @@ class install extends control
 
         $this->view->title = $this->lang->install->setConfig;
 
-        $this->view->dbHost     = $dbHost ? $dbHost : '127.0.0.1';
-        $this->view->dbPort     = $dbPort ? $dbPort : '3306';
-        $this->view->dbName     = $dbName ? $dbName : 'zentao';
-        $this->view->dbUser     = $dbUser ? $dbUser : 'root';
-        $this->view->dbPassword = $dbPassword ? $dbPassword : '';
+        $this->view->dbHost     = $dbHost ?: '127.0.0.1';
+        $this->view->dbPort     = $dbPort ?: '3306';
+        $this->view->dbName     = $dbName ?: 'zentao';
+        $this->view->dbUser     = $dbUser ?: 'root';
+        $this->view->dbPassword = $dbPassword ?: '';
         $this->display();
     }
 

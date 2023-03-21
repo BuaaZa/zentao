@@ -204,14 +204,7 @@ foreach(explode(',', $config->testcase->create->requiredFields) as $field)
                       </div>
                     </td>
                       <td class='step-actions'>
-
-                              <button type='button' class='btn btn-step-add-datasample' tabindex='-1'><i class='icon icon-plus'>
-                                      <?php
-                                      $Link = $this->createLink('testcase', 'datasample');
-                                      echo html::a($Link,'填写') ;
-                                      ?>
-                                  </i></button>
-
+                          <?php echo $this->loadModel('common')->buildMenu('testcase', 'datasample', "", '', 'button', 'plus', '', 'showinonlybody iframe', true);?>
                       </td>
                   </tr>
                   <?php foreach($steps as $stepID => $step):?>
@@ -251,12 +244,7 @@ foreach(explode(',', $config->testcase->create->requiredFields) as $field)
                       </div>
                     </td>
                       <td class='step-actions'>
-                      <button type='button' class='btn btn-step-add-datasample' tabindex='-1'><i class='icon icon-plus'>
-                                      <?php
-                                      $Link = $this->createLink('testcase', 'datasample');
-                                      echo html::a($Link,'填写') ;
-                                      ?>
-                      </i></button>
+                      <?php echo $this->loadModel('common')->buildMenu('testcase', 'datasample', "", '', 'button', 'plus', '', 'showinonlybody iframe', true);?>
                       </td>
                   </tr>
                   <?php endforeach; ?>
@@ -282,7 +270,9 @@ foreach(explode(',', $config->testcase->create->requiredFields) as $field)
         <tfoot>
           <tr>
             <td colspan='3' class='text-center form-actions'>
-              <?php echo html::submitButton();?>
+              <?php //echo html::submitButton();?>
+                <input type='hidden' name='datasample' id='datasample' value='null' class='step-datasample'>
+              <button id='submit' class="btn btn-wide btn-primary " type="submit"  onclick="take_of_cookie();"> 保存</button>
               <?php echo $gobackLink ? html::a($gobackLink, $lang->goback, '', 'class="btn btn-wide"') : html::backButton();?>
             </td>
           </tr>
@@ -307,5 +297,11 @@ foreach(explode(',', $config->testcase->create->requiredFields) as $field)
     </div>
   </div>
 </div>
+<script>
+   function take_of_cookie(){
+       //alert($.cookie('datasample'));
+       $('#datasample').attr('value',$.cookie('datasample'));
+   }
+</script>
 <?php js::set('caseModule', $lang->testcase->module)?>
 <?php include '../../common/view/footer.html.php';?>
