@@ -358,4 +358,82 @@ class qastoryModel extends model
         return;
     }
 
+    public function subdivide($storyID, $stories)
+    {
+        $now      = helper::now();
+        $oldStory = $this->dao->findById($storyID)->from(TABLE_STORY)->fetch();
+        if($oldStory->type == 'requirement')
+        {
+            foreach($stories as $id)
+            {
+                $data = new stdclass();
+                $data->product  = $oldStory->product;
+                $data->AType    = 'requirement';
+                $data->relation = 'subdivideinto';
+                $data->BType    = 'story';
+                $data->AID      = $storyID;
+                $data->BID      = $id;
+                $data->AVersion = $oldStory->version;
+                $data->BVersion = 1;
+                $data->extra    = 1;
+
+                $this->dao->insert(TABLE_RELATION)->data($data)->autoCheck()->exec();
+
+                $data->AType    = 'story';
+                $data->relation = 'subdividedfrom';
+                $data->BType    = 'requirement';
+                $data->AID      = $id;
+                $data->BID      = $storyID;
+                $data->AVersion = 1;
+                $data->BVersion = $oldStory->version;
+
+                $this->dao->insert(TABLE_RELATION)->data($data)->autoCheck()->exec();
+            }
+
+            if(dao::isError()) return print(js::error(dao::getError()));
+
+            $isonlybody = isonlybody();
+            unset($_GET['onlybody']);
+            return print(js::locate(helper::createLink('product', 'browse', "productID=$oldStory->product&branch=0&browseType=unclosed&queryID=0&type=story"), $isonlybody ? 'parent.parent' : 'parent'));
+        }
+        else
+        {
+            /* Set parent to child story. */
+            $this->dao->update(TABLE_STORY)->set('parent')->eq($storyID)->where('id')->in($stories)->exec();
+            $this->computeEstimate($storyID);
+
+            /* Set childStories. */
+            $childStories = join(',', $stories);
+
+            $newStory = new stdClass();
+            if($oldStory->parent<=0)$newStory->parent         = '-1';
+            $newStory->plan           = '';
+            $newStory->lastEditedBy   = $this->app->user->account;
+            $newStory->lastEditedDate = $now;
+            $newStory->childStories   = trim($oldStory->childStories . ',' . $childStories, ',');
+
+            /* Subdivide story. */
+            $this->dao->update(TABLE_STORY)->data($newStory)->autoCheck()->where('id')->eq($storyID)->exec();
+
+            $changes = common::createChanges($oldStory, $newStory);
+            if($changes)
+            {
+                $actionID = $this->loadModel('action')->create('story', $storyID, 'createChildrenStory', '', $childStories);
+                $this->action->logHistory($actionID, $changes);
+            }
+        }
+    }
+
+    public function computeEstimate($storyID)
+    {
+        if(!$storyID) return true;
+
+        $stories = $this->dao->select('`id`,`estimate`,status')->from(TABLE_STORY)->where('parent')->eq($storyID)->andWhere('deleted')->eq(0)->fetchAll('id');
+        if(empty($stories)) return true;
+
+        $estimate = 0;
+        foreach($stories as $story) $estimate += $story->estimate;
+        $this->dao->update(TABLE_STORY)->set('estimate')->eq($estimate)->autoCheck()->where('id')->eq($storyID)->exec();
+        return !dao::isError();
+    }
 }

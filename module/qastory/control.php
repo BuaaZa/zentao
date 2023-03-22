@@ -62,21 +62,7 @@ class qaStory extends control
         }
 
         /* Set menu. */
-        if($this->app->tab == 'project')
-        {
-            $this->session->set('storyList', $this->app->getURI(true), 'project');
-            $this->loadModel('project')->setMenu($projectID);
-        }
-        elseif($this->app->tab == 'qa'){
-            $this->loadModel('qa')->setMenu($products,$productID);
-        }
-        else
-        {
-            $this->session->set('storyList',   $this->app->getURI(true), 'product');
-            $this->session->set('productList', $this->app->getURI(true), 'product');
-
-            $this->product->setMenu($productID, $branch, 0, '', "storyType=$storyType");
-        }
+        $this->loadModel('qa')->setMenu($products,$productID);
 
         /* Lower browse type. */
         $browseType = strtolower($browseType);
@@ -321,7 +307,7 @@ class qaStory extends control
             /* If storyID not equal zero, subdivide this story to child stories and close it. */
             if($storyID and !empty($mails))
             {
-                $this->story->subdivide($storyID, $stories);
+                $this->qastory->subdivide($storyID, $stories);
                 if(dao::isError()) return print(js::error(dao::getError()));
             }
 

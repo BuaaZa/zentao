@@ -1133,11 +1133,11 @@ class storyModel extends model
 
         $oldParentStory = $this->dao->select('*')->from(TABLE_STORY)->where('id')->eq($parentID)->andWhere('deleted')->eq(0)->fetch();
         if(empty($oldParentStory)) return $this->dao->update(TABLE_STORY)->set('parent')->eq('0')->where('id')->eq($storyID)->exec();
-        if($oldParentStory->parent != '-1') $this->dao->update(TABLE_STORY)->set('parent')->eq('-1')->where('id')->eq($parentID)->exec();
+        if($oldParentStory->parent == 0) $this->dao->update(TABLE_STORY)->set('parent')->eq('-1')->where('id')->eq($parentID)->exec();
         $this->computeEstimate($parentID);
 
         $childrenStatus = $this->dao->select('id,status')->from(TABLE_STORY)->where('parent')->eq($parentID)->andWhere('deleted')->eq(0)->fetchPairs('status', 'status');
-        if(empty($childrenStatus)) return $this->dao->update(TABLE_STORY)->set('parent')->eq('0')->where('id')->eq($parentID)->exec();
+        if(empty($childrenStatus) && $oldParentStory->parent == -1) return $this->dao->update(TABLE_STORY)->set('parent')->eq('0')->where('id')->eq($parentID)->exec();
 
         $status = $oldParentStory->status;
         if(count($childrenStatus) == 1 and $oldParentStory->status != 'changing')
@@ -1179,7 +1179,6 @@ class storyModel extends model
 
             $story->lastEditedBy   = $this->app->user->account;
             $story->lastEditedDate = $now;
-            $story->parent         = '-1';
             $this->dao->update(TABLE_STORY)->data($story)->where('id')->eq($parentID)->exec();
             if(!dao::isError())
             {
