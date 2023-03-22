@@ -130,7 +130,7 @@ class ztinterface extends control
         }
 
         /* Get module tree.*/
-        $moduleTree = $this->tree->getTreeMenu($productID, 'interface', 0, array('treeModel', 'createInterfaceLink'), array('productID' => $productID), $branch);
+        $moduleTree = $this->tree->getTreeMenu($productID, 'ztinterface', 0, array('treeModel', 'createInterfaceLink'), array('productID' => $productID), $branch);
         
 
         $showBranch      = false;

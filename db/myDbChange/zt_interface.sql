@@ -6,6 +6,7 @@ CREATE TABLE `zt_interface`  (
   `id` mediumint NOT NULL AUTO_INCREMENT,
   `product` mediumint NOT NULL,
   `name` CHAR(50),
+  `method` ENUM('GET', 'POST', 'PUT', 'DELETE', 'HEAD', 'OPTIONS', 'TRACE', 'CONNECT') NOT NULL,
   `url` TEXT NOT NULL,
   `module` mediumint NOT NULL DEFAULT 0,
   `header` json,

@@ -1,0 +1,92 @@
+{
+    "content":[
+        {
+            "name": "Connection",
+            "type": "String",
+            "must": true,
+            "example": "keep-alive",
+            "description": "连接方式"
+        },
+        {
+            "name": "User-Agent",
+            "type": "String",
+            "must": false,
+            "example": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)",
+            "description": "用户代理信息"
+        }
+    ]
+}
+
+{
+    "content":[
+        {
+            "name": "name",
+            "type": "String",
+            "must": true,
+            "null": true,
+            "mock": null,
+            "example": "xiaoli",
+            "description": "用户名",
+            "content":[]
+        },
+        {
+            "name": "day",
+            "type": "integer",
+            "must": false,
+            "null": true,
+            "mock": null,
+            "example": 7,
+            "description": "剩余天数",
+            "content":[]
+        },
+        {
+            "name": "studentlist",
+            "type": "array",
+            "must": true,
+            "null": false,
+            "mock": null,
+            "example": "[\"xiaoli\",\"xiaowang\"]",
+            "description": "学员名单",
+            "content":[
+                {
+                    "name": "items",
+                    "type": "string",
+                    "must": false,
+                    "null": true,
+                    "mock": null,
+                }
+            ]
+        },
+        {
+            "name": "leader",
+            "type": "object",
+            "must": true,
+            "null": false,
+            "mock": null,
+            "example": "",
+            "description": "领导",
+            "content":[
+                {
+                    "name": "name",
+                    "type": "String",
+                    "must": true,
+                    "null": false,
+                    "mock": null,
+                    "example": "xiaoli",
+                    "description": "用户名",
+                    "content":[]
+                },
+                {
+                    "name": "day",
+                    "type": "integer",
+                    "must": false,
+                    "null": true,
+                    "mock": null,
+                    "example": 7,
+                    "description": "剩余天数",
+                    "content":[]
+                }
+            ]
+        }
+    ]
+}
