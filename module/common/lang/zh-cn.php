@@ -26,7 +26,7 @@ $lang->percent   = '%';
 $lang->dash      = '-';
 $lang->and       = '和';
 
-$lang->zentaoPMS      = '禅道';
+$lang->zentaoPMS      = '【协同研发平台】';
 $lang->systemName     = '开发管理';
 $lang->pmsName        = '开源版';
 $lang->proName        = '专业版';

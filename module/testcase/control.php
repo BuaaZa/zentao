@@ -402,6 +402,9 @@ class testcase extends control
                 //die($noticeStr);
             }
 
+            //获取数据样本表的填写内容
+            $datasample = json_decode($this->post->datasample, true);
+            //error_log(print_r($datasample, 1));
 
             $response['result'] = 'success';
 
@@ -2379,6 +2382,68 @@ class testcase extends control
         }
 
         #if(dao::isError()) return $this->send(array('result' => 'fail', 'message' => dao::getError()));
+        $this->display();
+    }
+
+    /**
+     * batch export cases to word.
+     *
+     * @param  Array   $caseIDList
+     * @access public
+     * @return void
+     */
+    public function batchExportToWord($caseIDList = [])
+    {
+        require_once 'vendor/autoload.php';
+        if($this->server->request_method == 'POST')
+        {
+            $caseIDList = array_slice(explode(',', $this->post->caseIdList2),0,-1);
+
+            $PHPWord = new \PhpOffice\PhpWord\PhpWord();
+            foreach ($caseIDList as $caseID){
+                $caseID = (int)$caseID;
+                $results = $this->loadModel('testtask')->getResults(0, $caseID);
+                $sample_data_all = array();
+                $version = -1;
+                foreach($results as $result){
+                    if($result->version > $version){
+                        $version = $result->version;
+                    }
+                }
+                foreach($results as $result){
+                    if($result->version != $version)continue;
+                    if(isset($result->sample_data['sample_in']) or isset($result->sample_data['sample_out'])){
+                        array_push($sample_data_all, $result->sample_data);
+                    }
+                }
+                $sample_data_all = array_reverse($sample_data_all);
+
+                $PHPWord = $this->testcase->exportToWord($caseID,$sample_data_all, $PHPWord);
+            }
+            $saveTime = date("Ymd-H:i:m");
+            $filename = '用例集合' . '_' . $saveTime . '.docx';
+            //$filepath = 'tmp_case/' . $filename;
+            $PHPWord->save($filename, 'Word2007', true);
+            //$this->loadModel('file')->sendDownHeader($filename, 'docx', realpath('./'.$filename), 'file', false);
+            return $this->send(array('result' => 'success', 'closeModal' => true));
+        }
+
+        #if(dao::isError()) return $this->send(array('result' => 'fail', 'message' => dao::getError()));
+        $this->display();
+    }
+
+    /**
+     * fill in datasample table in front end
+     *
+     * @access public
+     * @return void
+     */
+    public function datasample()
+    {
+        if($this->server->request_method == 'POST')
+        {
+            return $this->send(array('result' => 'success', 'closeModal' => true));
+        }
         $this->display();
     }
     /**

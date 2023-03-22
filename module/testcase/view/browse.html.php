@@ -246,6 +246,7 @@ js::set('suiteID',        $suiteID);
               $actionLink = '#importToLib';
               echo html::a($actionLink, $lang->testcase->importToLib, '', "class='btn btn-primary' data-toggle='modal'");
           }
+          echo html::a('#exportToWord', $lang->testcase->exportToWord , '', "class='btn btn-primary' data-toggle='modal'");
           ?>
         </div>
         <div class="table-statistic"><?php echo $summary;?></div>
@@ -279,11 +280,56 @@ js::set('suiteID',        $suiteID);
     </div>
   </div>
 </div>
+
+<div class="modal fade" id="exportToWord">
+    <div class="modal-dialog mw-500px">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true"><i class="icon icon-close"></i></button>
+                <h4 class="modal-title"><?php echo $lang->testcase->exportToWord;?></h4>
+            </div>
+            <div class="modal-body">
+                <form method='post' target='hiddenwin' onsubmit='setDownloading();' style='padding: 40px 25%' action='<?php echo $this->createLink('testcase', 'batchExportToWord');?>'>
+                    <table class='w-p100'>
+                        <tr>
+                            <td class='w-100px'>
+                                <?php echo html::select('', $lang->testcase->exportCaseTypetList, 'word', "class='form-control'");?>
+                            </td>
+                            <td>
+                                <?php echo html::hidden('caseIdList2', '');?>
+                                <?php echo html::submitButton();?>
+                            </td>
+                        </tr>
+                    </table>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
 <script>
 $('#module' + moduleID).closest('li').addClass('active');
 $('#' + caseBrowseType + 'Tab').addClass('btn-active-text').find('.text').after(" <span class='label label-light label-badge'><?php echo $pager->recTotal;?></span>");
 <?php if($useDatatable):?>
 $(function(){$('#caseForm').table();})
+function setDownloading()
+{
+    if(navigator.userAgent.toLowerCase().indexOf("opera") > -1) return true;   // Opera don't support, omit it.
+
+    $.cookie('downloading', 1);
+    time = setInterval("closeWindow()", 300);
+    return true;
+}
+
+function closeWindow()
+{
+    if($.cookie('downloading') == 1)
+    {
+        parent.$.closeModal();
+        $.cookie('downloading', null);
+        clearInterval(time);
+    }
+}
 <?php endif;?>
 </script>
 <?php include '../../common/view/footer.html.php';?>

@@ -64,7 +64,7 @@ class testcaseModel extends model
             ->setIF($this->config->systemMode == 'new' and $this->app->tab == 'project', 'project', $this->session->project)
             ->setIF($this->app->tab == 'execution', 'execution', $this->session->execution)
             ->setIF($this->post->story != false, 'storyVersion', $this->loadModel('story')->getVersion((int)$this->post->story))
-            ->remove('steps,expects,files,labels,stepType,forceNotReview,inputs,goal_actions,eval_criterias,stepIoType')
+            ->remove('steps,expects,files,labels,stepType,forceNotReview,inputs,goal_actions,eval_criterias,stepIoType,datasample')
             ->setDefault('story', 0)
             ->cleanInt('story,product,branch,module')
             ->join('stage', ',')

@@ -185,22 +185,22 @@ class bug extends control
      * @param int $productID
      * @param string $branch
      * @param string $browseType
-     * @param int $param
+     * @param int|string $param
      * @param string $orderBy
      * @param int $recTotal
      * @param int $recPerPage
      * @param int $pageID
-     * @access public
      * @return void
+     * @access public
      */
-    public function browse(int    $productID = 0,
-                           string $branch = '',
-                           string $browseType = '',
-                           int    $param = 0,
-                           string $orderBy = '',
-                           int    $recTotal = 0,
-                           int    $recPerPage = 20,
-                           int    $pageID = 1): void
+    public function browse(int        $productID = 0,
+                           string     $branch = '',
+                           string     $browseType = '',
+                           int|string $param = 0,
+                           string     $orderBy = '',
+                           int        $recTotal = 0,
+                           int        $recPerPage = 20,
+                           int        $pageID = 1): void
     {
         $this->loadModel('datatable');
 

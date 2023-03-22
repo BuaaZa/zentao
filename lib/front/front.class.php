@@ -155,7 +155,7 @@ class html extends baseHTML
      * @static
      * @access public
      */
-    static public function select($name = '', string|array $options = array(), $selectedItems = "", $attrib = "", $append = false)
+    static public function select($name = '', array|string|null $options = array(), $selectedItems = "", $attrib = "", $append = false)
     {
         $options = (array)($options);
         if($append and !isset($options[$selectedItems]))
