@@ -323,7 +323,7 @@ function setDownloading()
 
 function closeWindow()
 {
-    if($.cookie('downloading') == 1)
+    if($.cookie('downloading') === 1)
     {
         parent.$.closeModal();
         $.cookie('downloading', null);

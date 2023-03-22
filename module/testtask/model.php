@@ -1341,6 +1341,8 @@ class testtaskModel extends model
         $sample_data['sample_out'] = $sample_out;
         $sample_data['sample_result'] = $sample_result;
 
+        $datasample_result = $postData->datasample_result;
+
 
         /* Insert into testResult table. */
         $now = helper::now();
@@ -1349,10 +1351,11 @@ class testtaskModel extends model
             ->add('caseResult', $caseResult)
             ->setForce('stepResults', serialize($stepResults))
             ->setForce('sample_data', serialize($sample_data))
+            ->setForce('data_sample_result_new', serialize($datasample_result))
             ->setDefault('lastRunner', $this->app->user->account)
             ->setDefault('date', $now)
             ->skipSpecial('stepResults,sample_data')
-            ->remove('steps,reals,result,sample_in,sample_out,sample_result')
+            ->remove('steps,reals,result,sample_in,sample_out,sample_result,datasample_result')
             ->get();
 
         /* Remove files and labels field when uploading files for case result or step result. */
