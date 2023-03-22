@@ -4,9 +4,8 @@ ARG USER=www-data
 ARG GROUP=www-data
 ARG APACHE_DOCUMENT_ROOT=/var/www/html
 
-RUN sed -i "s@deb.debian.org@mirrors.aliyun.com@g" /etc/apt/sources.list
-
 RUN set -x ; \
+    sed -i "s@deb.debian.org@mirrors.aliyun.com@g" /etc/apt/sources.list ; \
     apt update && apt install -yqq libzip-dev libxml2-dev ; \
     apt autoclean && apt autoremove ; \
     docker-php-ext-install pdo pdo_mysql zip xml xmlwriter
