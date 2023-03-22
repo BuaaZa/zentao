@@ -169,9 +169,9 @@ class gitModel extends model
             $logs    = $this->repo->getUnsyncedCommits($repo);
             $objects = array();
 
-            ChromePhp::log($repo);
+//            ChromePhp::log($repo);
 
-            ChromePhp::log($logs);
+//            ChromePhp::log($logs);
 
             if(!empty($logs))
             {
@@ -187,7 +187,7 @@ class gitModel extends model
                     $lastVersion = $version;
                     $version     = $this->repo->saveOneCommit($repo->id, $log, $version, $branch);
 
-                    ChromePhp::log($objects);
+//                    ChromePhp::log($objects);
 
                     if($objects)
                     {
@@ -196,8 +196,9 @@ class gitModel extends model
                             ' task:' . join(' ', $objects['tasks']) .
                             ' bug:'  . join(',', $objects['bugs']));
 
-                        ChromePhp::log($this->repoRoot);
-                        if($lastVersion != $version) $this->repo->saveAction2PMS($objects, $log, $this->repoRoot, $repo->encoding, 'git', $accountPairs, $repo);
+//                        ChromePhp::log($this->repoRoot);
+                        if($lastVersion != $version)
+                            $this->repo->saveAction2PMS($objects, $log, $this->repoRoot, $repo->encoding, 'git', $accountPairs, $repo);
                     }
                     else
                     {

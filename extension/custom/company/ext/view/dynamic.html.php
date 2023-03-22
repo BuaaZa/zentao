@@ -42,12 +42,12 @@
     <div class='pull-right'>
         <?php if(common::hasPriv('company', 'archiveaction'))
             common::printLink('company', 'archiveaction',
-                "", $lang->company->archiveaction,
+                "", "<i class='icon icon-lock'></i> " . $lang->company->archiveaction,
                 '', "id='archive' class='btn btn-primary iframe' data-width='75%' data-app='company'",
                 '', 'true');?>
         <?php if(common::hasPriv('company', 'recoveraction'))
             common::printLink('company', 'recoveraction',
-                "", $lang->company->recoveraction,
+                "", "<i class='icon icon-undo'></i> " . $lang->company->recoveraction,
                 '', "id='recover' class='btn btn-primary iframe' data-width='75%' data-app='company'",
                 '', 'true');?>
     </div>

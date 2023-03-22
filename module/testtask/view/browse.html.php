@@ -77,11 +77,14 @@ $status = strtolower($status);
       </div>
       <hr class="space">
       <?php endif;?>
-      <?php echo $taskTree;?>
+      <?php
+//        ChromePhp::log($taskTree);
+        echo $taskTree;
+      ?>
     </div>
   </div>
   <div class="main-col">
-    <div class="cell">
+    <div class="cell" >
       <?php if(empty($tasks)):?>
       <div class="table-empty-tip">
         <p>
