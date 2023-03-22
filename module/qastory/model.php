@@ -59,7 +59,6 @@ class qastoryModel extends model
 
     public function batchCreate($storyID = 0, $branch = 0, $type = 'story')
     {
-        $forceReview = $this->checkForceReview();
 
         $this->loadModel('action');
         $branch    = (int)$branch;
@@ -91,6 +90,7 @@ class qastoryModel extends model
             $story->type       = $type;
             $story->title      = trim($stories->title[$i]);
             $story->version      = 1;
+            $story->color      = $stories->color[$i];
             $story->plan = '';
             $story->notifyEmail = '';
             $story->openedBy = $this->app->user->account;
@@ -109,12 +109,14 @@ class qastoryModel extends model
         $link2Plans = array();
         foreach($data as $i => $story)
         {
+            ChromePhp::log($data);
             $this->dao->insert(TABLE_STORY)->data($story)->autoCheck()->checkFlow()->exec();
             if(dao::isError())
             {
                 echo js::error(dao::getError());
                 return print(js::reload('parent'));
             }
+            ChromePhp::log('save success');
 
             $storyID = $this->dao->lastInsertID();
             $this->setStage($storyID);
