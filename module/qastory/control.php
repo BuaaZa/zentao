@@ -313,28 +313,22 @@ class qaStory extends control
 
         if(!empty($_POST))
         {
-            ChromePhp::log('batchCreate1');
             $mails = $this->qastory->batchCreate($storyID, $branch, $storyType);
             if(dao::isError()) return print(js::error(dao::getError()));
-            ChromePhp::log('batchCreate2');
             $stories = array();
             foreach($mails as $mail) $stories[] = $mail->storyID;
 
-            ChromePhp::log('batchCreate3');
             /* If storyID not equal zero, subdivide this story to child stories and close it. */
             if($storyID and !empty($mails))
             {
-                ChromePhp::log('batchCreate4');
                 $this->story->subdivide($storyID, $stories);
                 if(dao::isError()) return print(js::error(dao::getError()));
             }
 
             if($this->viewType == 'json') return $this->send(array('result' => 'success', 'message' => $this->lang->saveSuccess, 'idList' => $stories));
-            ChromePhp::log('batchCreate5');
             if($storyID)
             {
-                ChromePhp::log('batchCreate6');
-                return print(js::locate(inlink('view', "storyID=$storyID&version=0&param=0&storyType=story"), 'parent'));
+                return print(js::locate($this->createLink('qastory', 'story', "productID=$productID"), 'parent'));
             }
             elseif($executionID)
             {
@@ -537,8 +531,6 @@ class qaStory extends control
         $this->view->users              = $this->user->getPairs('noletter');
         $this->view->reviewers          = $reviewers;
         $this->view->relations          = $this->story->getStoryRelation($story->id, $story->type);
-        $this->view->executions         = $this->execution->getPairs(0, 'all', 'nocode');
-        $this->view->execution          = empty($story->execution) ? array() : $this->dao->findById($story->execution)->from(TABLE_EXECUTION)->fetch();
         $this->view->actions            = $this->action->getList('story', $storyID);
         $this->view->storyModule        = $storyModule;
         $this->view->modulePath         = $modulePath;
