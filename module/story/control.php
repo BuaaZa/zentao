@@ -481,6 +481,8 @@ class story extends control
         $this->view->branches         = $branches;
         if($storyType == 'taskPoint'){
             $this->view->stories          = $this->story->getParentStoryPairsTaskPoint($productID);
+        }else{
+            $this->view->stories = $this->story->getParentStoryPairs($productID);
         }
         $this->view->productID        = $productID;
         $this->view->product          = $product;
