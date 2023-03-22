@@ -313,24 +313,28 @@ class qaStory extends control
 
         if(!empty($_POST))
         {
+            ChromePhp::log('batchCreate1');
             $mails = $this->qastory->batchCreate($storyID, $branch, $storyType);
             if(dao::isError()) return print(js::error(dao::getError()));
-
+            ChromePhp::log('batchCreate2');
             $stories = array();
             foreach($mails as $mail) $stories[] = $mail->storyID;
 
+            ChromePhp::log('batchCreate3');
             /* If storyID not equal zero, subdivide this story to child stories and close it. */
             if($storyID and !empty($mails))
             {
+                ChromePhp::log('batchCreate4');
                 $this->story->subdivide($storyID, $stories);
                 if(dao::isError()) return print(js::error(dao::getError()));
             }
 
             if($this->viewType == 'json') return $this->send(array('result' => 'success', 'message' => $this->lang->saveSuccess, 'idList' => $stories));
-
+            ChromePhp::log('batchCreate5');
             if($storyID)
             {
-                return print(js::locate(inlink('view', "storyID=$storyID&version=0&param=0&storyType=$storyType"), 'parent'));
+                ChromePhp::log('batchCreate6');
+                return print(js::locate(inlink('view', "storyID=$storyID&version=0&param=0&storyType=story"), 'parent'));
             }
             elseif($executionID)
             {
