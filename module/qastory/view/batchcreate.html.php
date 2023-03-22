@@ -65,7 +65,6 @@
           <tr>
             <td colspan="4" class="text-center form-actions">
               <?php echo html::commonButton($lang->save, "id='saveButton'", 'btn btn-primary btn-wide');?>
-              <?php echo html::commonButton($lang->story->saveDraft, "id='saveDraftButton'", 'btn btn-secondary btn-wide');?>
               <?php echo html::backButton();?>
             </td>
           </tr>

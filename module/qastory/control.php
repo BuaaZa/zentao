@@ -73,26 +73,11 @@ class qaStory extends control
 
         if(!empty($_POST))
         {
-            $mails = $this->story->batchCreate($productID, $branch, $storyType);
+            $mails = $this->qastory->batchCreate($storyID, $branch, $storyType);
             if(dao::isError()) return print(js::error(dao::getError()));
 
             $stories = array();
             foreach($mails as $mail) $stories[] = $mail->storyID;
-
-            $lanes = array();
-            if(isset($_POST['lanes']))
-            {
-                foreach($mails as $i => $mail) $lanes[$mail->storyID] = $_POST['lanes'][$i];
-            }
-
-            /* Project or execution linked stories. */
-            if($executionID)
-            {
-                $products = array();
-                foreach($mails as $story) $products[$story->storyID] = $productID;
-                if($executionID != $this->session->project) $this->execution->linkStory($this->session->project, $stories, $products);
-                $this->execution->linkStory($executionID, $stories, $products, $extra, $lanes);
-            }
 
             /* If storyID not equal zero, subdivide this story to child stories and close it. */
             if($storyID and !empty($mails))
@@ -256,6 +241,102 @@ class qaStory extends control
         $this->view->needReview       = ($this->app->user->account == $product->PO or $executionID > 0 or $this->config->story->needReview == 0 or !$this->story->checkForceReview()) ? 0 : 1;
         $this->view->forceReview      = $this->story->checkForceReview();
         $this->view->executionID      = $executionID;
+
+        $this->display();
+    }
+
+    public function view($storyID, $version = 0, $param = 0, $storyType = 'story')
+    {
+        if($storyType = "taskPoint")
+            $storyType = "story";
+        $uri        = $this->app->getURI(true);
+        $tab        = $this->app->tab;
+        $buildApp   = $tab == 'product' ?   'project' : $tab;
+        $releaseApp = $tab == 'execution' ? 'product' : $tab;
+        $this->session->set('productList', $uri . "#app={$tab}", 'product');
+        $this->session->set('buildList',   $uri, $buildApp);
+        $this->app->loadLang('bug');
+
+        $storyID = (int)$storyID;
+        $story   = $this->story->getById($storyID, $version, true);
+        $version = empty($version) ? $story->version : $version;
+        $linkModuleName = $this->config->vision == 'lite' ? 'project' : 'product';
+        if(!$story) return print(js::error($this->lang->notFound) . js::locate($this->createLink($linkModuleName, 'index')));
+
+        $story = $this->story->mergeReviewer($story, true);
+
+        $this->story->replaceURLang($story->type);
+
+        $product       = $this->dao->findById($story->product)->from(TABLE_PRODUCT)->fields('name, id, type, status')->fetch();
+        $plan          = $this->dao->findById($story->plan)->from(TABLE_PRODUCTPLAN)->fetch('title');
+        $bugs          = $this->dao->select('id,title,status,pri,severity')->from(TABLE_BUG)->where('story')->eq($storyID)->andWhere('deleted')->eq(0)->fetchAll();
+        $fromBug       = $this->dao->select('id,title')->from(TABLE_BUG)->where('toStory')->eq($storyID)->fetch();
+        $cases         = $this->dao->select('id,title,status,pri')->from(TABLE_CASE)->where('story')->eq($storyID)->andWhere('deleted')->eq(0)->fetchAll();
+        $linkedMRs     = $this->loadModel('mr')->getLinkedMRPairs($storyID, 'story');
+        $modulePath    = $this->tree->getParents($story->module);
+        $storyModule   = empty($story->module) ? '' : $this->tree->getById($story->module);
+        $linkedStories = isset($story->linkStoryTitles) ? array_keys($story->linkStoryTitles) : array();
+        $storyProducts = $this->dao->select('id,product')->from(TABLE_STORY)->where('id')->in($linkedStories)->fetchPairs();
+
+        /* Set the menu. */
+        $from = $this->app->tab;
+        if($from == 'execution')
+        {
+            $result = $this->execution->setMenu($param);
+            if($result) return;
+        }
+        elseif($from == 'project')
+        {
+            $this->loadModel('project')->setMenu($this->session->project);
+        }
+        elseif($from == 'qa')
+        {
+            $products = $this->product->getProductPairsByProject(0, 'noclosed');
+            $this->loadModel('qa')->setMenu($products, $story->product);
+        }
+        else
+        {
+            $this->product->setMenu($story->product, $story->branch);
+        }
+
+        if($product->type != 'normal') $this->lang->product->branch = sprintf($this->lang->product->branch, $this->lang->product->branchName[$product->type]);
+
+        $reviewers  = $this->story->getReviewerPairs($storyID, $story->version);
+        $reviewedBy = trim($story->reviewedBy, ',');
+
+        $this->executeHooks($storyID);
+
+        $title      = "STORY #$story->id $story->title - $product->name";
+        $position[] = html::a($this->createLink('product', 'browse', "product=$product->id&branch=$story->branch"), $product->name);
+        $position[] = $this->lang->story->common;
+        $position[] = $this->lang->story->view;
+
+        $this->view->title              = $title;
+        $this->view->position           = $position;
+        $this->view->product            = $product;
+        $this->view->branches           = $product->type == 'normal' ? array() : $this->loadModel('branch')->getPairs($product->id);
+        $this->view->plan               = $plan;
+        $this->view->bugs               = $bugs;
+        $this->view->fromBug            = $fromBug;
+        $this->view->cases              = $cases;
+        $this->view->story              = $story;
+        $this->view->linkedMRs          = $linkedMRs;
+        $this->view->track              = $this->story->getTrackByID($story->id);
+        $this->view->users              = $this->user->getPairs('noletter');
+        $this->view->reviewers          = $reviewers;
+        $this->view->relations          = $this->story->getStoryRelation($story->id, $story->type);
+        $this->view->executions         = $this->execution->getPairs(0, 'all', 'nocode');
+        $this->view->execution          = empty($story->execution) ? array() : $this->dao->findById($story->execution)->from(TABLE_EXECUTION)->fetch();
+        $this->view->actions            = $this->action->getList('story', $storyID);
+        $this->view->storyModule        = $storyModule;
+        $this->view->modulePath         = $modulePath;
+        $this->view->storyProducts      = $storyProducts;
+        $this->view->version            = $version;
+        $this->view->preAndNext         = $this->loadModel('common')->getPreAndNextObject('story', $storyID);
+        $this->view->from               = $from;
+        $this->view->param              = $param;
+        $this->view->builds             = $this->loadModel('build')->getStoryBuilds($storyID);
+        $this->view->releases           = $this->loadModel('release')->getStoryReleases($storyID);
 
         $this->display();
     }

@@ -56,4 +56,91 @@ class qastoryModel extends model
 
         return $stories;
     }
+
+    public function batchCreate($storyID = 0, $branch = 0, $type = 'story')
+    {
+        $forceReview = $this->checkForceReview();
+
+        $this->loadModel('action');
+        $branch    = (int)$branch;
+        $storyID = (int)$storyID;
+        $now       = helper::now();
+        $mails     = array();
+        $stories   = fixer::input('post')->get();
+        $faStory = $this->loadModel('story')->getById($storyID);
+        if(!$faStory){
+            dao::$errors['message'] = '父需求不存在';
+        }
+        elseif($faStory->type == 'taskPoint'){
+            dao::$errors['message'] = '父需求不能为功能点';
+        }
+
+
+        $result  = $this->loadModel('common')->removeDuplicate('story', $stories, "product={$faStory->product}");
+        $stories = $result['data'];
+
+        if(isset($stories->uploadImage)) $this->loadModel('file');
+
+        $now = helper::now();
+        $data         = array();
+        foreach($stories->title as $i => $title)
+        {
+            if(empty($title)) continue;
+            
+            $story = new stdclass();
+            $story->type       = $type;
+            $story->title      = trim($stories->title[$i]);
+            $story->version      = 1;
+            $story->plan = '';
+            $story->notifyEmail = '';
+            $story->openedBy = $this->app->user->account;
+            $story->openedDate = $now;
+            $story->feedbackBy = '';
+            $story->fromBug = 0;
+            $story->assignedTo = '';
+            $story->product    = $faStory->product;
+            $story->parent = $faStory->id;
+            $story->status = 'active';
+            $story->stage = 'projected';
+            
+            $data[$i] = $story;
+        }
+
+        $link2Plans = array();
+        foreach($data as $i => $story)
+        {
+            $this->dao->insert(TABLE_STORY)->data($story)->autoCheck()->checkFlow()->exec();
+            if(dao::isError())
+            {
+                echo js::error(dao::getError());
+                return print(js::reload('parent'));
+            }
+
+            $storyID = $this->dao->lastInsertID();
+            $this->setStage($storyID);
+
+            $specData = new stdclass();
+            $specData->story   = $storyID;
+            $specData->version = 1;
+            $specData->title   = $stories->title[$i];
+            $specData->spec    = '';
+            $specData->verify  = '';
+            if(!empty($stories->spec[$i]))  $specData->spec   = nl2br($stories->spec[$i]);
+            if(!empty($stories->verify[$i]))$specData->verify = nl2br($stories->verify[$i]);
+
+
+            $this->dao->insert(TABLE_STORYSPEC)->data($specData)->exec();
+
+            $this->executeHooks($storyID);
+
+            $actionID = $this->action->create('story', $storyID, 'Opened', '');
+            if(!dao::isError()) $this->loadModel('score')->create('story', 'create',$storyID);
+            $mails[$i] = new stdclass();
+            $mails[$i]->storyID  = $storyID;
+            $mails[$i]->actionID = $actionID;
+        }
+
+        return $mails;
+    }
+
 }
