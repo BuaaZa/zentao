@@ -14,14 +14,14 @@ class blockModel extends model
     /**
      * Save params
      *
-     * @param  int    $id
+     * @param int $id
      * @param  string $type
      * @param  string $appName
      * @param  int    $blockID
      * @access public
      * @return void
      */
-    public function save($id, $source, $type, $module = 'my')
+    public function save(int $id, $source, $type, $module = 'my'): void
     {
         $block = $id ? $this->getByID($id) : null;
         $data = fixer::input('post')
@@ -126,21 +126,20 @@ class blockModel extends model
     /**
      * Get block list for account.
      *
-     * @param  string $appName
+     * @param string $module
+     * @param string $type
+     * @return array
      * @access public
-     * @return void
      */
-    public function getBlockList($module = 'my', $type = '')
+    public function getBlockList(string $module = 'my', string $type = ''): array
     {
-        $blocks = $this->dao->select('*')->from(TABLE_BLOCK)->where('account')->eq($this->app->user->account)
+        return $this->dao->select()->from(TABLE_BLOCK)->where('account')->eq($this->app->user->account)
             ->andWhere('module')->eq($module)
             ->andWhere('vision')->eq($this->config->vision)
             ->andWhere('hidden')->eq(0)
             ->beginIF($type)->andWhere('type')->eq($type)->fi()
             ->orderBy('`order`')
             ->fetchAll('id');
-
-        return $blocks;
     }
 
     /**

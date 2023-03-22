@@ -319,13 +319,14 @@ class control extends baseControl
      * Get the output of one module's one method as a string, thus in one module's method, can fetch other module's content.
      * If the module name is empty, then use the current module and method. If set, use the user defined module and method.
      *
-     * @param  string $moduleName module name.
-     * @param  string $methodName method name.
-     * @param  array  $params     params.
-     * @access  public
+     * @param string $moduleName module name.
+     * @param string $methodName method name.
+     * @param array|string $params params.
+     * @param string $appName
      * @return  string  the parsed html.
+     * @access  public
      */
-    public function fetch($moduleName = '', $methodName = '', $params = array(), $appName = '')
+    public function fetch(string $moduleName = '', string $methodName = '', array|string $params = array(), string $appName = ''): string
     {
         if($moduleName != $this->moduleName) $this->app->fetchModule = $moduleName;
 

@@ -11,6 +11,10 @@
  */
 class block extends control
 {
+    public blockModel $block;
+    public projectModel $project;
+    public userModel $user;
+
     /**
      * construct.
      *
@@ -92,12 +96,13 @@ class block extends control
     /**
      * Set params when type is rss or html.
      *
-     * @param  int    $id
-     * @param  string $type
+     * @param int $id
+     * @param string $type
+     * @param string $source
+     * @return int
      * @access public
-     * @return void
      */
-    public function set($id, $type, $source = '')
+    public function set(int $id, string $type, string $source = ''): int
     {
         if($_POST)
         {
@@ -117,6 +122,7 @@ class block extends control
 
         if(isset($this->lang->block->moduleList[$source]))
         {
+            // 获得调用的函数
             $func   = 'get' . ucfirst($type) . 'Params';
             $params = $this->block->$func($source);
             $this->view->params = json_decode($params, true);
@@ -130,8 +136,10 @@ class block extends control
         $this->view->source = $source;
         $this->view->type   = $type;
         $this->view->id     = $id;
-        $this->view->block  = ($block) ? $block : array();
+        $this->view->block  = ($block) ?: array();
         $this->display();
+
+        return 0;
     }
 
     /**
@@ -216,26 +224,30 @@ class block extends control
     /**
      * Display dashboard for app.
      *
-     * @param  string    $module
-     * @param  string    $type
-     * @param  int       $projectID
+     * @param string $module
+     * @param string $type
+     * @param int $projectID
      * @access public
-     * @return void
+     * @return int
      */
-    public function dashboard($module, $type = '', $projectID = 0)
+    public function dashboard(string $module, string $type = '', int $projectID = 0): int
     {
-        if($this->loadModel('user')->isLogon()) $this->session->set('blockModule', $module);
+        $this->block = $this->loadModel('block');
+        $this->project = $this->loadModel('project');
+        $this->user = $this->loadModel('user');
+
+        if($this->user->isLogon()) $this->session->set('blockModule', $module);
         $blocks = $this->block->getBlockList($module, $type);
         $vision = $this->config->vision;
 
         $section = 'common';
         if($module == 'project' and $projectID)
         {
-            $project = $this->loadModel('project')->getByID($projectID);
+            $project = $this->project->getByID($projectID);
             $section = $project->model . 'common';
         }
 
-        $inited = $this->dao->select('*')->from(TABLE_CONFIG)
+        $inited = $this->dao->select()->from(TABLE_CONFIG)
             ->where('module')->eq($module)
             ->andWhere('owner')->eq($this->app->user->account)
             ->andWhere('`section`')->eq($section)->fi()
@@ -243,7 +255,7 @@ class block extends control
             ->andWhere('vision')->eq($vision)
             ->fetch('value');
 
-        /* Init block when vist index first. */
+        /* Init block when visit index first. */
         if((empty($blocks) and !$inited and !defined('TUTORIAL')))
         {
             if($this->block->initBlock($module, $type)) return print(js::reload());
@@ -317,6 +329,7 @@ class block extends control
         if($this->app->getViewType() == 'json') return print(json_encode($blocks));
 
         $this->display();
+        return 0;
     }
 
     /**
