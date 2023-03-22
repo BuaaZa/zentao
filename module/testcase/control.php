@@ -2448,7 +2448,7 @@ class testcase extends control
     {
         if($this->server->request_method == 'POST')
         {
-            return $this->send(array('result' => 'success', 'closeModal' => true));
+            return $this->send(array('result' => 'success','message' => $this->lang->saveSuccess, 'closeModal' => true));
         }
         $this->display();
     }

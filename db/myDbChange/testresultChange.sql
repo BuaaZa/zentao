@@ -10,6 +10,13 @@ BEGIN
         alter table `zt_testresult` add `sample_data` text NULL;
     END IF;
 
+    IF NOT EXISTS(SELECT * FROM information_schema.COLUMNS
+                  WHERE COLUMN_NAME = 'data_sample_result_new' AND TABLE_NAME = 'zt_testresult')
+    THEN
+        alter table `zt_testresult` add `data_sample_result_new` text NULL;
+
+END IF;
+
 END//
 
 DELIMITER ';'
