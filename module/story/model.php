@@ -2817,8 +2817,8 @@ class storyModel extends model
         if(!$stories) return array();
         $taskpoint = $this->dao->select('*')->from(TABLE_STORY)
             ->where('deleted')->eq(0)
+            ->beginIF($productID)->andWhere('product')->in($productID)->fi()
             ->andWhere('type')->eq('taskPoint')
-            ->andWhere('status')->notin('closed,draft')
             ->orderBy('parent')
             ->fetchAll();
         $res = $this->formatStories($stories, $type, $limit);
