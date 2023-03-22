@@ -313,28 +313,56 @@ class qaStory extends control
 
         if(!empty($_POST))
         {
-            ChromePhp::log('batchCreate1');
             $mails = $this->qastory->batchCreate($storyID, $branch, $storyType);
             if(dao::isError()) return print(js::error(dao::getError()));
-            ChromePhp::log('batchCreate2');
+
             $stories = array();
             foreach($mails as $mail) $stories[] = $mail->storyID;
 
-            ChromePhp::log('batchCreate3');
             /* If storyID not equal zero, subdivide this story to child stories and close it. */
             if($storyID and !empty($mails))
             {
-                ChromePhp::log('batchCreate4');
                 $this->story->subdivide($storyID, $stories);
                 if(dao::isError()) return print(js::error(dao::getError()));
             }
 
             if($this->viewType == 'json') return $this->send(array('result' => 'success', 'message' => $this->lang->saveSuccess, 'idList' => $stories));
-            ChromePhp::log('batchCreate5');
+
+            if(isonlybody())
+            {
+                $executionID = $executionID ? $executionID : $this->session->execution;
+                $execution   = $this->execution->getByID($executionID);
+                if($this->app->tab == 'execution')
+                {
+                    $execLaneType = $this->session->execLaneType ? $this->session->execLaneType : 'all';
+                    $execGroupBy  = $this->session->execGroupBy ? $this->session->execGroupBy : 'default';
+
+                    if($execution->type == 'kanban')
+                    {
+                        $rdSearchValue = $this->session->rdSearchValue ? $this->session->rdSearchValue : '';
+                        $kanbanData    = $this->loadModel('kanban')->getRDKanban($executionID, $execLaneType, 'id_desc', 0, $execGroupBy, $rdSearchValue);
+                        $kanbanData    = json_encode($kanbanData);
+                        return print(js::closeModal('parent.parent', '', "parent.parent.updateKanban($kanbanData)"));
+                    }
+                    else
+                    {
+                        $taskSearchValue = $this->session->taskSearchValue ? $this->session->taskSearchValue : '';
+                        $kanbanData      = $this->loadModel('kanban')->getExecutionKanban($execution->id, $execLaneType, $execGroupBy, $taskSearchValue);
+                        $kanbanType      = $execLaneType == 'all' ? 'story' : key($kanbanData);
+                        $kanbanData      = $kanbanData[$kanbanType];
+                        $kanbanData      = json_encode($kanbanData);
+                        return print(js::closeModal('parent.parent', '', "parent.parent.updateKanban(\"story\", $kanbanData)"));
+                    }
+                }
+                else
+                {
+                    return print(js::reload('parent.parent'));
+                }
+            }
+
             if($storyID)
             {
-                ChromePhp::log('batchCreate6');
-                return print(js::locate(inlink('view', "storyID=$storyID&version=0&param=0&storyType=story"), 'parent'));
+                return print(js::locate(inlink('view', "storyID=$storyID&version=0&param=0&storyType=$storyType"), 'parent'));
             }
             elseif($executionID)
             {
