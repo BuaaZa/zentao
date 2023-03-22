@@ -50,7 +50,7 @@ $lang->block->finish       = '已完成';
 
 $lang->block->leftToday           = '今天剩余工作总计';
 $lang->block->myTask              = '我的任务';
-$lang->block->myStory             = "我的{$lang->SRCommon}";
+$lang->block->myStory             = "我的$lang->SRCommon";
 $lang->block->myBug               = '我的BUG';
 $lang->block->myExecution         = '未关闭的' . $lang->executionCommon;
 $lang->block->myProduct           = '未关闭的' . $lang->productCommon;
@@ -125,10 +125,13 @@ $lang->block->titleList['scrumtest']      = '待测版本';
 $lang->block->titleList['scrumlist']      = '迭代列表';
 $lang->block->titleList['sprint']         = '迭代总览';
 $lang->block->titleList['projectdynamic'] = '最新动态';
-$lang->block->titleList['bug']            = '指派给我的Bug';
-$lang->block->titleList['case']           = '指派给我的用例';
+$lang->block->titleList['bug']            = '指派给我的缺陷' . __LINE__;
+$lang->block->titleList['case']           = '指派给我的用例' . __LINE__;
 $lang->block->titleList['testtask']       = '待测版本列表';
 
+/**
+ * todo: 这里的代码意义不明
+ */
 $lang->block->default['waterfall']['project']['3']['title']  = "项目计划";
 $lang->block->default['waterfall']['project']['3']['block']  = 'waterfallgantt';
 $lang->block->default['waterfall']['project']['3']['source'] = 'project';
@@ -228,7 +231,7 @@ $lang->block->default['execution']['5']['grid']  = 8;
 $lang->block->default['execution']['5']['params']['count']   = 15;
 $lang->block->default['execution']['5']['params']['orderBy'] = 'id_desc';
 
-$lang->block->default['qa']['1']['title'] = '测试统计';
+$lang->block->default['qa']['1']['title'] = '测试统计statistic' . __LINE__;
 $lang->block->default['qa']['1']['block'] = 'statistic';
 $lang->block->default['qa']['1']['grid']  = 8;
 
@@ -239,15 +242,15 @@ $lang->block->default['qa']['1']['params']['count'] = '20';
 //$lang->block->default['qa']['2']['block'] = 'overview';
 //$lang->block->default['qa']['2']['grid']  = 4;
 
-$lang->block->default['qa']['2']['title'] = '指派给我的Bug';
-$lang->block->default['qa']['2']['block'] = 'bug';
+$lang->block->default['qa']['2']['title'] = '指派给我的缺陷' . __LINE__;
+$lang->block->default['qa']['2']['block'] = 'bug或者缺陷' . __LINE__;
 $lang->block->default['qa']['2']['grid']  = 4;
 
 $lang->block->default['qa']['2']['params']['count']   = 15;
 $lang->block->default['qa']['2']['params']['orderBy'] = 'id_desc';
 $lang->block->default['qa']['2']['params']['type']    = 'assignedTo';
 
-$lang->block->default['qa']['3']['title'] = '指派给我的用例';
+$lang->block->default['qa']['3']['title'] = '指派给我的用例' . __LINE__;
 $lang->block->default['qa']['3']['block'] = 'case';
 $lang->block->default['qa']['3']['grid']  = 4;
 
@@ -255,7 +258,7 @@ $lang->block->default['qa']['3']['params']['count']   = 15;
 $lang->block->default['qa']['3']['params']['orderBy'] = 'id_desc';
 $lang->block->default['qa']['3']['params']['type']    = 'assigntome';
 
-$lang->block->default['qa']['4']['title'] = '待测版本列表';
+$lang->block->default['qa']['4']['title'] = '待测版本列表' . __LINE__;
 $lang->block->default['qa']['4']['block'] = 'testtask';
 $lang->block->default['qa']['4']['grid']  = 8;
 
@@ -344,10 +347,10 @@ $lang->block->orderBy = '排序';
 $lang->block->availableBlocks              = new stdclass();
 $lang->block->availableBlocks->todo        = '日程';
 $lang->block->availableBlocks->task        = '任务';
-$lang->block->availableBlocks->bug         = 'Bug';
+$lang->block->availableBlocks->bug         = 'Bug或者缺陷' . __LINE__;
 $lang->block->availableBlocks->case        = '用例';
-$lang->block->availableBlocks->story       = "{$lang->SRCommon}";
-$lang->block->availableBlocks->requirement = "{$lang->URCommon}";
+$lang->block->availableBlocks->story       = "$lang->SRCommon";
+$lang->block->availableBlocks->requirement = "$lang->URCommon";
 $lang->block->availableBlocks->product     = $lang->productCommon . '列表';
 $lang->block->availableBlocks->execution   = $lang->executionCommon . '列表';
 $lang->block->availableBlocks->plan        = "计划列表";
@@ -405,11 +408,12 @@ $lang->block->modules['execution']->availableBlocks->build     = '版本列表';
 
 $lang->block->modules['qa'] = new stdclass();
 $lang->block->modules['qa']->availableBlocks = new stdclass();
-$lang->block->modules['qa']->availableBlocks->statistic = '测试统计';
-//$lang->block->modules['qa']->availableBlocks->overview  = '测试用例总览';
-$lang->block->modules['qa']->availableBlocks->bug       = 'Bug列表';
-$lang->block->modules['qa']->availableBlocks->case      = '用例列表';
-$lang->block->modules['qa']->availableBlocks->testtask  = '版本列表';
+$lang->block->modules['qa']->availableBlocks->statistic = '测试统计' . __LINE__;
+$lang->block->modules['qa']->availableBlocks->overview  = '测试用例总览';
+$lang->block->modules['qa']->availableBlocks->bug       = '缺陷列表';
+$lang->block->modules['qa']->availableBlocks->case      = '测试用例列表';
+$lang->block->modules['qa']->availableBlocks->testtask  = '测试集列表';
+$lang->block->modules['qa']->availableBlocks->testreport  = '测试报告列表';
 
 $lang->block->modules['todo'] = new stdclass();
 $lang->block->modules['todo']->availableBlocks = new stdclass();
@@ -551,7 +555,7 @@ $lang->block->modules['execution']->moreLinkList->list = 'execution|all|status=%
 $lang->block->modules['execution']->moreLinkList->task = 'my|task|type=%s';
 
 $lang->block->modules['qa']->moreLinkList           = new stdclass();
-$lang->block->modules['qa']->moreLinkList->bug      = 'my|bug|type=%s';
+$lang->block->modules['qa']->moreLinkList->bug      = 'my|bug或者缺陷 + __LINE__ lang|type=%s';
 $lang->block->modules['qa']->moreLinkList->case     = 'my|testcase|type=%s';
 $lang->block->modules['qa']->moreLinkList->testtask = 'testtask|browse|type=%s';
 
