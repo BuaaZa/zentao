@@ -2596,6 +2596,7 @@ class testtaskModel extends model
             ->fetch();
         if(!$task) return false;
         $parents = $this->getParentList();
+//        ChromePhp::log($parents);
         $childs = $this->dao->select('id,name')->from(TABLE_TESTTASK)
             ->where('deleted')->eq(0)
             ->andWhere('id')->notin($parents)
@@ -2607,6 +2608,7 @@ class testtaskModel extends model
         }else{
             $ans = $this->dfsGetSons('.', $taskID,$childs);
         }
+//        ChromePhp::log($ans);
         return $ans;        
     }
 

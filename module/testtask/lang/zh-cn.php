@@ -9,8 +9,12 @@
  * @version     $Id: zh-cn.php 4490 2013-02-27 03:27:05Z wyd621@gmail.com $
  * @link        http://www.zentao.net
  */
+
+$lang->testtask->move             = "转移到";
+$lang->testtask->batchMove        = "批量转移";
+
 $lang->testtask->index            = "测试集首页";
-$lang->testtask->create           = "提交测试";
+$lang->testtask->create           = "添加测试集";
 $lang->testtask->reportChart      = '报表统计';
 $lang->testtask->delete           = "删除测试集";
 $lang->testtask->importUnitResult = "导入单元测试结果";

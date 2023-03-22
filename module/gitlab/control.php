@@ -11,6 +11,7 @@
  */
 class gitlab extends control
 {
+    public gitlabModel $gitlab;
     /**
      * The gitlab constructor.
      * @param string $moduleName

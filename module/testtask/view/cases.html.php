@@ -55,8 +55,14 @@
   </div>
   <div class='btn-toolbar pull-right'>
     <?php
+
+    common::printLink('testtask', 'create',
+        "product=$productID", "<i class='icon icon-plus'></i> " . $lang->testtask->create,
+        '', "class='btn btn-primary'");
+
     if(!$task->isParent){
-      common::printIcon('testtask', 'linkCase', "taskID=$task->id", $task, 'button', 'link');
+      common::printIcon('testtask', 'linkCase',
+          "taskID=$task->id", $task, 'button', 'link');
     }
     common::printIcon('testcase', 'export', "productID=$productID&orderBy=case_desc&taskID=$task->id", '', 'button', '', '', 'export');
     common::printIcon('testtask', 'report', "productID=$productID&taskID=$task->id&browseType=$browseType&branchID=$task->branch&moduleID=" . (empty($moduleID) ? '' : $moduleID));
@@ -87,7 +93,10 @@ if(!empty($headerHooks))
     $datatableId  = $this->moduleName . ucfirst($this->methodName);
     $useDatatable = (isset($config->datatable->$datatableId->mode) and $config->datatable->$datatableId->mode == 'datatable');
     ?>
-    <form class='main-table table-cases' data-hot='true' method='post' name='casesform' id='casesForm' <?php if(!$useDatatable) echo "data-ride='table'";?>>
+    <form class='main-table table-cases'
+          data-hot='true' method='post'
+          name='casesform' id='casesForm'
+        <?php if(!$useDatatable) echo "data-ride='table'";?>>
       <div class="table-header fixed-right">
         <nav class="btn-toolbar pull-right"></nav>
       </div>
@@ -97,9 +106,12 @@ if(!empty($headerHooks))
       $canBatchEdit   = common::hasPriv('testcase', 'batchEdit');
       $canBatchUnlink = common::hasPriv('testtask', 'batchUnlinkCases');
       $canBatchAssign = common::hasPriv('testtask', 'batchAssign');
+//      ChromePhp::log($task->isParent);
+//      ChromePhp::log($this->app->user->rights);
+      $canBatchMove   = common::hasPriv('testtask', 'batchMove');
       $canBatchRun    = common::hasPriv('testtask', 'batchRun');
 
-      $canBatchAction = ($canBeChanged and ($canBatchEdit or $canBatchUnlink or $canBatchAssign or $canBatchRun));
+      $canBatchAction = ($canBeChanged and ($canBatchEdit or $canBatchUnlink or $canBatchAssign or $canBatchMove or $canBatchRun));
 
       if($useDatatable) include '../../common/view/datatable.html.php';
       if(!$useDatatable) include '../../common/view/tablesorter.html.php';
@@ -111,8 +123,14 @@ if(!empty($headerHooks))
       $widths  = $this->datatable->setFixedFieldWidth($setting);
       $columns = 0;
       ?>
+
       <?php if(!$useDatatable) echo '<div class="table-responsive">';?>
-        <table class='table has-sort-head<?php if($useDatatable) echo ' datatable';?>' id='caseList' data-fixed-left-width='<?php echo $widths['leftWidth']?>' data-fixed-right-width='<?php echo $widths['rightWidth']?>' data-checkbox-name='caseIDList[]'>
+        <table class='table has-sort-head
+            <?php if($useDatatable) echo ' datatable';?>'
+               id='caseList'
+               data-fixed-left-width='<?php echo $widths['leftWidth']?>'
+               data-fixed-right-width='<?php echo $widths['rightWidth']?>'
+               data-checkbox-name='caseIDList[]'>
           <thead>
             <tr>
             <?php
@@ -141,14 +159,19 @@ if(!empty($headerHooks))
         <?php if($canBatchAction):?>
         <div class="checkbox-primary check-all"><label><?php echo $lang->selectAll?></label></div>
         <div class='table-actions btn-toolbar'>
-          <div class='btn-group dropup'>
+<!--            批量编辑/移除-->
+          <div class='btn-group '>
             <?php
-            $actionLink = $this->createLink('testcase', 'batchEdit', "productID=$productID&branch=all");
-            $misc       = $canBatchEdit ? "onclick=\"setFormAction('$actionLink')\"" : "disabled='disabled'";
-            echo html::commonButton($lang->edit, $misc);
+                $actionLink = $this->createLink('testcase', 'batchEdit', "productID=$productID&branch=all");
+                $misc       = $canBatchEdit ? "onclick=\"setFormAction('$actionLink')\"" : "disabled='disabled'";
+                echo html::commonButton($lang->edit, $misc);
             ?>
+
             <?php if($canBatchUnlink):?>
-            <button type='button' class='btn dropdown-toggle' data-toggle='dropdown'><span class='caret'></span></button>
+            <button type='button' class='btn dropdown-toggle' data-toggle='dropdown'>
+                <span class='caret'></span>
+            </button>
+
             <ul class='dropdown-menu'>
               <?php
               $actionLink = $this->createLink('testtask', 'batchUnlinkCases', "taskID=$task->id");
@@ -157,36 +180,102 @@ if(!empty($headerHooks))
               ?>
             </ul>
             <?php endif;?>
+
           </div>
-          <?php if($canBatchAssign):?>
-          <div class="btn-group dropup">
-            <button data-toggle="dropdown" type="button" class="btn"><?php echo $lang->testtask->assign;?> <span class="caret"></span></button>
+<!--            批量指派-->
+          <?php if($canBatchAssign && !$task->isParent):?>
+          <div class="btn-group ">
+
+            <button data-toggle="dropdown" type="button" class="btn">
+                <?php echo $lang->testtask->assign;?>
+                <span class="caret"></span>
+            </button>
+
             <?php
-            $withSearch = count($assignedToList) > 10;
-            $actionLink = inLink('batchAssign', "taskID=$task->id");
-            echo html::select('assignedTo', $assignedToList, '', 'class="hidden"');
+                $withSearch = count($assignedToList) > 10;
+                echo html::select('assignedTo', $assignedToList, '', 'class="hidden"');
             ?>
-            <div class="dropdown-menu search-list<?php if($withSearch) echo ' search-box-sink';?>" data-ride="searchList">
+
+            <div class="dropdown-menu search-list
+                <?php if($withSearch) echo ' search-box-sink';?>"
+                 data-ride="searchList">
+
               <?php if($withSearch):?>
-              <?php $membersPinYin = common::convert2Pinyin($assignedToList);?>
+              <?php
+                  $membersPinYin = common::convert2Pinyin($assignedToList);
+              ?>
               <div class="input-control search-box has-icon-left has-icon-right search-example">
                 <input id="userSearchBox" type="search" autocomplete="off" class="form-control search-input">
                 <label for="userSearchBox" class="input-control-icon-left search-icon"><i class="icon icon-search"></i></label>
                 <a class="input-control-icon-right search-clear-btn"><i class="icon icon-close icon-sm"></i></a>
               </div>
               <?php endif;?>
+
               <div class="list-group">
               <?php foreach ($assignedToList as $key => $value):?>
                   <?php
                   if(empty($key) or $key == 'closed') continue;
                   $searchKey = $withSearch ? ('data-key="' . zget($membersPinYin, $value, '') . " @$key\"") : "data-key='@$key'";
-                  echo html::a("javascript:$(\"#assignedTo\").val(\"$key\");setFormAction(\"$actionLink\", \"hiddenwin\")", $value, '', $searchKey);
+//                  echo html::a("javascript:$(\"#assignedTo\").val(\"$key\");
+//                                    setFormAction(\"$actionLink\", \"hiddenwin\")",
+//                                    $value, '', $searchKey);
+
+                  $actionLink = inLink('batchAssign', "taskID=$task->id");
+                  echo html::a('#', $value, '',
+                      "$searchKey onclick=\"$('#assignedTo').val('$key');setFormAction('$actionLink', 'hiddenwin')\" ",);
                   ?>
               <?php endforeach;?>
               </div>
+
             </div>
           </div>
           <?php endif;?>
+
+<!--        todo: 批量移动-->
+          <?php if($canBatchMove && !$task->isParent):?>
+          <div class="btn-group ">
+            <button data-toggle="dropdown" type="button" class="btn">
+                <?php echo $lang->testtask->move;?>
+                <span class="caret"></span>
+            </button>
+
+            <?php
+                $withSearch = count($taskList) > 10;
+                echo html::select('moveTo', $taskList, '', 'class="hidden"');
+            ?>
+            <div class="dropdown-menu search-list
+                <?php if($withSearch) echo ' search-box-sink';?>"
+                 data-ride="searchList">
+
+                <?php if($withSearch):?>
+                    <?php
+                        $membersPinYin = common::convert2Pinyin($taskList);
+                    ?>
+                    <div class="input-control search-box has-icon-left has-icon-right search-example">
+                        <input id="userSearchBox" type="search" autocomplete="off" class="form-control search-input">
+                        <label for="userSearchBox" class="input-control-icon-left search-icon"><i class="icon icon-search"></i></label>
+                        <a class="input-control-icon-right search-clear-btn"><i class="icon icon-close icon-sm"></i></a>
+                    </div>
+                <?php endif;?>
+
+                <div class="list-group">
+                    <?php foreach ($taskList as $key => $value):?>
+                        <?php
+                        if(empty($key) or $key == 'closed') continue;
+                        $searchKey = $withSearch ? ('data-key="' . zget($membersPinYin, $value, '') . " @$key\"") : "data-key='@$key'";
+
+                        $actionLink = inLink('batchMove', "taskID=$task->id");
+                        echo html::a('#', $value, '',
+                            "$searchKey onclick=\"$('#moveTo').val('$key');setFormAction('$actionLink', 'hiddenwin')\" ",);
+                        ?>
+                    <?php endforeach;?>
+                </div>
+
+            </div>
+          </div>
+          <?php endif;?>
+
+<!--            批量执行-->
           <?php
           if($canBatchRun)
           {
@@ -194,6 +283,7 @@ if(!empty($headerHooks))
               echo html::commonButton($lang->testtask->runCase, "onclick=\"setFormAction('$actionLink')\"");
           }
           ?>
+
         </div>
         <?php endif;?>
         <?php $pager->show('right', 'pagerjs');?>
