@@ -2817,8 +2817,8 @@ class storyModel extends model
         if(!$stories) return array();
         $taskpoint = $this->dao->select('*')->from(TABLE_STORY)
             ->where('deleted')->eq(0)
+            ->beginIF($productID)->andWhere('product')->in($productID)->fi()
             ->andWhere('type')->eq('taskPoint')
-            ->andWhere('status')->notin('closed,draft')
             ->orderBy('parent')
             ->fetchAll();
         $res = $this->formatStories($stories, $type, $limit);
@@ -4355,7 +4355,7 @@ class storyModel extends model
         $story->notReview = isset($story->notReview) ? $story->notReview : array();
 
         $isSuperReviewer = strpos(',' . trim(zget($config->story, 'superReviewers', ''), ',') . ',', ',' . $app->user->account . ',');
-
+ 
         if($action == 'change')     return (($isSuperReviewer !== false or count($story->reviewer) == 0 or count($story->notReview) == 0) and $story->status == 'active');
         if($action == 'review')     return (($isSuperReviewer !== false or in_array($app->user->account, $story->notReview)) and $story->status == 'reviewing');
         if($action == 'recall')     return strpos('reviewing,changing', $story->status) !== false;
@@ -4387,7 +4387,15 @@ class storyModel extends model
 
         if($type == 'browse')
         {
-            if(common::canBeChanged('story', $story))
+            if($this->app->tab=='qa'){
+                $title = $story->type == 'taskPoint'?'编辑':'只能编辑功能点';
+                $menu .= $this->buildMenu('story', 'edit', $params . "&kanbanGroup=default&storyType=$story->type", $story, "qabrowse", '', '', 'showinonlybody', '', '', $title);
+                $menu .= $this->buildMenu('testcase', 'create', "productID=$story->product&branch=$story->branch&module=0&from=&param=0&$params", $story, "qabrowse", 'sitemap', '', 'showinonlybody', false);
+                $title = $story->type == 'story'?'划分功能点':'功能点无法继续划分功能点';
+                $menu .= $this->buildMenu('qastory', 'batchCreate', "productID=$story->product&branch=$story->branch&module=$story->module&$params&executionID=0&plan=0&storyType=taskPoint", $story, "qabrowse", 'split', '', 'showinonlybody', '', '', $title);
+                return $menu;
+            }
+            else if(common::canBeChanged('story', $story))
             {
                 $storyReviewer = isset($story->reviewer) ? $story->reviewer : array();
                 if($story->URChanged) return $this->buildMenu('story', 'processStoryChange', $params, $story, $type, 'ok', '', 'iframe', true, '', $this->lang->confirm);

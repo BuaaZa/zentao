@@ -447,6 +447,10 @@ class testcase extends control
             $useSession         = ($this->app->tab != 'qa' and $this->session->caseList and strpos($this->session->caseList, 'dynamic') === false);
             $locateLink         = $this->app->tab == 'project' ? $this->createLink('project', 'testcase', "projectID={$this->session->project}") : $this->createLink('testcase', 'browse', "productID={$this->post->product}&branch={$this->post->branch}&browseType=all&param=0&orderBy=id_desc");
             $response['locate'] = $useSession ? $this->session->caseList : $locateLink;
+            if($storyID and $this->app->tab == 'qa'){
+                $response['locate'] = $this->createLink('qastory', 'story', "productID=$productID")."#app=qa";
+                ChromePhp::log($response);
+            }
             return $this->send($response);
         }
         if(empty($this->products)) $this->locate($this->createLink('product', 'create'));
@@ -564,7 +568,7 @@ class testcase extends control
             $modules        = $this->tree->getAllChildID($modules);
         }
 
-        $stories = $this->story->getProductStoryPairsTestcase($productID, $branch, $modules, array_keys($storyStatus), 'id_desc', 50, 'null', 'story', false);
+        $stories = $this->story->getProductStoryPairsTestcase($productID, $branch, $modules, array_keys($storyStatus), 'id_desc', 50, 'null', 'story', true);
         if($this->app->tab != 'qa' and $this->app->tab != 'product')
         {
             $projectID = $this->app->tab == 'project' ? $this->session->project : $this->session->execution;
