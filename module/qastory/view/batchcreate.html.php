@@ -28,43 +28,14 @@
       <table class="table table-form">
         <thead>
           <tr>
-            <th class='c-branch<?php echo zget($visibleFields, $product->type, ' hidden')?> branchBox'><?php echo $lang->product->branch;?></th>
-            <th class='c-module<?php echo zget($requiredFields, 'module', '', ' required');?>'><?php echo $lang->story->module;?></th>
-            <th class='c-plan<?php echo zget($visibleFields, 'plan', ' hidden') . zget($requiredFields, 'plan', '', ' required');?> planBox'><?php echo $lang->story->plan;?></th>
-            <?php if(isset($execution) and $execution->type == 'kanban'):?>
-            <th class='c-branch'><?php echo $lang->kanbancard->region;?></th>
-            <th class='c-branch'><?php echo $lang->kanbancard->lane;?></th>
-            <?php endif;?>
-            <th class='c-name required has-btn'><?php echo $lang->story->title;?></th>
-            <th class='c-spec<?php echo zget($visibleFields, 'spec', ' hidden') . zget($requiredFields, 'spec', '', ' required');?> specBox'><?php echo $lang->story->spec;?></th>
-            <th class='c-source<?php echo zget($visibleFields, 'source', ' hidden') . zget($requiredFields, 'source', '', ' required');?> sourceBox'><?php echo $lang->story->source;?></th>
-            <th class='c-note<?php echo zget($visibleFields, 'source', ' hidden') . zget($requiredFields, 'sourceNote', '', ' required');?> sourceBox'><?php echo $lang->story->sourceNote;?></th>
-            <th class='c-verify<?php echo zget($visibleFields, 'verify', ' hidden') . zget($requiredFields, 'verify', '', ' required');?> verifyBox'><?php echo $lang->story->verify;?></th>
-            <th class='c-category'><?php echo $lang->story->category;?></th>
-            <th class='c-pri<?php echo zget($visibleFields, 'pri', ' hidden') . zget($requiredFields, 'pri', '', ' required');?> priBox'><?php echo $lang->story->pri;?></th>
-            <th class='c-estimate<?php echo zget($visibleFields, 'estimate', ' hidden') . zget($requiredFields, 'estimate', '', ' required');?> estimateBox'><?php echo $lang->story->estimate;?></th>
-            <th class='<?php echo zget($visibleFields, 'review',   ' hidden');?><?php if($forceReview) echo ' required'?> reviewBox'><?php echo $lang->story->reviewedBy;?></th>
-            <th class='c-keywords<?php echo zget($visibleFields, 'keywords', ' hidden') . zget($requiredFields, 'keywords', '', ' required');?> keywordsBox'><?php echo $lang->story->keywords;?></th>
-            <?php
-            $extendFields = $this->story->getFlowExtendFields();
-            foreach($extendFields as $extendField)
-            {
-                $required = strpos(",$extendField->rules,", ',1,') !== false ? 'required' : '';
-                echo "<th class='c-extend $required'>{$extendField->name}</th>";
-            }
-            ?>
+            <th class='c-name required has-btn'><?php echo $lang->qastory->title;?></th>
+            <th class='c-spec specBox'><?php echo $lang->qastory->spec;?></th>
+            <th class='c-verify verifyBox'><?php echo $lang->qastory->verify;?></th>
             <th class='c-actions'><?php echo $lang->actions;?></th>
           </tr>
         </thead>
         <tbody>
           <tr class="template">
-            <td class='text-left<?php echo zget($visibleFields, $product->type, ' hidden')?> branchBox'><?php echo html::select('branch[$id]', $branches, $branch, "class='form-control chosen' onchange='setModuleAndPlan(this.value, $productID, \$id)'");?></td>
-            <td class='text-left' style='overflow:visible'><?php echo html::select('module[$id]', $moduleOptionMenu, $moduleID, "class='form-control chosen'");?></td>
-            <td class='text-left<?php echo zget($visibleFields, 'plan', ' hidden')?> planBox' style='overflow:visible'><?php echo html::select('plan[$id]', $plans, $planID, "class='form-control chosen'");?></td>
-            <?php if(isset($execution) and $execution->type == 'kanban'):?>
-            <td class='text-left'><?php echo html::select('regions[$id]', $regionPairs, $regionID, "class='form-control chosen' onchange='setLane(this.value, \$id)'");?>
-            <td class='text-left'><?php echo html::select('lanes[$id]', $lanePairs, $laneID, "class='form-control chosen'");?>
-            <?php endif;?>
             <td style='overflow:visible'>
               <div class="input-group">
                 <div class="input-control has-icon-right">
@@ -78,28 +49,12 @@
                   </div>
                 </div>
                 <span class="input-group-btn">
-                  <button type="button" class="btn btn-link btn-icon btn-copy" data-copy-from="#title$id" data-copy-to="#spec$id" title="<?php echo $lang->story->copyTitle;?>"><i class="icon icon-arrow-right"></i></button>
+                  <button type="button" class="btn btn-link btn-icon btn-copy" data-copy-from="#title$id" data-copy-to="#spec$id" title="<?php echo $lang->qastory->copyTitle ;?>"><i class="icon icon-arrow-right"></i></button>
                 </span>
               </div>
             </td>
-            <td class='<?php echo zget($visibleFields, 'spec', 'hidden')?> specBox'><textarea name="spec[$id]" id="spec$id" rows="1" class="form-control autosize"></textarea></td>
-            <td class='text-left<?php echo zget($visibleFields, 'source', ' hidden')?> sourceBox'><?php echo html::select('source[$id]', $sourceList, '', "class='form-control chosen' id='source_\$id'");?></td>
-            <td class='<?php echo zget($visibleFields, 'source', 'hidden')?> sourceBox'><?php echo html::input('sourceNote[$id]', '', "class='form-control' id='sourceNote_\$id'");?></td>
-            <td class='<?php echo zget($visibleFields, 'verify', 'hidden')?> verifyBox'><textarea name="verify[$id]" id="verify$id" rows="1" class="form-control autosize"></textarea></td>
-            <td class='text-left' style='overflow:visible'><?php echo html::select('category[$id]', $lang->story->categoryList, 'feature', "class='form-control chosen'");?></td>
-            <td class='text-left<?php echo zget($visibleFields, 'pri', ' hidden')?> priBox' style='overflow:visible'><?php echo html::select('pri[$id]', $priList, $pri, "class='form-control chosen'");?></td>
-            <td class='<?php echo zget($visibleFields, 'estimate', 'hidden')?> estimateBox'><?php echo html::input('estimate[$id]', $estimate, "class='form-control'");?></td>
-            <td class='<?php echo zget($visibleFields, 'review', 'hidden')?> reviewBox'>
-              <div class='input-group'>
-                <?php echo html::select('reviewer[$id][]', $reviewers, '', "class='form-control chosen' multiple");?>
-                <span class='input-group-addon reviewerDitto'><input type='checkbox' name='reviewDitto[$id]' value='ditto' checked='checked' id='dittocheck$id'/> <?php echo $lang->story->ditto;?></span>
-              </div>
-            </td>
-            <td class='<?php echo zget($visibleFields, 'keywords', 'hidden')?> keywordsBox'><?php echo html::input('keywords[$id]', '', "class='form-control'");?></td>
-            <?php
-            $this->loadModel('flow');
-            foreach($extendFields as $extendField) echo "<td" . (($extendField->control == 'select' or $extendField->control == 'multi-select') ? " style='overflow:visible'" : '') . ">" . $this->flow->getFieldControl($extendField, '', $extendField->field . '[$id]') . "</td>";
-            ?>
+            <td class='spec specBox'><textarea name="spec[$id]" id="spec$id" rows="1" class="form-control autosize"></textarea></td>
+            <td class='verify verifyBox'><textarea name="verify[$id]" id="verify$id" rows="1" class="form-control autosize"></textarea></td>
             <td class='c-actions text-left'>
               <a href='javascript:;' onclick='addRow(this)' class='btn btn-link'><i class='icon-plus'></i></a>
               <a href='javascript:;' onclick='deleteRow(this)' class='btn btn-link'><i class='icon icon-close'></i></a>
@@ -108,7 +63,7 @@
         </tbody>
         <tfoot>
           <tr>
-            <td colspan="<?php echo count($visibleFields) + 3?>" class="text-center form-actions">
+            <td colspan="4" class="text-center form-actions">
               <?php echo html::commonButton($lang->save, "id='saveButton'", 'btn btn-primary btn-wide');?>
               <?php echo html::commonButton($lang->story->saveDraft, "id='saveDraftButton'", 'btn btn-secondary btn-wide');?>
               <?php echo html::backButton();?>
@@ -123,13 +78,6 @@
   <?php $i = '%i%';?>
   <table class='hidden'>
     <tr id='addRow' class='hidden'>
-      <td class='text-left<?php echo zget($visibleFields, $product->type, ' hidden')?> branchBox'><?php echo html::select("branch[$i]", $branches, $branch, "class='form-control chosen' onchange='setModuleAndPlan(this.value, $productID, $i)'");?></td>
-      <td class='text-left' style='overflow:visible'><?php echo html::select("module[$i]", $moduleOptionMenu, 'ditto', "class='form-control chosen'");?></td>
-      <td class='text-left<?php echo zget($visibleFields, 'plan', ' hidden')?> planBox' style='overflow:visible'><?php echo html::select("plan[$i]", $plans, 'ditto', "class='form-control chosen'");?></td>
-      <?php if(isset($execution) and $execution->type == 'kanban'):?>
-      <td class='text-left'><?php echo html::select("regions[$i]", $regionPairs, $regionID, "class='form-control chosen' onchange='setLane(this.value, $i)'");?>
-      <td class='text-left'><?php echo html::select("lanes[$i]", $lanePairs, $laneID, "class='form-control chosen'");?>
-      <?php endif;?>
       <td style='overflow:visible'>
         <div class="input-group">
           <div class="input-control has-icon-right">
@@ -143,28 +91,12 @@
             </div>
           </div>
           <span class="input-group-btn">
-            <button type="button" class="btn btn-link btn-icon btn-copy" data-copy-from="#title<?php echo $i?>" data-copy-to="#spec<?php echo $i?>" title="<?php echo $lang->story->copyTitle;?>"><i class="icon icon-arrow-right"></i></button>
+            <button type="button" class="btn btn-link btn-icon btn-copy" data-copy-from="#title<?php echo $i?>" data-copy-to="#spec<?php echo $i?>" title="<?php echo $lang->story->copyTaskPointTitle ;?>"><i class="icon icon-arrow-right"></i></button>
           </span>
         </div>
       </td>
-      <td class='<?php echo zget($visibleFields, 'spec', 'hidden')?> specBox'><textarea name="spec[<?php echo $i?>]" id="spec<?php echo $i;?>" rows="1" class="form-control autosize"></textarea></td>
-      <td class='text-left<?php echo zget($visibleFields, 'source', ' hidden')?> sourceBox'><?php echo html::select("source[$i]", $sourceList, 'ditto', "class='form-control chosen' id='source_$i'");?></td>
-      <td class='<?php echo zget($visibleFields, 'source', 'hidden')?> sourceBox'><?php echo html::input("sourceNote[$i]", '', "class='form-control' id='sourceNote_$i'");?></td>
-      <td class='<?php echo zget($visibleFields, 'verify', 'hidden')?> verifyBox'><textarea name="verify[<?php echo $i?>]" id="verify<?php echo $i?>" rows="1" class="form-control autosize"></textarea></td>
-      <td class='text-left' style='overflow:visible'><?php echo html::select("category[$i]", $lang->story->categoryList, 'feature', "class='form-control chosen'");?></td>
-      <td class='text-left<?php echo zget($visibleFields, 'pri', ' hidden')?> priBox' style='overflow:visible'><?php echo html::select("pri[$i]", $priList, 'ditto', "class='form-control chosen'");?></td>
-      <td class='<?php echo zget($visibleFields, 'estimate', 'hidden')?> estimateBox'><?php echo html::input("estimate[$i]", $estimate, "class='form-control'");?></td>
-      <td class='<?php echo zget($visibleFields, 'review', 'hidden')?> reviewBox'>
-        <div class='input-group'>
-          <?php echo html::select("reviewer[$i][]", $reviewers, '', "class='form-control chosen' multiple");?>
-          <span class='input-group-addon reviewerDitto'><input type='checkbox' name="reviewDitto[<?php echo $i?>]" value='ditto' checked='checked' id="dittocheck<?php echo $i?>"/> <?php echo $lang->story->ditto;?></span>
-        </div>
-      </td>
-      <td class='<?php echo zget($visibleFields, 'keywords', 'hidden')?> keywordsBox'><?php echo html::input("keywords[$i]", '', "class='form-control'");?></td>
-      <?php
-      $this->loadModel('flow');
-      foreach($extendFields as $extendField) echo "<td" . (($extendField->control == 'select' or $extendField->control == 'multi-select') ? " style='overflow:visible'" : '') . ">" . $this->flow->getFieldControl($extendField, '', $extendField->field . "[$i]") . "</td>";
-      ?>
+      <td class='spec specBox'><textarea name="spec[<?php echo $i?>]" id="spec<?php echo $i;?>" rows="1" class="form-control autosize"></textarea></td>
+      <td class='verify verifyBox'><textarea name="verify[<?php echo $i?>]" id="verify<?php echo $i;?>" rows="1" class="form-control autosize"></textarea></td>
       <td class='c-actions text-left'>
         <a href='javascript:;' onclick='addRow(this)' class='btn btn-link'><i class='icon-plus'></i></a>
         <a href='javascript:;' onclick='deleteRow(this)' class='btn btn-link'><i class='icon icon-close'></i></a>
