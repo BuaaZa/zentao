@@ -2350,13 +2350,13 @@ class testcase extends control
         $this->display();
     }
     /**
-     * Export case to word.
+     * Export case to word in old way
      *
      * @param  int    $caseID
      * @access public
      * @return void
      */
-    public function exportToWord($caseID, $version = -1)
+    public function exportToWord_old($caseID, $version = -1)
     {
         require_once 'vendor/autoload.php';
         if($this->server->request_method == 'POST')
@@ -2378,7 +2378,45 @@ class testcase extends control
             }
             $sample_data_all = array_reverse($sample_data_all);
             $PHPWord = new \PhpOffice\PhpWord\PhpWord();
-            $PHPWord = $this->testcase->exportToWord($caseID,$sample_data_all, $PHPWord);
+            $PHPWord = $this->testcase->exportToWord_old($caseID,$sample_data_all, $PHPWord);
+            $saveTime = date("Ymd-H:i:m");
+            $filename = $caseID . '_' . $saveTime . '.docx';
+            //$filepath = 'tmp_case/' . $filename;
+            $PHPWord->save($filename, 'Word2007', true);
+            //$this->loadModel('file')->sendDownHeader($filename, 'docx', realpath('./'.$filename), 'file', false);
+            return $this->send(array('result' => 'success', 'closeModal' => true));
+        }
+
+        #if(dao::isError()) return $this->send(array('result' => 'fail', 'message' => dao::getError()));
+        $this->display();
+    }
+
+    /**
+     * Export case to word.
+     *
+     * @param  int    $caseID
+     * @access public
+     * @return void
+     */
+    public function exportToWord($caseID)
+    {
+        require_once 'vendor/autoload.php';
+        if($this->server->request_method == 'POST')
+        {
+            $results = $this->loadModel('testtask')->getResults(0, $caseID);
+            $data_sample_result = array();
+            $id = -1;
+            foreach($results as $result){
+                $tmp_result = $result->data_sample_result_new;
+                if(isset($tmp_result) && count($tmp_result)>1){
+                    if($result->id > $id){
+                        $id = $result->id;
+                        $data_sample_result = $tmp_result;
+                    }
+                }
+            }
+            $PHPWord = new \PhpOffice\PhpWord\PhpWord();
+            $PHPWord = $this->testcase->exportToWord($caseID,$data_sample_result, $PHPWord);
             $saveTime = date("Ymd-H:i:m");
             $filename = $caseID . '_' . $saveTime . '.docx';
             //$filepath = 'tmp_case/' . $filename;
@@ -2409,22 +2447,19 @@ class testcase extends control
             foreach ($caseIDList as $caseID){
                 $caseID = (int)$caseID;
                 $results = $this->loadModel('testtask')->getResults(0, $caseID);
-                $sample_data_all = array();
-                $version = -1;
+                $data_sample_result = array();
+                $id = -1;
                 foreach($results as $result){
-                    if($result->version > $version){
-                        $version = $result->version;
+                    $tmp_result = $result->data_sample_result_new;
+                    if(isset($tmp_result) && count($tmp_result)>1){
+                        if($result->id > $id){
+                            $id = $result->id;
+                            $data_sample_result = $tmp_result;
+                        }
                     }
                 }
-                foreach($results as $result){
-                    if($result->version != $version)continue;
-                    if(isset($result->sample_data['sample_in']) or isset($result->sample_data['sample_out'])){
-                        array_push($sample_data_all, $result->sample_data);
-                    }
-                }
-                $sample_data_all = array_reverse($sample_data_all);
 
-                $PHPWord = $this->testcase->exportToWord($caseID,$sample_data_all, $PHPWord);
+                $PHPWord = $this->testcase->exportToWord($caseID,$data_sample_result, $PHPWord);
             }
             $saveTime = date("Ymd-H:i:m");
             $filename = '用例集合' . '_' . $saveTime . '.docx';
