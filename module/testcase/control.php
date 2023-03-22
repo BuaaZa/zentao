@@ -11,6 +11,8 @@
  */
 class testcase extends control
 {
+    public treeModel $tree;
+
     /**
      * All products.
      *

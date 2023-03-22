@@ -189,7 +189,8 @@ body {margin-bottom: 25px;}
     </div>
   </div>
   <div class="main-col">
-    <div class="cell<?php if($browseType == 'bysearch') echo ' show';?>" id="queryBox" data-module='task'></div>
+    <div class="cell<?php if($browseType == 'bysearch') echo ' show';?>"
+         id="queryBox" data-module='task'></div>
     <?php if(empty($tasks)):?>
     <div class="table-empty-tip">
       <p>
@@ -232,7 +233,9 @@ body {margin-bottom: 25px;}
       $canBatchAction = ($canBatchEdit or $canBatchClose or $canBatchCancel or $canBatchChangeModule or $canBatchAssignTo);
       ?>
       <?php if(!$useDatatable) echo '<div class="table-responsive">';?>
-      <table class='table has-sort-head<?php if($useDatatable) echo ' datatable';?>' id='taskList' data-fixed-left-width='<?php echo $widths['leftWidth']?>' data-fixed-right-width='<?php echo $widths['rightWidth']?>'>
+      <table class='table has-sort-head<?php if($useDatatable) echo ' datatable';?>'
+             id='taskList' data-fixed-left-width='<?php echo $widths['leftWidth']?>'
+             data-fixed-right-width='<?php echo $widths['rightWidth']?>'>
         <thead>
           <tr>
           <?php if($this->app->getViewType() == 'xhtml'):?>

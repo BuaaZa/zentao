@@ -81,9 +81,11 @@ class testtask extends control
      * @access public
      * @return void
      */
-    public function browse($productID = 0, $branch = '', $type = 'local,totalStatus', $orderBy = 'id_desc', $recTotal = 0, $recPerPage = 20, $pageID = 1, $beginTime = 0, $endTime = 0, $openId = 0)
+    public function browse($productID = 0, $branch = '', $type = 'local,totalStatus', $orderBy = 'id_desc',
+                           $recTotal = 0, $recPerPage = 20, $pageID = 1, $beginTime = 0, $endTime = 0, $openId = 0)
     {
-        $thisParam = "productID=$productID&branch=$branch&type=$type&orderBy=$orderBy&recTotal=$recTotal&recPerPage=$recPerPage&pageID=1&beginTime=$beginTime&endTime=$endTime";
+        $thisParam =    "productID=$productID&branch=$branch&type=$type&orderBy=$orderBy".
+                        "&recTotal=$recTotal&recPerPage=$recPerPage&pageID=1&beginTime=$beginTime&endTime=$endTime";
         /* Save session. */
         $uri = $this->app->getURI(true);
         $this->session->set('testtaskList', $uri, 'qa');
@@ -115,11 +117,16 @@ class testtask extends control
         if($product->type == 'normal') $branch = 'all';
         $tasks = $this->testtask->getProductTasks($productID, $branch, $sort, $pager, $scopeAndStatus, $beginTime, $endTime, $openId);
 
+//        ChromePhp::log($tasks);
+//        ChromePhp::log($scopeAndStatus);
         if($scopeAndStatus[0] == 'all')
             $sonTree = $this->testtask->getSonsObject("testtask", "browse", $thisParam);
         else
             $sonTree = $this->testtask->getSonsObject("testtask", "browse", $thisParam, $productID);
+
+//        ChromePhp::log($sonTree);
         $taskTree = $this->loadModel("tree")->buildMyTree($sonTree, "testtask");
+//        ChromePhp::log($taskTree);
         if($openId>0){
             $this->view->openTask = $this->testtask->getById($openId);
             $this->view->openTask->backURL = $this->createLink("testtask", "browse", $thisParam);
@@ -225,6 +232,22 @@ class testtask extends control
      */
     public function create($productID, $executionID = 0, $build = 0, $projectID = 0)
     {
+        $tab = $this->app->tab;
+//        ChromePhp::log($tab);
+        $referer = $_SERVER['HTTP_REFERER'];
+//        ChromePhp::log($referer);
+
+        $refererArray = parse_url($_SERVER['HTTP_REFERER']);
+        parse_str($refererArray['query'],$refererParam);
+//        ChromePhp::log($refererParam);
+
+        $gobackCookie = json_decode($_COOKIE['goback'])  ;
+//        ChromePhp::log($gobackCookie->{$tab});
+
+        $gobackCookieArray = parse_url($gobackCookie->{$tab});
+        parse_str($gobackCookieArray['query'],$cookieParam);
+//        ChromePhp::log($cookieParam);
+
         if(!empty($_POST))
         {
             $taskID = $this->testtask->create($projectID);
@@ -241,7 +264,17 @@ class testtask extends control
             $task = $this->dao->findById($taskID)->from(TABLE_TESTTASK)->fetch();
             if($this->app->tab == 'project') $link = $this->createLink('project', 'testtask', "projectID=$task->project");
             if($this->app->tab == 'execution') $link = $this->createLink('execution', 'testtask', "executionID=$task->execution");
-            if($this->app->tab == 'qa') $link = $this->createLink('testtask', 'browse', "productID=" . $this->post->product);
+
+
+            if($this->app->tab == 'qa') {
+                if(isset($cookieParam->productID)){
+//                    ChromePhp::log($cookieParam->productID);
+                    $link = $this->createLink($cookieParam['m'], $cookieParam['f'], "productID=" . $cookieParam['productID']);
+                }else{
+//                    ChromePhp::log($cookieParam->taskID);
+                    $link = $this->createLink($cookieParam['m'], $cookieParam['f'], "taskID=" . $cookieParam['taskID']);
+                }
+            }
             return $this->send(array('result' => 'success', 'message' => $this->lang->saveSuccess, 'locate' => $link));
         }
 
@@ -470,9 +503,11 @@ class testtask extends control
      * @access public
      * @return void
      */
-    public function cases($taskID, $browseType = 'all', $param = 0, $orderBy = 'id_desc', $recTotal = 0, $recPerPage = 20, $pageID = 1, $openId = 0)
+    public function cases($taskID, $browseType = 'all', $param = 0, $orderBy = 'id_desc',
+                          $recTotal = 0, $recPerPage = 20, $pageID = 1, $openId = 0)
     {
-        $thisParam = "taskID=$taskID&browseType=$browseType&param=$param&orderBy=$orderBy&recTotal=$recTotal&recPerPage=$recPerPage&pageID=1";
+        $thisParam = "taskID=$taskID&browseType=$browseType&param=$param&orderBy=$orderBy".
+                    "&recTotal=$recTotal&recPerPage=$recPerPage&pageID=1";
         if(!$openId){
             $openId = $taskID;
         }else{
@@ -498,6 +533,7 @@ class testtask extends control
 
         /* Get task and product info, set menu. */
         $task = $this->testtask->getById($taskID);
+
         if(!$task) return print(js::error($this->lang->testtask->checkLinked) . js::locate('back'));
 
         $productID = $task->product;
@@ -555,15 +591,42 @@ class testtask extends control
         $sort = common::appendOrder($orderBy, 't2.id');
 
         //测试计划树
-        $sonTree = $this->testtask->getSonsObject("testtask", "cases", $thisParam, 0, $openId);
+        $sonTree = $this->testtask->getSonsObject("testtask", "cases", $thisParam, 0, ( $task->parent > 0 ) ? $task->parent : $taskID);
+//        ChromePhp::log($sonTree);
         $taskTree = $this->loadModel("tree")->buildMyTree($sonTree, "testtask");
         if($taskID>0){
             $this->view->backURL = $this->createLink("testtask", "cases", $thisParam);
         }
 
+        $allTree = $this->testtask->getSonsObject("testtask", "cases", $thisParam, $productID);
+//        ChromePhp::log($allTree);
+
+        $allTree->name = '';
+        $taskList = array();
+        $stack = array();
+        $stack[] = $allTree;
+        while(!empty($stack))
+        {
+            $now = array_pop($stack);
+            foreach (array_reverse($now->childs) as $key => $value)
+            {
+                $value->name = $now->name . " /".$value->name;
+                $stack[] = $value;
+            }
+
+//            去掉父节点
+            if($now->id>0 && empty($now->childs))
+            {
+                $taskList[$now->id] = $now->name;
+            }
+        }
+
+//        ChromePhp::log($taskList);
+
         /* Get test cases. */
         $runs = $this->testtask->getTaskCases($productID, $browseType, $queryID, $moduleID, $sort, $pager, $task);
         $allSons = $this->testtask->getSonsAndName($task->id);
+
         if($task->isParent){
             foreach($allSons as $key => $son){
                 $son->runs = $this->testtask->getTaskCases($productID, $browseType, $queryID, $moduleID, $sort, $pager, $son);
@@ -615,6 +678,7 @@ class testtask extends control
         $this->view->runs           = $runs;
         $this->view->users          = $this->loadModel('user')->getPairs('noclosed|qafirst|noletter');
         $this->view->assignedToList = $assignedToList;
+//        ChromePhp::log($assignedToList);
         $this->view->moduleTree     = $this->loadModel('tree')->getTreeMenu($productID, 'case', 0, array('treeModel', 'createTestTaskLink'), $taskID, $task->branch);
         $this->view->browseType     = $browseType;
         $this->view->param          = $param;
@@ -631,6 +695,8 @@ class testtask extends control
         $this->view->canBeChanged   = $canBeChanged;
         $this->view->taskTree = $taskTree;
         $this->view->allSons = $allSons;
+
+        $this->view->taskList  = $taskList;
 
         $this->display();
     }
@@ -1452,7 +1518,9 @@ class testtask extends control
             $case    = $this->testtask->getRunById($runID)->case;
             $results = $this->testtask->getResults($runID);
 
-            $testtaskID = $this->dao->select('task')->from(TABLE_TESTRUN)->where('id')->eq($runID)->fetch('task');
+            $testtaskID = $this->dao->select('task')->from(TABLE_TESTRUN)
+                ->where('id')->eq($runID)
+                ->fetch('task');
             $testtask   = $this->dao->select('id, build, execution, product')->from(TABLE_TESTTASK)->where('id')->eq($testtaskID)->fetch();
 
             $this->view->testtask = $testtask;
@@ -1481,14 +1549,51 @@ class testtask extends control
      */
     public function batchAssign($taskID)
     {
-        $this->dao->update(TABLE_TESTRUN)
+        $result = $this->dao->update(TABLE_TESTRUN)
             ->set('assignedTo')->eq($this->post->assignedTo)
             ->where('task')->eq((int)$taskID)
             ->andWhere('`case`')->in($this->post->caseIDList)
             ->exec();
-        $this->loadModel('action');
-        foreach($this->post->caseIDList as $caseID) $this->action->create('case', $caseID, 'assigned', '', $this->post->assignedTo);
+        if($result == 1 ){
+            $this->loadModel('action');
+            foreach($this->post->caseIDList as $caseID)
+                $this->action->create('case', $caseID, 'assigned', '', $this->post->assignedTo);
+        }
         return print(js::locate($this->session->caseList, 'parent'));
+    }
+
+    /**
+     * Batch assign cases.
+     *
+     * @param  int    $taskID
+     * @access public
+     * @return void
+     */
+    public function batchMove($taskID)
+    {
+        $testtaskID = $this->dao->select('id')->from(TABLE_TESTRUN)
+            ->where('task')->eq($this->post->moveTo)
+            ->andWhere('`case`')->in($this->post->caseIDList)
+            ->fetchAll();
+
+        if(empty($testtaskID)){
+            $result = $this->dao->update(TABLE_TESTRUN)
+                ->set('task')->eq($this->post->moveTo)
+                ->where('task')->eq((int)$taskID)
+                ->andWhere('`case`')->in($this->post->caseIDList)
+                ->exec();
+            if($result == 1 ){
+                $this->loadModel('action');
+                foreach($this->post->caseIDList as $caseID)
+                    $this->action->create('case', $caseID, 'casemove', '', $this->post->moveTo);
+            }
+            return print(js::locate($this->session->caseList, 'parent'));
+        }else{
+            js::import($this->config->webRoot.'js/message.js');
+            $js ="showMessage('danger','目标测试集已经存在相同用例','parent',900);";
+            js::execute($js);
+        }
+
     }
 
     /**

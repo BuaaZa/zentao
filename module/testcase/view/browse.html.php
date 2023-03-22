@@ -124,7 +124,7 @@ js::set('suiteID',        $suiteID);
         <div class="checkbox-primary check-all"><label><?php echo $lang->selectAll?></label></div>
         <?php endif;?>
         <div class='table-actions btn-toolbar'>
-          <div class='btn-group dropup'>
+          <div class='btn-group'>
             <?php
             $actionLink = $this->createLink('testtask', 'batchRun', "productID=$productID&orderBy=$orderBy");
             $misc = $canBatchRun ? "onclick=\"setFormAction('$actionLink', '', '#caseList')\"" : "disabled='disabled'";
@@ -183,7 +183,7 @@ js::set('suiteID',        $suiteID);
             </ul>
           </div>
           <?php if(common::hasPriv('testcase', 'batchChangeBranch') and $this->session->currentProductType != 'normal'):?>
-          <div class="btn-group dropup">
+          <div class="btn-group ">
             <button data-toggle="dropdown" type="button" class="btn"><?php echo $lang->product->branchName[$this->session->currentProductType];?> <span class="caret"></span></button>
             <?php $withSearch = count($branchTagOption) > 6;?>
             <?php if($withSearch):?>
@@ -210,10 +210,15 @@ js::set('suiteID',        $suiteID);
             </div>
           </div>
           <?php endif;?>
+
           <?php if($canBatchChangeModule and !empty($productID)):?>
           <?php if($product->type == 'normal' or ($product->type != 'normal' and $branch !== 'all')):?>
-          <div class="btn-group dropup">
-            <button data-toggle="dropdown" type="button" class="btn"><?php echo $lang->story->moduleAB;?> <span class="caret"></span></button>
+
+          <div class="btn-group ">
+            <button data-toggle="dropdown" type="button" class="btn">
+                <?php echo $lang->story->moduleAB;?>
+                <span class="caret"></span>
+            </button>
             <?php $withSearch = count($modules) > 6;?>
             <?php if($withSearch):?>
             <div class="dropdown-menu search-list search-box-sink" data-ride="searchList">
@@ -222,7 +227,11 @@ js::set('suiteID',        $suiteID);
                 <label for="userSearchBox" class="input-control-icon-left search-icon"><i class="icon icon-search"></i></label>
                 <a class="input-control-icon-right search-clear-btn"><i class="icon icon-close icon-sm"></i></a>
               </div>
-              <?php $modulesPinYin = common::convert2Pinyin($modules);?>
+              <?php
+                $modulesPinYin = common::convert2Pinyin($modules);
+//                ChromePhp::log($modules);
+//                ChromePhp::log($modulesPinYin);
+              ?>
             <?php else:?>
             <div class="dropdown-menu search-list">
             <?php endif;?>
@@ -232,14 +241,17 @@ js::set('suiteID',        $suiteID);
                 {
                     $searchKey = $withSearch ? ('data-key="' . zget($modulesPinYin, $module, '') . '"') : '';
                     $actionLink = $this->createLink('testcase', 'batchChangeModule', "moduleID=$moduleId");
-                    echo html::a('#', $module, '', "title='$module' $searchKey onclick=\"setFormAction('$actionLink', 'hiddenwin', '#caseList')\"");
+                    echo html::a('#', $module, '',
+                        "title='$module' $searchKey onclick=\"setFormAction('$actionLink', 'hiddenwin', '#caseList')\"");
                 }
                 ?>
               </div>
             </div>
           </div>
+
           <?php endif;?>
           <?php endif;?>
+
           <?php
           if($canImportToLib)
           {
