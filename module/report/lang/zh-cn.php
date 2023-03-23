@@ -181,7 +181,7 @@ $lang->report->annualData->objectTypeList['task']        = '任务';
 $lang->report->annualData->objectTypeList['repo']        = '代码';
 $lang->report->annualData->objectTypeList['bug']         = 'Bug';
 $lang->report->annualData->objectTypeList['build']       = '版本';
-$lang->report->annualData->objectTypeList['testtask']    = '测试集';
+$lang->report->annualData->objectTypeList['testtask']    = '测试单';
 $lang->report->annualData->objectTypeList['case']        = '用例';
 $lang->report->annualData->objectTypeList['doc']         = '文档';
 
