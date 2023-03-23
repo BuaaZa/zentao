@@ -92,7 +92,7 @@
         <?php echo html::submitButton($lang->testcase->import, '', 'btn btn-secondary');?>
       </div>
       <div class="btn-toolbar">
-        <?php echo html::linkButton($lang->goback, $this->session->caseList);?>
+        <?php echo html::linkButton($lang->goback, $this->session->interfaceList);?>
       </div>
       <div class='table-statistic'></div>
       <?php $pager->show('right', 'pagerjs');?>

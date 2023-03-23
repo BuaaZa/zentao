@@ -1,8 +1,7 @@
 <?php js::set('flow', $config->global->flow);?>
 <?php $isProjectApp  = $this->app->tab == 'project'?>
-<?php $currentModule = $isProjectApp ? 'project'  : 'testcase';?>
-<?php $currentMethod = $isProjectApp ? 'testcase' : 'browse';?>
-<?php $projectParam  = $isProjectApp ? "projectID={$this->session->project}&" : '';?>
+<?php $currentModule = 'ztinterface';?>
+<?php $currentMethod = 'browse';?>
 <?php if(common::checkNotCN()):?>
 <style> .btn-toolbar>.btn {margin-right: 3px !important;}</style>
 <?php endif;?>
@@ -49,63 +48,9 @@
     if(isset($menuItem->hidden)) continue;
     $menuType = $menuItem->name;
     if(!$config->testcase->needReview and empty($config->testcase->forceReview) and $menuType == 'wait') continue;
-    if($hasBrowsePriv and $menuType == 'QUERY' and in_array($browseType, array('all', 'needconfirm', 'bysuite')))
+    if($hasBrowsePriv and ($menuType == 'all' or $menuType == 'wait'))
     {
-        $searchBrowseLink = $this->createLink($currentModule, $currentMethod, $projectParam . "productID=$productID&branch=$branch&browseType=bySearch&param=%s");
-        $isBySearch       = $browseType == 'bysearch';
-        include '../../common/view/querymenu.html.php';
-    }
-    elseif($hasBrowsePriv and ($menuType == 'all' or $menuType == 'needconfirm' or $menuType == 'wait'))
-    {
-        echo html::a($this->createLink($currentModule, $currentMethod, $projectParam . "productID=$productID&branch=$branch&browseType=$menuType"), "<span class='text'>{$menuItem->text}</span>", '', "class='btn btn-link' id='{$menuType}Tab' data-app='{$this->app->tab}'");
-    }
-    elseif($hasBrowsePriv and $menuType == 'suite' and $this->app->tab == 'qa')
-    {
-        $currentSuiteID = isset($suiteID) ? (int)$suiteID : 0;
-        $currentSuite   = zget($suiteList, $currentSuiteID, '');
-        $currentLable   = empty($currentSuite) ? $lang->testsuite->common : $currentSuite->name;
-
-        echo "<div id='bysuiteTab' class='btn-group'>";
-        echo html::a('javascript:;', "<span class='text'>{$currentLable}</span>" . " <span class='caret'></span>", '', "class='btn btn-link' data-toggle='dropdown'");
-        if(empty($productID) or common::canModify('product', $product))
-        {
-            echo "<ul class='dropdown-menu' style='max-height:240px; overflow-y:auto'>";
-
-            if(empty($suiteList))
-            {
-                echo '<li>';
-                echo html::a($this->createLink('testsuite', 'create', "productID=$productID"), "<i class='icon-plus'></i> " . $lang->testsuite->create);
-                echo '</li>';
-            }
-        }
-
-        foreach($suiteList as $suiteID => $suite)
-        {
-            $suiteName = $suite->name;
-            echo '<li' . ($suiteID == (int)$currentSuiteID ? " class='active'" : '') . '>';
-            echo html::a($this->createLink('testcase', 'browse', "productID=$productID&branch=$branch&browseType=bySuite&param=$suiteID"), $suiteName);
-            echo "</li>";
-        }
-
-        echo '</ul></div>';
-    }
-    elseif($hasGroupPriv and $menuType == 'group')
-    {
-        $groupBy = isset($groupBy)  ? $groupBy : '';
-        $active  = !empty($groupBy) ? 'btn-active-text' : '';
-
-        echo "<div id='groupTab' class='btn-group'>";
-        echo html::a($this->createLink('testcase', 'groupCase', "productID=$productID&branch=$branch&groupBy=story&projectID=$projectID"), "<span class='text'>{$lang->testcase->groupByStories}</span>", '', "class='btn btn-link $active' data-app='{$this->app->tab}'");
-        echo '</div>';
-    }
-    elseif($hasZeroPriv and $menuType == 'zerocase')
-    {
-        $projectID = $isProjectApp ? $this->session->project : 0;
-        echo html::a($this->createLink('testcase', 'zeroCase', "productID=$productID&branch=$branch&orderBy=id_desc&projectID=$projectID"), "<span class='text'>{$lang->testcase->zeroCase}</span>", '', "class='btn btn-link' id='zerocaseTab' data-app='{$this->app->tab}'");
-    }
-    elseif($hasUnitPriv and $menuType == 'browseunits')
-    {
-        echo html::a($this->createLink('testtask', 'browseUnits', "productID=$productID&browseType=newest&orderBy=id_desc&recTotal=0&recPerPage=20&pageID=1&projectID=$projectID"), "<span class='text'>{$lang->testcase->browseUnits}</span>", '', "class='btn btn-link' id='browseunitsTab' data-app='{$this->app->tab}'");
+        echo html::a($this->createLink($currentModule, $currentMethod, "productID=$productID&branch=$branch&browseType=$menuType"), "<span class='text'>{$menuItem->text}</span>", '', "class='btn btn-link' id='{$menuType}Tab' data-app='{$this->app->tab}'");
     }
     ?>
     <?php endforeach;?>
@@ -116,7 +61,7 @@
   <?php if(!isonlybody()):?>
   <div class='btn-toolbar pull-right'>
     <?php if(!empty($productID)): ?>
-    <div class='btn-group'>
+    <!-- <div class='btn-group'>
       <button type='button' class='btn btn-link dropdown-toggle' data-toggle='dropdown'>
         <i class='icon icon-export muted'></i> <?php echo $lang->export ?>
         <span class='caret'></span>
@@ -134,7 +79,7 @@
       echo "<li $class>" . html::a($link, $lang->testcase->exportTemplate, '', $misc . "data-app={$this->app->tab} data-width='65%'") . "</li>";
       ?>
       </ul>
-    </div>
+    </div> -->
     <?php endif;?>
     <?php if(empty($productID) or common::canModify('product', $product)):?>
     <?php if(!empty($productID) and (common::hasPriv('testcase', 'import') or common::hasPriv('testcase', 'importFromLib'))): ?>
@@ -142,47 +87,19 @@
       <button type='button' class='btn btn-link dropdown-toggle' data-toggle='dropdown' id='importAction'><i class='icon icon-import muted'></i> <?php echo $lang->import ?><span class='caret'></span></button>
       <ul class='dropdown-menu pull-right' id='importActionMenu'>
       <?php
-      if(common::hasPriv('testcase', 'import')) echo "<li>" . html::a($this->createlink('testcase', 'import', "productID=$productID&branch=$branch"), $lang->testcase->fileImport, '', "class='export' data-app={$app->tab}") . "</li>";
-
-      $link  = $this->createLink('testcase', 'importFromLib', "productID=$productID&branch=$branch&libID=0&orderBy=id_desc&browseType=&queryID=10&recTotal=0&recPerPage=20&pageID=1&projectID=$projectID");
-      if(common::hasPriv('testcase', 'importFromLib')) echo "<li>" . html::a($link, $lang->testcase->importFromLib, '', "data-app={$app->tab}") . "</li>";
-      ?>
+        echo "<li>" . html::a($this->createlink('ztinterface', 'import', "productID=$productID&branch=$branch"), $lang->ztinterface->jsonImport, '', "class='export' data-app={$app->tab}") . "</li>";?>
       </ul>
     </div>
     <?php endif;?>
     <?php $initModule = isset($moduleID) ? (int)$moduleID : 0;?>
     <div class='btn-group dropdown'>
       <?php
-      $createTestcaseLink = $this->createLink('testcase', 'create', "productID=$productID&branch=$branch&moduleID=$initModule");
-      $batchCreateLink    = $this->createLink('testcase', 'batchCreate', "productID=$productID&branch=$branch&moduleID=$initModule");
-
-      $buttonLink  = '';
-      $buttonTitle = '';
-      if(common::hasPriv('testcase', 'batchCreate'))
-      {
-          $buttonLink  = !empty($productID) ? $batchCreateLink : '';
-          $buttonTitle = $lang->testcase->batchCreate;
-      }
-      if(common::hasPriv('testcase', 'create'))
-      {
-          $buttonLink  = $createTestcaseLink;
-          $buttonTitle = $lang->testcase->create;
-      }
-
-      $hidden = empty($buttonLink) ? 'hidden' : '';
+      $createTestcaseLink = $this->createLink('ztinterface', 'create', "productID=$productID&branch=$branch&moduleID=$initModule");
+      $buttonLink  = $createTestcaseLink;
+      $buttonTitle = $lang->ztinterface->create;
       echo html::a($buttonLink, "<i class='icon-plus'></i> " . $buttonTitle, '', "class='btn btn-primary $hidden' data-app='{$this->app->tab}'");
       ?>
-      <?php if(!empty($productID) and common::hasPriv('testcase', 'batchCreate') and common::hasPriv('testcase', 'create')):?>
-      <button type='button' class='btn btn-primary dropdown-toggle' data-toggle='dropdown'><span class='caret'></span></button>
-      <ul class='dropdown-menu'>
-        <li><?php echo html::a($createTestcaseLink, $lang->testcase->create);?></li>
-        <li><?php echo html::a($batchCreateLink, $lang->testcase->batchCreate, '', "data-app='{$this->app->tab}'");?></li>
-      </ul>
-      <?php endif;?>
     </div>
-    <?php if($this->app->rawMethod == 'browseunits' and (empty($productID) or common::canModify('product', $product))):?>
-      <?php common::printLink('testtask', 'importUnitResult', "product=$productID", "<i class='icon icon-import'></i> " . $lang->testtask->importUnitResult, '', "class='btn btn-primary' data-app='{$this->app->tab}'");?>
-    <?php endif;?>
     <?php endif;?>
   </div>
   <?php endif;?>
@@ -213,33 +130,5 @@ $(function()
     var hasZerocaseTab    = $zerocaseTab.length > 0;
     var hasbysuiteTab     = $bysuiteTab.length > 0;
     var hasBrowseunitsTab = $browseunitsTab.length > 0;
-
-    if((hasAllTab || hasWaitTab) && (hasNeedconfirmTab || hasGroupTab || hasbysuiteTab || hasZerocaseTab || hasBrowseunitsTab))
-    {
-        if(hasWaitTab)
-        {
-            $waitTab.after("<div class='dividing-line'></div>");
-        }
-        else
-        {
-            $allTab.after("<div class='dividing-line'></div>");
-        }
-    }
-
-    if((hasNeedconfirmTab || hasGroupTab || hasZerocaseTab) && (hasbysuiteTab || hasBrowseunitsTab)) 
-    {
-        if(hasZerocaseTab)
-        {
-            $zerocaseTab.after("<div class='dividing-line'></div>");
-        }
-        else if(hasGroupTab)
-        {
-            $groupTab.after("<div class='dividing-line'></div>");
-        }
-        else
-        {
-            $needconfirmTab.after("<div class='dividing-line'></div>");
-        }
-    }
 });
 </script>

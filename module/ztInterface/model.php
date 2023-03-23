@@ -39,7 +39,7 @@ class ztinterfaceModel extends model
     public function getInterfaces($productID, $moduleID, $sort, $pager)
     {
         $modules    = $moduleID ? $this->loadModel('tree')->getAllChildId($moduleID) : '0';
-        return $this->dao->select('id, name, url')->from(TABLE_INTERFACE)
+        return $this->dao->select('*')->from(TABLE_INTERFACE)
                 ->where('product')->eq((int)$productID)
                 ->beginIF(is_array($modules))->andWhere('module')->in($modules)->fi()
                 ->andWhere('deleted')->eq('0')
@@ -48,10 +48,83 @@ class ztinterfaceModel extends model
                 ->fetchAll('id');
     }
 
+    public function getById($interfaceID)
+    {
+        return $this->dao->select('*')->from(TABLE_INTERFACE)
+            ->where('deleted')->eq(0)
+            ->andWhere('id')->eq($interfaceID)
+            ->fetchAll('id');
+    }
+
+
     public function summary($interfaces)
     {
         return sprintf($this->lang->interface->summary, count($interfaces));
     }
+
+    public function printCell($col, $interface, $users, $branches, $modulePairs = array(), $browseType = '', $mode = 'datatable')
+    {
+        $interfaceLink   = helper::createLink('interface', 'view', "interfaceID=$interface->id");
+        $account    = $this->app->user->account;
+        $id = $col->id;
+        if($col->show)
+        {
+            $class = $id == 'title' ? 'c-name' : 'c-' . $id;
+            $title = '';
+            if($id == 'name')
+            {
+                $class .= ' text-left';
+                $title  = "title='{$interface->title}'";
+            }
+            if($id == 'actions') $class .= ' c-actions';
+            if($id == 'lastRunResult') $class .= " {$case->lastRunResult}";
+
+            echo "<td class='{$class}' {$title}>";
+            switch($id)
+            {
+            case 'id':
+                printf('%03d', $interface->id);
+                break;
+            case 'name':
+                echo html::a($interfaceLink, $interface->name, null, "style='color: ' data-app='{$this->app->tab}'");
+                break;
+            case 'method':
+                echo "<b style=\"color:{$this->lang->ztinterface->methodColor[$interface->method]};\">$interface->method</b>";
+                break;
+            case 'url':
+                echo '<div style="font-size: 1.3rem; letter-spacing: 0.05em;">' . $interface->url . '</div>';
+                break;
+            case 'actions':
+                $interface ->browseType = $browseType;
+                echo $this->buildOperateMenu($interface, 'browse');
+                break;
+            }
+            echo '</td>';
+        }
+    }
+
+    public function buildOperateMenu($interface, $type = 'view')
+    {
+        $function = 'buildOperate' . ucfirst($type) . 'Menu';
+        return $this->$function($interface);
+    }
+
+    public function buildOperateBrowseMenu($interface)
+    {
+        $menu   = '';
+        $params = "interfaceID=$interface->id";
+
+        $menu .= $this->buildMenu('ztinterface', 'send', $params, $interface, 'browse');
+        $menu .= $this->buildMenu('ztinterface', 'message', $params, $interface, 'browse');
+        $menu .= $this->buildMenu('ztinterface', 'edit', $params, $interface, 'browse');
+        
+        $deleteURL = helper::createLink('ztinterface', 'delete', $params."&confirm=yes");
+        $class = 'btn';
+        $menu .= html::a("javascript:ajaxDelete(\"$deleteURL\",\"interfaceList\",confirmDelete)", '<i class="icon-common-delete icon-trash"></i>', '', "title='{$this->lang->ztinterface->delete}' class='{$class}'");
+        
+        return $menu;
+    }
+
 
     /**
      * Create a case.
@@ -60,7 +133,7 @@ class ztinterfaceModel extends model
      * @access public
      * @return void
      */
-    function create($bugID)
+    public function create($bugID)
     {
         $steps   = $this->post->steps;
         $expects = $this->post->expects;
@@ -145,7 +218,7 @@ class ztinterfaceModel extends model
      * @access public
      * @return array
      */
-    function batchCreate($productID, $branch, $storyID)
+    public function batchCreate($productID, $branch, $storyID)
     {
         $branch      = (int)$branch;
         $productID   = (int)$productID;
@@ -358,78 +431,6 @@ class ztinterfaceModel extends model
             ->beginIF($auto != 'unit')->andWhere('t1.auto')->ne('unit')->fi()
             ->andWhere('t1.deleted')->eq('0')
             ->orderBy($orderBy)->page($pager)->fetchAll('id');
-    }
-
-    /**
-     * Get case info by ID.
-     *
-     * @param  int    $caseID
-     * @param  int    $version
-     * @access public
-     * @return object|bool
-     */
-    public function getById($caseID, $version = 0)
-    {
-        $case = $this->dao->findById($caseID)->from(TABLE_CASE)->fetch();
-        if(!$case) return false;
-        foreach($case as $key => $value) if(strpos($key, 'Date') !== false and !(int)substr($value, 0, 4)) $case->$key = '';
-
-        /* Get project and execution. */
-        if($this->app->tab == 'project')
-        {
-            $case->project = $this->session->project;
-        }
-        elseif($this->app->tab == 'execution')
-        {
-            $case->execution = $this->session->execution;
-            $case->project   = $this->dao->select('project')->from(TABLE_PROJECT)->where('id')->eq($case->execution)->fetch('project');
-        }
-        else
-        {
-            $objects = $this->dao->select('t1.*, t1.project as objectID, t2.type')->from(TABLE_PROJECTCASE)->alias('t1')
-                ->leftJoin(TABLE_EXECUTION)->alias('t2')->on('t1.project=t2.id')
-                ->where('t1.case')->eq($caseID)
-                ->fetchAll('objectID');
-
-            foreach($objects as $objectID => $object)
-            {
-                if($object->type == 'project') $case->project = $objectID;
-                if(in_array($object->type, array('sprint', 'stage', 'kanban'))) $case->execution = $objectID;
-            }
-        }
-
-        if($case->story)
-        {
-            $story = $this->dao->findById($case->story)->from(TABLE_STORY)->fields('title, status, version, assignedTo')->fetch();
-            $case->storyTitle         = $story->title;
-            $case->storyStatus        = $story->status;
-            $case->latestStoryVersion = $story->version;
-            $case->story_assignedTo   = $story->assignedTo;
-        }
-        if($case->fromBug) $case->fromBugTitle      = $this->dao->findById($case->fromBug)->from(TABLE_BUG)->fields('title')->fetch('title');
-
-        $case->toBugs = array();
-        $toBugs       = $this->dao->select('id, title')->from(TABLE_BUG)->where('`case`')->eq($caseID)->fetchAll();
-        foreach($toBugs as $toBug) $case->toBugs[$toBug->id] = $toBug->title;
-
-        if($case->linkCase or $case->fromCaseID) $case->linkCaseTitles = $this->dao->select('id,title')->from(TABLE_CASE)->where('id')->in($case->linkCase)->orWhere('id')->eq($case->fromCaseID)->fetchPairs();
-        if($version == 0) $version = $case->version;
-        $case->files = $this->loadModel('file')->getByObject('testcase', $caseID);
-        $case->currentVersion = $version ? $version : $case->version;
-
-        $case->steps = $this->dao->select('*')->from(TABLE_CASESTEP)->where('`case`')->eq($caseID)->andWhere('version')->eq($version)->orderBy('id')->fetchAll('id');
-
-        foreach($case->steps as $key => $step)
-        {
-            $step->desc   = html_entity_decode($step->desc);
-            $step->input = html_entity_decode($step->input);
-            $step->goal_action = html_entity_decode($step->goal_action);
-            $step->expect = html_entity_decode($step->expect);
-            $step->eval_criteria = html_entity_decode($step->eval_criteria);
-            $step->iotype = $step->is_out;
-        }
-
-        return $case;
     }
 
     /**
@@ -2077,175 +2078,6 @@ class ztinterfaceModel extends model
 
         $this->loadModel('search')->setSearchParams($this->config->testcase->search);
     }
-
-    /**
-     * Print cell data
-     *
-     * @param  object $col
-     * @param  object $case
-     * @param  array  $users
-     * @param  array  $branches
-     * @access public
-     * @return void
-     */
-    public function printCell($col, $case, $users, $branches, $modulePairs = array(), $browseType = '', $mode = 'datatable')
-    {
-        /* Check the product is closed. */
-        $canBeChanged = common::canBeChanged('case', $case);
-
-        $canBatchRun                = common::hasPriv('testtask', 'batchRun');
-        $canBatchEdit               = common::hasPriv('testcase', 'batchEdit');
-        $canBatchDelete             = common::hasPriv('testcase', 'batchDelete');
-        $canBatchCaseTypeChange     = common::hasPriv('testcase', 'batchCaseTypeChange');
-        $canBatchConfirmStoryChange = common::hasPriv('testcase', 'batchConfirmStoryChange');
-        $canBatchChangeModule       = common::hasPriv('testcase', 'batchChangeModule');
-
-        $canBatchAction             = ($canBatchRun or $canBatchEdit or $canBatchDelete or $canBatchCaseTypeChange or $canBatchConfirmStoryChange or $canBatchChangeModule);
-
-        $canView    = common::hasPriv('testcase', 'view');
-        $caseLink   = helper::createLink('testcase', 'view', "caseID=$case->id&version=$case->version");
-        $account    = $this->app->user->account;
-        $fromCaseID = $case->fromCaseID;
-        $id = $col->id;
-        if($col->show)
-        {
-            $class = $id == 'title' ? 'c-name' : 'c-' . $id;
-            $title = '';
-            if($id == 'title')
-            {
-                $class .= ' text-left';
-                $title  = "title='{$case->title}'";
-            }
-            if($id == 'status')
-            {
-                $class .= $case->status;
-                $title  = "title='" . $this->processStatus('testcase', $case) . "'";
-            }
-            if(strpos(',bugs,results,stepNumber,', ",$id,") !== false) $title = "title='{$case->$id}'";
-            if($id == 'actions') $class .= ' c-actions';
-            if($id == 'lastRunResult') $class .= " {$case->lastRunResult}";
-            if(strpos(',stage,precondition,keywords,story,', ",{$id},") !== false) $class .= ' text-ellipsis';
-
-            echo "<td class='{$class}' {$title}>";
-            if($this->config->edition != 'open') $this->loadModel('flow')->printFlowCell('testcase', $case, $id);
-            switch($id)
-            {
-            case 'id':
-                if($canBatchAction)
-                {
-                    $disabled = $canBeChanged ? '' : 'disabled';
-                    echo html::checkbox('caseIDList', array($case->id => ''), '', $disabled) . html::a(helper::createLink('testcase', 'view', "caseID=$case->id"), sprintf('%03d', $case->id), '', "data-app='{$this->app->tab}'");
-                }
-                else
-                {
-                    printf('%03d', $case->id);
-                }
-                break;
-            case 'pri':
-                echo "<span class='label-pri label-pri-" . $case->pri . "' title='" . zget($this->lang->testcase->priList, $case->pri, $case->pri) . "'>";
-                echo zget($this->lang->testcase->priList, $case->pri, $case->pri);
-                echo "</span>";
-                break;
-            case 'title':
-                if($this->app->tab == 'project')
-                {
-                    $showBranch = isset($this->config->project->testcase->showBranch) ? $this->config->project->testcase->showBranch : 1;
-                }
-                else
-                {
-                    $showBranch = isset($this->config->testcase->browse->showBranch) ? $this->config->testcase->browse->showBranch : 1;
-                }
-                if(isset($branches[$case->branch]) and $showBranch) echo "<span class='label label-outline label-badge'>{$branches[$case->branch]}</span> ";
-                if($modulePairs and $case->module and isset($modulePairs[$case->module])) echo "<span class='label label-gray label-badge'>{$modulePairs[$case->module]}</span> ";
-                echo $canView ? ($fromCaseID ? html::a($caseLink, $case->title, null, "style='color: $case->color' data-app='{$this->app->tab}'") . html::a(helper::createLink('testcase', 'view', "caseID=$fromCaseID"), "[<i class='icon icon-share' title='{$this->lang->testcase->fromCaselib}'></i>#$fromCaseID]", '', "data-app='{$this->app->tab}'") : html::a($caseLink, $case->title, null, "style='color: $case->color' data-app='{$this->app->tab}'")) : "<span style='color: $case->color'>$case->title</span>";
-                break;
-            case 'branch':
-                echo $branches[$case->branch];
-                break;
-            case 'type':
-                echo $this->lang->testcase->typeList[$case->type];
-                break;
-            case 'stage':
-                $stages = '';
-                foreach(explode(',', trim($case->stage, ',')) as $stage) $stages .= $this->lang->testcase->stageList[$stage] . ',';
-                $stages = trim($stages, ',');
-                echo "<span title='$stages'>$stages</span>";
-                break;
-            case 'status':
-                if($case->needconfirm)
-                {
-                    print("<span class='status-story status-changed' title='{$this->lang->story->changed}'>{$this->lang->story->changed}</span>");
-                }
-                elseif(isset($case->fromCaseVersion) and $case->fromCaseVersion > $case->version and !$case->needconfirm)
-                {
-                    print("<span class='status-story status-changed' title='{$this->lang->testcase->changed}'>{$this->lang->testcase->changed}</span>");
-                }
-                else
-                {
-                    print("<span class='status-testcase status-{$case->status}'>" . $this->processStatus('testcase', $case) . "</span>");
-                }
-                break;
-            case 'story':
-                static $stories = array();
-                if(empty($stories)) $stories = $this->dao->select('id,title')->from(TABLE_STORY)->where('deleted')->eq('0')->andWhere('product')->eq($case->product)->fetchPairs('id', 'title');
-                if($case->story and isset($stories[$case->story])) echo html::a(helper::createLink('story', 'view', "storyID=$case->story"), $stories[$case->story]);
-                break;
-            case 'precondition':
-                echo $case->precondition;
-                break;
-            case 'keywords':
-                echo $case->keywords;
-                break;
-            case 'version':
-                echo $case->version;
-                break;
-            case 'openedBy':
-                echo zget($users, $case->openedBy);
-                break;
-            case 'openedDate':
-                echo substr($case->openedDate, 5, 11);
-                break;
-            case 'reviewedBy':
-                echo zget($users, $case->reviewedBy);
-                break;
-            case 'reviewedDate':
-                 echo helper::isZeroDate($case->reviewedDate) ? '' : substr($case->reviewedDate, 5, 11);
-                break;
-            case 'lastEditedBy':
-                echo zget($users, $case->lastEditedBy);
-                break;
-            case 'lastEditedDate':
-                 echo helper::isZeroDate($case->lastEditedDate) ? '' : substr($case->lastEditedDate, 5, 11);
-                break;
-            case 'lastRunner':
-                echo zget($users, $case->lastRunner);
-                break;
-            case 'lastRunDate':
-                if(!helper::isZeroDate($case->lastRunDate)) echo substr($case->lastRunDate, 5, 11);
-                break;
-            case 'lastRunResult':
-                $class = 'result-' . $case->lastRunResult;
-                $lastRunResultText = $case->lastRunResult ? zget($this->lang->testcase->resultList, $case->lastRunResult, $case->lastRunResult) : $this->lang->testcase->unexecuted;
-                echo "<span class='$class'>" . $lastRunResultText . "</span>";
-                break;
-            case 'bugs':
-                echo (common::hasPriv('testcase', 'bugs') and $case->bugs) ? html::a(helper::createLink('testcase', 'bugs', "runID=0&caseID={$case->id}"), $case->bugs, '', "class='iframe'") : $case->bugs;
-                break;
-            case 'results':
-                echo (common::hasPriv('testtask', 'results') and $case->results) ? html::a(helper::createLink('testtask', 'results', "runID=0&caseID={$case->id}"), $case->results, '', "class='iframe'") : $case->results;
-                break;
-            case 'stepNumber':
-                echo $case->stepNumber;
-                break;
-            case 'actions':
-                $case->browseType = $browseType;
-                echo $this->buildOperateMenu($case, 'browse');
-                break;
-            }
-            echo '</td>';
-        }
-    }
-
     /**
      * Append bugs and results.
      *
@@ -2513,19 +2345,6 @@ class ztinterfaceModel extends model
         return '';
     }
 
-    /**
-     * Build test case menu.
-     *
-     * @param  object $case
-     * @param  string $type
-     * @access public
-     * @return string
-     */
-    public function buildOperateMenu($case, $type = 'view')
-    {
-        $function = 'buildOperate' . ucfirst($type) . 'Menu';
-        return $this->$function($case);
-    }
 
     /**
      * Build test case view menu.
@@ -2601,43 +2420,6 @@ class ztinterfaceModel extends model
         return $menu;
     }
 
-    /**
-     * Build test case browse menu.
-     *
-     * @param  object $case
-     * @access public
-     * @return string
-     */
-    public function buildOperateBrowseMenu($case)
-    {
-        $canBeChanged = common::canBeChanged('case', $case);
-        if(!$canBeChanged) return '';
-
-        $menu   = '';
-        $params = "caseID=$case->id";
-
-        if($case->needconfirm || $case->browseType == 'needconfirm')
-        {
-            return $this->buildMenu('testcase', 'confirmstorychange', $params, $case, 'browse', 'ok', 'hiddenwin', '', '', '', $this->lang->confirm);
-        }
-
-        $menu .= $this->buildMenu('testtask', 'runCase', "runID=0&$params&version=$case->version", $case, 'browse', 'play', '', 'runCase iframe', false, "data-width='95%'");
-        $menu .= $this->buildMenu('testtask', 'results', "runID=0&$params", $case, 'browse', '', '', 'iframe', true, "data-width='95%'");
-
-        $editParams = $params;
-        if($this->app->tab == 'project')   $editParams .= "&comment=false&projectID={$this->session->project}";
-        if($this->app->tab == 'execution') $editParams .= "&comment=false&executionID={$this->session->execution}";
-        $menu .= $this->buildMenu('testcase', 'edit', $editParams, $case, 'browse');
-
-        if($this->config->testcase->needReview || !empty($this->config->testcase->forceReview))
-        {
-            common::printIcon('testcase', 'review', $params, $case, 'browse', 'glasses', '', 'iframe');
-        }
-        $menu .= $this->buildMenu('testcase', 'createBug', "product=$case->product&branch=$case->branch&extra=caseID=$case->id,version=$case->version,runID=", $case, 'browse', 'bug', '', 'iframe', '', "data-width='90%'");
-        $menu .= $this->buildMenu('testcase', 'create',  "productID=$case->product&branch=$case->branch&moduleID=$case->module&from=testcase&param=$case->id", $case, 'browse', 'copy');
-
-        return $menu;
-    }
 
     /**
      * processDatas

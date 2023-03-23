@@ -612,7 +612,6 @@ class productModel extends model
     {
         $currentModule = $this->app->moduleName;
         $currentMethod = $this->app->methodName;
-
         /* Init currentModule and currentMethod for report and story. */
         if($currentModule == 'story')
         {
@@ -633,7 +632,7 @@ class productModel extends model
             $this->session->set('currentProductType', $currentProduct->type);
         }
 
-        $fromModule   = $this->lang->navGroup->qa == 'qa' ? 'qa' : '';
+        $fromModule   = $this->app->tab == 'qa' ? 'qa' : '';
         $dropMenuLink = helper::createLink(($this->app->tab == 'qa' or $this->app->tab == 'ztinterface') ? 'product' : $this->app->tab, 'ajaxGetDropMenu', "objectID=$productID&module=$currentModule&method=$currentMethod&extra=$extra&from=$fromModule");
 
         if($this->app->viewType == 'mhtml' and $productID) return $this->getModuleNav(array($productID => $currentProductName), $productID, $extra, $branch);
@@ -2336,7 +2335,7 @@ class productModel extends model
             return helper::createLink('qastory', 'story', "productID=%s");
         }
         elseif($module == 'ztinterface'){
-            $link = helper::createLink($module, $methodName, "productID=%s");
+            $link = helper::createLink($module, $method, "productID=%s");
         }
 
         return $link;

@@ -275,3 +275,25 @@ $lang->testcase->featureBar['groupcase']             = $lang->testcase->featureB
 $lang->ztinterface->common = "接口";
 $lang->ztinterface->summary   = "本页共 <strong>%s</strong> 个接口。";
 $lang->ztinterface->noModule = '<div>您现在还没有模块信息</div><div>请维护接口模块</div>';
+$lang->ztinterface->noInterface = "暂时没有接口。";
+$lang->ztinterface->create = "创建接口";
+$lang->ztinterface->jsonImport = "从json导入";
+$lang->ztinterface->name       = '接口名';
+$lang->ztinterface->method       = '请求方法';
+$lang->ztinterface->url       = 'URL';
+$lang->ztinterface->delete       = '删除接口';
+$lang->ztinterface->send       = '发送报文';
+$lang->ztinterface->message       = '历史报文';
+$lang->ztinterface->edit       = '编辑';
+$lang->ztinterface->methodColor = array(
+    'GET' => '#7FFF7F',
+    'POST' => '#7FBFFF',
+    'PUT' => '#FFBF7F',
+    'DELETE' => '#FF7F7F',
+    'HEAD' => '#D8BFD8',
+    'OPTIONS' => '#008080',
+    'CONNECT' => '#800000',
+    'TRACE' => '#556B2F',
+    'PATCH' => '#000080'
+);
+

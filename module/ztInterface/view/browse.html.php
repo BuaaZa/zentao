@@ -41,20 +41,14 @@ js::set('suiteID',        $suiteID);
     </div>
   </div>
   <div class='main-col'>
-    <div id='queryBox' data-module='testcase' class='cell<?php if($browseType == 'bysearch') echo ' show';?>'></div>
-    <?php if(empty($cases)):?>
+    <div id='queryBox' data-module='ztinterface' class='cell<?php if($browseType == 'bysearch') echo ' show';?>'></div>
+    <?php if(empty($interfaces)):?>
     <?php $useDatatable = '';?>
     <div class="table-empty-tip">
       <p>
-        <span class="text-muted"><?php echo $lang->testcase->noCase;?></span>
-        <?php if((empty($productID) or common::canModify('product', $product)) and common::hasPriv('testcase', 'create') and $browseType != 'bysuite'):?>
+        <span class="text-muted"><?php echo $lang->ztinterface->noInterface;?></span>
         <?php $initModule = isset($moduleID) ? (int)$moduleID : 0;?>
-        <?php echo html::a($this->createLink('testcase', 'create', "productID=$productID&branch=$branch&moduleID=$initModule"), "<i class='icon icon-plus'></i> " . $lang->testcase->create, '', "class='btn btn-info' data-app='{$this->app->tab}'");?>
-        <?php endif;?>
-
-        <?php if(common::hasPriv('testsuite', 'linkCase') and $browseType == 'bysuite'):?>
-        <?php echo html::a($this->createLink('testsuite', 'linkCase', "suiteID=$param"), "<i class='icon icon-plus'></i> " . $lang->testsuite->linkCase, '', "class='btn btn-info' data-app='{$this->app->tab}'");?>
-        <?php endif;?>
+        <?php echo html::a($this->createLink('ztinterface', 'create', "productID=$productID&branch=$branch&moduleID=$initModule"), "<i class='icon icon-plus'></i> " . $lang->ztinterface->create, '', "class='btn btn-info' data-app='{$this->app->tab}'");?>
       </p>
     </div>
     <?php else:?>
@@ -62,7 +56,7 @@ js::set('suiteID',        $suiteID);
     $datatableId  = $this->moduleName . ucfirst($this->methodName);
     $useDatatable = (isset($config->datatable->$datatableId->mode) and $config->datatable->$datatableId->mode == 'datatable');
     ?>
-    <form class='main-table table-case' id='caseForm' method='post' <?php if(!$useDatatable) echo "data-ride='table'";?>>
+    <form class='main-table table-case' id='interfaceForm' method='post' <?php if(!$useDatatable) echo "data-ride='table'";?>>
       <div class="table-header fixed-right">
         <nav class="btn-toolbar pull-right setting"></nav>
       </div>
@@ -73,21 +67,13 @@ js::set('suiteID',        $suiteID);
       else               include '../../common/view/tablesorter.html.php';
 
       if($config->testcase->needReview or !empty($config->testcase->forceReview)) $config->testcase->datatable->fieldList['actions']['width'] = '180';
-      $setting = $this->datatable->getSetting('testcase');
+      $setting = $this->loadModel('datatable')->getSetting('ztinterface');
       $widths  = $this->datatable->setFixedFieldWidth($setting);
       $columns = 0;
-
-      $canBatchRun                = common::hasPriv('testtask', 'batchRun');
-      $canBatchEdit               = common::hasPriv('testcase', 'batchEdit');
-      $canBatchDelete             = common::hasPriv('testcase', 'batchDelete');
-      $canBatchCaseTypeChange     = common::hasPriv('testcase', 'batchCaseTypeChange');
-      $canBatchConfirmStoryChange = common::hasPriv('testcase', 'batchConfirmStoryChange');
-      $canBatchChangeModule       = common::hasPriv('testcase', 'batchChangeModule');
-      $canImportToLib             = common::hasPriv('testcase', 'importToLib');
-      $canBatchAction             = ($canBatchRun or $canBatchEdit or $canBatchDelete or $canBatchCaseTypeChange or $canBatchConfirmStoryChange or $canBatchChangeModule or $canImportToLib);
+      $canBatchAction             = false;
       ?>
-      <?php if(!$useDatatable) echo '<div class="table-responsive">';?>
-      <table class='table has-sort-head<?php if($useDatatable) echo ' datatable';?>' id='caseList' data-fixed-left-width='<?php echo $widths['leftWidth']?>' data-fixed-right-width='<?php echo $widths['rightWidth']?>' data-checkbox-name='caseIDList[]'>
+      <?php echo '<div class="table-responsive">';?>
+      <table class='table has-sort-head' id='interfaceList' data-fixed-left-width='<?php echo $widths['leftWidth']?>' data-fixed-right-width='<?php echo $widths['rightWidth']?>' data-checkbox-name='interfaceIDList[]'>
         <thead>
           <tr>
           <?php
@@ -95,7 +81,7 @@ js::set('suiteID',        $suiteID);
           {
               if($value->show)
               {
-                  $this->datatable->printHead($value, $orderBy, $vars, $canBatchAction);
+                  $this->datatable->printHead($value, $orderBy, $vars, false);
                   $columns ++;
               }
           }
@@ -103,9 +89,9 @@ js::set('suiteID',        $suiteID);
           </tr>
         </thead>
         <tbody>
-          <?php foreach($cases as $case):?>
-          <tr data-id='<?php echo $case->id?>'>
-            <?php foreach($setting as $key => $value) $this->testcase->printCell($value, $case, $users, $branchOption, $modulePairs, $browseType, $useDatatable ? 'datatable' : 'table');?>
+          <?php foreach($interfaces as $interface):?>
+          <tr data-id='<?php echo $interface->id?>'>
+            <?php foreach($setting as $key => $value) $this->ztinterface->printCell($value, $interface, $users, $branchOption, $modulePairs, $browseType, 'table');?>
           </tr>
           <?php $caseProductIds[$case->product] = $case->product;?>
           <?php endforeach;?>

@@ -1164,6 +1164,7 @@ class product extends control
 
         foreach($products as $product) $programProducts[$product->program][] = $product;
 
+        ChromePhp::log($method);
         if($module == 'product'&& $method = 'browse' && $from = 'qa'){
             $this->view->link  = $this->product->getProductLink('qastory', 'story', $extra);
         }else{

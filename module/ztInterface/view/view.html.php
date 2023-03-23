@@ -12,7 +12,7 @@
 ?>
 <?php include '../../common/view/header.html.php';?>
 <?php include '../../common/view/kindeditor.html.php';?>
-<?php $browseLink  = $app->session->caseList ? $app->session->caseList : $this->createLink('testcase', 'browse', "productID=$case->product");?>
+<?php $browseLink  = $app->session->interfaceList ? $app->session->interfaceList : $this->createLink('ztinterface', 'browse', "productID=$case->product");?>
 <?php js::set('sysurl', common::getSysUrl());?>
 <?php js::set('tab', $app->tab);?>
 <div id='mainMenu' class='clearfix'>
