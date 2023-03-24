@@ -11,6 +11,7 @@
  */
 class block extends control
 {
+    public actionModel $action;
     public blockModel $block;
     public projectModel $project;
     public userModel $user;
@@ -338,14 +339,17 @@ class block extends control
      * @access public
      * @return void
      */
-    public function dynamic()
+    public function dynamic(): void
     {
+        $this->action = $this->loadModel('action');
+        $this->user = $this->loadModel('user');
+
         /* Load pager. */
-        $this->app->loadClass('pager', $static = true);
+        $this->app->loadClass('pager', true);
         $pager = new pager(0, 30, 1);
 
-        $this->view->actions = $this->loadModel('action')->getDynamic('all', 'today', 'date_desc', $pager);
-        $this->view->users   = $this->loadModel('user')->getPairs('nodeleted|noletter|all');
+        $this->view->actions = $this->action->getDynamic('all', 'today', 'date_desc', $pager);
+        $this->view->users   = $this->user->getPairs('nodeleted|noletter|all');
 
         $this->display();
     }
@@ -677,7 +681,7 @@ class block extends control
      */
     public function printCaseBlock()
     {
-        $this->session->set('caseList', $this->createLink('my', 'index'), 'qa');
+        $this->session->set('caseList', $this->createLink('my'), 'qa');
         $this->app->loadLang('testcase');
         $this->app->loadLang('testtask');
 

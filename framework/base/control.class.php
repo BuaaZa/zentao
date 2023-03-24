@@ -995,15 +995,19 @@ class baseControl
      * 创建一个模块方法的链接。
      * Create a link to one method of one module.
      *
-     * @param  string       $moduleName module name
-     * @param  string       $methodName method name
-     * @param  string|array $vars       the params passed, can be array(key=>value) or key1=value1&key2=value2
-     * @param  string       $viewType   the view type
-     * @param  string       $onlybody   remove header and footer or not in iframe
-     * @access  public
-     * @return  string the link string.
+     * @param string $moduleName module name
+     * @param string $methodName method name
+     * @param array|string $vars the params passed, can be array(key=>value) or key1=value1&key2=value2
+     * @param string $viewType the view type
+     * @param bool|string $onlybody remove header and footer or not in iframe
+     * @access public
+     * @return string the link string.
      */
-    public function createLink($moduleName, $methodName = 'index', $vars = array(), $viewType = '', $onlybody = false)
+    public function createLink(string       $moduleName,
+                               string       $methodName = 'index',
+                               array|string $vars = array(),
+                               string       $viewType = '',
+                               bool|string  $onlybody = false): string
     {
         if(empty($moduleName)) $moduleName = $this->moduleName;
         return helper::createLink($moduleName, $methodName, $vars, $viewType, $onlybody);
