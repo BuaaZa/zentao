@@ -55,7 +55,7 @@ $config->story->excludeCheckFileds = ',uploadImage,category,reviewer,reviewDitto
 global $lang, $app;
 $config->story->datatable = new stdclass();
 
-$config->story->datatable->defaultField = array('id', 'title', 'pri', 'plan', 'status', 'openedBy', 'estimate', 'reviewedBy', 'stage', 'assignedTo', 'taskCount', 'actions');
+$config->story->datatable->defaultField = array('id', 'title', 'pri', 'plan', 'status', 'openedBy', 'estimate', 'reviewedBy', 'stage', 'assignedTo', 'caseCount', 'actions');
 
 $config->story->datatable->fieldList['id']['title']    = 'idAB';
 $config->story->datatable->fieldList['id']['fixed']    = 'left';
@@ -77,9 +77,9 @@ $config->story->datatable->fieldList['title']['fixed']    = 'left';
 $config->story->datatable->fieldList['title']['width']    = 'auto';
 $config->story->datatable->fieldList['title']['required'] = 'yes';
 
-$config->story->datatable->fieldList['pri']['title']    = 'priAB';
+$config->story->datatable->fieldList['pri']['title']    = $this->lang->story->pri;
 $config->story->datatable->fieldList['pri']['fixed']    = 'left';
-$config->story->datatable->fieldList['pri']['width']    = '50';
+$config->story->datatable->fieldList['pri']['width']    = '60';
 $config->story->datatable->fieldList['pri']['required'] = 'no';
 $config->story->datatable->fieldList['pri']['name']     = $this->lang->story->pri;
 
@@ -231,25 +231,25 @@ $config->story->datatable->fieldList['version']['fixed']    = 'no';
 $config->story->datatable->fieldList['version']['width']    = '60';
 $config->story->datatable->fieldList['version']['required'] = 'no';
 
-$config->story->datatable->fieldList['taskCount']['title']    = 'T';
+$config->story->datatable->fieldList['taskCount']['title']    = $lang->story->taskCount;
 $config->story->datatable->fieldList['taskCount']['fixed']    = 'no';
-$config->story->datatable->fieldList['taskCount']['width']    = '30';
+$config->story->datatable->fieldList['taskCount']['width']    = '60';
 $config->story->datatable->fieldList['taskCount']['required'] = 'no';
-$config->story->datatable->fieldList['taskCount']['sort']     = 'no';
+$config->story->datatable->fieldList['taskCount']['sort']     = 'yes';
 $config->story->datatable->fieldList['taskCount']['name']     = $lang->story->taskCount;
 
-$config->story->datatable->fieldList['bugCount']['title']    = 'B';
+$config->story->datatable->fieldList['bugCount']['title']    = $lang->story->bugCount;
 $config->story->datatable->fieldList['bugCount']['fixed']    = 'no';
-$config->story->datatable->fieldList['bugCount']['width']    = '30';
+$config->story->datatable->fieldList['bugCount']['width']    = '60';
 $config->story->datatable->fieldList['bugCount']['required'] = 'no';
-$config->story->datatable->fieldList['bugCount']['sort']     = 'no';
+$config->story->datatable->fieldList['bugCount']['sort']     = 'yes';
 $config->story->datatable->fieldList['bugCount']['name']     = $lang->story->bugCount;
 
-$config->story->datatable->fieldList['caseCount']['title']    = 'C';
+$config->story->datatable->fieldList['caseCount']['title']    = $lang->story->caseCount;
 $config->story->datatable->fieldList['caseCount']['fixed']    = 'no';
-$config->story->datatable->fieldList['caseCount']['width']    = '30';
+$config->story->datatable->fieldList['caseCount']['width']    = '60';
 $config->story->datatable->fieldList['caseCount']['required'] = 'no';
-$config->story->datatable->fieldList['caseCount']['sort']     = 'no';
+$config->story->datatable->fieldList['caseCount']['sort']     = 'yes';
 $config->story->datatable->fieldList['caseCount']['name']     = $lang->story->caseCount;
 
 $config->story->datatable->fieldList['actions']['title']    = 'actions';
