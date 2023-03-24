@@ -187,6 +187,9 @@ class bug extends control
             }
             $response['message'] = $this->lang->saveSuccess;
             $response['locate'] = $location;
+            if ($this->app->tab == 'feedback') {
+                $response['locate'] = $this->createLink('feedback', 'adminView', "feedbackID=$feedbackID", 'html');
+            }
             return $this->send($response);
         }
 

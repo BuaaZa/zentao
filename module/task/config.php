@@ -52,7 +52,7 @@ $config->task->custom->batchEditFields   = 'module,assignedTo,status,pri,estimat
 $config->task->excludeCheckFileds = ',pri,estStartedDitto,deadlineDitto,parent,regions,lanes,vision,region,';
 
 $config->task->datatable = new stdclass();
-$config->task->datatable->defaultField = array('id', 'name', 'pri', 'assignedTo', 'status', 'finishedBy', 'deadline', 'estimate', 'consumed', 'left', 'progress', 'actions');
+$config->task->datatable->defaultField = array('id', 'name', 'pri', 'assignedTo', 'status', 'finishedBy', 'deadline', 'estimate', 'consumed', 'left', 'progress','workcodeline', 'actions');
 
 global $lang;
 $config->task->datatable->fieldList['id']['title']    = 'idAB';
@@ -65,9 +65,9 @@ $config->task->datatable->fieldList['name']['fixed']    = 'left';
 $config->task->datatable->fieldList['name']['width']    = 'auto';
 $config->task->datatable->fieldList['name']['required'] = 'yes';
 
-$config->task->datatable->fieldList['pri']['title']    = 'priAB';
+$config->task->datatable->fieldList['pri']['title']    = $lang->task->pri;
 $config->task->datatable->fieldList['pri']['fixed']    = 'left';
-$config->task->datatable->fieldList['pri']['width']    = '35';
+$config->task->datatable->fieldList['pri']['width']    = '60';
 $config->task->datatable->fieldList['pri']['required'] = 'no';
 $config->task->datatable->fieldList['pri']['name']     = $lang->task->pri;
 
@@ -125,6 +125,15 @@ $config->task->datatable->fieldList['progress']['width']    = '75';
 $config->task->datatable->fieldList['progress']['required'] = 'no';
 $config->task->datatable->fieldList['progress']['sort']     = 'no';
 $config->task->datatable->fieldList['progress']['name']     = $lang->task->progress;
+
+# add
+$config->task->datatable->fieldList['workcodeline']['title']    = 'workcodeline';
+$config->task->datatable->fieldList['workcodeline']['fixed']    = 'no';
+$config->task->datatable->fieldList['workcodeline']['width']    = '75';
+$config->task->datatable->fieldList['workcodeline']['required'] = 'no';
+$config->task->datatable->fieldList['workcodeline']['sort']     = 'no';
+$config->task->datatable->fieldList['workcodeline']['name']     = $lang->task->workcodeline;
+#
 
 $config->task->datatable->fieldList['openedBy']['title']    = 'openedByAB';
 $config->task->datatable->fieldList['openedBy']['fixed']    = 'no';

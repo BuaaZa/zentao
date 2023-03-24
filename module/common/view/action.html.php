@@ -48,7 +48,9 @@
   <div class="detail-content">
   <?php endif;?>
     <ol class='histories-list'>
-      <?php $i = 1; ?>
+      <?php
+        $i = 1;
+      ?>
       <?php foreach($actions as $action):?>
       <?php $canEditComment = ((!isset($canBeChanged) or !empty($canBeChanged)) and end($actions) == $action and trim($action->comment) != '' and strpos(',view,objectlibs,viewcard,', ",$this->methodName,") !== false and $action->actor == $this->app->user->account and common::hasPriv('action', 'editComment'));?>
       <li value='<?php echo $i ++;?>'>

@@ -38,6 +38,24 @@ class feedback extends control
             // $mode     = (empty($this->config->CRProduct)) ? 'noclosed' : '';
             $products = $this->product->getPairs('', 0, 'program_asc');
         }
+
+        // 反馈的产品下拉选过滤allowFeedback
+        $ids = array();
+        foreach ($products as $id=>$productEle) {
+            array_push($ids, $id);
+        }
+        $products = array();
+        $queryRet=$this->dao->select('id,name')
+            ->from(TABLE_PRODUCT)
+            ->where('id')->in($ids)
+            ->andWhere('allowFeedback')->eq('1')
+            ->fetchAll();
+        if (!empty($queryRet)) {
+            foreach ($queryRet as $p) {
+                $products[$p->id]=$p->name;
+            }
+        }
+
         $this->view->products = $this->products = $products;
         $this->view->allProducts = $this->allProducts = $products;
 
@@ -134,6 +152,10 @@ class feedback extends control
         $this->display();
     }
 
+    public function ajaxGetExecutionLang($projectID = 0){
+        return print("选择执行");
+    }
+
     /**
      * Create a bug.
      *
@@ -145,7 +167,10 @@ class feedback extends control
      */
     public function create($productID, $branch = '', $extras = '')
     {
-        if (empty($this->products)) $this->locate($this->createLink('feedback', 'create'));
+        if (empty($this->products)) {
+            return $this->send(array('result' => 'success', 'message' => '没有产品可以反馈，如果有产品定义，请确认产品中【是否反馈】有没有选择【是】', 'closeModal' => true, 'locate' => inlink('admin','browseType=all')));
+            // $this->locate($this->createLink('product', 'create'));
+        }
         if (!empty($_POST)) {
             $response['result'] = 'success';
 
@@ -258,6 +283,8 @@ class feedback extends control
         $this->view->feedback = $feedback;
         $this->view->browseType      = $browseType;
         $this->view->actions     = $this->action->getList('feedback', $feedbackID);
+        // 查找反馈转化的任务需求缺陷等关联数据
+        $this->view->relations = $this->feedback->feedbackRelations($feedbackID);
         $this->display();
     }
 
@@ -279,7 +306,7 @@ class feedback extends control
         $projects += $this->product->getProjectPairsByProduct($productID, $branch);
         if ($this->app->getViewType() == 'json') return print(json_encode($projects));
 
-        return print(html::select('project', $projects, $projectID, "class='form-control' onchange='loadProductExecutions({$productID}, this.value)'"));
+        return print(html::select('taskProjects', $projects, $projectID, "class='form-control' onchange='loadProductExecutions({$productID}, this.value)'"));
     }
 
     public function ajaxGetExecutions($productID, $projectID = 0, $branch = 0, $number = '', $executionID = 0, $from = '')
@@ -295,7 +322,7 @@ class feedback extends control
 
         if ($number === '') {
             $event = ''; //$from == 'bugToTask' ? '' : " onchange='loadExecutionRelated(this.value)'";
-            return print(html::select('execution', array('' => '') + $executions, $executionID, "class='form-control' $event"));
+            return print(html::select('executions', array('' => '') + $executions, $executionID, "class='form-control' $event"));
         } else {
             $executions     = empty($executions) ? array('' => '') : $executions;
             $executionsName = $from == 'showImport' ? "execution[$number]" : "executions[$number]";

@@ -74,6 +74,11 @@ class model extends baseModel
 
     public function buildMenu($moduleName, $methodName, $params, $data, $type = 'view', $icon = '', $target = '', $class = '', $onlyBody = false, $misc = '' , $title = '', $returnHtml = true)
     {
+        $inQa = false;
+        if($type == "qabrowse"){
+            $inQa = true;
+            $type = "browse";
+        }
         if(strpos($moduleName, '.') !== false) list($appName, $moduleName) = explode('.', $moduleName);
 
         if(strpos($methodName, '_') !== false && strpos($methodName, '_') > 0) list($module, $method) = explode('_', $methodName);
@@ -116,6 +121,16 @@ class model extends baseModel
         else
         {
             if(method_exists($this, 'isClickable')) $enabled = $this->isClickable($data, $method, $module);
+        }
+
+        if($inQa and $methodName == 'edit'){
+            $enabled = ($data->type == 'taskPoint');
+        }
+        if($inQa and $methodName == 'batchCreate'){
+            $enabled = ($data->type == 'story');
+        }
+        if($inQa and $methodName == 'create' and $data->type == 'taskPoint'){
+            $enabled = true;
         }
 
         if(!$returnHtml) return $enabled;

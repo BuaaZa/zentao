@@ -142,15 +142,39 @@ class story extends control
                 $response['message'] = $this->lang->saveSuccess;
                 if($objectID == 0)
                 {
-                    $response['locate'] = $this->createLink('story', 'view', "storyID={$thisStory->parent}&version=0&param=0&storyType=$thisStory->type");
+                    $response['locate'] = $this->createLink('story', 'view', "storyID={$thisStory->parent}&version=0&param=0&storyType=story");
                 }
                 else
                 {
                     $execution          = $this->dao->findById((int)$objectID)->from(TABLE_EXECUTION)->fetch();
                     $moduleName         = $execution->type != 'execution' ? 'story' : 'execution';
                     $funcName           = $execution->type != 'execution' ? 'view' : 'storyView';
-                    $param              = $execution->type != 'execution' ? "storyID={$thisStory->parent}&version=0&param=0&storyType=$thisStory->type" : "storyID={$thisStory->parent}&executionID={$objectID}";
+                    $param              = $execution->type != 'execution' ? "storyID={$thisStory->parent}&version=0&param=0&storyType=story" : "storyID={$thisStory->parent}&executionID={$objectID}";
                     $response['locate'] = $this->createLink($moduleName, $funcName, $param);
+                }
+                if($this->app->tab == 'qa'){
+                    $response['locate'] = $this->createLink('story', 'view', "storyID={$thisStory->parent}&version=0&param=0&storyType=story").'#app=qa';
+                }
+                return $this->send($response);
+            }
+            if($storyResult['status'] == 'created' && $thisStory->type == 'story')
+            {
+                $response['result'] = 'success';
+                $response['message'] = $this->lang->saveSuccess;
+                if($objectID == 0)
+                {
+                    $response['locate'] = $this->createLink('story', 'view', "storyID={$thisStory->id}&version=0&param=0&storyType=story");
+                }
+                else
+                {
+                    $execution          = $this->dao->findById((int)$objectID)->from(TABLE_EXECUTION)->fetch();
+                    $moduleName         = $execution->type != 'execution' ? 'story' : 'execution';
+                    $funcName           = $execution->type != 'execution' ? 'view' : 'storyView';
+                    $param              = $execution->type != 'execution' ? "storyID={$thisStory->id}&version=0&param=0&storyType=story" : "storyID={$thisStory->id}&executionID={$objectID}";
+                    $response['locate'] = $this->createLink($moduleName, $funcName, $param);
+                }
+                if($this->app->tab == 'qa'){
+                    $response['locate'] = $this->createLink('story', 'view', "storyID={$thisStory->id}&version=0&param=0&storyType=story").'#app=qa';
                 }
                 return $this->send($response);
             }
@@ -168,6 +192,9 @@ class story extends control
                     $moduleName         = $execution->type == 'project' ? 'projectstory' : 'execution';
                     $param              = $execution->type == 'project' ? "projectID=$objectID&productID=$productID" : "executionID=$objectID";
                     $response['locate'] = $this->createLink($moduleName, 'story', $param);
+                }
+                if($this->app->tab == 'qa'){
+                    $response['locate'] = $this->createLink('qastory', 'story', 'productID=$productID').'#app=qa';
                 }
                 return $this->send($response);
             }
@@ -452,11 +479,10 @@ class story extends control
         $this->view->pri              = $pri;
         $this->view->branch           = $branch;
         $this->view->branches         = $branches;
-        if($stroyType == 'taskPoint'){
+        if($storyType == 'taskPoint'){
             $this->view->stories          = $this->story->getParentStoryPairsTaskPoint($productID);
-        }
-        else{
-            $this->view->stories          = $this->story->getParentStoryPairs($productID);
+        }else{
+            $this->view->stories = $this->story->getParentStoryPairs($productID);
         }
         $this->view->productID        = $productID;
         $this->view->product          = $product;
@@ -529,6 +555,9 @@ class story extends control
             }
             $this->view->execution = $execution;
         }
+        else if($this->app->tab == 'qa'){
+            $this->loadModel('qa')->setMenu('',$productID);
+        }
         else
         {
             $this->product->setMenu($productID, $branch);
@@ -544,7 +573,7 @@ class story extends control
         if($storyID)
         {
             $story = $this->story->getById($storyID);
-            if(($story->status != 'active' or $story->stage != 'wait' or $story->parent > 0) and $this->config->vision != 'lite') return print(js::alert($this->lang->story->errorNotSubdivide) . js::locate('back'));
+            if($storyType == 'story' && ($story->status != 'active' or $story->stage != 'wait' or $story->parent > 0) and $this->config->vision != 'lite') return print(js::alert($this->lang->story->errorNotSubdivide) . js::locate('back'));
         }
 
         if(!empty($_POST))
@@ -711,6 +740,7 @@ class story extends control
 
         $this->view->customFields = $customFields;
         $this->view->showFields   = $showFields;
+
 
         $this->view->title            = $product->name . $this->lang->colon . ($storyID ? $this->lang->story->subdivide : $this->lang->story->batchCreate);
         $this->view->productName      = $product->name;
@@ -1276,7 +1306,6 @@ class story extends control
     {
         if($storyType = "taskPoint")
             $storyType = "story";
-
         $uri        = $this->app->getURI(true);
         $tab        = $this->app->tab;
         $buildApp   = $tab == 'product' ?   'project' : $tab;
@@ -2570,9 +2599,9 @@ class story extends control
      * @access public
      * @return string
      */
-    public function ajaxGetParentStory($productID, $labelName = '')
+    public function ajaxGetParentStory($productID, $labelName = '', $fromExecution = -1)
     {
-        $stories = $this->story->getParentStoryPairs($productID);
+        $stories = $this->story->getParentStoryPairs($productID, '',$fromExecution);
         return print(html::select($labelName, $stories, 0, 'class="form-control"'));
     }
 

@@ -67,8 +67,14 @@
         $openGroup  = 'project';
     }
     ?>
-    <?php common::printLink('story', 'create', "productID={$story->product}&branch={$story->branch}&moduleID={$story->module}&$otherParam&bugID=0&planID=0&todoID=0&extra=&type=$story->type", "<i class='icon icon-plus'></i> " . $lang->story->create, '', "class='btn btn-primary' data-app='$tab'"); ?>
-    <?php common::printLink('story', 'create', "productID={$story->product}&branch={$story->branch}&moduleID={$story->module}&$otherParam&bugID=0&planID=0&todoID=0&extra=&type=taskPoint&storyID=$story->id", "<i class='icon icon-plus'></i> " . $lang->story->createTaskPoint, '', "class='btn btn-primary' data-app='$tab'"); ?>
+    <?php 
+    if($from != 'qa'){
+      common::printLink('story', 'create', "productID={$story->product}&branch={$story->branch}&moduleID={$story->module}&$otherParam&bugID=0&planID=0&todoID=0&extra=&storyType=$story->type", "<i class='icon icon-plus'></i> " . $lang->story->create, '', "class='btn btn-primary' data-app='$from'");
+    }
+    else{
+      common::printLink('story', 'create', "productID={$story->product}&branch={$story->branch}&moduleID={$story->module}&$otherParam&bugID=0&planID=0&todoID=0&extra=&storyType=taskPoint&storyID=$story->id", "<i class='icon icon-plus'></i> " . $lang->story->createTaskPoint, '', "class='btn btn-primary' data-app='$from'"); 
+    }
+    ?>
     <?php endif;?>
   </div>
   <?php endif;?>
