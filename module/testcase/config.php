@@ -105,9 +105,9 @@ $config->testcase->datatable->fieldList['branch']['width']      = '100';
 $config->testcase->datatable->fieldList['branch']['required']   = 'no';
 $config->testcase->datatable->fieldList['branch']['dataSource'] = array('module' => 'port', 'method' => 'getRelatedObjects', 'params' => 'testcase&branch&id,name');
 
-$config->testcase->datatable->fieldList['pri']['title']    = 'priAB';
+$config->testcase->datatable->fieldList['pri']['title']    = $lang->testcase->pri;
 $config->testcase->datatable->fieldList['pri']['fixed']    = 'left';
-$config->testcase->datatable->fieldList['pri']['width']    = '40';
+$config->testcase->datatable->fieldList['pri']['width']    = '60';
 $config->testcase->datatable->fieldList['pri']['required'] = 'no';
 $config->testcase->datatable->fieldList['pri']['name']     = $lang->testcase->pri;
 

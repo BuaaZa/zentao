@@ -13950,7 +13950,7 @@ select.form-control option.selected, select.form-control option:hover {
 }
 
 .c-num, .c-pri, .c-type {
-    width: 80px;
+    width: 100px;
     overflow: hidden
 }
 
@@ -16040,7 +16040,7 @@ th.c-confirmed, th.c-confirm {
 }
 
 .c-pri {
-    width: 40px
+    width: 70px
 }
 
 .c-severity {
@@ -16064,7 +16064,7 @@ th.c-confirmed, th.c-confirm {
 }
 
 .c-status, .c-type, .c-user, .c-date, .c-encode, .c-resolution, .c-pri-box, .c-extend {
-    width: 100px
+    width: 120px
 }
 
 .c-qq, .c-weixin {

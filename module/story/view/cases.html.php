@@ -11,8 +11,8 @@
       <thead>
         <tr class='text-center'>
           <th class='c-id'>    <?php echo $lang->idAB;?></th>
-          <th class='w-p30'>   <?php echo $lang->testcase->title;?></th>
-          <th class='c-pri' title=<?php echo $lang->story->pri;?>><?php echo $lang->priAB;?></th>
+          <th class='w-p20'>   <?php echo $lang->testcase->title;?></th>
+          <th class='c-pri' title=<?php echo $lang->story->pri;?>><?php echo $lang->story->pri;?></th>
           <th class='c-type'>  <?php echo $lang->testcase->type;?></th>
           <th class='c-status'><?php echo $lang->statusAB;?></th>
           <th class='c-user'>  <?php echo $lang->testcase->lastRunner;?></th>
@@ -24,7 +24,7 @@
         <?php foreach($cases as $key => $case):?>
         <tr class='text-center'>
           <td><?php echo $case->id;?></td>
-          <td class='text-left' title="<?php echo $case->title?>"><?php echo $case->title;?></td>
+          <td class='text-center' title="<?php echo $case->title?>"><?php echo $case->title;?></td>
           <td><span class='<?php echo 'pri' . zget($lang->testcase->priList, $case->pri, $case->pri)?>'><?php echo $case->pri == '0' ? '' : zget($lang->case->priList, $case->pri, $case->pri);?></span></td>
           <td><?php echo $lang->testcase->typeList[$case->type];?></td>
           <td><?php echo $this->processStatus('testcase', $case);?></td>
