@@ -48,12 +48,12 @@ class ztinterfaceModel extends model
                 ->fetchAll('id');
     }
 
-    public function getById($interfaceID)
+    public function getByID($interfaceID)
     {
         return $this->dao->select('*')->from(TABLE_INTERFACE)
             ->where('deleted')->eq(0)
             ->andWhere('id')->eq($interfaceID)
-            ->fetchAll('id');
+            ->fetch();
     }
 
 
@@ -114,7 +114,7 @@ class ztinterfaceModel extends model
         $menu   = '';
         $params = "interfaceID=$interface->id";
 
-        $menu .= $this->buildMenu('ztinterface', 'send', $params, $interface, 'browse');
+        $menu .= $this->buildMenu('ztinterface', 'sendMessage', $params, $interface, 'browse');
         $menu .= $this->buildMenu('ztinterface', 'message', $params, $interface, 'browse');
         $menu .= $this->buildMenu('ztinterface', 'edit', $params, $interface, 'browse');
         
@@ -125,7 +125,20 @@ class ztinterfaceModel extends model
         return $menu;
     }
 
-
+    public function getBaseURL($productID)
+    {
+        $datalist   = '<datalist id="baseUrlList">';
+        $baseURL = $this->dao->select('*')->from(TABLE_BASEURL)
+                ->where('product')->eq($productID)
+                ->fetchAll('id');
+        ChromePhp::log($baseURL);
+        foreach($baseURL as $url){
+            $datalist.="<option value=\"$url->url\" label=\"($url->name)\">";
+        }
+        
+        $datalist.="</datalist>";
+        return $datalist;
+    }
     /**
      * Create a case.
      *

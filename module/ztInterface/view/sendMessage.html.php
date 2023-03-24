@@ -12,42 +12,29 @@
 ?>
 <?php include '../../common/view/header.html.php';?>
 <?php include '../../common/view/kindeditor.html.php';?>
-<?php js::set('page', 'edit');?>
-<?php js::set('lblDelete', $lang->testcase->deleteStep);?>
-<?php js::set('lblBefore', $lang->testcase->insertBefore);?>
-<?php js::set('lblAfter',  $lang->testcase->insertAfter);?>
-<?php js::set('caseID', $case->id);?>
-<?php js::set('executionID', $case->execution);?>
+<?php js::set('page', 'send');?>
+<?php js::set('interfaceID', $interface->id);?>
 <?php js::set('tab', $this->app->tab);?>
-<?php js::set('isLibCase', $isLibCase);?>
-<?php js::set('testtasks', $testtasks);?>
-<?php js::set('caseBranch', $case->branch);?>
 <?php js::set('confirmUnlinkTesttask', $lang->testcase->confirmUnlinkTesttask);?>
-<?php if($this->app->tab == 'execution') js::set('objectID', $case->execution);?>
-<?php if($this->app->tab == 'project') js::set('objectID', $case->project);?>
 <div id='mainContent' class='main-content'>
   <div class='main-header'>
     <h2>
-      <span class='label label-id'><?php echo $case->id;?></span>
-      <?php echo html::a($this->createLink('testcase', 'view', "caseID=$case->id"), $case->title, '', 'class="case-title"');?>
+      <?php echo "<b style=\"margin-right: 10px;font-size: 1.3em;color:{$this->lang->ztinterface->methodColor[$interface->method]};\">$interface->method</b>";?>
+      <?php echo "<b style=\"font-size: 1.3em;\">$interface->name</b>";?>
     </h2>
   </div>
   <form method='post' enctype='multipart/form-data' target='hiddenwin' id='dataform'>
     <div class='main-row'>
-      <div class='main-col col-8'>
+      <div class='main-col col-4'>
         <div class='cell'>
           <div class='detail'>
-            <div class='detail-title'><?php echo $lang->testcase->title;?></div>
+            <div class='detail-title'><?php echo $lang->ztinterface->url;?></div>
             <div class="detail-content">
-              <div class="input-control has-icon-right">
-                <?php echo html::input('title', $case->title, 'class="form-control" placeholder="' . $lang->case->title . '"');?>
-                <div class="colorpicker">
-                  <button type="button" class="btn btn-link dropdown-toggle" data-toggle="dropdown"><span class="cp-title"></span><span class="color-bar"></span><i class="ic"></i></button>
-                  <ul class="dropdown-menu clearfix">
-                    <li class="heading"><?php echo $lang->testcase->colorTag;?><i class="icon icon-close"></i></li>
-                  </ul>
-                  <input type="hidden" class="colorpicker" id="color" name="color" value="<?php echo $case->color ?>" data-icon="color" data-wrapper="input-control-icon-right" data-update-color="#title"  data-provide="colorpicker">
-                </div>
+              <div class="input-control" style="display: flex; align-items: center;">
+                <?php #echo '<span style="font-size: 1.3rem; letter-spacing: 0.05em;">' . $interface->url . '</span>';?>
+                <?php echo html::input('baseURL', '', 'class="form-control" style="width: 60%;" list="baseUrlList" placeholder="' . $lang->ztinterface->baseUrl . '"');?>
+                <?php echo html::input('URL', $interface->url, 'class="form-control" style="width: 40%;" disabled title="接口文档中指定"');?>
+                <?php echo $baseURLList;?>
               </div>
             </div>
           </div>

@@ -186,7 +186,6 @@ $lang->testcase->legendOpenAndEdit = '创建编辑';
 $lang->testcase->legendComment     = '备注';
 
 $lang->testcase->summary               = "本页共 <strong>%s</strong> 个用例，已执行<strong>%s</strong>个。";
-$lang->testcase->confirmDelete         = '您确认要删除该测试用例吗？';
 $lang->testcase->confirmBatchDelete    = '您确认要批量删除这些测试用例吗？';
 $lang->testcase->ditto                 = '同上';
 $lang->testcase->dittoNotice           = '该用例与上一用例不属于同一产品！';
@@ -273,6 +272,7 @@ $lang->testcase->featureBar['browse']['suite']       = '套件';
 $lang->testcase->featureBar['groupcase']             = $lang->testcase->featureBar['browse'];
 
 $lang->ztinterface->common = "接口";
+$lang->testcase->view      = "接口详情";
 $lang->ztinterface->summary   = "本页共 <strong>%s</strong> 个接口。";
 $lang->ztinterface->noModule = '<div>您现在还没有模块信息</div><div>请维护接口模块</div>';
 $lang->ztinterface->noInterface = "暂时没有接口。";
@@ -282,9 +282,12 @@ $lang->ztinterface->name       = '接口名';
 $lang->ztinterface->method       = '请求方法';
 $lang->ztinterface->url       = 'URL';
 $lang->ztinterface->delete       = '删除接口';
-$lang->ztinterface->send       = '发送报文';
+$lang->ztinterface->sendMessage       = '发送报文';
 $lang->ztinterface->message       = '历史报文';
 $lang->ztinterface->edit       = '编辑';
+$lang->ztinterface->confirmDelete     = '您确认要删除该接口吗？';
+$lang->ztinterface->baseUrl = '基地址';
+
 $lang->ztinterface->methodColor = array(
     'GET' => '#7FFF7F',
     'POST' => '#7FBFFF',
