@@ -10,6 +10,15 @@
  * @link        http://www.zentao.net
  */
 global $config;
+$lang->story->requirementfix = "需求";
+$lang->story->taskPoint = "功能点";
+$lang->story->taskPointTitle = "功能点名称";
+$lang->story->taskPointSpec = "功能点描述";
+$lang->story->taskPointVerify = "功能点验收标准";
+$lang->story->taskPointTitle = "功能点名称";
+$lang->story->decomposeTaskPoint = "分解功能点";
+$lang->story->createTaskPoint = "提功能点";
+
 $lang->story->create            = "提{$lang->SRCommon}";
 
 $lang->story->requirement       = zget($lang, 'URCommon', "需求");
@@ -492,11 +501,3 @@ $lang->requirement->batchChangeModule  = "批量修改模块";
 $lang->requirement->submitReview       = $lang->story->submitReview;
 $lang->requirement->linkStory          = "关联{$lang->SRCommon}";
 
-$lang->story->requirementfix = "需求";
-$lang->story->taskPoint = "功能点";
-$lang->story->taskPointTitle = "功能点名称";
-$lang->story->taskPointSpec = "功能点描述";
-$lang->story->taskPointVerify = "功能点验收标准";
-$lang->story->taskPointTitle = "功能点名称";
-$lang->story->decomposeTaskPoint = "分解功能点";
-$lang->story->createTaskPoint = "提功能点";
