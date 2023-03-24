@@ -339,8 +339,12 @@ $projectIDParam = $isProjectStory ? "projectID=$projectID&" : '';
           </tr>
         </thead>
         <tbody>
+
           <?php foreach($stories as $story):?>
-          <tr data-id='<?php echo $story->id?>' data-estimate='<?php echo $story->estimate?>' <?php if(!empty($story->children)) echo "data-children=" . count($story->children);?> data-cases='<?php echo zget($storyCases, $story->id, 0);?>'>
+          <tr data-id='<?php echo $story->id?>'
+              data-estimate='<?php echo $story->estimate?>'
+              <?php if(!empty($story->children)) echo "data-children=" . count($story->children);?>
+              data-cases='<?php echo zget($storyCases, $story->id, 0);?>'>
             <?php $story->from = $from;?>
             <?php if($this->app->getViewType() == 'xhtml'):?>
             <?php
@@ -352,33 +356,83 @@ $projectIDParam = $isProjectStory ? "projectID=$projectID&" : '';
                 }
             }?>
             <?php else/*下面这行是输出需求的，删除后子需求还显示*/:?>
-            <?php foreach($setting as $key => $value) $this->story->printCell($value, $story, $users, $branchOption, $storyStages, $modulePairs, $storyTasks, $storyBugs, $storyCases, $useDatatable ? 'datatable' : 'table', $storyType);?>
+            <?php foreach($setting as $key => $value)
+                $this->story->printCell($value, $story, $users, $branchOption, $storyStages, $modulePairs,
+                    $storyTasks, $storyBugs, $storyCases, $useDatatable ? 'datatable' : 'table', $storyType);
+            ?>
             <?php endif;?>
           </tr>
+          <?php
+              ChromePhp::log($story);
+              ChromePhp::log($setting);
+          ?>
           <?php if(!empty($story->children)):?>
-          <?php $i = 0;?>
-          <?php foreach($story->children as $key => $child):?>
-          <?php $child->from = $from;?>
-          <?php $class  = $i == 0 ? ' table-child-top' : '';?>
-          <?php $class .= ($i + 1 == count($story->children)) ? ' table-child-bottom' : '';?>
-          <tr class='table-children<?php echo $class;?> parent-<?php echo $story->id;?>' data-id='<?php echo $child->id?>' data-status='<?php echo $child->status?>' data-estimate='<?php echo $child->estimate?>' data-cases='<?php echo zget($storyCases, $story->id, 0);?>'>
-            <?php if($this->app->getViewType() == 'xhtml'):?>
-            <?php
-            foreach($setting as $key => $value)
-            {
-                if($value->id == 'title' || $value->id == 'id' || $value->id == 'pri' || $value->id == 'status')
-                {
-                  $this->story->printCell($value, $child, $users, $branchOption, $storyStages, $modulePairs, $storyTasks, $storyBugs, $storyCases, $useDatatable ? 'datatable' : 'table', $storyType);
-                }
-            }?>
-            <?php else:?>
-            <?php foreach($setting as $key => $value) $this->story->printCell($value, $child, $users, $branchOption, $storyStages, $modulePairs, $storyTasks, $storyBugs, $storyCases, $useDatatable ? 'datatable' : 'table', $storyType);?>
-            <?php endif;?>
-          </tr>
-          <?php $i ++;?>
-          <?php endforeach;?>
+                <?php $i = 0;?>
+                <?php foreach($story->children as $key => $child):?>
+                <?php if($child->type =='story'): ?>
+                <?php $child->from = $from;?>
+                <?php $class  = $i == 0 ? ' table-child-top' : '';?>
+                <?php $class .= ($i + 1 == count($story->children)) ? ' table-child-bottom' : '';?>
+
+                  <tr class='table-children<?php echo $class;?> parent-<?php echo $story->id;?>'
+                      data-id='<?php echo $child->id?>' data-status='<?php echo $child->status?>'
+                      data-estimate='<?php echo $child->estimate?>'
+                      data-cases='<?php echo zget($storyCases, $story->id, 0);?>'>
+                        <?php if($this->app->getViewType() == 'xhtml'):?>
+                        <?php
+                        foreach($setting as $key => $value)
+                        {
+                            if($value->id == 'title' || $value->id == 'id' || $value->id == 'pri' || $value->id == 'status')
+                            {
+                              $this->story->printCell($value, $child, $users, $branchOption, $storyStages, $modulePairs, $storyTasks, $storyBugs, $storyCases, $useDatatable ? 'datatable' : 'table', $storyType);
+                            }
+                        }?>
+                        <?php else:?>
+                        <?php foreach($setting as $key => $value)
+                            $this->story->printCell($value, $child, $users, $branchOption, $storyStages, $modulePairs, $storyTasks,
+                                $storyBugs, $storyCases, $useDatatable ? 'datatable' : 'table', $storyType);?>
+                        <?php endif;?>
+                  </tr>
+                <?php if(!empty($child->children)):?>
+                    <?php $j = 0;?>
+                    <?php foreach($child->children as $key => $taskPoint):?>
+<!--                      --><?php //if($taskPoint->type =='story'): ?>
+                      <?php $taskPoint->from = $from;?>
+                      <?php $class  = $j == 0 ? ' table-child-top' : '';?>
+                      <?php $class .= ($j + 1 == count($child->children)) ? ' table-child-bottom' : '';?>
+
+                          <tr class='table-children-children table-children<?php echo $class;?> parent-<?php echo $child->id;?>'
+                              data-id='<?php echo $taskPoint->id?>' data-status='<?php echo $taskPoint->status?>'
+                              data-estimate='<?php echo $taskPoint->estimate?>'
+                              data-cases='<?php echo zget($storyCases, $child->id, 0);?>'>
+                              <?php if($this->app->getViewType() == 'xhtml'):?>
+                                  <?php
+                                  foreach($setting as $key => $value)
+                                  {
+                                      if($value->id == 'title' || $value->id == 'id' || $value->id == 'pri' || $value->id == 'status')
+                                      {
+                                          $this->story->printCell($value, $taskPoint, $users, $branchOption, $storyStages, $modulePairs, $storyTasks, $storyBugs, $storyCases, $useDatatable ? 'datatable' : 'table', $storyType);
+                                      }
+                                  }?>
+                              <?php else:?>
+                                  <?php foreach($setting as $key => $value)
+                                      $this->story->printCell($value, $taskPoint, $users, $branchOption, $storyStages, $modulePairs, $storyTasks,
+                                          $storyBugs, $storyCases, $useDatatable ? 'datatable' : 'table', $storyType);?>
+                              <?php endif;?>
+                          </tr>
+
+
+                    <?php $j ++;?>
+<!--                    --><?php //endif;?>
+                    <?php endforeach;?>
+                <?php endif;?>
+
+                <?php $i ++;?>
+                <?php endif;?>
+                <?php endforeach;?>
           <?php endif;?>
           <?php endforeach;?>
+
         </tbody>
       </table>
       <?php if(!$useDatatable) echo '</div>';?>

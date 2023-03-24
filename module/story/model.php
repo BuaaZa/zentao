@@ -2757,7 +2757,7 @@ class storyModel extends model
             ->beginIF(!empty($moduleIdList))->andWhere('module')->in($moduleIdList)->fi()
             ->beginIF(!empty($excludeStories))->andWhere('id')->notIN($excludeStories)->fi()
             ->beginIF($status and $status != 'all')->andWhere('status')->in($status)->fi()
-            ->andWhere('type')->eq($type)
+            ->andWhere('type')->in($type)
             ->andWhere('deleted')->eq(0)
             ->orderBy($orderBy)
             ->page($pager)
@@ -4698,13 +4698,15 @@ class storyModel extends model
             $tmpStories[$story->id] = $story;
             if($story->parent > 0) $parents[$story->parent] = $story->parent;
         }
-        $parents = $this->dao->select('*')->from(TABLE_STORY)->where('id')->in($parents)->fetchAll('id');
+        $parents = $this->dao->select('*')->from(TABLE_STORY)
+            ->where('id')->in($parents)
+            ->fetchAll('id');
 
         foreach($stories as $storyID => $story)
         {
             if($story->parent > 0)
             {
-                if(isset($stories[$story->parent]))
+                if(isset($stories[$story->parent]) )
                 {
                     $stories[$story->parent]->children[$story->id] = $story;
                     unset($stories[$storyID]);
@@ -4979,7 +4981,20 @@ class storyModel extends model
                 if($story->parent > 0 and isset($story->parentName)) $story->title = "{$story->parentName} / {$story->title}";
                 if(isset($branches[$story->branch]) and $showBranch and $this->config->vision == 'rnd') echo "<span class='label label-outline label-badge' title={$branches[$story->branch]}>{$branches[$story->branch]}</span> ";
                 if($story->module and isset($modulePairs[$story->module])) echo "<span class='label label-gray label-badge'>{$modulePairs[$story->module]}</span> ";
-                if($story->parent > 0) echo '<span class="label label-badge label-light" title="' . $this->lang->story->children . '">' . $this->lang->story->childrenAB . '</span> ';
+                if($story->parent > 0) {
+                    if($story->type == 'story') {
+                        echo '<span class="label label-badge label-light" 
+                                title="' . $this->lang->story->children . '">' .
+                            $this->lang->story->childrenAB .
+                            '</span> ';
+                    }else if ($story->type == 'taskPoint'){
+                        echo '<span class="label label-badge label-light" 
+                                title="' . $this->lang->story->taskPoint . '">' .
+                            $this->lang->story->taskPoint .
+                            '</span> ';
+                    }
+                }
+
                 echo $canView ? html::a($storyLink, $story->title, '', "title='$story->title' style='color: $story->color' data-app='$tab'") : "<span style='color: $story->color'>{$story->title}</span>";
                 if(!empty($story->children)) echo '<a class="story-toggle" data-id="' . $story->id . '"><i class="icon icon-angle-right"></i></a>';
                 break;

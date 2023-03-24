@@ -10,6 +10,7 @@
  */
 class qaStory extends control
 {
+    public productModel $product;
     /**
      * All products.
      *
@@ -152,7 +153,7 @@ class qaStory extends control
         }
         else
         {
-            $stories = $this->product->getStories($productID, $branchID, $browseType, $queryID, $moduleID, $storyType, $sort, $pager);
+            $stories = $this->product->getStories($productID, $branchID, $browseType, $queryID, $moduleID, "taskPoint,story", $sort, $pager);
         }
         $queryCondition = $this->dao->get();
 
