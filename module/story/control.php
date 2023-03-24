@@ -1431,10 +1431,10 @@ class story extends control
             $this->executeHooks($storyID);
 
             if($story->type == 'taskPoint'){
-                $moduleName         = $fromExecution <= 0 ? 'story' : 'execution';
-                $funcName           = $fromExecution <= 0 ? 'view' : 'storyView';
-                $param              = $fromExecution <= 0 ? "storyID={$story->parent}&version=0&param=0&storyType=story" : "storyID={$thisStory->parent}&executionID={$fromExecution}";
-                $locateLink = $this->createLink($moduleName, $funcName, $param);
+                $moduleName         = 'story';
+                $funcName           = 'view';
+                $param              = "storyID={$story->parent}&version=0&param=0&storyType=story";
+                $locateLink = $this->createLink($moduleName, $funcName, $param)."#app=qa";
                 return print(js::locate($locateLink, 'parent'));
             }
 
