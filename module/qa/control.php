@@ -11,15 +11,25 @@
  */
 class qa extends control
 {
+
+    public productModel $product;
+    public qaModel $qa;
+
     /**
      * The index of qa, go to bug's browse page.
      *
      * @access public
-     * @return void
+     * @param string $locate
+     * @param int $productID
+     * @param int $projectID
+     * @return int
      */
-    public function index($locate = 'auto', $productID = 0, $projectID = 0)
+    public function index($locate = 'auto', $productID = 0, $projectID = 0): int
     {
-        $products = $this->loadModel('product')->getProductPairsByProject($projectID, 'noclosed');
+        $this->product = $this->loadModel('product');
+        $this->qa = $this->loadModel('qa');
+
+        $products = $this->product->getProductPairsByProject($projectID, 'noclosed');
         if(empty($products)) return print($this->locate($this->createLink('product', 'showErrorNone', "moduleName=qa&activeMenu=index")));
         if($locate == 'yes') $this->locate($this->createLink('bug', 'browse'));
 
@@ -31,5 +41,6 @@ class qa extends control
         $this->view->position[] = $this->lang->qa->index;
         $this->view->products   = $products;
         $this->display();
+        return 0;
     }
 }

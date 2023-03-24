@@ -576,7 +576,7 @@ class installModel extends model
      * @access public
      * @return void
      */
-    public function updateLang()
+    public function updateLang(): void
     {
         /* Update group name and desc on dafault lang. */
         $groups = $this->dao->select('*')->from(TABLE_GROUP)->orderBy('id')->fetchAll();
