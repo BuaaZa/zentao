@@ -4702,6 +4702,8 @@ class storyModel extends model
             ->where('id')->in($parents)
             ->fetchAll('id');
 
+        ChromePhp::log($stories);
+
         foreach($stories as $storyID => $story)
         {
             if($story->parent > 0)
