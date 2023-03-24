@@ -243,7 +243,7 @@ $lang->block->default['qa']['1']['params']['count'] = '20';
 //$lang->block->default['qa']['2']['grid']  = 4;
 
 $lang->block->default['qa']['2']['title'] = '指派给我的缺陷';
-$lang->block->default['qa']['2']['block'] = 'Bug（缺陷）';
+$lang->block->default['qa']['2']['block'] = 'bug';
 $lang->block->default['qa']['2']['grid']  = 4;
 
 $lang->block->default['qa']['2']['params']['count']   = 15;
@@ -347,7 +347,7 @@ $lang->block->orderBy = '排序';
 $lang->block->availableBlocks              = new stdclass();
 $lang->block->availableBlocks->todo        = '日程';
 $lang->block->availableBlocks->task        = '任务';
-$lang->block->availableBlocks->bug         = 'Bug（缺陷）';
+$lang->block->availableBlocks->bug         = 'Bug';
 $lang->block->availableBlocks->case        = '用例';
 $lang->block->availableBlocks->story       = "$lang->SRCommon";
 $lang->block->availableBlocks->requirement = "$lang->URCommon";
