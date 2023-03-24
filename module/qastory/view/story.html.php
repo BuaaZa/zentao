@@ -363,13 +363,13 @@ $projectIDParam = $isProjectStory ? "projectID=$projectID&" : '';
             <?php endif;?>
           </tr>
           <?php
-              ChromePhp::log($story);
-              ChromePhp::log($setting);
+//              ChromePhp::log($story);
+//              ChromePhp::log($setting);
           ?>
           <?php if(!empty($story->children)):?>
                 <?php $i = 0;?>
                 <?php foreach($story->children as $key => $child):?>
-                <?php if($child->type =='story'): ?>
+<!--                --><?php //if($child->type =='story'): ?>
                 <?php $child->from = $from;?>
                 <?php $class  = $i == 0 ? ' table-child-top' : '';?>
                 <?php $class .= ($i + 1 == count($story->children)) ? ' table-child-bottom' : '';?>
@@ -428,7 +428,7 @@ $projectIDParam = $isProjectStory ? "projectID=$projectID&" : '';
                 <?php endif;?>
 
                 <?php $i ++;?>
-                <?php endif;?>
+<!--                --><?php //endif;?>
                 <?php endforeach;?>
           <?php endif;?>
           <?php endforeach;?>
