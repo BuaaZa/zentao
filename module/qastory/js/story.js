@@ -34,9 +34,24 @@ $(function()
     $(document).on('click', '.story-toggle', function(e)
     {
         var $toggle = $(this);
+        // console.log($toggle);
         var id = $(this).data('id');
         var isCollapsed = $toggle.toggleClass('collapsed').hasClass('collapsed');
-        $toggle.closest('[data-ride="table"]').find('tr.parent-' + id).toggle(!isCollapsed);
+        // console.log(isCollapsed);
+        var $childToggleList = $toggle.closest('[data-ride="table"]').find('tr.parent-' + id)
+        // console.log($childToggleList);
+        $childToggleList.each(function ()
+            {
+                var $childToggle = $(this);
+                var childId = $childToggle.data('id');
+                var isCollapsed = $childToggle.find('a.story-toggle').hasClass('collapsed');
+                if(!isCollapsed){
+                    $childToggle.find('a.story-toggle').toggleClass('collapsed');
+                    $childToggle.closest('[data-ride="table"]').find('tr.parent-' + childId).toggle(false);
+                }
+            }
+        );
+        $childToggleList.toggle(!isCollapsed);
 
         e.stopPropagation();
         e.preventDefault();
