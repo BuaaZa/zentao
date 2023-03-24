@@ -2033,8 +2033,18 @@ class testcaseModel extends model
         $de_html_str = htmlspecialchars_decode($case->data_sample_new, ENT_QUOTES);
         $data_sample = json_decode($de_html_str, true);
 
-        if(isset($data_sample_result) && count($data_sample_result)>1){
-            array_push($data_sample, $data_sample_result);
+        if(isset($data_sample) && count($data_sample)>1){
+
+            if(isset($data_sample_result) && count($data_sample_result)>1){
+                array_push($data_sample, $data_sample_result);
+            }else{
+                $data_sample_result = array();
+                for($i = 0; $i < count($data_sample[0]); $i += 1){
+                    array_push($data_sample_result, "");
+                }
+                $data_sample_result[0] = $data_sample[count($data_sample)-1][0] . '(实际结果)';
+                array_push($data_sample, $data_sample_result);
+            }
 
             $SignTable3 = $section->addTable('myOwnTableStyle');
             $SignTable3->addRow(250);
