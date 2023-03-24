@@ -16,7 +16,7 @@
         <br><br>
         <button class="btn" type="button"  onclick="addRow();"> 添加输入输出项</button>
         <button class="btn" type="button"  onclick="addCol();"> 添加测试样本</button>
-        <button id='submit' class="btn btn-wide btn-primary " type="submit"  onclick="save_in_cookie();"> 保存</button>
+        <button disabled="disabled" id='submit' class="btn btn-wide btn-primary " type="submit"  onclick="save_in_cookie();"> 保存</button>
         <br><br>
         </form>
     <!-- <input type="button" value="保存" onclick="save_in_cookie();"/> -->
@@ -35,9 +35,9 @@
         var rowCount = 0;
         var colCount = 1;
         function addRow(){
-
+            $('#submit').attr("disabled",false);
             rowCount++;
-            var rowTemplate_1 = "<td><textarea rows='1' class='form-control autosize step-expects' name='datasample["+(rowCount-1)+"][0]' placeholder=''></textarea></td>";
+            var rowTemplate_1 = "<tr><td><textarea rows='1' class='form-control autosize step-expects' name='datasample["+(rowCount-1)+"][0]' placeholder=''></textarea></td>";
             var rowTemplate_2 = '';
             for(i = 1; i<=colCount; i++){
                 var tmp_template = "<td><textarea rows='1' class='form-control autosize step-expects' name='datasample["+(rowCount-1)+"]["+i+"]'></textarea></td>";
@@ -45,11 +45,15 @@
             }
             var rowTemplate_3 = '</tr>';
             var rowTemplate = rowTemplate_1 + rowTemplate_2 + rowTemplate_3;
-            var testtable = $("#testTable").find("tbody");
-            var tableHtml = testtable.html();
-            tableHtml += rowTemplate;
 
-            testtable.html(tableHtml);
+            var testtable = $("#testTable");
+            var lastRow = testtable.find("tr:last");
+            if (lastRow.length) {
+                lastRow.after(rowTemplate);
+            } else {
+                testtable.append(rowTemplate);
+            }
+
         }
         function delRow(_id){
             $("#testTable .tr_"+_id).hide();
@@ -59,14 +63,14 @@
             colCount++;
             var i = 1;
             $("#testTable tr").each(function(){
-                var trHtml = $(this).html();
+                var trHtml = '';
                 if(i === 1){
-                    trHtml += '<td><b>样本'+colCount+'</b></td>';
+                    trHtml = '<td><b>样本'+colCount+'</b></td>';
                 }else{
-                    trHtml += "<td><textarea rows='1' class='form-control autosize step-expects' name='datasample["+(i-2)+"]["+colCount+"]'></textarea></td>";
+                    trHtml = "<td><textarea rows='1' class='form-control autosize step-expects' name='datasample["+(i-2)+"]["+colCount+"]'></textarea></td>";
                 }
 
-                $(this).html(trHtml);
+                $(this).append(trHtml);
                 i++;
             });
         }
