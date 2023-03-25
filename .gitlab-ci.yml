@@ -1,21 +1,10 @@
 stages:
-  - prepare
   - build
   - clean
   - deploy
 
 variables:
   PROJECT: "121.89.178.134:5050/15-test-group/zentaopms"
-
-clone-snippets-1:
-  stage: prepare
-  tags:
-    - docker
-  only:
-    - main
-  script:
-    - cd ~/1
-    - git fetch
 
 build-to-amd64:
   stage: build
