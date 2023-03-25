@@ -291,10 +291,13 @@ $lang->ztinterface->head = '请求头';
 $lang->ztinterface->key = '参数名';
 $lang->ztinterface->description = '描述';
 $lang->ztinterface->type = '类型';
-$lang->ztinterface->canNull = 'NULL';
+$lang->ztinterface->notNull = '非空';
 $lang->ztinterface->value = '值';
 $lang->ztinterface->messageView = '报文';
 $lang->ztinterface->mock = 'MOCK';
+$lang->ztinterface->noHeaders = '请求头内未设置可配置字段';
+$lang->ztinterface->body = '请求体';
+$lang->ztinterface->noBody = '请求体内未设置可配置字段';
 
 
 $lang->ztinterface->methodColor = array(
