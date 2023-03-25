@@ -6,7 +6,22 @@ stages:
 variables:
   PROJECT: "121.89.178.134:5050/15-test-group/zentaopms"
 
-docker-build:
+build-to-amd64:
+  stage: build
+  tags:
+    - docker
+  only:
+    - main
+  script:
+    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+    - docker buildx use gitlab_builder
+    - docker buildx build --tag $PROJECT/zentaopms-amd64:$(date "+%Y-%m-%d") --platform linux/amd64 --load .
+    - docker tag $PROJECT/zentaopms-amd64:$(date "+%Y-%m-%d") $PROJECT/zentaopms-amd64:latest
+    - docker push $PROJECT/zentaopms-amd64:$(date "+%Y-%m-%d")
+    - docker push $PROJECT/zentaopms-amd64:latest
+    - docker image prune -f
+
+build-to-arm64v8:
   stage: build
   tags:
     - docker
@@ -18,13 +33,9 @@ docker-build:
     # - docker buildx create --name gitlab_builder --use
     - docker buildx use gitlab_builder
     - docker buildx build --tag $PROJECT/zentaopms-arm64v8:$(date "+%Y-%m-%d") --platform linux/arm64 --load .
-    - docker buildx build --tag $PROJECT/zentaopms-amd64:$(date "+%Y-%m-%d") --platform linux/amd64 --load .
     - docker tag $PROJECT/zentaopms-arm64v8:$(date "+%Y-%m-%d") $PROJECT/zentaopms-arm64v8:latest
-    - docker tag $PROJECT/zentaopms-amd64:$(date "+%Y-%m-%d") $PROJECT/zentaopms-amd64:latest
     - docker push $PROJECT/zentaopms-arm64v8:$(date "+%Y-%m-%d")
     - docker push $PROJECT/zentaopms-arm64v8:latest
-    - docker push $PROJECT/zentaopms-amd64:$(date "+%Y-%m-%d")
-    - docker push $PROJECT/zentaopms-amd64:latest
     - docker image prune -f
 
 clean-old-orchestration:
@@ -33,8 +44,10 @@ clean-old-orchestration:
     - docker
   only:
     - main
+  needs:
+    - job: build-to-amd64
   script:
-    - echo docker compose down -v
+    - docker compose down -v
 
 deploy-to-production:    
   stage: deploy  
@@ -68,10 +81,12 @@ deploy-to-production:
       - .git/**/*
       - .git
 
-deploy-on-docker:
+deploy-new-orchestration:
   stage: deploy
   environment:
     name: test
+  needs:
+    - job: clean-old-orchestration
   only: 
     - main
   tags:
