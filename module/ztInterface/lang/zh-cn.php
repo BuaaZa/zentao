@@ -287,6 +287,15 @@ $lang->ztinterface->message       = '历史报文';
 $lang->ztinterface->edit       = '编辑';
 $lang->ztinterface->confirmDelete     = '您确认要删除该接口吗？';
 $lang->ztinterface->baseUrl = '基地址';
+$lang->ztinterface->head = '请求头';
+$lang->ztinterface->key = '参数名';
+$lang->ztinterface->description = '描述';
+$lang->ztinterface->type = '类型';
+$lang->ztinterface->canNull = 'NULL';
+$lang->ztinterface->value = '值';
+$lang->ztinterface->messageView = '报文';
+$lang->ztinterface->mock = 'MOCK';
+
 
 $lang->ztinterface->methodColor = array(
     'GET' => '#7FFF7F',
