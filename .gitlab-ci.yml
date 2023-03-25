@@ -6,22 +6,7 @@ stages:
 variables:
   PROJECT: "121.89.178.134:5050/15-test-group/zentaopms"
 
-build-to-amd64:
-  stage: build
-  tags:
-    - docker
-  only:
-    - main
-  script:
-    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
-    - docker buildx use gitlab_builder
-    - docker buildx build --tag $PROJECT/zentaopms-amd64:$(date "+%Y-%m-%d") --platform linux/amd64 --load .
-    - docker tag $PROJECT/zentaopms-amd64:$(date "+%Y-%m-%d") $PROJECT/zentaopms-amd64:latest
-    - docker push $PROJECT/zentaopms-amd64:$(date "+%Y-%m-%d")
-    - docker push $PROJECT/zentaopms-amd64:latest
-    - docker image prune -f
-
-build-to-arm64v8:
+docker-build:
   stage: build
   tags:
     - docker
@@ -33,9 +18,13 @@ build-to-arm64v8:
     # - docker buildx create --name gitlab_builder --use
     - docker buildx use gitlab_builder
     - docker buildx build --tag $PROJECT/zentaopms-arm64v8:$(date "+%Y-%m-%d") --platform linux/arm64 --load .
+    - docker buildx build --tag $PROJECT/zentaopms-amd64:$(date "+%Y-%m-%d") --platform linux/amd64 --load .
     - docker tag $PROJECT/zentaopms-arm64v8:$(date "+%Y-%m-%d") $PROJECT/zentaopms-arm64v8:latest
+    - docker tag $PROJECT/zentaopms-amd64:$(date "+%Y-%m-%d") $PROJECT/zentaopms-amd64:latest
     - docker push $PROJECT/zentaopms-arm64v8:$(date "+%Y-%m-%d")
     - docker push $PROJECT/zentaopms-arm64v8:latest
+    - docker push $PROJECT/zentaopms-amd64:$(date "+%Y-%m-%d")
+    - docker push $PROJECT/zentaopms-amd64:latest
     - docker image prune -f
 
 clean-old-orchestration:
@@ -45,9 +34,7 @@ clean-old-orchestration:
   only:
     - main
   script:
-    - tree -L 4
-    - cd ~/1
-    - docker compose down -v
+    - echo docker compose down -v
 
 deploy-to-production:    
   stage: deploy  
@@ -90,6 +77,4 @@ deploy-on-docker:
   tags:
     - docker
   script:
-    - pwd
-    - cd ~/1
     - docker compose up -d
