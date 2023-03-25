@@ -139,6 +139,46 @@ class ztinterfaceModel extends model
         $datalist.="</datalist>";
         return $datalist;
     }
+    
+    public function generateBody($content, $level, $path)
+    {
+        $table = '';
+        foreach($content as $id => $obj){
+            $newPath = $path.'-'.$obj['name'];
+            
+            $table .= "<tr class='body-key'>";
+
+            $table .= "<td>";
+            $table .= "<b>{$obj["name"]}</b>";
+            if($obj['description']) {
+                $table .= "<span style=\"color: #888888;\">({$obj["description"]})</span>";
+            }
+            $table .= "</td>";
+
+            $table .= "<td style=\"text-align: center;\">{$obj["type"]}</td>";
+
+            $table .= "<td style=\"text-align: center;\"><input tabindex='-1' type=\"checkbox\" class='notNull' disabled";
+            if ($obj["notNull"]) {
+                $table .= " checked";
+            }
+            $table .= "></td>";
+            
+            $table .= "<td>" . html::input($newPath.':mock', $obj['mock'], 'class="form-control" list="'.$obj['type'].'List" placeholder="Mock"') . "</td>";
+            
+            $placeholder = "placeholder=".($obj['example'] ? "示例:" . $obj['example'] : $obj['name']);
+            $table .= "<td>" . html::textarea($newPath.':value', '', "rows='1' class='form-control autosize header-value' ".$placeholder ) . "</td>";
+            
+            $table .= "</tr>";
+            
+            if($obj["content"]){
+                $table .= $this->generateBody($obj["content"],$level+1,$newPath);
+            }
+        }
+        return $table;
+    }
+
+
+
     /**
      * Create a case.
      *

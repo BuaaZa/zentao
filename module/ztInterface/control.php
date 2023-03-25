@@ -160,6 +160,7 @@ class ztinterface extends control
         $this->view->productName = $product->name;
         $this->view->header = json_decode($interface->header,TRUE);
         $this->view->data = json_decode($interface->data,TRUE);
+        $this->view->bodyHtml = $this->ztinterface->generateBody($this->view->data["content"],0,'');
         $this->view->baseURLList = $this->ztinterface->getBaseURL($productID);
         $this->view->position[] = $this->lang->ztinterface->common;
         $this->view->position[] = $this->lang->ztinterface->view;

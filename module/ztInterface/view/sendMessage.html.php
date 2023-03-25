@@ -124,36 +124,7 @@
                       <td colspan="5" class="no-data-message"><?php echo $lang->ztinterface->noBody;?></td>
                     </tr>
                   <?php else:?>
-                    <?php foreach($header["content"] as $id => $message):?>
-                    <tr class='header-key'>
-                      <td>
-                        <b><?php echo $message["name"];?></b>
-                        <?php if(!empty($message["description"])){
-                            echo "<span style=\"color: #888888;\">({$message["description"]})</span>";
-                          }
-                        ?>
-                      </td>
-                      <td style="text-align: center;"><?php echo $message["type"];?></td>
-                      <td style="text-align: center;">
-                          <?php $checkbox = "<input tabindex='-1' type=\"checkbox\" class='notNull' disabled";
-                                if($message["notNull"]){
-                                    $checkbox.="checked";
-                                }
-                                $checkbox.=">";
-                                echo $checkbox;
-                          ?>
-                      </td>
-                      <td>
-                        <?php echo html::input($message['name'].'-mock', $message['mock'], 'class="form-control" list="'.$message['type'].'List" placeholder="Mock"');?></td>
-                      <td><?php
-                        $valueExample = '';
-                        if(!empty($message["example"])){
-                          $valueExample = "示例:".$message["example"];
-                        }
-                        echo html::textarea('header_value[]', '', "rows='1' class='form-control autosize header-value' placeholder=\"$valueExample\""); ?>
-                      </td>
-                    </tr>
-                    <?php endforeach; ?>
+                    <?php echo $bodyHtml;?>
                   <?php endif;?>
                 </tbody>
               </table>
