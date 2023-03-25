@@ -166,6 +166,9 @@ class product extends control
             $this->session->set('storyList', $this->app->getURI(true), 'project');
             $this->loadModel('project')->setMenu($projectID);
         }
+        elseif($this->app->tab == 'qa'){
+            $this->loadModel('qa')->setMenu($products,$productID);
+        }
         else
         {
             $this->session->set('storyList',   $this->app->getURI(true), 'product');

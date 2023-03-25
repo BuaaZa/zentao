@@ -186,9 +186,9 @@ $config->bug->datatable->fieldList['severity']['width']    = '50';
 $config->bug->datatable->fieldList['severity']['required'] = 'no';
 $config->bug->datatable->fieldList['severity']['name']     = $lang->bug->severity;
 
-$config->bug->datatable->fieldList['pri']['title']    = 'P';
+$config->bug->datatable->fieldList['pri']['title']    = $lang->bug->pri;
 $config->bug->datatable->fieldList['pri']['fixed']    = 'left';
-$config->bug->datatable->fieldList['pri']['width']    = '50';
+$config->bug->datatable->fieldList['pri']['width']    = '60';
 $config->bug->datatable->fieldList['pri']['required'] = 'no';
 $config->bug->datatable->fieldList['pri']['name']     = $lang->bug->pri;
 

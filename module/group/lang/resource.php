@@ -1096,6 +1096,7 @@ $lang->resource->testtask->start            = 'startAction';
 $lang->resource->testtask->close            = 'closeAction';
 $lang->resource->testtask->delete           = 'delete';
 $lang->resource->testtask->batchAssign      = 'batchAssign';
+$lang->resource->testtask->batchMove        = 'batchMove';
 $lang->resource->testtask->linkcase         = 'linkCase';
 $lang->resource->testtask->unlinkcase       = 'lblUnlinkCase';
 $lang->resource->testtask->batchUnlinkCases = 'batchUnlinkCases';

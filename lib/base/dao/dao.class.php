@@ -611,6 +611,8 @@ class baseDAO
         }
 
         if ($record) self::$querys[] = $this->processKeywords($sql);
+//        对MySQL执行情况进行debug，解注释这条语句即可
+//        ChromePhp::log("[MySQL]: " . $sql);
         return $sql;
     }
 
@@ -689,12 +691,12 @@ class baseDAO
      * 将记录进行分页，自动设置limit语句。
      * Page the records, set the limit part auto.
      *
-     * @param object|null $pager
+     * @param object|string|null $pager
      * @param string $distinctField
      * @return baseDAO the dao object self.
      * @access public
      */
-    public function page(object|null $pager, string $distinctField = ''): baseDAO
+    public function page(object|string|null $pager, string $distinctField = ''): baseDAO
     {
         if (!is_object($pager))
             return $this;

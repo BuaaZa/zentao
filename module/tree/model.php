@@ -175,12 +175,19 @@ class treeModel extends model
         $syncConfig = $this->getSyncConfig($type);
 
         $treeMenu = array();
+//        ChromePhp::log($branches);
         foreach($branches as $branchID => $branch)
         {
+//            ChromePhp::log($this->buildMenuQuery($rootID, $type, $startModule, $branchID, $param));
+
             $stmt    = $this->dbh->query($this->buildMenuQuery($rootID, $type, $startModule, $branchID, $param));
+
+//            ChromePhp::log($stmt);
+
             $modules = array();
             while($module = $stmt->fetch())
             {
+//                ChromePhp::log($module);
                 /* If is feedback or ticket filter story module by grade.*/
                 if(($type == 'feedback' or $type == 'ticket') and $module->type == 'story')
                 {
@@ -191,12 +198,15 @@ class treeModel extends model
                 $modules[$module->id] = $module;
             }
 
+
             foreach($modules as $module)
             {
                 $branchName = (isset($product) and $product->type != 'normal' and $module->branch === BRANCH_MAIN) ? $this->lang->branch->main : $branch;
                 $this->buildTreeArray($treeMenu, $modules, $module, (empty($branchName)) ? '/' : "/$branchName/");
             }
         }
+
+//        ChromePhp::log($treeMenu);
 
         ksort($treeMenu);
         $topMenu = @array_shift($treeMenu);
@@ -586,7 +596,7 @@ class treeModel extends model
     {
         if(!$object)
             return false;
-        $menu = "<ul id='modules' class='tree' data-ride='tree' data-name='tree-$name'>";
+        $menu = "<ul id='modules' class='tree' data-ride='tree' data-name='tree-$name'>\n";
 
         if(empty($object->childs))
             return false;
@@ -594,7 +604,7 @@ class treeModel extends model
             $menu = $menu.$this->dfsGetLi($ch, $name);
         }
 
-        $menu .= '</ul>';
+        $menu .= "</ul>";
         return $menu;
     }
 
@@ -609,15 +619,15 @@ class treeModel extends model
         }
 
         if(!empty($object->childs)){
-            $li = $li."<li class='closed'>".$con."<ul>";
+            $li = $li."<li class='closed'>\n".$con."<ul>\n";
             foreach($object->childs as $ch){
                 $li = $li.$this->dfsGetLi($ch, $name);
             }
-            $li = $li."</ul>";
+            $li = $li."</ul>\n";
         }else{
-            $li = $li."<li>".$con;
+            $li = $li."<li>\n".$con;
         }
-        $li = $li."</li>";
+        $li = $li."</li>\n";
         return $li;
     }
 

@@ -1133,11 +1133,11 @@ class storyModel extends model
 
         $oldParentStory = $this->dao->select('*')->from(TABLE_STORY)->where('id')->eq($parentID)->andWhere('deleted')->eq(0)->fetch();
         if(empty($oldParentStory)) return $this->dao->update(TABLE_STORY)->set('parent')->eq('0')->where('id')->eq($storyID)->exec();
-        if($oldParentStory->parent != '-1') $this->dao->update(TABLE_STORY)->set('parent')->eq('-1')->where('id')->eq($parentID)->exec();
+        if($oldParentStory->parent == 0) $this->dao->update(TABLE_STORY)->set('parent')->eq('-1')->where('id')->eq($parentID)->exec();
         $this->computeEstimate($parentID);
 
         $childrenStatus = $this->dao->select('id,status')->from(TABLE_STORY)->where('parent')->eq($parentID)->andWhere('deleted')->eq(0)->fetchPairs('status', 'status');
-        if(empty($childrenStatus)) return $this->dao->update(TABLE_STORY)->set('parent')->eq('0')->where('id')->eq($parentID)->exec();
+        if(empty($childrenStatus) && $oldParentStory->parent == -1) return $this->dao->update(TABLE_STORY)->set('parent')->eq('0')->where('id')->eq($parentID)->exec();
 
         $status = $oldParentStory->status;
         if(count($childrenStatus) == 1 and $oldParentStory->status != 'changing')
@@ -1179,7 +1179,6 @@ class storyModel extends model
 
             $story->lastEditedBy   = $this->app->user->account;
             $story->lastEditedDate = $now;
-            $story->parent         = '-1';
             $this->dao->update(TABLE_STORY)->data($story)->where('id')->eq($parentID)->exec();
             if(!dao::isError())
             {
@@ -2758,7 +2757,7 @@ class storyModel extends model
             ->beginIF(!empty($moduleIdList))->andWhere('module')->in($moduleIdList)->fi()
             ->beginIF(!empty($excludeStories))->andWhere('id')->notIN($excludeStories)->fi()
             ->beginIF($status and $status != 'all')->andWhere('status')->in($status)->fi()
-            ->andWhere('type')->eq($type)
+            ->andWhere('type')->in($type)
             ->andWhere('deleted')->eq(0)
             ->orderBy($orderBy)
             ->page($pager)
@@ -2817,8 +2816,8 @@ class storyModel extends model
         if(!$stories) return array();
         $taskpoint = $this->dao->select('*')->from(TABLE_STORY)
             ->where('deleted')->eq(0)
+            ->beginIF($productID)->andWhere('product')->in($productID)->fi()
             ->andWhere('type')->eq('taskPoint')
-            ->andWhere('status')->notin('closed,draft')
             ->orderBy('parent')
             ->fetchAll();
         $res = $this->formatStories($stories, $type, $limit);
@@ -4355,7 +4354,7 @@ class storyModel extends model
         $story->notReview = isset($story->notReview) ? $story->notReview : array();
 
         $isSuperReviewer = strpos(',' . trim(zget($config->story, 'superReviewers', ''), ',') . ',', ',' . $app->user->account . ',');
-
+ 
         if($action == 'change')     return (($isSuperReviewer !== false or count($story->reviewer) == 0 or count($story->notReview) == 0) and $story->status == 'active');
         if($action == 'review')     return (($isSuperReviewer !== false or in_array($app->user->account, $story->notReview)) and $story->status == 'reviewing');
         if($action == 'recall')     return strpos('reviewing,changing', $story->status) !== false;
@@ -4387,7 +4386,15 @@ class storyModel extends model
 
         if($type == 'browse')
         {
-            if(common::canBeChanged('story', $story))
+            if($this->app->tab=='qa'){
+                $title = $story->type == 'taskPoint'?'编辑':'只能编辑功能点';
+                $menu .= $this->buildMenu('story', 'edit', $params . "&kanbanGroup=default&storyType=$story->type", $story, "qabrowse", '', '', 'showinonlybody', '', '', $title);
+                $menu .= $this->buildMenu('testcase', 'create', "productID=$story->product&branch=$story->branch&module=0&from=&param=0&$params", $story, "qabrowse", 'sitemap', '', 'showinonlybody', false);
+                $title = $story->type == 'story'?'划分功能点':'功能点无法继续划分功能点';
+                $menu .= $this->buildMenu('qastory', 'batchCreate', "productID=$story->product&branch=$story->branch&module=$story->module&$params&executionID=0&plan=0&storyType=taskPoint", $story, "qabrowse", 'split', '', 'showinonlybody', '', '', $title);
+                return $menu;
+            }
+            else if(common::canBeChanged('story', $story))
             {
                 $storyReviewer = isset($story->reviewer) ? $story->reviewer : array();
                 if($story->URChanged) return $this->buildMenu('story', 'processStoryChange', $params, $story, $type, 'ok', '', 'iframe', true, '', $this->lang->confirm);
@@ -4691,13 +4698,17 @@ class storyModel extends model
             $tmpStories[$story->id] = $story;
             if($story->parent > 0) $parents[$story->parent] = $story->parent;
         }
-        $parents = $this->dao->select('*')->from(TABLE_STORY)->where('id')->in($parents)->fetchAll('id');
+        $parents = $this->dao->select('*')->from(TABLE_STORY)
+            ->where('id')->in($parents)
+            ->fetchAll('id');
+
+//        ChromePhp::log($stories);
 
         foreach($stories as $storyID => $story)
         {
             if($story->parent > 0)
             {
-                if(isset($stories[$story->parent]))
+                if(isset($stories[$story->parent]) )
                 {
                     $stories[$story->parent]->children[$story->id] = $story;
                     unset($stories[$storyID]);
@@ -4972,7 +4983,20 @@ class storyModel extends model
                 if($story->parent > 0 and isset($story->parentName)) $story->title = "{$story->parentName} / {$story->title}";
                 if(isset($branches[$story->branch]) and $showBranch and $this->config->vision == 'rnd') echo "<span class='label label-outline label-badge' title={$branches[$story->branch]}>{$branches[$story->branch]}</span> ";
                 if($story->module and isset($modulePairs[$story->module])) echo "<span class='label label-gray label-badge'>{$modulePairs[$story->module]}</span> ";
-                if($story->parent > 0) echo '<span class="label label-badge label-light" title="' . $this->lang->story->children . '">' . $this->lang->story->childrenAB . '</span> ';
+                if($story->parent > 0) {
+                    if($story->type == 'story') {
+                        echo '<span class="label label-badge label-light" 
+                                title="' . $this->lang->story->children . '">' .
+                            $this->lang->story->childrenAB .
+                            '</span> ';
+                    }else if ($story->type == 'taskPoint'){
+                        echo '<span class="label label-badge label-light" 
+                                title="' . $this->lang->story->taskPoint . '">' .
+                            $this->lang->story->taskPoint .
+                            '</span> ';
+                    }
+                }
+
                 echo $canView ? html::a($storyLink, $story->title, '', "title='$story->title' style='color: $story->color' data-app='$tab'") : "<span style='color: $story->color'>{$story->title}</span>";
                 if(!empty($story->children)) echo '<a class="story-toggle" data-id="' . $story->id . '"><i class="icon icon-angle-right"></i></a>';
                 break;

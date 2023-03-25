@@ -1341,6 +1341,8 @@ class testtaskModel extends model
         $sample_data['sample_out'] = $sample_out;
         $sample_data['sample_result'] = $sample_result;
 
+        $datasample_result = $postData->datasample_result;
+
 
         /* Insert into testResult table. */
         $now = helper::now();
@@ -1349,10 +1351,11 @@ class testtaskModel extends model
             ->add('caseResult', $caseResult)
             ->setForce('stepResults', serialize($stepResults))
             ->setForce('sample_data', serialize($sample_data))
+            ->setForce('data_sample_result_new', serialize($datasample_result))
             ->setDefault('lastRunner', $this->app->user->account)
             ->setDefault('date', $now)
             ->skipSpecial('stepResults,sample_data')
-            ->remove('steps,reals,result,sample_in,sample_out,sample_result')
+            ->remove('steps,reals,result,sample_in,sample_out,sample_result,datasample_result')
             ->get();
 
         /* Remove files and labels field when uploading files for case result or step result. */
@@ -1548,6 +1551,7 @@ class testtaskModel extends model
         {
             $result->stepResults = unserialize($result->stepResults);
             $result->sample_data = unserialize($result->sample_data);
+            $result->data_sample_result_new = unserialize(htmlspecialchars_decode($result->data_sample_result_new, ENT_QUOTES));
 
             $result->build       = $result->run ? zget($runs, $result->run, 0) : 0;
             $result->files       = zget($resultFiles, $resultID, array()); //Get files of case result.
@@ -2596,6 +2600,7 @@ class testtaskModel extends model
             ->fetch();
         if(!$task) return false;
         $parents = $this->getParentList();
+//        ChromePhp::log($parents);
         $childs = $this->dao->select('id,name')->from(TABLE_TESTTASK)
             ->where('deleted')->eq(0)
             ->andWhere('id')->notin($parents)
@@ -2607,6 +2612,7 @@ class testtaskModel extends model
         }else{
             $ans = $this->dfsGetSons('.', $taskID,$childs);
         }
+//        ChromePhp::log($ans);
         return $ans;        
     }
 

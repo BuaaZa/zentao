@@ -481,6 +481,8 @@ class story extends control
         $this->view->branches         = $branches;
         if($storyType == 'taskPoint'){
             $this->view->stories          = $this->story->getParentStoryPairsTaskPoint($productID);
+        }else{
+            $this->view->stories = $this->story->getParentStoryPairs($productID);
         }
         $this->view->productID        = $productID;
         $this->view->product          = $product;
@@ -553,6 +555,9 @@ class story extends control
             }
             $this->view->execution = $execution;
         }
+        else if($this->app->tab == 'qa'){
+            $this->loadModel('qa')->setMenu('',$productID);
+        }
         else
         {
             $this->product->setMenu($productID, $branch);
@@ -568,7 +573,7 @@ class story extends control
         if($storyID)
         {
             $story = $this->story->getById($storyID);
-            if(($story->status != 'active' or $story->stage != 'wait' or $story->parent > 0) and $this->config->vision != 'lite') return print(js::alert($this->lang->story->errorNotSubdivide) . js::locate('back'));
+            if($storyType == 'story' && ($story->status != 'active' or $story->stage != 'wait' or $story->parent > 0) and $this->config->vision != 'lite') return print(js::alert($this->lang->story->errorNotSubdivide) . js::locate('back'));
         }
 
         if(!empty($_POST))
@@ -735,6 +740,7 @@ class story extends control
 
         $this->view->customFields = $customFields;
         $this->view->showFields   = $showFields;
+
 
         $this->view->title            = $product->name . $this->lang->colon . ($storyID ? $this->lang->story->subdivide : $this->lang->story->batchCreate);
         $this->view->productName      = $product->name;
@@ -1425,10 +1431,10 @@ class story extends control
             $this->executeHooks($storyID);
 
             if($story->type == 'taskPoint'){
-                $moduleName         = $fromExecution <= 0 ? 'story' : 'execution';
-                $funcName           = $fromExecution <= 0 ? 'view' : 'storyView';
-                $param              = $fromExecution <= 0 ? "storyID={$story->parent}&version=0&param=0&storyType=story" : "storyID={$thisStory->parent}&executionID={$fromExecution}";
-                $locateLink = $this->createLink($moduleName, $funcName, $param);
+                $moduleName         = 'story';
+                $funcName           = 'view';
+                $param              = "storyID={$story->parent}&version=0&param=0&storyType=story";
+                $locateLink = $this->createLink($moduleName, $funcName, $param)."#app=qa";
                 return print(js::locate($locateLink, 'parent'));
             }
 

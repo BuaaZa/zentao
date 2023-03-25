@@ -13,6 +13,7 @@
 <?php
 class productModel extends model
 {
+    public storyModel $story;
     /**
      * Get product module menu.
      *

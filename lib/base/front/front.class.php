@@ -220,16 +220,16 @@ class baseHTML
      * 生成单选按钮。
      * Create tags like "<input type='radio' />"
      *
-     * @param  string $name       the name of the radio tag.
-     * @param  array  $options    the array to create radio tag from.
-     * @param  string $checked    the value to checked by default.
-     * @param  string $attrib     other attribs.
-     * @param  string $type       inline or block
+     * @param string $name the name of the radio tag.
+     * @param array|string|null $options the array to create radio tag from.
+     * @param string $checked the value to checked by default.
+     * @param string $attrib other attribs.
+     * @param string $type inline or block
+     * @return string
      * @static
      * @access public
-     * @return string
      */
-    static public function radio($name = '', $options = array(), $checked = '', $attrib = '', $type = 'inline')
+    static public function radio(string $name = '', array|string|null $options = array(), $checked = '', $attrib = '', $type = 'inline')
     {
         $options = (array)($options);
         if(!is_array($options) or empty($options)) return false;
@@ -445,7 +445,7 @@ class baseHTML
         global $lang;
 
         $label = empty($label) ? $lang->save : $label;
-        $misc .= strpos($misc, 'data-loading') === false ? " data-loading='$lang->loading'" : '';
+        $misc .= !str_contains($misc, 'data-loading') ? " data-loading='$lang->loading'" : '';
 
         return " <button type='submit' id='submit' class='$class' $misc>$label</button>";
     }
