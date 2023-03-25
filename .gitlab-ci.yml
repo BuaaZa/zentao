@@ -1,10 +1,21 @@
 stages:
+  - prepare
   - build
   - clean
   - deploy
 
 variables:
   PROJECT: "121.89.178.134:5050/15-test-group/zentaopms"
+
+clone-snippets-1:
+  stage: prepare
+  tags:
+    - docker
+  only:
+    - main
+  script:
+    - cd ~/1
+    - git fetch
 
 build-to-amd64:
   stage: build
@@ -44,15 +55,10 @@ clean-old-orchestration:
     - docker
   only:
     - main
-  needs:
-    - project: http://121.89.178.134/15-test-group/zentaopms/snippets/1
-      job: clone-snippets-1
-      ref: main
-      artifacts: true
   script:
-    - pwd
     - tree -L 4
-    # - docker compose down -v
+    - cd ~/1
+    - docker compose down -v
 
 deploy-to-production:    
   stage: deploy  
@@ -96,5 +102,5 @@ deploy-on-docker:
     - docker
   script:
     - pwd
-    # - git clone git@121.89.178.134:15-test-group/zentaopms/snippets/1.git && cd 1
-    # - docker compose up -d
+    - cd ~/1
+    - docker compose up -d
