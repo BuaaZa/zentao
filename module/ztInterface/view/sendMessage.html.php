@@ -38,6 +38,31 @@
   display: inline-block;
   vertical-align: middle;
 }
+.icon-angle-right{
+  background-color: transparent;
+  border: none;
+  outline: none;
+}
+.icon-angle-down{
+  background-color: transparent;
+  border: none;
+  outline: none;
+}
+.innerbtn{
+  width:20px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.generate-button {
+  padding: 10px 20px;
+  border: none;
+  background-color: #0077ff;
+  color: #fff;
+  font-size: 16px;
+  font-weight: bold;
+}
+
 </style>
 <div id='mainContent' class='main-content'>
   <div class='main-header'>
@@ -135,7 +160,10 @@
           </div>
         </div>
       </div>
-      <div class='side-col col-4'>
+      <div class='side-col innerbtn'>
+        
+      </div>
+        <div class='side-col col-3'>
         <div class='cell'>
           <div class='detail'>
             <div class='detail-title'><?php echo $lang->ztinterface->messageView;?></div>

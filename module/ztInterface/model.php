@@ -140,19 +140,30 @@ class ztinterfaceModel extends model
         return $datalist;
     }
     
-    public function generateBody($content, $level, $path)
+    public function generateBody($content, $level, $path, $inArray = false)
     {
         $table = '';
         foreach($content as $id => $obj){
+            $obj['type'] = strtolower($obj['type']);
             $newPath = $path.'-'.$obj['name'];
+            if(!$path){
+                $newPath = $obj['name'];
+                $table .= "<tr id='$newPath' class='body-key'>";
+            }
+            else
+                $table .= "<tr id='$newPath' class='$path::child'>";
             
-            $table .= "<tr class='body-key'>";
-
             $table .= "<td>";
+            $indent = $level*20 + ($obj["content"]?0:8);
+            $table .= "<div style=\"text-indent:".$indent."px\">";
+            if($obj["content"]){
+                $table .= "<button class='icon-angle-down' onclick='toggleChildren(this)'></button>";
+            }
             $table .= "<b>{$obj["name"]}</b>";
             if($obj['description']) {
                 $table .= "<span style=\"color: #888888;\">({$obj["description"]})</span>";
             }
+            $table .= "</div>";
             $table .= "</td>";
 
             $table .= "<td style=\"text-align: center;\">{$obj["type"]}</td>";
@@ -163,15 +174,35 @@ class ztinterfaceModel extends model
             }
             $table .= "></td>";
             
-            $table .= "<td>" . html::input($newPath.':mock', $obj['mock'], 'class="form-control" list="'.$obj['type'].'List" placeholder="Mock"') . "</td>";
+            if($obj['type'] !== "object"){
+                $table .= "<td>" . html::input($newPath.':mock', $obj['mock'], ' class="form-control input-mock" list="'.$obj['type'].'List" placeholder="Mock"');
+                $table .= "<span id=\"error-404\" style=\"font-size:4px;color:red;display:none;\">Mock函数不存在</span>";
+                $table .= "</td>";
+            }else{
+                $table .= "<td>" . html::input($newPath.':mock', $obj['mock'], 'class="form-control" disabled') . "</td>";
+            }
             
-            $placeholder = "placeholder=".($obj['example'] ? "示例:" . $obj['example'] : $obj['name']);
-            $table .= "<td>" . html::textarea($newPath.':value', '', "rows='1' class='form-control autosize header-value' ".$placeholder ) . "</td>";
-            
+            $placeholder = "placeholder=".($obj['example'] ? "示例:" . $obj['example'] : "键名:".$obj['name']);
+            $table .= "<td>";
+            if($obj['type'] == 'object' or $inArray){
+                $placeholder = $inArray ? "placeholder='请直接在父级Array中编辑数组'" : "placeholder='请直接编辑子字段的值'";
+                $table .= html::input($newPath.':value', '', 'class="form-control" disabled '.$placeholder);
+            }else{
+                $table .= "<div class=\"input-control has-icon-right\">";
+                $table .= html::input($newPath.':value', '', 'class="form-control" '. $placeholder);
+                $table .= '<div class="colorpicker">
+                            <button type="button" class="btn btn-link dropdown-toggle refresh-button"><i class="ic"></i></button>
+                            <input type="hidden"  data-icon="refresh" data-wrapper="input-control-icon-right"  data-provide="colorpicker">
+                        </div>';
+                $table .= "</div>";
+            }
+            $table .= "</td>";
             $table .= "</tr>";
             
-            if($obj["content"]){
+            if($obj["type"] == 'object'){
                 $table .= $this->generateBody($obj["content"],$level+1,$newPath);
+            }else if($obj["type"] == 'array'){
+                $table .= $this->generateBody($obj["content"],$level+1,$newPath,true);
             }
         }
         return $table;
