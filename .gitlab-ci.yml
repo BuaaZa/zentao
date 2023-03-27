@@ -49,7 +49,7 @@ clean-old-orchestration:
   script:
     - docker compose down -v
 
-deploy-to-production:    
+deploy-to-production:
   stage: deploy  
   environment: production
   tags:
@@ -87,7 +87,7 @@ deploy-new-orchestration:
     name: test
   needs:
     - job: clean-old-orchestration
-  only: 
+  only:
     - main
   tags:
     - docker

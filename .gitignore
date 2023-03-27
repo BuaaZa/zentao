@@ -9,7 +9,6 @@ target/
 config/my.php
 # maybe dangerous!
 tmp/
-config/my.php
 # 暂时只屏蔽upload
 www/data/upload/
 .DS_Store
