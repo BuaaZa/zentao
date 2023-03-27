@@ -452,7 +452,7 @@ CREATE TABLE IF NOT EXISTS `zt_casestep`
     `version`       smallint(3) unsigned  NOT NULL default '0',
     `type`          varchar(10)           NOT NULL DEFAULT 'step',
     `desc`          text                  NOT NULL,
-    `input`         text                  NOT NULL,
+    `input`         text                  NOT NULL comment '弃用 at 20230327',
     `goal_action`   text                  NOT NULL,
     `expect`        text                  NOT NULL,
     `eval_criteria` text                  NOT NULL,
@@ -2135,7 +2135,6 @@ CREATE TABLE IF NOT EXISTS `zt_webhook`
     PRIMARY KEY (`id`)
 ) ENGINE = InnoDB
   DEFAULT CHARSET = utf8;
-
 
 
 
@@ -15508,7 +15507,10 @@ BEGIN
           from zt_projectproduct
           where project in (select id
                             from zt_project
-                            where project = $project and type = 'stage' and attribute = 'request' and deleted = '0')
+                            where project = $project
+                              and type = 'stage'
+                              and attribute = 'request'
+                              and deleted = '0')
           GROUP BY product) as product
     into @product__DELIMITER__
     -- 让项目产品总数和已设置需求阶段产品总数比较,都设置返回1,否则返回0
@@ -15571,7 +15573,9 @@ BEGIN
       and deleted = '0'
       and id not in (select parent
                      from zt_project
-                     where project = $project and attribute = $attribute and grade = 2
+                     where project = $project
+                       and attribute = $attribute
+                       and grade = 2
                      group by parent)
     into @totalstory__DELIMITER__
     -- 查询某类型已设置实际工期的阶段总数
@@ -15583,7 +15587,9 @@ BEGIN
       and realDuration > 0
       and id not in (select parent
                      from zt_project
-                     where project = $project and attribute = $attribute and grade = 2
+                     where project = $project
+                       and attribute = $attribute
+                       and grade = 2
                      group by parent)
     into @setstory__DELIMITER__
     -- 查询项目下某类型阶段实际工期总数
@@ -15595,7 +15601,9 @@ BEGIN
       and realDuration > 0
       and id not in (select parent
                      from zt_project
-                     where project = $project and attribute = $attribute and grade = 2
+                     where project = $project
+                       and attribute = $attribute
+                       and grade = 2
                      group by parent)
     into @days__DELIMITER__
     -- 判断项目下某类型的阶段是否都已设置实际工期
@@ -15615,7 +15623,9 @@ BEGIN
       and deleted = '0'
       and id not in (select parent
                      from zt_project
-                     where project = $project and attribute = $attribute and grade = 2
+                     where project = $project
+                       and attribute = $attribute
+                       and grade = 2
                      group by parent)
     into @days__DELIMITER__
     return @days__DELIMITER__
@@ -16101,3 +16111,21 @@ alter table zt_task
 
 alter table `zt_testtask`
     add `parent` int not null;
+
+create table if not exists `data_sample`
+(
+    `id`           int unsigned auto_increment primary key comment '数据样本的ID',
+    `case_id`      int unsigned unique not null comment '用例外键ID',
+    `casestep_id`  int unsigned unique not null comment '测试步骤外键ID',
+    `object`       json comment '样本实体',
+    `delete`       enum ('0', '1') default '0'
+);
+
+create table if not exists `data_sample_result`
+(
+    `id`             int unsigned auto_increment primary key comment '数据样本结果的ID',
+    `data_sample_id` int unsigned unique not null comment '数据样本外键ID',
+    `object`         json comment '样本结果实体',
+    `create_date`    datetime        default current_timestamp() comment '创建时间与日期',
+    `delete`         enum ('0', '1') default '0'
+);
