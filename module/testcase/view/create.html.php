@@ -198,7 +198,8 @@ foreach(explode(',', $config->testcase->create->requiredFields) as $field)
                     <td><textarea rows='1' class='form-control autosize step-expects' name='expects[]'></textarea></td>
                       <td><textarea rows='1' class='form-control autosize step-expects' name='eval_criterias[]'></textarea></td>
                       <td class='step-actions'>
-                          <?php echo $this->loadModel('common')->buildMenu('testcase', 'datasample', "", '', 'button', '', '', 'showinonlybody iframe', true, '', '填写');?>
+                          <input type='hidden' name='datasample[]' id='datasample' value='' class='step-datasample'>
+                          <?php echo $this->loadModel('common')->buildMenu('testcase', 'datasample', "", '', 'button', '', '', 'showinonlybody iframe btn-datasample', true, '', '填写');?>
                       </td>
                       <td class='step-actions'>
                       <div class='btn-group'>
@@ -239,7 +240,8 @@ foreach(explode(',', $config->testcase->create->requiredFields) as $field)
                     <td><?php echo html::textarea('expects[]', $step->expect, "rows='1' class='form-control autosize step-expects'") ?></td>
                       <td><?php echo html::textarea('eval_criterias[]', $step->eval_criteria, "rows='1' class='form-control autosize step-expects'") ?></td>
                       <td class='step-actions'>
-                          <?php echo $this->loadModel('common')->buildMenu('testcase', 'datasample', "", '', 'button', '', '', 'showinonlybody iframe', true, '', '填写');?>
+                          <input type='hidden' name='datasample[]' id='datasample' value='' class='step-datasample'>
+                          <?php echo $this->loadModel('common')->buildMenu('testcase', 'datasample', "", '', 'button', '', '', 'showinonlybody iframe btn-datasample', true, '', '填写');?>
                       </td>
                     <td class='step-actions'>
                       <div class='btn-group'>
@@ -274,7 +276,6 @@ foreach(explode(',', $config->testcase->create->requiredFields) as $field)
           <tr>
             <td colspan='3' class='text-center form-actions'>
               <?php //echo html::submitButton();?>
-                <input type='hidden' name='datasample' id='datasample' value='null' class='step-datasample'>
               <button id='submit' class="btn btn-wide btn-primary " type="submit"  onclick="take_of_cookie();"> 保存</button>
               <?php echo $gobackLink ? html::a($gobackLink, $lang->goback, '', 'class="btn btn-wide"') : html::backButton();?>
             </td>
@@ -303,7 +304,18 @@ foreach(explode(',', $config->testcase->create->requiredFields) as $field)
 <script>
    function take_of_cookie(){
        //alert($.cookie('datasample'));
-       $('#datasample').attr('value',$.cookie('datasample'));
+       var stepsNum = $('#steps').children('.step').length;
+       var i = 1;
+       for(i = 1; i<=stepsNum; i+=1){
+           if($.cookie('datasample['+i+']')!=null && $.cookie('datasample['+i+']').length>0){
+               //console.log($.cookie('datasample['+i+']'));
+               var nameStr = 'datasample['+i+']';
+               selector = document.getElementsByName(nameStr);
+               element = $(selector);
+               element.attr("value", $.cookie('datasample['+i+']'));
+               $.cookie('datasample['+i+']', null);
+           }
+       }
    }
 </script>
 <?php js::set('caseModule', $lang->testcase->module)?>
