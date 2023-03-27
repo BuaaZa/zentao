@@ -432,18 +432,19 @@ class installModel extends model
     public function createDB($version)
     {
         $sql = "CREATE DATABASE `{$this->config->db->name}`";
-        if($version > 4.1) $sql .= " DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci";
+//        if($version > 4.1) $sql .= " DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci";
         return $this->dbh->query($sql);
     }
 
     /**
      * Create tables.
      *
-     * @param  string    $version
+     * @param string $version
      * @access public
      * @return bool
+     * @throws EndResponseException
      */
-    public function createTable($version)
+    public function createTable(string $version): bool
     {
         /* Add exception handling to ensure that all SQL is executed successfully. */
         try
