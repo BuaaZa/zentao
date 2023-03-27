@@ -62,13 +62,16 @@
             if(item.code == 'qa'){
                 $li.append('<ul class=\'more-list dropdown-menu fade \'></ul>');
 
-                var url = '/zentaopms/www/index.php?m=testcase&f=browse';
+
+                var url = '/zentaopms/www/index.php?m=qastory&f=story';
                 url = $.tabSession.convertUrlWithTid(url);
+                // console.log(url);
+                // console.log(document.cookie);
                 var $link= $('<a></a>')
-                    .attr('href',url)
+                    .attr('href',url + '#app=qa')
                     .attr('data-app', 'qa')
                     .attr('data-toggle', 'tooltip')
-                    .html('<i class=\'icon icon-usecase\'></i> 用例');
+                    .html('<i class=\'icon icon-usecase\'></i> 功能点');
                 $('<li></li>')
                     .append($link)
                     .appendTo($li.find("ul"));
@@ -79,7 +82,7 @@
                     .attr('href',url)
                     .attr('data-app', 'qa')
                     .attr('data-toggle', 'tooltip')
-                    .html('<i class=\'icon icon-list\'></i> 测试计划');
+                    .html('<i class=\'icon icon-list\'></i> 测试单');
                 $('<li></li>')
                     .append($link)
                     .appendTo($li.find("ul"));
@@ -90,7 +93,7 @@
                     .attr('href',url)
                     .attr('data-app', 'qa')
                     .attr('data-toggle', 'tooltip')
-                    .html('<i class=\'icon icon-bug\'></i> bug');
+                    .html('<i class=\'icon icon-bug\'></i> 缺陷');
                 $('<li></li>')
                     .append($link)
                     .appendTo($li.find("ul"));

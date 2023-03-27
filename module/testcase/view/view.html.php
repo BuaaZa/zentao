@@ -73,10 +73,10 @@
               <tr>
                 <th class='w-50px'><?php echo $lang->testcase->stepID;?></th>
                 <th class='w-p60 text-left'><?php echo $lang->testcase->stepDesc;?></th>
-                  <th class='text-left'><?php echo $lang->testcase->stepinput;?></th>
-                  <th class='text-left'><?php echo $lang->testcase->step_goal_action;?></th>
+                <th class='text-left'><?php echo $lang->testcase->stepinput;?></th>
+                <th class='text-left'><?php echo $lang->testcase->step_goal_action;?></th>
                 <th class='text-left'><?php echo $lang->testcase->stepExpect;?></th>
-                  <th class='text-left'><?php echo $lang->testcase->step_eval_criteria;?></th>
+                <th class='text-left'><?php echo $lang->testcase->step_eval_criteria;?></th>
               </tr>
             </thead>
             <?php

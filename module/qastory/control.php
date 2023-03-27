@@ -27,6 +27,13 @@ class qaStory extends control
         $this->loadModel('tree');
         $this->loadModel('user');
         $this->loadModel('action');
+
+        $products = array();
+        $objectID = 0;
+
+        $products = $this->product->getPairs();
+
+        $this->view->products = $this->products = $products;
     }
 
     /**
