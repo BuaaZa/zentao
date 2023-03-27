@@ -9,6 +9,9 @@
  * @version     $Id: zh-cn.php 4764 2013-05-05 04:07:04Z chencongzhi520@gmail.com $
  * @link        http://www.zentao.net
  */
+
+$lang->testcase->stepprecondition = '前提和约束';
+
 $lang->testcase->id               = '用例编号';
 $lang->testcase->product          = "所属{$lang->productCommon}";
 $lang->testcase->project          = '所属项目';

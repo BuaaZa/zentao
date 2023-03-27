@@ -72,7 +72,9 @@ class model extends baseModel
      * @return string
      */
 
-    public function buildMenu($moduleName, $methodName, $params, $data, $type = 'view', $icon = '', $target = '', $class = '', $onlyBody = false, $misc = '' , $title = '', $returnHtml = true)
+    public function buildMenu($moduleName, $methodName, $params, $data,
+                              $type = 'view', $icon = '', $target = '', $class = '',
+                              $onlyBody = false, $misc = '' , $title = '', $returnHtml = true)
     {
         $inQa = false;
         if($type == "qabrowse"){

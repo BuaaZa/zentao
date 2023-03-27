@@ -1,3 +1,8 @@
+#stepform > thead>tr>th
+{
+    text-align: center;
+}
+
 #searchStories .searchInput {position: relative;}
 #searchStories .searchInput .icon {position: absolute; display: block; left: 9px; top: 9px; z-index: 5; color: #808080;}
 #storySearchInput {padding-left: 30px;}
