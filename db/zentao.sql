@@ -396,6 +396,7 @@ CREATE TABLE IF NOT EXISTS `zt_case` (
   `lastRunner` varchar(30) NOT NULL,
   `lastRunDate` datetime NOT NULL,
   `lastRunResult` char(30) NOT NULL,
+  `data_sample_new` text NULL,
   PRIMARY KEY (`id`),
   KEY `product` (`product`),
   KEY `story` (`story`),
@@ -1690,6 +1691,7 @@ CREATE TABLE IF NOT EXISTS `zt_testresult` (
   `duration` float NOT NULL,
   `xml` text NOT NULL,
     `sample_data` text NULL,
+  `data_sample_result_new` text NULL,
   PRIMARY KEY  (`id`),
   KEY `case` (`case`),
   KEY `version` (`version`),
@@ -14332,3 +14334,5 @@ create index project
 
 alter table zt_task
     add workcodelines int unsigned default 0 null after fromIssue;
+
+alter table `zt_testtask` add `parent` int not null;

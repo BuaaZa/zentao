@@ -64,7 +64,7 @@ class testcaseModel extends model
             ->setIF($this->config->systemMode == 'new' and $this->app->tab == 'project', 'project', $this->session->project)
             ->setIF($this->app->tab == 'execution', 'execution', $this->session->execution)
             ->setIF($this->post->story != false, 'storyVersion', $this->loadModel('story')->getVersion((int)$this->post->story))
-            ->remove('steps,expects,files,labels,stepType,forceNotReview,inputs,goal_actions,eval_criterias,stepIoType')
+            ->remove('steps,expects,files,labels,stepType,forceNotReview,inputs,goal_actions,eval_criterias,stepIoType,datasample')
             ->setDefault('story', 0)
             ->cleanInt('story,product,branch,module')
             ->join('stage', ',')
@@ -80,6 +80,7 @@ class testcaseModel extends model
 
         /* Value of story may be showmore. */
         $case->story = (int)$case->story;
+        $case->data_sample_new = fixer::input('post')->get()->datasample;
         $this->dao->insert(TABLE_CASE)->data($case)->autoCheck()->batchCheck($this->config->testcase->create->requiredFields, 'notempty')->checkFlow()->exec();
         if(!$this->dao->isError())
         {
@@ -1784,7 +1785,7 @@ class testcaseModel extends model
         //$this->downfile('tmp_case/' . $caseID . '_1.docx', $caseID . '_1');
     }
     /**
-     * Export a case to word.
+     * Export a case to word in old way.
      *
      * @param  int    $caseID
      * @param  array  $sample_data_all
@@ -1792,7 +1793,7 @@ class testcaseModel extends model
      * @access public
      * @return \PhpOffice\PhpWord\PhpWord
      */
-    public function exportToWord($caseID, $sample_data_all, $PHPWord){
+    public function exportToWord_old($caseID, $sample_data_all, $PHPWord){
         $cellRowSpan = ['vMerge' => 'restart', 'valign' => 'center']; // 设置可跨行，且文字在居中
         $cellRowContinue = ['vMerge' => 'continue']; //使行连接，且无边框线
         $cellHCentered = ['align' => 'center']; //段落居中
@@ -1941,6 +1942,185 @@ class testcaseModel extends model
                     $SignTable4->addCell(2000)->addText($reference_result_steps[$i]->desc,$fontStyle,$cellHCentered);
                     for($j = 1;$j<=$sample_num;$j++){
                         $SignTable4->addCell($sample_width)->addText($sample_data_all[$j-1]['sample_result'][$reference_result_steps[$i]->id],$fontStyle,$cellHCentered);
+                    }
+                    $SignTable4->addCell($comment_width)->addText('',$fontStyle,$cellHCentered);
+                }
+            }
+        }else{
+            $section->addTitle("该用例无数据样本信息",2);
+        }
+        $section->addTextBreak(1);
+        return $PHPWord;
+    }
+
+    /**
+     * Export a case to word.
+     *
+     * @param  int    $caseID
+     * @param  array  $sample_data_all
+     * @param  \PhpOffice\PhpWord\PhpWord  $PHPWord
+     * @access public
+     * @return \PhpOffice\PhpWord\PhpWord
+     */
+    public function exportToWord($caseID, $data_sample_result, $PHPWord){
+        $cellRowSpan = ['vMerge' => 'restart', 'valign' => 'center']; // 设置可跨行，且文字在居中
+        $cellRowContinue = ['vMerge' => 'continue']; //使行连接，且无边框线
+        $cellHCentered = ['align' => 'center']; //段落居中
+        $cellLeft = ['align' => 'left'];//段落居左对齐
+        //定义样式数组
+        $styleTable = [
+            'borderSize'=>6,
+            'borderColor'=>'070707',
+            'cellMargin'=>80
+        ];
+        $SignTableStyle = [
+            'borderSize'=>6,
+            'borderColor'=>'070707',
+            'cellMargin'=>80,
+        ];
+        //定义第一行的样式
+        $styleFirstRow = [
+            'borderBottomSize'=>18,
+            'borderBottomColor'=>'070707',
+            'bgColor'=>'c3bcbb'
+        ];
+        //定义第一行的字体
+        $fontStyle = ['bold'=>true,'align'=>'center','size' => 10];
+
+        //定义单元格样式数组  居中
+        $styleCell = ['valign'=>'center'];
+        $styleCellBTLR = ['valign'=>'center'];
+        $sectionStyle = array('orientation' => 'landscape',
+            'marginLeft' => 2.54*567,
+            'marginRight' => 2.54*567,
+            'marginTop' => 3.18*567,
+            'marginBottom' => 3.18*567);
+        $section = $PHPWord->addSection($sectionStyle);
+        $section->addTitle("用例ID：" . $caseID,2);
+        $section->addTextBreak(1);
+        $PHPWord->addTableStyle('myOwnTableStyle',$styleTable,$styleFirstRow);
+        $SignTable1 = $section->addTable('myOwnTableStyle');
+        $SignTable1->addRow(250);
+        $SignTable1->addCell(2800)->addText('测试要点名称/标识',$fontStyle,$cellHCentered);
+        $SignTable1->addCell(4800)->addText('XXXX/XXXX-GN-XXXX（需求或者功能点）',$fontStyle,$cellHCentered);
+        $SignTable1->addCell(3800)->addText('测试用例名称/标识',$fontStyle,$cellHCentered);
+        $SignTable1->addCell(3800)->addText('XXXX/XXXX-GN-XXXX-XXXX',$fontStyle,$cellHCentered);
+        $SignTable2 = $section->addTable('myOwnTableStyle');
+        $SignTable2->addRow(250);
+        $SignTable2->addCell(1280)->addText('测试步骤',$fontStyle,$cellHCentered);
+        $SignTable2->addCell(2320)->addText('前提和约束',$fontStyle,$cellHCentered);
+        $SignTable2->addCell(2320)->addText('输入',$fontStyle,$cellHCentered);
+        $SignTable2->addCell(2320)->addText('目的和动作',$fontStyle,$cellHCentered);
+        $SignTable2->addCell(2320)->addText('预期结果',$fontStyle,$cellHCentered);
+        $SignTable2->addCell(2320)->addText('评价准则',$fontStyle,$cellHCentered);
+        $SignTable2->addCell(2320)->addText('实际结果',$fontStyle,$cellHCentered);
+        $case = $this->getById($caseID);
+        $steps = $case->steps;
+        $id = 0;
+        foreach($steps as $step){
+            if($step->type=='item')continue;
+            else $id++;
+            $SignTable2->addRow(250);
+            $SignTable2->addCell(1280)->addText($id,$fontStyle,$cellHCentered);
+            $SignTable2->addCell(2320)->addText($case->precondition,$fontStyle,$cellHCentered);
+            $SignTable2->addCell(2320)->addText($step->input,$fontStyle,$cellHCentered);
+            $SignTable2->addCell(2320)->addText($step->goal_action,$fontStyle,$cellHCentered);
+            $SignTable2->addCell(2320)->addText($step->expect,$fontStyle,$cellHCentered);
+            $SignTable2->addCell(2320)->addText($step->eval_criteria,$fontStyle,$cellHCentered);
+            $SignTable2->addCell(2320)->addText('',$fontStyle,$cellHCentered);
+        }
+        $section->addTextBreak(1);
+        $de_html_str = htmlspecialchars_decode($case->data_sample_new, ENT_QUOTES);
+        $data_sample = json_decode($de_html_str, true);
+
+        if(isset($data_sample) && count($data_sample)>1){
+
+            if(isset($data_sample_result) && count($data_sample_result)>1){
+                array_push($data_sample, $data_sample_result);
+            }else{
+                $data_sample_result = array();
+                for($i = 0; $i < count($data_sample[0]); $i += 1){
+                    array_push($data_sample_result, "");
+                }
+                $data_sample_result[0] = $data_sample[count($data_sample)-1][0] . '(实际结果)';
+                array_push($data_sample, $data_sample_result);
+            }
+
+            $SignTable3 = $section->addTable('myOwnTableStyle');
+            $SignTable3->addRow(250);
+            $SignTable3->addCell(2800)->addText('数据样本名称/标识',$fontStyle,$cellHCentered);
+            $SignTable3->addCell(4*3800-2800)->addText('XXXXX数据样本/XXXX-GN-MMMM-BBBB-D1',$fontStyle,$cellHCentered);
+            $SignTable4 = $section->addTable('myOwnTableStyle');
+            $SignTable4->addRow(250);
+            $SignTable4->addCell(2000)->addText('输入/输出项',$fontStyle,$cellHCentered);
+            $SignTable4->addCell(2000)->addText('输入/输出项名称',$fontStyle,$cellHCentered);
+
+            $row_num = count($data_sample);
+            $col_num = count($data_sample[0]);
+
+            $sample_num = $col_num-1;
+
+            $sample_width = (4*3800-4000)/($sample_num+1);
+            $comment_width = 4*3800-4000-$sample_width*$sample_num;
+            for($i = 1;$i <= $sample_num;$i++){
+                $SignTable4->addCell($sample_width)->addText('样本'.$i,$fontStyle,$cellHCentered);
+            }
+            $SignTable4->addCell($comment_width)->addText('备注',$fontStyle,$cellHCentered);
+
+            $reference_in_num = $row_num - 2;
+            $reference_out_num = 1;
+            $reference_result_num = 1;
+
+            if($reference_in_num > 0){
+                for($i = 1;$i <= $reference_in_num;$i++){
+                    $SignTable4->addRow(250);
+                    if($i==1){
+                        if($reference_in_num>1)
+                            $SignTable4->addCell(2000,$cellRowSpan)->addText('输入项',$fontStyle,$cellHCentered);
+                        else
+                            $SignTable4->addCell(2000)->addText('输入项',$fontStyle,$cellHCentered);
+                    }else{
+                        $SignTable4->addCell(2000, $cellRowContinue);
+                    }
+                    $SignTable4->addCell(2000)->addText($data_sample[$i-1][0],$fontStyle,$cellHCentered);
+                    for($j = 1;$j<=$sample_num;$j++){
+                        $SignTable4->addCell($sample_width)->addText($data_sample[$i-1][$j],$fontStyle,$cellHCentered);
+                    }
+                    $SignTable4->addCell($comment_width)->addText('',$fontStyle,$cellHCentered);
+                }
+            }
+            if($reference_out_num > 0){
+                for($i = 1;$i <= $reference_out_num;$i++){
+                    $SignTable4->addRow(250);
+                    if($i==1){
+                        if($reference_out_num>1)
+                            $SignTable4->addCell(2000,$cellRowSpan)->addText('预期输出',$fontStyle,$cellHCentered);
+                        else
+                            $SignTable4->addCell(2000)->addText('预期输出',$fontStyle,$cellHCentered);
+                    }else{
+                        $SignTable4->addCell(2000, $cellRowContinue);
+                    }
+                    $SignTable4->addCell(2000)->addText($data_sample[$reference_in_num][0],$fontStyle,$cellHCentered);
+                    for($j = 1;$j<=$sample_num;$j++){
+                        $SignTable4->addCell($sample_width)->addText($data_sample[$reference_in_num+$i-1][$j],$fontStyle,$cellHCentered);
+                    }
+                    $SignTable4->addCell($comment_width)->addText('',$fontStyle,$cellHCentered);
+                }
+            }
+            if($reference_result_num > 0){
+                for($i = 1;$i <= $reference_result_num;$i++){
+                    $SignTable4->addRow(250);
+                    if($i==1){
+                        if($reference_result_num>1)
+                            $SignTable4->addCell(2000,$cellRowSpan)->addText('实际结果',$fontStyle,$cellHCentered);
+                        else
+                            $SignTable4->addCell(2000)->addText('实际结果',$fontStyle,$cellHCentered);
+                    }else{
+                        $SignTable4->addCell(2000, $cellRowContinue);
+                    }
+                    $SignTable4->addCell(2000)->addText($data_sample[$row_num-1][0],$fontStyle,$cellHCentered);
+                    for($j = 1;$j<=$sample_num;$j++){
+                        $SignTable4->addCell($sample_width)->addText($data_sample[$row_num-1+$i-1][$j],$fontStyle,$cellHCentered);
                     }
                     $SignTable4->addCell($comment_width)->addText('',$fontStyle,$cellHCentered);
                 }

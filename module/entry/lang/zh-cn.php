@@ -46,15 +46,23 @@ $lang->entry->note->account = '授权应用账号';
 $lang->entry->freePasswdList[1] = '开启';
 $lang->entry->freePasswdList[0] = '关闭';
 
-$lang->entry->errmsg['PARAM_CODE_MISSING']    = '缺少code参数';
-$lang->entry->errmsg['PARAM_TOKEN_MISSING']   = '缺少token参数';
-$lang->entry->errmsg['SESSION_CODE_MISSING']  = '缺少session code';
-$lang->entry->errmsg['EMPTY_KEY']             = '应用未设置密钥';
-$lang->entry->errmsg['INVALID_TOKEN']         = '无效的token参数';
-$lang->entry->errmsg['SESSION_VERIFY_FAILED'] = 'session验证失败';
-$lang->entry->errmsg['IP_DENIED']             = '该IP被限制访问';
-$lang->entry->errmsg['ACCOUNT_UNBOUND']       = '未绑定用户';
-$lang->entry->errmsg['INVALID_ACCOUNT']       = '用户不存在';
-$lang->entry->errmsg['EMPTY_ENTRY']           = '应用不存在';
-$lang->entry->errmsg['CALLED_TIME']           = 'Token已失效';
-$lang->entry->errmsg['ERROR_TIMESTAMP']       = '错误的时间戳。';
+$lang->entry->errmsg['PARAM_CODE_MISSING']      = '缺少__code__参数';
+$lang->entry->errmsg['PARAM_ACCOUNT_MISSING']   = '缺少__account__参数';
+$lang->entry->errmsg['PARAM_KEY_MISSING']       = '缺少__key__参数';
+$lang->entry->errmsg['PARAM_TOKEN_MISSING']     = '缺少token参数';
+$lang->entry->errmsg['SESSION_CODE_MISSING']    = '缺少session code';
+$lang->entry->errmsg['EMPTY_KEY']               = '应用未设置密钥';
+$lang->entry->errmsg['INVALID_TOKEN']           = '无效的token参数';
+$lang->entry->errmsg['SESSION_VERIFY_FAILED']   = 'session验证失败';
+$lang->entry->errmsg['IP_DENIED']               = '该IP被限制访问';
+$lang->entry->errmsg['ACCOUNT_UNBOUND']         = '未绑定用户';
+$lang->entry->errmsg['INVALID_ACCOUNT']         = '用户不存在';
+$lang->entry->errmsg['EMPTY_ENTRY']             = '应用不存在';
+$lang->entry->errmsg['CALLED_TIME']             = 'Token已失效';
+$lang->entry->errmsg['ERROR_TIMESTAMP']         = '错误的时间戳。';
+$lang->entry->errmsg['ERROR_IP_DENIED']         = '该IP被限制访问';
+$lang->entry->errmsg['ERROR_PASSWORD_FREE']     = '该应用要求密钥';
+$lang->entry->errmsg['ERROR_KEY_ERROR']         = '应用不存在，__key__参数不匹配';
+$lang->entry->errmsg['EMPTY_CODE_ERROR']         = '应用不存在，__code__配置有误';
+
+

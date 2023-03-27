@@ -67,7 +67,7 @@ $lang->misc->repairFail  = "修复失败，请到该数据库的数据目录下�
 $lang->misc->connectFail = "连接数据库失败，错误：%s，<br/> 请检查mysql错误日志，排查错误。";
 $lang->misc->tableName   = "表名";
 $lang->misc->tableStatus = "状态";
-$lang->misc->novice      = "您可能初次使用禅道，是否进入新手模式？";
+$lang->misc->novice      = "您可能初次使用【协同研发平台】，是否进入新手模式？";
 $lang->misc->showAnnual  = '新增年度总结功能';
 $lang->misc->annualDesc  = '12.0版本后，新增年度总结功能，可以到『统计->年度总结』页面查看。 是否现在<a href="%s" target="_blank" id="showAnnual" class="btn btn-mini btn-primary">查看</a>';
 $lang->misc->remind      = '新功能提醒';
@@ -79,7 +79,7 @@ $lang->misc->expiringPluginTips  = '即将到期的插件为：%s。';
 $lang->misc->expiredTipsForAdmin = '当前系统中有%s个插件即将到期，为避免影响功能的正常使用，请尽快到系统后台插件管理中进行续费或卸载处理。';
 
 $lang->misc->noticeRepair = "<h5>普通用户请联系管理员进行修复</h5>
-    <h5>管理员请登录禅道所在的服务器，创建<span>%s</span>文件。</h5>
+    <h5>管理员请登录【协同研发平台】所在的服务器，创建<span>%s</span>文件。</h5>
     <p>注意：</p>
     <ol>
     <li>文件内容为空。</li>
@@ -98,9 +98,9 @@ $lang->misc->feature->visions        = "不同场景界面切换";
 $lang->misc->feature->nextStep       = '下一步';
 $lang->misc->feature->close          = '关闭';
 $lang->misc->feature->downloadFile   = '下载新版本功能介绍文档';
-$lang->misc->feature->tutorialDesc   = "<p>禅道15系列新增了多项功能，您可以通过“<strong>新手引导教程</strong>”快速了解禅道的基本使用方法。</p><p>通过鼠标经过 [<span style='color: #0c60e1'>头像-新手引导</span>]，点击新手引导，即可进入新手引导教程。</p>";
-$lang->misc->feature->themeDesc      = "<p>禅道15系列上线了全新的“青春蓝”主题，页面呈现更加美观，体验更加友好。</p><p>通过鼠标经过 [<span style='color: #0c60e1'>头像-主题-青春蓝</span>]，点击青春蓝，即可设置成功。</p>";
-$lang->misc->feature->visionsDesc    = "<p>从16.5开始增加了界面概念，用户可以在<span style='color:#0c60e1'>[研发综合界面]</span>中处理研发事务、在<span style='color:#0c60e1'>[迅捷界面]</span>处理日常办公事务。</p><p>在头像右侧即可查看当前所处界面，点击当前界面名称可查看和切换其他的界面。</p>";
+$lang->misc->feature->tutorialDesc   = "<p>【协同研发平台】新增了多项功能，您可以通过“<strong>新手引导教程</strong>”快速了解【协同研发平台】的基本使用方法。</p><p>通过鼠标经过 [<span style='color: #0c60e1'>头像-新手引导</span>]，点击新手引导，即可进入新手引导教程。</p>";
+$lang->misc->feature->themeDesc      = "<p>【协同研发平台】上线了全新的“青春蓝”主题，页面呈现更加美观，体验更加友好。</p><p>通过鼠标经过 [<span style='color: #0c60e1'>头像-主题-青春蓝</span>]，点击青春蓝，即可设置成功。</p>";
+$lang->misc->feature->visionsDesc    = "<p>【协同研发平台】增加了界面概念，用户可以在<span style='color:#0c60e1'>[研发综合界面]</span>中处理研发事务、在<span style='color:#0c60e1'>[迅捷界面]</span>处理日常办公事务。</p><p>在头像右侧即可查看当前所处界面，点击当前界面名称可查看和切换其他的界面。</p>";
 $lang->misc->feature->visionsImage   = 'theme/default/images/main/visions.png';
 
 $lang->misc->releaseDate['17.7']        = '2022-10-19';

@@ -11,6 +11,8 @@
  */
 class testcase extends control
 {
+    public treeModel $tree;
+
     /**
      * All products.
      *
@@ -402,6 +404,9 @@ class testcase extends control
                 //die($noticeStr);
             }
 
+            //获取数据样本表的填写内容
+            $datasample = json_decode($this->post->datasample, true);
+            //error_log(print_r($datasample, 1));
 
             $response['result'] = 'success';
 
@@ -442,6 +447,10 @@ class testcase extends control
             $useSession         = ($this->app->tab != 'qa' and $this->session->caseList and strpos($this->session->caseList, 'dynamic') === false);
             $locateLink         = $this->app->tab == 'project' ? $this->createLink('project', 'testcase', "projectID={$this->session->project}") : $this->createLink('testcase', 'browse', "productID={$this->post->product}&branch={$this->post->branch}&browseType=all&param=0&orderBy=id_desc");
             $response['locate'] = $useSession ? $this->session->caseList : $locateLink;
+            if($storyID and $this->app->tab == 'qa'){
+                $response['locate'] = $this->createLink('qastory', 'story', "productID=$productID")."#app=qa";
+                ChromePhp::log($response);
+            }
             return $this->send($response);
         }
         if(empty($this->products)) $this->locate($this->createLink('product', 'create'));
@@ -559,7 +568,7 @@ class testcase extends control
             $modules        = $this->tree->getAllChildID($modules);
         }
 
-        $stories = $this->story->getProductStoryPairsTestcase($productID, $branch, $modules, array_keys($storyStatus), 'id_desc', 50, 'null', 'story', false);
+        $stories = $this->story->getProductStoryPairsTestcase($productID, $branch, $modules, array_keys($storyStatus), 'id_desc', 50, 'null', 'story', true);
         if($this->app->tab != 'qa' and $this->app->tab != 'product')
         {
             $projectID = $this->app->tab == 'project' ? $this->session->project : $this->session->execution;
@@ -2341,13 +2350,13 @@ class testcase extends control
         $this->display();
     }
     /**
-     * Export case to word.
+     * Export case to word in old way
      *
      * @param  int    $caseID
      * @access public
      * @return void
      */
-    public function exportToWord($caseID, $version = -1)
+    public function exportToWord_old($caseID, $version = -1)
     {
         require_once 'vendor/autoload.php';
         if($this->server->request_method == 'POST')
@@ -2369,7 +2378,7 @@ class testcase extends control
             }
             $sample_data_all = array_reverse($sample_data_all);
             $PHPWord = new \PhpOffice\PhpWord\PhpWord();
-            $PHPWord = $this->testcase->exportToWord($caseID,$sample_data_all, $PHPWord);
+            $PHPWord = $this->testcase->exportToWord_old($caseID,$sample_data_all, $PHPWord);
             $saveTime = date("Ymd-H:i:m");
             $filename = $caseID . '_' . $saveTime . '.docx';
             //$filepath = 'tmp_case/' . $filename;
@@ -2379,6 +2388,103 @@ class testcase extends control
         }
 
         #if(dao::isError()) return $this->send(array('result' => 'fail', 'message' => dao::getError()));
+        $this->display();
+    }
+
+    /**
+     * Export case to word.
+     *
+     * @param  int    $caseID
+     * @access public
+     * @return void
+     */
+    public function exportToWord($caseID)
+    {
+        require_once 'vendor/autoload.php';
+        if($this->server->request_method == 'POST')
+        {
+            $results = $this->loadModel('testtask')->getResults(0, $caseID);
+            $data_sample_result = array();
+            $id = -1;
+            foreach($results as $result){
+                $tmp_result = $result->data_sample_result_new;
+                if(isset($tmp_result) && count($tmp_result)>1){
+                    if($result->id > $id){
+                        $id = $result->id;
+                        $data_sample_result = $tmp_result;
+                    }
+                }
+            }
+            $PHPWord = new \PhpOffice\PhpWord\PhpWord();
+            $PHPWord = $this->testcase->exportToWord($caseID,$data_sample_result, $PHPWord);
+            $saveTime = date("Ymd-H:i:m");
+            $filename = $caseID . '_' . $saveTime . '.docx';
+            //$filepath = 'tmp_case/' . $filename;
+            $PHPWord->save($filename, 'Word2007', true);
+            //$this->loadModel('file')->sendDownHeader($filename, 'docx', realpath('./'.$filename), 'file', false);
+            return $this->send(array('result' => 'success', 'closeModal' => true));
+        }
+
+        #if(dao::isError()) return $this->send(array('result' => 'fail', 'message' => dao::getError()));
+        $this->display();
+    }
+
+    /**
+     * batch export cases to word.
+     *
+     * @param  Array   $caseIDList
+     * @access public
+     * @return void
+     */
+    public function batchExportToWord($caseIDList = [])
+    {
+        require_once 'vendor/autoload.php';
+        if($this->server->request_method == 'POST')
+        {
+            $caseIDList = array_slice(explode(',', $this->post->caseIdList2),0,-1);
+
+            $PHPWord = new \PhpOffice\PhpWord\PhpWord();
+            foreach ($caseIDList as $caseID){
+                $caseID = (int)$caseID;
+                $results = $this->loadModel('testtask')->getResults(0, $caseID);
+                $data_sample_result = array();
+                $id = -1;
+                foreach($results as $result){
+                    $tmp_result = $result->data_sample_result_new;
+                    if(isset($tmp_result) && count($tmp_result)>1){
+                        if($result->id > $id){
+                            $id = $result->id;
+                            $data_sample_result = $tmp_result;
+                        }
+                    }
+                }
+
+                $PHPWord = $this->testcase->exportToWord($caseID,$data_sample_result, $PHPWord);
+            }
+            $saveTime = date("Ymd-H:i:m");
+            $filename = '用例集合' . '_' . $saveTime . '.docx';
+            //$filepath = 'tmp_case/' . $filename;
+            $PHPWord->save($filename, 'Word2007', true);
+            //$this->loadModel('file')->sendDownHeader($filename, 'docx', realpath('./'.$filename), 'file', false);
+            return $this->send(array('result' => 'success', 'closeModal' => true));
+        }
+
+        #if(dao::isError()) return $this->send(array('result' => 'fail', 'message' => dao::getError()));
+        $this->display();
+    }
+
+    /**
+     * fill in datasample table in front end
+     *
+     * @access public
+     * @return void
+     */
+    public function datasample()
+    {
+        if($this->server->request_method == 'POST')
+        {
+            return $this->send(array('result' => 'success','message' => $this->lang->saveSuccess, 'closeModal' => true));
+        }
         $this->display();
     }
     /**

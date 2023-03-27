@@ -727,13 +727,14 @@ class baseControl
      * Get the output of one module's one method as a string, thus in one module's method, can fetch other module's content.
      * If the module name is empty, then use the current module and method. If set, use the user defined module and method.
      *
-     * @param  string $moduleName module name.
-     * @param  string $methodName method name.
-     * @param  array  $params     params.
-     * @access  public
+     * @param string $moduleName module name.
+     * @param string $methodName method name.
+     * @param array|string $params params.
+     * @param string $appName
      * @return  string  the parsed html.
+     * @access  public
      */
-    public function fetch($moduleName = '', $methodName = '', $params = array(), $appName = '')
+    public function fetch(string $moduleName = '', string $methodName = '', array|string $params = array(), string $appName = ''): string
     {
         /**
          * 如果模块名为空，则调用该模块、该方法。
@@ -815,14 +816,14 @@ class baseControl
             {
                 /**
                  * 设置站点扩展。
-                 * every site has it's extension.
+                 * every site has its extension.
                  */
                 $siteActionExtFile = $actionExtPath['site'] . strtolower($methodName) . '.php';
                 $file2Included     = file_exists($siteActionExtFile) ? $siteActionExtFile : $file2Included;
             }
 
             /* If class name is my{$moduleName} then set classNameToFetch for include this file. */
-            if(strpos($file2Included, DS . 'ext' . DS) !== false and stripos(file_get_contents($file2Included), "class my{$moduleName} extends $moduleName") !== false) $classNameToFetch = "my{$moduleName}";
+            if(str_contains($file2Included, DS . 'ext' . DS) and stripos(file_get_contents($file2Included), "class my{$moduleName} extends $moduleName") !== false) $classNameToFetch = "my{$moduleName}";
         }
 
         /**
@@ -994,15 +995,19 @@ class baseControl
      * 创建一个模块方法的链接。
      * Create a link to one method of one module.
      *
-     * @param  string       $moduleName module name
-     * @param  string       $methodName method name
-     * @param  string|array $vars       the params passed, can be array(key=>value) or key1=value1&key2=value2
-     * @param  string       $viewType   the view type
-     * @param  string       $onlybody   remove header and footer or not in iframe
-     * @access  public
-     * @return  string the link string.
+     * @param string $moduleName module name
+     * @param string $methodName method name
+     * @param array|string $vars the params passed, can be array(key=>value) or key1=value1&key2=value2
+     * @param string $viewType the view type
+     * @param bool|string $onlybody remove header and footer or not in iframe
+     * @access public
+     * @return string the link string.
      */
-    public function createLink($moduleName, $methodName = 'index', $vars = array(), $viewType = '', $onlybody = false)
+    public function createLink(string       $moduleName,
+                               string       $methodName = 'index',
+                               array|string $vars = array(),
+                               string       $viewType = '',
+                               bool|string  $onlybody = false): string
     {
         if(empty($moduleName)) $moduleName = $this->moduleName;
         return helper::createLink($moduleName, $methodName, $vars, $viewType, $onlybody);
@@ -1027,11 +1032,11 @@ class baseControl
      * 重定向到另一个页面。
      * Location to another page.
      *
-     * @param  string $url the target url.
+     * @param string $url the target url.
      * @access  public
      * @return  void
      */
-    public function locate($url)
+    public function locate(string $url)
     {
         header("location: $url");
         exit;

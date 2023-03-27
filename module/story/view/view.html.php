@@ -12,7 +12,7 @@
 ?>
 <?php include '../../common/view/header.html.php';?>
 <?php include '../../common/view/kindeditor.html.php';?>
-<?php $browseLink = $app->session->storyList ? $app->session->storyList : $this->createLink('product', 'browse', "productID=$story->product");?>
+<?php $browseLink = $this->app->tab == 'qa' ? $this->createLink('qastory', 'story', "productID=$product->id").'#app=qa' : ($app->session->storyList ? $app->session->storyList : $this->createLink('product', 'browse', "productID=$story->product"));?>
 <?php js::set('sysurl', common::getSysUrl());?>
 <?php if(strpos($_SERVER["QUERY_STRING"], 'isNotice=1') === false):?>
 <div id="mainMenu" class="clearfix">
@@ -69,10 +69,10 @@
     ?>
     <?php 
     if($from != 'qa'){
-      common::printLink('story', 'create', "productID={$story->product}&branch={$story->branch}&moduleID={$story->module}&$otherParam&bugID=0&planID=0&todoID=0&extra=&type=$story->type", "<i class='icon icon-plus'></i> " . $lang->story->create, '', "class='btn btn-primary' data-app='$from'");
+      common::printLink('story', 'create', "productID={$story->product}&branch={$story->branch}&moduleID={$story->module}&$otherParam&bugID=0&planID=0&todoID=0&extra=&storyType=$story->type", "<i class='icon icon-plus'></i> " . $lang->story->create, '', "class='btn btn-primary' data-app='$from'");
     }
     else{
-      common::printLink('story', 'create', "productID={$story->product}&branch={$story->branch}&moduleID={$story->module}&$otherParam&bugID=0&planID=0&todoID=0&extra=&type=taskPoint&storyID=$story->id", "<i class='icon icon-plus'></i> " . $lang->story->createTaskPoint, '', "class='btn btn-primary' data-app='$from'"); 
+      common::printLink('story', 'create', "productID={$story->product}&branch={$story->branch}&moduleID={$story->module}&$otherParam&bugID=0&planID=0&todoID=0&extra=&storyType=taskPoint&storyID=$story->id", "<i class='icon icon-plus'></i> " . $lang->story->createTaskPoint, '', "class='btn btn-primary' data-app='$from'"); 
     }
     ?>
     <?php endif;?>

@@ -9,7 +9,7 @@ $lang->bug->deliberationfile = '审议附件';
 
 $lang->bug->deliberationdescription = '审议文字记录';
 
-$lang->bug->tostatus = 'Bug目标状态';
+$lang->bug->tostatus = '缺陷目标状态';
 //影响显示的语言
 
 $lang->bug->tostatuslist['active'] = '重新打开';

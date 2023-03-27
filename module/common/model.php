@@ -13,7 +13,13 @@ class commonModel extends model
 {
     static public $requestErrors = array();
 
-    public userModel $user;
+    public userModel $userModel;
+
+    public entryModel $entryModel;
+
+    public actionModel $actionModel;
+
+    public scoreModel $scoreModel;
 
     /**
      * The construc method, to do some auto things.
@@ -88,7 +94,7 @@ class commonModel extends model
         }
     }
 
-   /**
+    /**
      * Set the status of the program to which theproject is linked as Ongoing.
      *
      * @param  object   $project
@@ -130,10 +136,10 @@ class commonModel extends model
         if($project->status == 'wait')
         {
             $this->dao->update(TABLE_PROJECT)
-                 ->set('status')->eq('doing')
-                 ->beginIf(helper::isZeroDate($project->realBegan))->set('realBegan')->eq($today)->fi()
-                 ->where('id')->eq($projectID)
-                 ->exec();
+                ->set('status')->eq('doing')
+                ->beginIf(helper::isZeroDate($project->realBegan))->set('realBegan')->eq($today)->fi()
+                ->where('id')->eq($projectID)
+                ->exec();
 
             $this->loadModel('action')->create('project', $projectID, 'syncproject');
         }
@@ -158,10 +164,10 @@ class commonModel extends model
         if($execution->deleted == '0' and $execution->status == 'doing' and in_array($parentExecution->status, array('wait', 'closed')))
         {
             $this->dao->update(TABLE_EXECUTION)
-                 ->set('status')->eq('doing')
-                 ->beginIf(helper::isZeroDate($parentExecution->realBegan))->set('realBegan')->eq($today)->fi()
-                 ->where('id')->eq($parentExecutionID)
-                 ->exec();
+                ->set('status')->eq('doing')
+                ->beginIf(helper::isZeroDate($parentExecution->realBegan))->set('realBegan')->eq($today)->fi()
+                ->where('id')->eq($parentExecutionID)
+                ->exec();
             $this->loadModel('action')->create('execution', $parentExecutionID, 'syncexecutionbychild');
         }
 
@@ -312,7 +318,7 @@ class commonModel extends model
             $user->rights     = $this->loadModel('user')->authorize('guest');
             $user->groups     = array('group');
             $user->visions    = $this->config->vision;
-            if(!defined('IN_UPGRADE')) $user->view = $this->user->grantUserView($user->account, $user->rights['acls']);
+            if(!defined('IN_UPGRADE')) $user->view = $this->userModel->grantUserView($user->account, $user->rights['acls']);
             $this->session->set('user', $user);
             $this->app->user = $this->session->user;
         }
@@ -410,13 +416,14 @@ class commonModel extends model
      */
     public function deny($module, $method, $reload = true)
     {
+        $this->userModel = $this->loadModel('user');
         if($reload)
         {
             /* Get authorize again. */
             $user = $this->app->user;
-            $user->rights = $this->loadModel('user')->authorize($user->account);
-            $user->groups = $this->user->getGroups($user->account);
-            $user->admin  = strpos($this->app->company->admins, ",{$user->account},") !== false;
+            $user->rights = $this->userModel->authorize($user->account);
+            $user->groups = $this->userModel->getGroups($user->account);
+            $user->admin  = str_contains($this->app->company->admins, ",$user->account,");
             $this->session->set('user', $user);
             $this->app->user = $this->session->user;
             if(commonModel::hasPriv($module, $method)) return true;
@@ -431,7 +438,7 @@ class commonModel extends model
         $denyLink = helper::createLink('user', 'deny', $vars);
 
         /* Fix the bug of IE: use js locate, can't get the referer. */
-        if(strpos($this->server->http_user_agent, 'Trident') !== false)
+        if(str_contains($this->server->http_user_agent, 'Trident'))
         {
             echo "<a href='$denyLink' id='denylink' style='display:none'>deny</a>";
             echo "<script>document.getElementById('denylink').click();</script>";
@@ -1102,7 +1109,7 @@ class commonModel extends model
         $isTutorialMode = commonModel::isTutorialMode();
         $currentModule = $app->rawModule;
         $currentMethod = $app->rawMethod;
-
+       
         if($isTutorialMode and defined('WIZARD_MODULE')) $currentModule  = WIZARD_MODULE;
         if($isTutorialMode and defined('WIZARD_METHOD')) $currentMethod  = WIZARD_METHOD;
 
@@ -1132,7 +1139,11 @@ class commonModel extends model
             if($subModule and in_array($currentModule, $subModule) and strpos(",$exclude,", ",$currentModule-$currentMethod,") === false)
             {
                 $activeMenu = $menuItem->name;
-                $active = 'active';
+                if($currentModule == 'story' and  $activeMenu == 'testcase')
+                {
+                    $active ='';
+                }
+                else $active = 'active';
             }
 
             if($menuItem->link['module'] == 'execution' and $menuItem->link['method'] == 'more')
@@ -1218,7 +1229,17 @@ class commonModel extends model
                     }
                     else
                     {
-                        echo "<li class='$class $active' data-id='$menuItem->name'>" . html::a($link, $label, $target, $misc) . "</li>\n";
+                        echo "<li class='$class $active $currentModule' data-id='$menuItem->name'> " . html::a($link, $label, $target, $misc) . "</li>\n";
+                       
+                        /*for($i=0; $i<4; $i++)
+                        {
+                            echo "数组第".($i+1)."个元素是：";
+                            echo $array[$i];
+                            echo "<br>";
+                        }*/
+                    
+                    
+                        //echo "<ul class='$currentModule'>\n";
                     }
                 }
                 else
@@ -1226,6 +1247,7 @@ class commonModel extends model
                     echo "<li class='$class $active' data-id='$menuItem->name'>$menuItem->text</li>\n";
                 }
             }
+            
         }
 
         echo "</ul>\n";
@@ -2435,8 +2457,8 @@ EOD;
             );
             if(!empty($this->app->user->modifyPassword) and (!isset($beforeValidMethods[$module]) or !in_array($method, $beforeValidMethods[$module]))) return print(js::locate(helper::createLink('my', 'changepassword')));
             if($this->isOpenMethod($module, $method)) return true;
-            if(!$this->loadModel('user')->isLogon() and $this->server->php_auth_user) $this->user->identifyByPhpAuth();
-            if(!$this->loadModel('user')->isLogon() and $this->cookie->za) $this->user->identifyByCookie();
+            if(!$this->loadModel('user')->isLogon() and $this->server->php_auth_user) $this->userModel->identifyByPhpAuth();
+            if(!$this->loadModel('user')->isLogon() and $this->cookie->za) $this->userModel->identifyByCookie();
 
             if(isset($this->app->user))
             {
@@ -2493,18 +2515,18 @@ EOD;
         $module = $this->app->getModuleName();
         $method = $this->app->getMethodName();
         if($module == 'index' or
-           $module == 'tutorial' or
-           $module == 'install' or
-           $module == 'upgrade' or
-           $module == 'sso' or
-          ($module == 'user' and strpos('|login|deny|logout|reset|forgetpassword|resetpassword|', "|{$method}|") !== false) or
-          ($module == 'my' and strpos('|changepassword|preference|', "|{$method}|") !== false) or
-          ($module == 'file' and strpos('|read|download|uploadimages|ajaxwopifiles|', "|{$method}|") !== false) or
-          ($module == 'report' && $method == 'annualdata') or
-          ($module == 'misc' && $method == 'captcha') or
-          ($module == 'execution' and $method == 'printkanban') or
-          ($module == 'traincourse' and $method == 'ajaxuploadlargefile') or
-          ($module == 'traincourse' and $method == 'playvideo'))
+            $module == 'tutorial' or
+            $module == 'install' or
+            $module == 'upgrade' or
+            $module == 'sso' or
+            ($module == 'user' and strpos('|login|deny|logout|reset|forgetpassword|resetpassword|', "|{$method}|") !== false) or
+            ($module == 'my' and strpos('|changepassword|preference|', "|{$method}|") !== false) or
+            ($module == 'file' and strpos('|read|download|uploadimages|ajaxwopifiles|', "|{$method}|") !== false) or
+            ($module == 'report' && $method == 'annualdata') or
+            ($module == 'misc' && $method == 'captcha') or
+            ($module == 'execution' and $method == 'printkanban') or
+            ($module == 'traincourse' and $method == 'ajaxuploadlargefile') or
+            ($module == 'traincourse' and $method == 'playvideo'))
         {
             return;
         }
@@ -2681,7 +2703,7 @@ EOD;
         /* Limited execution. */
         $limitedExecution = false;
         if(!empty($module) and in_array($module, array('task', 'story')) and !empty($object->execution) or
-           !empty($module) and $module == 'execution' and !empty($object->id)
+            !empty($module) and $module == 'execution' and !empty($object->id)
         )
         {
             $objectID = '';
@@ -2882,8 +2904,8 @@ EOD;
 
         $user->last   = time();
         $user->rights = $this->loadModel('user')->authorize($user->account);
-        $user->groups = $this->user->getGroups($user->account);
-        $user->view   = $this->user->grantUserView($user->account, $user->rights['acls']);
+        $user->groups = $this->userModel->getGroups($user->account);
+        $user->view   = $this->userModel->grantUserView($user->account, $user->rights['acls']);
         $user->admin  = str_contains($this->app->company->admins, ",{$user->account},");
         $this->session->set('user', $user);
         $this->app->user = $user;
@@ -2897,6 +2919,11 @@ EOD;
      */
     public function checkEntry()
     {
+        $this->entryModel = $this->loadModel('entry');
+        $this->userModel = $this->loadModel('user');
+        $this->actionModel = $this->loadModel('action');
+        $this->scoreModel = $this->loadModel('score');
+
         /* if the API is new version, goto checkNewEntry. */
         if($this->app->version) return $this->checkNewEntry();
 
@@ -2905,14 +2932,21 @@ EOD;
         if($this->isOpenMethod($_GET[$this->config->moduleVar], $_GET[$this->config->methodVar])) return true;
 
         if(!$this->get->code)  $this->response('PARAM_CODE_MISSING');
-        if(!$this->get->token) $this->response('PARAM_TOKEN_MISSING');
+        if (!$this->get->key)
+            if(!$this->get->token) $this->response('PARAM_TOKEN_MISSING');
+        if (!$this->get->module)
+            $this->get->module = 'my';
+        if (!$this->get->method)
+            $this->get->method = 'index';
 
-        $entry = $this->loadModel('entry')->getByCode($this->get->code);
+        $entry = $this->entryModel->getByCode($this->get->code);
 
         if(!$entry)                         $this->response('EMPTY_ENTRY');
         if(!$entry->key)                    $this->response('EMPTY_KEY');
         if(!$this->checkIP($entry->ip))     $this->response('IP_DENIED');
-        if(!$this->checkEntryToken($entry)) $this->response('INVALID_TOKEN');
+        if (!$this->get->key)
+            if(!$this->checkEntryToken($entry))
+                $this->response('INVALID_TOKEN');
         if($entry->freePasswd == 0 and empty($entry->account)) $this->response('ACCOUNT_UNBOUND');
 
         $isFreepasswd = ($_GET['m'] == 'user' and strtolower($_GET['f']) == 'apilogin' and $_GET['account'] and $entry->freePasswd);
@@ -2923,22 +2957,22 @@ EOD;
 
         $this->loadModel('user');
         $user->last   = time();
-        $user->rights = $this->user->authorize($user->account);
-        $user->groups = $this->user->getGroups($user->account);
-        $user->view   = $this->user->grantUserView($user->account, $user->rights['acls']);
+        $user->rights = $this->userModel->authorize($user->account);
+        $user->groups = $this->userModel->getGroups($user->account);
+        $user->view   = $this->userModel->grantUserView($user->account, $user->rights['acls']);
         $user->admin  = str_contains($this->app->company->admins, ",{$user->account},");
         $this->session->set('user', $user);
         $this->app->user = $user;
 
         $this->dao->update(TABLE_USER)->set('last')->eq($user->last)->where('account')->eq($user->account)->exec();
-        $this->loadModel('action')->create('user', $user->id, 'login');
-        $this->loadModel('score')->create('user', 'login');
+        $this->actionModel->create('user', $user->id, 'login');
+        $this->scoreModel->create('user', 'login');
 
         if($isFreepasswd) die(js::locate($this->config->webRoot));
 
         $this->session->set('ENTRY_CODE', $this->get->code);
         $this->session->set('VALID_ENTRY', md5(md5($this->get->code) . helper::getRemoteIp()));
-        $this->loadModel('entry')->saveLog($entry->id, $this->server->request_uri);
+        $this->entryModel->saveLog($entry->id, $this->server->request_uri);
 
         /* Add for task #5384. */
         if($_SERVER['REQUEST_METHOD'] == 'POST' and empty($_POST))
@@ -2950,6 +2984,63 @@ EOD;
 
         unset($_GET['code']);
         unset($_GET['token']);
+    }
+
+    /**
+     * 免密调用API方案，使用account + key + code的方式实现
+     * 使用前需要先在后台添加应用，使用时需要在Query参数中配置参数
+     *
+     * @return void
+     */
+    public function checkPasswordFreeAPIEntry(): void
+    {
+        $this->entryModel = $this->loadModel('entry');
+        $this->userModel = $this->loadModel('user');
+        $this->actionModel = $this->loadModel('action');
+        $this->scoreModel = $this->loadModel('score');
+
+        if (!$_GET['__account__'])
+            $this->response('PARAM_ACCOUNT_MISSING');
+        if (!$_GET['__key__'])
+            $this->response('PARAM_KEY_MISSING');
+        if (!$_GET['__code__'])
+            $this->response('PARAM_CODE_MISSING');
+
+        // 检查应用配置entry合法性，要求
+        //
+        // 1. 密钥选项为免密
+        // 2. IP不受限制
+        // 3. key正确匹配
+        $entry = $this->entryModel->getByCode($_GET['__code__']);
+        if ($entry) {
+            if (!$this->checkIP($entry->ip))
+                $this->response('ERROR_IP_DENIED');
+            if ($entry->freePasswd == 0)
+                $this->response('ERROR_PASSWORD_FREE');
+            if ($entry->key != $_GET['__key__'])
+                $this->response('ERROR_KEY_ERROR');
+        } else {
+            $this->response('EMPTY_CODE_ERROR');
+        }
+
+        // 检查用户user合法性，和checkEntry功能一致
+        $user = $this->dao->findByAccount($_GET['__account__'])->from(TABLE_USER)->andWhere('deleted')->eq(0)->fetch();
+        if (!$user)
+            $this->response('INVALID_ACCOUNT');
+        $user->last = time();
+        $user->rights = $this->userModel->authorize($user->account);
+        $user->groups = $this->userModel->getGroups($user->account);
+        $user->view = $this->userModel->grantUserView($user->account, $user->rights['acls']);
+        $user->admin = str_contains($this->app->company->admins, ",$user->account,");
+        $this->session->set('user', $user);
+        $this->app->user = $user;
+
+        $this->dao->update(TABLE_USER)->set('last')->eq($user->last)->where('account')->eq($user->account)->exec();
+        $this->actionModel->create('user', $user->id, 'login');
+        $this->scoreModel->create('user', 'login');
+
+        // 保存日志记录
+        $this->entryModel->saveLog($entry->id, $this->server->request_uri);
     }
 
     /**
@@ -3186,8 +3277,8 @@ EOD;
         global $lang, $app;
         if(!extension_loaded('curl'))
         {
-             if($dataType == 'json') return print($lang->error->noCurlExt);
-             return json_encode(array('result' => 'fail', 'message' => $lang->error->noCurlExt));
+            if($dataType == 'json') return print($lang->error->noCurlExt);
+            return json_encode(array('result' => 'fail', 'message' => $lang->error->noCurlExt));
         }
 
         commonModel::$requestErrors = array();

@@ -35,8 +35,18 @@
 </div>
 <?php js::set('systemMode', $this->config->systemMode);?>
 <script>
+
+// 清空
+function emptySelect(id){
+    $(`#${id}`).replaceWith(`<select name='${id}' id='${id}' class='form-control'></select>`);
+    $(`#${id}_chosen`).remove();
+    $(`#${id}`).chosen();
+}
+
 function getFeedbackID(obj)
 {
+    emptySelect('taskProjects');
+    emptySelect('executions');
     var feedbackID = $(obj).attr("data-id");
     $('#feedbackID').val(feedbackID);
     if(systemMode == 'new')

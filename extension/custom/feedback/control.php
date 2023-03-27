@@ -167,7 +167,10 @@ class feedback extends control
      */
     public function create($productID, $branch = '', $extras = '')
     {
-        if (empty($this->products)) $this->locate($this->createLink('feedback', 'create'));
+        if (empty($this->products)) {
+            return $this->send(array('result' => 'success', 'message' => '没有产品可以反馈，如果有产品定义，请确认产品中【是否反馈】有没有选择【是】', 'closeModal' => true, 'locate' => inlink('admin','browseType=all')));
+            // $this->locate($this->createLink('product', 'create'));
+        }
         if (!empty($_POST)) {
             $response['result'] = 'success';
 
@@ -303,7 +306,7 @@ class feedback extends control
         $projects += $this->product->getProjectPairsByProduct($productID, $branch);
         if ($this->app->getViewType() == 'json') return print(json_encode($projects));
 
-        return print(html::select('project', $projects, $projectID, "class='form-control' onchange='loadProductExecutions({$productID}, this.value)'"));
+        return print(html::select('taskProjects', $projects, $projectID, "class='form-control' onchange='loadProductExecutions({$productID}, this.value)'"));
     }
 
     public function ajaxGetExecutions($productID, $projectID = 0, $branch = 0, $number = '', $executionID = 0, $from = '')
@@ -319,7 +322,7 @@ class feedback extends control
 
         if ($number === '') {
             $event = ''; //$from == 'bugToTask' ? '' : " onchange='loadExecutionRelated(this.value)'";
-            return print(html::select('execution', array('' => '') + $executions, $executionID, "class='form-control' $event"));
+            return print(html::select('executions', array('' => '') + $executions, $executionID, "class='form-control' $event"));
         } else {
             $executions     = empty($executions) ? array('' => '') : $executions;
             $executionsName = $from == 'showImport' ? "execution[$number]" : "executions[$number]";
