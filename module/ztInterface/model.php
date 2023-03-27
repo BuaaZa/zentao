@@ -64,7 +64,7 @@ class ztinterfaceModel extends model
 
     public function printCell($col, $interface, $users, $branches, $modulePairs = array(), $browseType = '', $mode = 'datatable')
     {
-        $interfaceLink   = helper::createLink('interface', 'view', "interfaceID=$interface->id");
+        $interfaceLink   = helper::createLink('interface', 'sendMessage', "interfaceID=$interface->id");
         $account    = $this->app->user->account;
         $id = $col->id;
         if($col->show)
@@ -152,7 +152,7 @@ class ztinterfaceModel extends model
             }
             else
                 $table .= "<tr id='$newPath' class='$path::child'>";
-            
+            //Name
             $table .= "<td>";
             $indent = $level*20 + ($obj["content"]?0:8);
             $table .= "<div style=\"text-indent:".$indent."px\">";
@@ -166,22 +166,27 @@ class ztinterfaceModel extends model
             $table .= "</div>";
             $table .= "</td>";
 
+            //type
             $table .= "<td style=\"text-align: center;\">{$obj["type"]}</td>";
 
+            //notNull
             $table .= "<td style=\"text-align: center;\"><input tabindex='-1' type=\"checkbox\" class='notNull' disabled";
             if ($obj["notNull"]) {
                 $table .= " checked";
             }
             $table .= "></td>";
             
+            //mock
             if($obj['type'] !== "object"){
                 $table .= "<td>" . html::input($newPath.':mock', $obj['mock'], ' class="form-control input-mock" list="'.$obj['type'].'List" placeholder="Mock"');
                 $table .= "<span id=\"error-404\" style=\"font-size:4px;color:red;display:none;\">Mock函数不存在</span>";
+                $table .= "<span id=\"error-syntax\" style=\"font-size:4px;color:red;display:none;\">Mock格式不合法</span>";
                 $table .= "</td>";
             }else{
                 $table .= "<td>" . html::input($newPath.':mock', $obj['mock'], 'class="form-control" disabled') . "</td>";
             }
             
+            //value
             $placeholder = "placeholder=".($obj['example'] ? "示例:" . $obj['example'] : "键名:".$obj['name']);
             $table .= "<td>";
             if($obj['type'] == 'object' or $inArray){
@@ -206,6 +211,50 @@ class ztinterfaceModel extends model
             }
         }
         return $table;
+    }
+
+    public function generateMockList(){
+        $data = '';
+        foreach($this->lang->ztinterface->charType as $type){
+            $name = $type."List";
+            $mock = $type."Mock";
+            $data.="<datalist id='$name'>";
+            foreach($this->lang->ztinterface->$mock as $mockFunc){
+                $data.='<option value="'.$mockFunc['example'].'" label="'.$mockFunc['description'].'">';
+            }
+            $data.="</datalist>";
+        }
+        return $data;
+    }
+
+    public function mockStringBykeyword($name){
+        $faker = Faker\Factory::create();
+        $regex = '/(' . implode('|', $this->lang->ztinterface->fakerOptions) . ')/i';
+        $genStr = '';
+        if(preg_match($regex, $name, $matches)) {
+            $keyword = $matches[1];
+            if($keyword === 'ip')
+                $keyword = 'ipv4';
+            if($keyword === 'color')
+                $keyword = 'hexcolor';
+            if($keyword){
+                try{
+                    $genStr = $faker->$keyword;
+                }catch (Exception $e) {
+                    $genStr = '';
+                }
+            }
+        }
+        return $genStr;
+    }
+
+    public function parseSymbol($arg){
+        preg_match_all('/@[\w-]+/', $arg, $matches);
+        $matches=array_unique($matches);
+        $str = '';
+        foreach($matches as $m){
+            
+        }
     }
 
 

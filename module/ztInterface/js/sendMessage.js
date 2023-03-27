@@ -14,6 +14,10 @@ $('.input-mock').on('input', function() {
   if ($span.css('display') === 'inline') {
     $span.css('display', 'none');
   }
+  $span = $(this).siblings('span#error-syntax');
+  if ($span.css('display') === 'inline') {
+    $span.css('display', 'none');
+  }
 });
 
 $('.refresh-button').click(function() {
@@ -21,55 +25,57 @@ $('.refresh-button').click(function() {
   while(parentRow.nodeName!=="TR"){
     parentRow = parentRow.parentNode;
   }
-  var type = parentRow.querySelector('td:nth-child(2)').innerText;
-  type = type.toLowerCase();
-  var mock = parentRow.querySelector('td:nth-child(4) input').value;
-  var valueInput = parentRow.querySelector('td:nth-child(5) input');
+  const rowData = parseRow(parentRow);
+  if(!rowData){
+    console.log('fail to parse Row');
+    return;
+  } 
+  var postData = getPostData(rowData);
   
-  if(!mock){
-    var link = createLink('ztinterface', 'mockBase', 'type='+type);
-    $.get(link, function(data) {
-      
+  if(!rowData['funcName']){
+    if(rowData['mock'].value.trim()){
+      var $span = $(rowData['mock']).siblings('span#error-404');
+      if ($span.css('display') === 'inline') {
+        $span.css('display', 'none');
+      }
+      $span = $(rowData['mock']).siblings('span#error-syntax');
+      if ($span.css('display') === 'none') {
+        $span.css('display', 'inline');
+      }
+    }
+
+    var link = createLink('ztinterface', 'mockBase', '');
+    $.post(link, postData, function(response) {
+      if(response)
+        rowData['value'].value = response;
     });
     return;
   }
-
-  mock = cnToEn(mock);
-  var funcName = mock.match(/^@(\w+)\(/)[1];
-  const paramStr = mock.replace(/^@\w+\(|\)$/g, '');
-  const params = paramStr.match(/("[^"]*"|'[^']*'|\[[^\]]*\]|[^,]+)+/g);
-  var jsonData = JSON.stringify(params);
-  var postData = {params: jsonData,type: type};
     
-  if(type == 'array'){
+  if(rowData['type'] == 'array'){
     var itemRow = parentRow.nextElementSibling;
-    var itemType = itemRow.querySelector('td:nth-child(2)').innerText;
-    var itemMock = itemRow.querySelector('td:nth-child(4) input').value;
-    
-    itemMock = cnToEn(itemMock);
-    var itemFunc = itemMock.match(/^@(\w+)\(/)[1];
-    const itemStr = itemMock.replace(/^@\w+\(|\)$/g, '');
-    const itemParams = itemStr.match(/("[^"]*"|'[^']*'|\[[^\]]*\]|[^,]+)+/g);
-    var itemJson = JSON.stringify(itemParams);
-
-    postData['itemFunc'] = itemFunc;
-    postData['itemType'] = itemType;
-    postData['itemParams'] = itemJson;
+    var itemRowData = parseRow(itemRow);
+    postData['item'] = getPostData(itemRowData);
   }
+
+  console.log(postData);
   
-  funcName = funcName.toLowerCase().charAt(0).toUpperCase() + funcName.toLowerCase().substring(1);
-  var link = createLink('ztinterface', 'mock'+funcName, '');
+  var link = createLink('ztinterface', 'mock'+rowData['funcName'], '');
   $.post(link,postData)
   .done(function(response) {
-    // 成功获取到响应数据
-    console.log(response);
+    if(response)
+        rowData['value'].value = response;
   })
   .fail(function() {
     console.log("fail");
-    var mockTd = parentRow.querySelector('td:nth-child(4) input');
-    var $span =  $(mockTd).find('#error-404');
-    if ($span.css('display') === 'none') {
-      $span.css('display', 'inline');
+    var mockTd = parentRow.querySelector('td:nth-child(4)');
+    var $span404 =  $(mockTd).find('#error-404');
+    if ($span404.css('display') === 'none') {
+      $span404.css('display', 'inline');
+    }
+    var $spanSyntax =  $(mockTd).find('#error-syntax');
+    if ($spanSyntax.css('display') === 'inline') {
+      $spanSyntax.css('display', 'none');
     }
   });
 });
@@ -91,4 +97,50 @@ function cnToEn(str) {
     if (match === '\u2018' || match === '\u2019') return "'";
   });
   return str;
+}
+
+function parseRow(parentRow){
+  if(parentRow.nodeName!=="TR"){
+    return null;
+  }
+  var name = parentRow.querySelector('td:nth-child(1)').querySelector('b').innerText;
+  var type = parentRow.querySelector('td:nth-child(2)').innerText;
+  var notNull = parentRow.querySelector('td:nth-child(3) input').checked;
+  var mockInput = parentRow.querySelector('td:nth-child(4) input');
+  var mock = mockInput.value.trim();
+  var valueInput = parentRow.querySelector('td:nth-child(5) input');
+  type = type.toLowerCase();
+
+  mock = cnToEn(mock);
+  var funcName = '';
+  var jsonData = '';
+
+  var match = mock.match(/^\$(\w+)\(.*\)$/);
+  if(match)
+    funcName = match[1];
+
+  if(funcName){
+    const paramStr = mock.replace(/^\$\w+\(|\)$/g, '');
+    const params = paramStr.match(/("[^"]*"|'[^']*'|\[[^\]]*\]|[^,]+)+/g);
+    jsonData = JSON.stringify(params);
+  }else{
+    match = mock.match(/^\$(\w+)$/);
+    if(match)
+    funcName = match[1];
+  }
+
+  funcName = funcName.toLowerCase().charAt(0).toUpperCase() + funcName.toLowerCase().substring(1);
+  var data = {name:name,type:type,notNull:notNull,mock:mockInput,funcName:funcName,params:jsonData,value:valueInput};
+  
+  return data;
+}
+
+function getPostData(rowData){
+  var postData = {};
+  postData['name'] = rowData['name'];
+  postData['type'] = rowData['type'];
+  postData['notNull'] = rowData['notNull'];
+  postData['funcName'] = rowData['funcName'];
+  postData['params'] = rowData['params'];
+  return postData;
 }

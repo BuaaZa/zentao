@@ -298,6 +298,52 @@ $lang->ztinterface->mock = 'MOCK';
 $lang->ztinterface->noHeaders = '请求头内未设置可配置字段';
 $lang->ztinterface->body = '请求体';
 $lang->ztinterface->noBody = '请求体内未设置可配置字段';
+$lang->ztinterface->fakerOptions = array(
+    'userName',
+    'streetName',
+    'firstName',
+    'lastName',
+    'sentence',
+    'paragraph',
+    'word',
+    'streetAddress',
+    'address',
+    'country',
+    'city',
+    'state',
+    'company',
+    'email',
+    'password',
+    'url',
+    'macAddress',
+    'ipv4',
+    'ipv6',
+    'ip',
+    'userAgent',
+    'color',
+    'dateTime',
+    'date',
+    'time',
+    'monthName',
+    'month',
+    'year',
+    'timezone',
+    'name'    
+);
+
+$lang->ztinterface->charType = array("string","integer");
+$lang->ztinterface->stringMock = array();
+$lang->ztinterface->stringMock[0]['example'] = " ";
+$lang->ztinterface->stringMock[0]['description'] = "Mock为空时,将尝试根据参数名含义生成,失败则返回随机字符串";
+$lang->ztinterface->stringMock[1]['example'] = "\$String";
+$lang->ztinterface->stringMock[1]['description'] = "获取随机字符串,以大小写字母,数字,下划线组成";
+$lang->ztinterface->stringMock[2]['example'] = "\$String(@upper)";
+$lang->ztinterface->stringMock[2]['description'] = "指定可用字符(@upper:大写字母, @lower: 小写字母)";
+$lang->ztinterface->stringMock[3]['example'] = "\$String([@digit,@a-d,@under])";
+$lang->ztinterface->stringMock[3]['description'] = "指定多种可用字符(@digit: 数字, @a-d: 等价于abcd, @under: 下划线)";
+$lang->ztinterface->stringMock[4]['example'] = "\$String(@all,3,10)";
+$lang->ztinterface->stringMock[4]['description'] = "@all: 全部字符; 3: 最小长度, 10: 最大长度";
+$lang->ztinterface->integerMock = array();
 
 
 $lang->ztinterface->methodColor = array(

@@ -135,10 +135,10 @@
               <table class='table table-form table-bordered'>
                 <thead>
                   <tr>
-                    <th width="35%"><?php echo $lang->ztinterface->key?></th>
+                    <th width="30%"><?php echo $lang->ztinterface->key?></th>
                       <th width="70px"><?php echo $lang->ztinterface->type;?></th>
                       <th width="50px"><?php echo $lang->ztinterface->notNull;?></th>
-                      <th width="15%"><?php echo $lang->ztinterface->mock;?></th>
+                      <th width="25%"><?php echo $lang->ztinterface->mock;?></th>
                       <th><?php echo $lang->ztinterface->value;?></th>
                       <?php ChromePhp::log($data);?>
                   </tr>
@@ -153,6 +153,7 @@
                   <?php endif;?>
                 </tbody>
               </table>
+              <?php echo $mocklist;?>
             </div>
           </div>
           <div class='text-center detail form-actions'>
@@ -160,10 +161,7 @@
           </div>
         </div>
       </div>
-      <div class='side-col innerbtn'>
-        
-      </div>
-        <div class='side-col col-3'>
+        <div class='side-col col-4'>
         <div class='cell'>
           <div class='detail'>
             <div class='detail-title'><?php echo $lang->ztinterface->messageView;?></div>

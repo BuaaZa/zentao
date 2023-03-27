@@ -9,6 +9,7 @@
  * @version     $Id: control.php 5112 2013-07-12 02:51:33Z chencongzhi520@gmail.com $
  * @link        http://www.zentao.net
  */
+require_once __DIR__ . '/../../vendor/autoload.php';
 class ztinterface extends control
 {
     /**
@@ -149,7 +150,6 @@ class ztinterface extends control
         }
         $this->session->set('interfaceList', $this->createLink('ztinterface', 'browse',"productID=$interface->product"), $this->app->tab);
 
-
         $productID = $interface->product;
         $product   = $this->product->getByID($productID);
 
@@ -165,6 +165,7 @@ class ztinterface extends control
         $this->view->position[] = $this->lang->ztinterface->common;
         $this->view->position[] = $this->lang->ztinterface->view;
         $this->view->interface  = $interface;
+        $this->view->mocklist = $this->ztinterface->generateMockList(); 
 
         $this->display();
     }
@@ -198,6 +199,58 @@ class ztinterface extends control
 
             $browseList = $this->createLink('ztinterface', 'browse', "productID=$interface->product");
             return print(js::locate($browseList, 'parent'));
+        }
+    }
+
+    public function mockBase(){
+        if(!empty($_POST)){
+            if($_POST["type"] == 'string'){
+                return $this->mockString();
+            }
+        }
+    }
+
+    public function mockString($data = ''){
+        $genStr = '';
+        if(!$data and !empty($_POST)){
+            $data = array();
+            foreach($_POST as $key=>$value){
+                $data[$key] = $value;
+            }
+        }
+
+        if($data['funcName']!='String'){
+            if($data['notNull'] == 'false'){
+                if(rand(0,5) == 0){
+                    echo "null";
+                    return;
+                }
+            }
+            $genStr =  $this->ztinterface->mockStringBykeyword($data['name']);
+            if($genStr){
+                echo $genStr;
+                return;
+            }
+        }
+
+        $args = json_decode($data["params"]);
+        ChromePhp::log($args);
+        $min = 1;
+        $max = 20;
+        if(isset($args[1]) and is_numeric($args[1]) and (int)$args[1]>0){
+            $min = (int)$args[1];
+        }
+        if(isset($args[2]) and is_numeric($args[2]) and (int)$args[2]>0){
+            $max = (int)$args[2];
+        }
+        if($min>$max){
+            $temp = $min;
+            $min = $max;
+            $max = $temp;
+        }
+        $pre = '^[A-Za-z1-9_]';
+        if(isset($args[0])){
+            $chars = $this->ztinterface->parseSymbol($args[0]);
         }
     }
 
