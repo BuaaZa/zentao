@@ -412,16 +412,16 @@ class testcaseModel extends model
     /**
      * Get case info by ID.
      *
-     * @param  int    $caseID
-     * @param  int    $version
+     * @param int $caseID
+     * @param int $version
      * @access public
      * @return object|bool
      */
-    public function getById($caseID, $version = 0)
+    public function getById(int $caseID, int $version = 0): object|bool
     {
         $case = $this->dao->findById($caseID)->from(TABLE_CASE)->fetch();
         if(!$case) return false;
-        foreach($case as $key => $value) if(strpos($key, 'Date') !== false and !(int)substr($value, 0, 4)) $case->$key = '';
+        foreach($case as $key => $value) if(str_contains($key, 'Date') and !(int)substr($value, 0, 4)) $case->$key = '';
 
         /* Get project and execution. */
         if($this->app->tab == 'project')
@@ -464,9 +464,13 @@ class testcaseModel extends model
         if($case->linkCase or $case->fromCaseID) $case->linkCaseTitles = $this->dao->select('id,title')->from(TABLE_CASE)->where('id')->in($case->linkCase)->orWhere('id')->eq($case->fromCaseID)->fetchPairs();
         if($version == 0) $version = $case->version;
         $case->files = $this->loadModel('file')->getByObject('testcase', $caseID);
-        $case->currentVersion = $version ? $version : $case->version;
+        $case->currentVersion = $version ?: $case->version;
 
-        $case->steps = $this->dao->select('*')->from(TABLE_CASESTEP)->where('`case`')->eq($caseID)->andWhere('version')->eq($version)->orderBy('id')->fetchAll('id');
+        $case->steps = $this->dao->select('*')
+            ->from(TABLE_CASESTEP)
+            ->where('`case`')->eq($caseID)
+            ->andWhere('version')->eq($version)
+            ->orderBy('id')->fetchAll('id');
 
         foreach($case->steps as $key => $step)
         {

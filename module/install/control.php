@@ -181,14 +181,13 @@ class install extends control
                 $this->view->config        = $this->config;
                 $this->view->title         = $this->lang->install->saveConfig;
                 $this->view->customSession = $customSession;
-                $this->display();
             }
             else
             {
                 $this->view->title = $this->lang->install->saveConfig;
                 $this->view->error = $return->error;
-                $this->display();
             }
+            $this->display();
         }
         else
         {

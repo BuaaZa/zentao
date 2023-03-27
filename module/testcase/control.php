@@ -28,6 +28,8 @@ class testcase extends control
      * @access public
      */
     public $projectID = 0;
+    public testcaseModel $testcase;
+    public storyModel $story;
 
     /**
      * Construct function, load product, tree, user auto.
@@ -778,19 +780,23 @@ class testcase extends control
     /**
      * View a test case.
      *
-     * @param  int    $caseID
-     * @param  int    $version
-     * @param  string $from
-     * @access public
+     * @param int $caseID
+     * @param int $version
+     * @param string $from
+     * @param int $taskID
      * @return void
+     * @access public
      */
-    public function view($caseID, $version = 0, $from = 'testcase', $taskID = 0)
+    public function view(int    $caseID,
+                         int    $version = 0,
+                         string $from = 'testcase',
+                         int    $taskID = 0)
     {
+        $this->story = $this->loadModel('story');
         $this->session->set('bugList', $this->app->getURI(true), $this->app->tab);
 
-        $caseID = (int)$caseID;
         $case   = $this->testcase->getById($caseID, $version);
-        $case   = $this->loadModel('story')->checkNeedConfirm($case);
+        $case   = $this->story->checkNeedConfirm($case);
         if(!$case)
         {
             if(defined('RUN_MODE') && RUN_MODE == 'api') return $this->send(array('status' => 'fail', 'message' => '404 Not found'));
