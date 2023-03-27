@@ -12,11 +12,19 @@
             <td><b>输入-输出项名称</b></td>
             <td><b>样本1</b></td>
         </tr>
+        <tr>
+            <td>
+                <textarea rows='1' class='form-control autosize step-expects' name='datasample[0][0]' placeholder='预期输出'></textarea>
+            </td>
+            <td>
+                <textarea rows='1' class='form-control autosize step-expects' name='datasample[0][1]' ></textarea>
+            </td>
+        </tr>
     </table>
         <br><br>
-        <button class="btn" type="button"  onclick="addRow();"> 添加输入输出项</button>
-        <button class="btn" type="button"  onclick="addCol();"> 添加测试样本</button>
-        <button disabled="disabled" id='submit' class="btn btn-wide btn-primary " type="submit"  onclick="save_in_cookie();"> 保存</button>
+        <button class="btn" type="button"  onclick="addRow();">添加输入项</button>
+        <button class="btn" type="button"  onclick="addCol();">添加测试样本</button>
+        <button id='submit' class="btn btn-wide btn-primary " type="submit"  onclick="save_in_cookie();">保存</button>
         <br><br>
         </form>
     <!-- <input type="button" value="保存" onclick="save_in_cookie();"/> -->
@@ -32,24 +40,33 @@
         }
     </style>
     <script type="text/javascript">
-        var rowCount = 0;
+        var rowCount = 1;
         var colCount = 1;
         function addRow(){
-            $('#submit').attr("disabled",false);
+            //$('#submit').attr("disabled",false);
+            var testtable = $("#testTable");
+            var lastRow = testtable.find("tr:last");
+            var lastRowTexts = lastRow.find("textarea");
+            lastRowTexts.each(function(){
+                var indices = $(this).attr('name').match(/\d+/g);
+                var row = parseInt(indices[0]); // get row index as number
+                var col = parseInt(indices[1]); // get column index as number
+                row += 1;
+                $(this).attr('name','datasample['+row+']['+col+']');
+            });
+
             rowCount++;
-            var rowTemplate_1 = "<tr><td><textarea rows='1' class='form-control autosize step-expects' name='datasample["+(rowCount-1)+"][0]' placeholder=''></textarea></td>";
+            var rowTemplate_1 = "<tr><td><textarea rows='1' class='form-control autosize step-expects' name='datasample["+(rowCount-2)+"][0]' placeholder='输入项'></textarea></td>";
             var rowTemplate_2 = '';
             for(i = 1; i<=colCount; i++){
-                var tmp_template = "<td><textarea rows='1' class='form-control autosize step-expects' name='datasample["+(rowCount-1)+"]["+i+"]'></textarea></td>";
+                var tmp_template = "<td><textarea rows='1' class='form-control autosize step-expects' name='datasample["+(rowCount-2)+"]["+i+"]'></textarea></td>";
                 rowTemplate_2 += tmp_template;
             }
             var rowTemplate_3 = '</tr>';
             var rowTemplate = rowTemplate_1 + rowTemplate_2 + rowTemplate_3;
 
-            var testtable = $("#testTable");
-            var lastRow = testtable.find("tr:last");
             if (lastRow.length) {
-                lastRow.after(rowTemplate);
+                lastRow.before(rowTemplate);
             } else {
                 testtable.append(rowTemplate);
             }
@@ -112,7 +129,7 @@
             }
             var matrixString = JSON.stringify(matrix); // convert array to string using JSON.stringify()
             //document.cookie = "datasam="+matrixString;
-            $.cookie("datasample", matrixString);
+            $.cookie("datasample["+$.cookie('curStepID')+"]", matrixString);
             //alert($.cookie('datasample'));
             //alert(matrixString);
         }
