@@ -38,11 +38,11 @@ $startTime = getTime();
 $app = new router("pms", dirname(__FILE__, 2));
 
 /* installed or not. */
-if(!isset($config->installed) or !$config->installed) die(header('location: install.php'));
+if(!isset($config->installed) or !$config->installed) die(header('location: _install.php'));
 
 /* Check for need upgrade. */
-$config->installedVersion = $app->getInstalledVersion();
-if($config->version != $config->installedVersion) die(header('location: upgrade.php'));
+//$config->installedVersion = $app->getInstalledVersion();
+//if($config->version != $config->installedVersion) die(header('location: upgrade.php'));
 
 /* Run the app. */
 $common = $app->loadCommon();
