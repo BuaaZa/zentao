@@ -239,6 +239,7 @@ class block extends control
 
         if($this->user->isLogon()) $this->session->set('blockModule', $module);
         $blocks = $this->block->getBlockList($module, $type);
+//        ChromePhp::log($blocks);
         $vision = $this->config->vision;
 
         $section = 'common';
@@ -324,7 +325,9 @@ class block extends control
         }
 
         $this->view->longBlocks  = $longBlocks;
+//        ChromePhp::log($longBlocks);
         $this->view->shortBlocks = $shortBlocks;
+//        ChromePhp::log($shortBlocks);
         $this->view->module      = $module;
 
         if($this->app->getViewType() == 'json') return print(json_encode($blocks));
@@ -714,6 +717,7 @@ class block extends control
                 ->fetchAll();
         }
         $this->view->cases = $cases;
+//        ChromePhp::log($cases);
     }
 
     /**
