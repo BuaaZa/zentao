@@ -22,11 +22,6 @@ BEGIN
         alter table `zt_casestep` add `eval_criteria` text not null;
     END IF;
 
-    IF NOT EXISTS(SELECT * FROM information_schema.COLUMNS
-                      WHERE COLUMN_NAME = 'is_out' AND TABLE_NAME = 'zt_casestep')
-    THEN
-        alter table `zt_casestep` add `is_out` enum('0','1') NOT NULL default '0';
-    END IF;
 END//
 
 DELIMITER ';'
