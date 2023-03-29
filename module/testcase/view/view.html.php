@@ -10,181 +10,201 @@
  * @link        http://www.zentao.net
  */
 ?>
-<?php include '../../common/view/header.html.php';?>
-<?php include '../../common/view/kindeditor.html.php';?>
-<?php $browseLink  = $app->session->caseList ? $app->session->caseList : $this->createLink('testcase', 'browse', "productID=$case->product");?>
-<?php js::set('sysurl', common::getSysUrl());?>
-<?php js::set('tab', $app->tab);?>
+<?php include '../../common/view/header.html.php'; ?>
+<?php include '../../common/view/kindeditor.html.php'; ?>
+<?php $browseLink = $app->session->caseList ? $app->session->caseList : $this->createLink('testcase', 'browse', "productID=$case->product"); ?>
+<?php js::set('sysurl', common::getSysUrl()); ?>
+<?php js::set('tab', $app->tab); ?>
 <div id='mainMenu' class='clearfix'>
-  <div class='btn-toolbar pull-left'>
-    <?php if(!isonlybody()):?>
-    <?php echo html::a($browseLink, '<i class="icon icon-back icon-sm"></i> ' . $lang->goback, '', "class='btn btn-secondary'");?>
-    <div class="divider"></div>
-    <?php endif;?>
-    <div class="page-title">
-      <span class='label label-id'><?php echo $case->id;?></span>
-      <span class='text' title='<?php echo $case->title;?>' style='color: <?php echo $case->color; ?>'><?php echo $case->title;?></span>
-      <?php if($case->fromCaseID):?>
-      <small><?php echo html::a(helper::createLink('testcase', 'view', "caseID=$case->fromCaseID"), html::icon($lang->icons['testcase']) . " {$lang->testcase->fromCase}$lang->colon$case->fromCaseID");?></small>
-      <?php endif;?>
+    <div class='btn-toolbar pull-left'>
+        <?php if (!isonlybody()): ?>
+            <?php echo html::a($browseLink, '<i class="icon icon-back icon-sm"></i> ' . $lang->goback, '', "class='btn btn-secondary'"); ?>
+            <div class="divider"></div>
+        <?php endif; ?>
+        <div class="page-title">
+            <span class='label label-id'><?php echo $case->id; ?></span>
+            <span class='text' title='<?php echo $case->title; ?>'
+                  style='color: <?php echo $case->color; ?>'><?php echo $case->title; ?></span>
+            <?php if ($case->fromCaseID): ?>
+                <small><?php echo html::a(helper::createLink('testcase', 'view', "caseID=$case->fromCaseID"), html::icon($lang->icons['testcase']) . " {$lang->testcase->fromCase}$lang->colon$case->fromCaseID"); ?></small>
+            <?php endif; ?>
 
-      <?php if($case->deleted):?>
-      <span class='label label-danger'><?php echo $lang->product->deleted;?></span>
-      <?php endif; ?>
+            <?php if ($case->deleted): ?>
+                <span class='label label-danger'><?php echo $lang->product->deleted; ?></span>
+            <?php endif; ?>
 
-      <?php if($case->version > 1):?>
-      <span class='dropdown'>
-        &nbsp; <a href='#' data-toggle='dropdown' class='text-muted'><?php echo '#' . $version;?> <span class='caret'></span></a>
+            <?php if ($case->version > 1): ?>
+                <span class='dropdown'>
+        &nbsp; <a href='#' data-toggle='dropdown' class='text-muted'><?php echo '#' . $version; ?> <span
+                                class='caret'></span></a>
         <ul class='dropdown-menu'>
         <?php
-        for($i = $case->version; $i >= 1; $i --)
-        {
+        for ($i = $case->version; $i >= 1; $i--) {
             $class = $i == $version ? " class='active'" : '';
-            echo '<li' . $class .'>' . html::a(inlink('view', "caseID=$case->id&version=$i"), '#' . $i) . '</li>';
+            echo '<li' . $class . '>' . html::a(inlink('view', "caseID=$case->id&version=$i"), '#' . $i) . '</li>';
         }
         ?>
         </ul>
       </span>
-      <?php endif; ?>
+            <?php endif; ?>
+        </div>
     </div>
-  </div>
-  <?php if(!isonlybody()):?>
-  <div class='btn-toolbar pull-right'>
-    <button type='button' class='btn btn-secondary fullscreen-btn' title='<?php echo $lang->retrack;?>'><i class='icon icon-fullscreen'></i><?php echo ' ' . $lang->retrack;?></button>
-    <?php if(common::canBeChanged('testcase', $case)) common::printLink('testcase', 'create', "productID={$case->product}&branch={$case->branch}&moduleID={$case->module}", "<i class='icon icon-plus'></i> " . $lang->testcase->create, '', "class='btn btn-primary'"); ?>
-  </div>
-  <?php endif;?>
+    <?php if (!isonlybody()): ?>
+        <div class='btn-toolbar pull-right'>
+            <button type='button' class='btn btn-secondary fullscreen-btn' title='<?php echo $lang->retrack; ?>'><i
+                        class='icon icon-fullscreen'></i><?php echo ' ' . $lang->retrack; ?></button>
+            <?php if (common::canBeChanged('testcase', $case)) common::printLink('testcase', 'create', "productID={$case->product}&branch={$case->branch}&moduleID={$case->module}", "<i class='icon icon-plus'></i> " . $lang->testcase->create, '', "class='btn btn-primary'"); ?>
+        </div>
+    <?php endif; ?>
 </div>
 
 <div id="mainContent" class="main-row">
-  <div class='main-col col-8'>
-    <div class='cell' style='word-break:break-all'>
-      <?php if($case->auto != 'unit' and !empty($case->precondition)):?>
-      <div class='detail'>
-        <div class='detail-title'><?php echo $lang->testcase->precondition;?></div>
-        <div class="detail-content article-content"><?php echo nl2br($case->precondition);?></div>
-      </div>
-      <?php endif;?>
-      <div class='detail'>
-        <div class='detail-title'><?php echo $lang->testcase->steps;?></div>
-        <div class="detail-content">
-          <table class='table table-condensed table-hover table-striped table-bordered' id='steps'>
-            <thead>
-              <tr>
-                <th class='w-50px'><?php echo $lang->testcase->stepID;?></th>
-                <th class='w-p60 text-left'><?php echo $lang->testcase->stepDesc;?></th>
-                <th class='text-left'><?php echo $lang->testcase->stepinput;?></th>
-                <th class='text-left'><?php echo $lang->testcase->step_goal_action;?></th>
-                <th class='text-left'><?php echo $lang->testcase->stepExpect;?></th>
-                <th class='text-left'><?php echo $lang->testcase->step_eval_criteria;?></th>
-              </tr>
-            </thead>
-            <?php
-            $stepId = $childId = 0;
-            foreach($case->steps as $stepID => $step)
-            {
-                $stepClass = "step-{$step->type}";
-                if($step->type == 'group' or $step->type == 'step')
-                {
-                    $stepId++;
-                    $childId = 0;
-                }
-                if($step->type == 'step') $stepClass = 'step-group';
-                echo "<tr class='step {$stepClass}'>";
-                if($step->type != 'item'){
-                    echo "<th class='step-id'>$stepId</th>";
-                }else{
-                    if($step->iotype == '0'){
-                        echo "<th class='step-iotype'>输入项</th>";
-                    }else{
-                        echo "<th class='step-iotype'>输出项</th>";
-                    }
-                }
-                echo "<td class='text-left'><div class='input-group'>";
-                //if($step->type == 'item') echo "<span class='step-item-id'>{$stepId}.{$childId}</span>";
-                echo nl2br(str_replace(' ', '&nbsp;', $step->desc)) . "</td>";
-                echo "<td class='text-left'>" . nl2br(str_replace(' ', '&nbsp;', $step->input)) . "</div></td>";
-                echo "<td class='text-left'>" . nl2br(str_replace(' ', '&nbsp;', $step->goal_action)) . "</div></td>";
-                echo "<td class='text-left'>" . nl2br(str_replace(' ', '&nbsp;', $step->expect)) . "</div></td>";
-                echo "<td class='text-left'>" . nl2br(str_replace(' ', '&nbsp;', $step->eval_criteria)) . "</div></td>";
-                echo "</tr>";
-                $childId ++;
-            }
-            ?>
-          </table>
+    <div class='main-col col-8'>
+        <div class='cell' style='word-break:break-all'>
+            <!-- 用例前提条件 -->
+            <div class='detail'>
+                <div class='detail-title'>
+                    <?php echo $lang->testcase->precondition; ?>
+                </div>
+                <div class="detail-content article-content">
+                    <?php
+                        if ($case->auto != 'unit' && !empty($case->precondition))
+                            echo nl2br($case->precondition);
+                        else
+                            echo "无" . $lang->testcase->precondition;
+                    ?>
+                </div>
+            </div>
+            <!-- 用例步骤 -->
+            <div class='detail'>
+                <div class='detail-title'>
+                    <?php echo $lang->testcase->steps; ?>
+                </div>
+                <div class="detail-content">
+                    <table class='table table-condensed table-hover table-striped table-bordered' id='steps'>
+                        <thead>
+                        <tr>
+                            <th class='w-50px'><?php echo $lang->testcase->stepID; ?></th>
+                            <th class='w-p60 text-left'><?php echo $lang->testcase->stepDesc; ?></th>
+<!--                            <th class='text-left'>--><?php //echo $lang->testcase->stepinput; ?><!--</th>-->
+                            <th class='text-left'><?php echo $lang->testcase->step_goal_action; ?></th>
+                            <th class='text-left'><?php echo $lang->testcase->stepExpect; ?></th>
+                            <th class='text-left'><?php echo $lang->testcase->step_eval_criteria; ?></th>
+                            <th class='text-left'><?php echo $lang->testcase->datasample; ?></th>
+                        </tr>
+                        </thead>
+                        <?php
+                        $stepId = $childId = 0;
+                        $step_id_for_datasample = 0;
+                        foreach ($case->steps as $stepID => $step) {
+                            $stepClass = "step-$step->type";
+                            if ($step->type == 'group' or $step->type == 'step') {
+                                $stepId++;
+                                $childId = 0;
+                            }
+                            if ($step->type == 'step') $stepClass = 'step-group';
+                            echo "<tr class='step $stepClass'>";
+                            if ($step->type != 'item') {
+                                echo "<th class='step-id'>$stepId</th>";
+                            } else {
+                                if ($step->iotype == '0') {
+                                    echo "<th class='step-iotype'>输入项</th>";
+                                } else {
+                                    echo "<th class='step-iotype'>输出项</th>";
+                                }
+                            }
+                            echo "<td class='text-left'><div class='input-group'>";
+                            //if($step->type == 'item') echo "<span class='step-item-id'>{$stepId}.{$childId}</span>";
+                            echo nl2br(str_replace(' ', '&nbsp;', $step->desc)) . "</td>";
+//                            echo "<td class='text-left'>" . nl2br(str_replace(' ', '&nbsp;', $step->input)) . "</div></td>";
+                            echo "<td class='text-left'>" . nl2br(str_replace(' ', '&nbsp;', $step->goal_action)) . "</div></td>";
+                            echo "<td class='text-left'>" . nl2br(str_replace(' ', '&nbsp;', $step->expect)) . "</div></td>";
+                            echo "<td class='text-left'>" . nl2br(str_replace(' ', '&nbsp;', $step->eval_criteria)) . "</div></td>";
+
+                            $level = (int)$datasamples[$step_id_for_datasample]->casestep_level;
+
+
+                            // 拼接数据样本url
+                            echo "<td class='text-left'>";
+                            if ($level !== 0)
+                                common::printIcon('datasample', 'view',"caseID=$case->id&casestepLevel=$level", '',
+                                'button', 'eye', '', 'showinonlybody iframe',
+                                true,'','查看' );
+                            echo "</div></td>";
+
+                            echo "</tr>";
+                            $childId++;
+                            $step_id_for_datasample++;
+                        }
+                        ?>
+                    </table>
+                </div>
+            </div>
+            <?php if (!empty($case->xml)): ?>
+                <div class='detail'>
+                    <div class='detail-title'><?php echo $lang->testcase->xml; ?></div>
+                    <div class="detail-content article-content"><?php echo nl2br(htmlSpecialString($case->xml)); ?></div>
+                </div>
+            <?php endif; ?>
+            <?php echo $this->fetch('file', 'printFiles', array('files' => $case->files, 'fieldset' => 'true', 'object' => $case, 'method' => 'view', 'showDelete' => false)); ?>
         </div>
-      </div>
-      <?php if(!empty($case->xml)):?>
-      <div class='detail'>
-        <div class='detail-title'><?php echo $lang->testcase->xml;?></div>
-        <div class="detail-content article-content"><?php echo nl2br(htmlSpecialString($case->xml));?></div>
-      </div>
-      <?php endif;?>
-      <?php echo $this->fetch('file', 'printFiles', array('files' => $case->files, 'fieldset' => 'true', 'object' => $case, 'method' => 'view', 'showDelete' => false));?>
+        <?php $this->printExtendFields($case, 'div', "position=left&inForm=0&inCell=1"); ?>
+        <div class='main-actions'>
+            <div class="btn-toolbar">
+                <?php common::printBack($browseLink); ?>
+                <?php if (!isonlybody()) echo "<div class='divider'></div>"; ?>
+                <?php $case->isLibCase = $isLibCase; ?>
+                <?php $case->caseFails = $caseFails; ?>
+                <?php $case->runID = $runID; ?>
+                <?php echo $this->testcase->buildOperateMenu($case, 'view'); ?>
+            </div>
+        </div>
     </div>
-    <?php $this->printExtendFields($case, 'div', "position=left&inForm=0&inCell=1");?>
-    <div class='main-actions'>
-      <div class="btn-toolbar">
-        <?php common::printBack($browseLink);?>
-        <?php if(!isonlybody()) echo "<div class='divider'></div>";?>
-        <?php $case->isLibCase = $isLibCase;?>
-        <?php $case->caseFails = $caseFails;?>
-        <?php $case->runID     = $runID;?>
-        <?php echo $this->testcase->buildOperateMenu($case, 'view');?>
-      </div>
-    </div>
-  </div>
-  <div class='side-col col-4'>
-    <div class="cell">
-      <details class="detail" open>
-        <summary class="detail-title"><?php echo $lang->testcase->legendBasicInfo;?></summary>
-        <div class="detail-content">
-          <table class='table table-data'>
-            <?php if($isLibCase):?>
-            <tr>
-              <th><?php echo $lang->testcase->fromCase;?></th>
-              <td>
-                <?php
-                if(isset($case->linkCaseTitles))
-                {
-                    foreach($case->linkCaseTitles as $linkCaseID => $linkCaseTitle)
-                    {
-                        echo html::a($this->createLink('testcase', 'view', "caseID=$linkCaseID", '', true), "#$linkCaseID $linkCaseTitle", '', "class='iframe' data-width='80%'") . '<br />';
-                    }
-                }
-                ?>
-              </td>
-            </tr>
-            <tr>
-              <th class='thWidth'><?php echo $lang->testcase->lib;?></th>
-              <td><?php echo common::hasPriv('caselib', 'browse') ? html::a($this->createLink('caselib', 'browse', "libID=$case->lib"), $libName) : $libName;?></td>
-            </tr>
-            <?php else:?>
-            <tr>
-              <th class='thWidth'><?php echo $lang->testcase->product;?></th>
-              <td><?php echo (common::hasPriv('product', 'browse') and $productName) ? html::a($this->createLink('product', 'browse', "productID=$case->product"), $productName) : $productName;?></td>
-            </tr>
-            <?php if($product->type != 'normal'):?>
-            <tr>
-              <th><?php echo sprintf($lang->product->branch, $lang->product->branchName[$product->type]);?></th>
-              <td><?php echo common::hasPriv('testcase', 'browse') ? html::a($this->createLink('testcase', 'browse', "productID=$case->product&branch=$case->branch"), $branchName) : $branchName;?></td>
-            </tr>
-            <?php endif;?>
-            <?php endif;?>
-            <tr>
-              <th><?php echo $lang->testcase->module;?></th>
-              <td>
-                <?php
-                if(empty($modulePath))
-                {
-                    echo "/";
-                }
-                else
-                {
-                    if($caseModule->branch and isset($branches[$caseModule->branch]))
-                    {
-                        echo $branches[$caseModule->branch] . $lang->arrow;
-                    }
+    <div class='side-col col-4'>
+        <div class="cell">
+            <details class="detail" open>
+                <summary class="detail-title"><?php echo $lang->testcase->legendBasicInfo; ?></summary>
+                <div class="detail-content">
+                    <table class='table table-data'>
+                        <?php if ($isLibCase): ?>
+                            <tr>
+                                <th><?php echo $lang->testcase->fromCase; ?></th>
+                                <td>
+                                    <?php
+                                    if (isset($case->linkCaseTitles)) {
+                                        foreach ($case->linkCaseTitles as $linkCaseID => $linkCaseTitle) {
+                                            echo html::a($this->createLink('testcase', 'view', "caseID=$linkCaseID", '', true), "#$linkCaseID $linkCaseTitle", '', "class='iframe' data-width='80%'") . '<br />';
+                                        }
+                                    }
+                                    ?>
+                                </td>
+                            </tr>
+                            <tr>
+                                <th class='thWidth'><?php echo $lang->testcase->lib; ?></th>
+                                <td><?php echo common::hasPriv('caselib', 'browse') ? html::a($this->createLink('caselib', 'browse', "libID=$case->lib"), $libName) : $libName; ?></td>
+                            </tr>
+                        <?php else: ?>
+                            <tr>
+                                <th class='thWidth'><?php echo $lang->testcase->product; ?></th>
+                                <td><?php echo (common::hasPriv('product', 'browse') and $productName) ? html::a($this->createLink('product', 'browse', "productID=$case->product"), $productName) : $productName; ?></td>
+                            </tr>
+                            <?php if ($product->type != 'normal'): ?>
+                                <tr>
+                                    <th><?php echo sprintf($lang->product->branch, $lang->product->branchName[$product->type]); ?></th>
+                                    <td><?php echo common::hasPriv('testcase', 'browse') ? html::a($this->createLink('testcase', 'browse', "productID=$case->product&branch=$case->branch"), $branchName) : $branchName; ?></td>
+                                </tr>
+                            <?php endif; ?>
+                        <?php endif; ?>
+                        <tr>
+                            <th><?php echo $lang->testcase->module; ?></th>
+                            <td>
+                                <?php
+                                if (empty($modulePath)) {
+                                    echo "/";
+                                } else {
+                                    if ($caseModule->branch and isset($branches[$caseModule->branch])) {
+                                        echo $branches[$caseModule->branch] . $lang->arrow;
+                                    }
 
                     foreach($modulePath as $key => $module)
                     {
@@ -375,11 +395,11 @@
   </div>
 </div>
 <div id="mainActions" class='main-actions'>
-  <?php common::printPreAndNext($preAndNext, $this->createLink('testcase', 'view', "caseID=%s&version=&from=$from&taskID=$taskID"));?>
+    <?php common::printPreAndNext($preAndNext, $this->createLink('testcase', 'view', "caseID=%s&version=&from=$from&taskID=$taskID")); ?>
 </div>
 <?php
 js::set('fullscreen', $lang->fullscreen);
 js::set('retrack', $lang->retrack);
 js::set('isLibCase', $isLibCase);
 ?>
-<?php include '../../common/view/footer.html.php';?>
+<?php include '../../common/view/footer.html.php'; ?>

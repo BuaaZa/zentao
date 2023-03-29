@@ -343,6 +343,8 @@ define('TABLE_DASHBOARD', '`' . $config->db->prefix . 'dashboard`');
 define('TABLE_DATASET',   '`' . $config->db->prefix . 'dataset`');
 
 define('TABLE_DELIBERATION',  '`' . $config->db->prefix . 'deliberation`');
+define('TABLE_DATASAMPLE', '`' . $config->db->prefix . 'data_sample`');
+define('TABLE_DATASAMPLE_RESULT', '`' . $config->db->prefix . 'data_sample_result`');
 
 $config->objectTables['product']      = TABLE_PRODUCT;
 $config->objectTables['productplan']  = TABLE_PRODUCTPLAN;

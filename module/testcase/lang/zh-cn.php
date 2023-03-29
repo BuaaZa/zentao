@@ -9,6 +9,9 @@
  * @version     $Id: zh-cn.php 4764 2013-05-05 04:07:04Z chencongzhi520@gmail.com $
  * @link        http://www.zentao.net
  */
+
+$lang->testcase->stepprecondition = '前提和约束';
+
 $lang->testcase->id               = '用例编号';
 $lang->testcase->product          = "所属{$lang->productCommon}";
 $lang->testcase->project          = '所属项目';
@@ -101,11 +104,12 @@ $lang->testcase->executionStatus  = '执行状态';
 $lang->case = $lang->testcase;  // 用于DAO检查时使用。因为case是系统关键字，所以无法定义该模块为case，只能使用testcase，但表还是使用的case。
 
 $lang->testcase->stepID      = '编号';
-$lang->testcase->stepDesc    = '步骤';
+$lang->testcase->stepDesc    = '前置条件';
 $lang->testcase->stepinput  = '输入';
 $lang->testcase->step_goal_action  = '目的和动作';
 $lang->testcase->stepExpect  = '预期结果';
 $lang->testcase->step_eval_criteria  = '评价准则';
+$lang->testcase->datasample  = '数据样本';
 $lang->testcase->stepVersion = '版本';
 $lang->testcase->noticegroupnum = '最多使一个步骤绑定输入输出项！';
 $lang->testcase->sample_in     = "样本输入";
@@ -240,7 +244,7 @@ $lang->testcase->exportCaseTypetList['word'] = 'Word';
 $lang->testcase->buttonToList = '返回';
 
 $lang->testcase->whichLine        = '第%s行';
-$lang->testcase->stepsEmpty       = '步骤%s不能为空';
+$lang->testcase->stepsEmpty       = '前置条件%s不能为空';
 $lang->testcase->errorEncode      = '无数据，请选择正确的编码重新上传！';
 $lang->testcase->noFunction       = '不存在iconv和mb_convert_encoding转码方法，不能将数据转成想要的编码！';
 $lang->testcase->noRequire        = "%s行的“%s”是必填字段，不能为空";

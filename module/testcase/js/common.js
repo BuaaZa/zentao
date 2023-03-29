@@ -169,10 +169,10 @@ function initSteps(selector)
         var $step;
         for(var i = 0; i < count; ++i)
         {
-            $step = $stepTemplate.clone();
+            $step = $stepTemplate.clone(true);
             if($row) $row.after($step);
             else $steps.append($step);
-            $step.addClass('step-new');
+            $step.addClass('step-new').addClass('text-center');
             if(type) $step.find('.step-type').val(type);
         }
         if(!notFocus && $step) setTimeout(function(){$step.find('.step-steps').focus();}, 10);
@@ -236,6 +236,8 @@ function initSteps(selector)
             $step.find('[name^="expects["]').attr('name', "expects[" +stepID + ']');
             $step.find('[name^="eval_criterias["]').attr('name', "eval_criterias[" +stepID + ']');
             $step.find('[name^="stepIoType["]').attr('name', "stepIoType[" +stepID + ']');
+            $step.find('[name^="datasample["]').attr('name', "datasample[" +stepID + ']');
+
             if($step.find('.step-group-toggle2').is(':checked')){
                 $step.find('.step-iotype').val('1');
             }else{
@@ -363,6 +365,33 @@ function initSteps(selector)
                 refreshSteps();
             }
         }
+    }).on('click', '.btn-datasample', function()
+    {
+        var $step = $(this).closest('.step');
+        var stepID = $step.find('.step-id').text();
+        $.cookie('curStepID', stepID);
+    }).on('click', '.datasample-undo', function()
+    {
+        var $step = $(this).closest('.step');
+        var $stepInput = $step.find('#datasample');
+        // console.log($stepInput.attr('value'));
+        $stepInput.attr('value','');
+        // console.log($stepInput.attr('value'));
+
+        var stepID = $step.find('.step-id').text();
+
+        var $otherDatasampleActions = $('#steps tr[data-index!="'+ stepID +'"] td.stepsample-actions');
+
+        $otherDatasampleActions.find('a').removeAttr("disabled").css("pointer-events","");
+        $otherDatasampleActions.find('button').removeAttr("disabled");
+
+        new $.zui.Messager('成功清除数据样本', {
+            type: 'success',
+            close: true,
+            icon: 'exclamation-sign',
+            time: 900 // 不进行自动隐藏
+        }).show();
+
     });
     initSortable();
     refreshSteps();

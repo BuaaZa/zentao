@@ -75,9 +75,9 @@ class installModel extends model
      * @access public
      * @return string   ok|fail
      */
-    public function checkPHP()
+    public function checkPHP(): string
     {
-        return $result = version_compare(PHP_VERSION, '5.2.0') >= 0 ? 'ok' : 'fail';
+        return version_compare(PHP_VERSION, '8.0.0') >= 0 ? 'ok' : 'fail';
     }
 
     /**
@@ -86,9 +86,9 @@ class installModel extends model
      * @access public
      * @return string   ok|fail
      */
-    public function checkPDO()
+    public function checkPDO(): string
     {
-        return $result = extension_loaded('pdo') ? 'ok' : 'fail';
+        return extension_loaded('pdo') ? 'ok' : 'fail';
     }
 
     /**
@@ -97,9 +97,9 @@ class installModel extends model
      * @access public
      * @return string   ok|fail
      */
-    public function checkPDOMySQL()
+    public function checkPDOMySQL(): string
     {
-        return $result = extension_loaded('pdo_mysql') ? 'ok' : 'fail';
+        return extension_loaded('pdo_mysql') ? 'ok' : 'fail';
     }
 
     /**
@@ -108,9 +108,9 @@ class installModel extends model
      * @access public
      * @return string   ok|fail
      */
-    public function checkJSON()
+    public function checkJSON(): string
     {
-        return $result = extension_loaded('json') ? 'ok' : 'fail';
+        return extension_loaded('json') ? 'ok' : 'fail';
     }
 
     /**
@@ -119,9 +119,9 @@ class installModel extends model
      * @access public
      * @return string   ok|fail
      */
-    public function checkOpenssl()
+    public function checkOpenssl(): string
     {
-        return $result = extension_loaded('openssl') ? 'ok' : 'fail';
+        return extension_loaded('openssl') ? 'ok' : 'fail';
     }
 
     /**
@@ -130,9 +130,9 @@ class installModel extends model
      * @access public
      * @return string   ok|fail
      */
-    public function checkMbstring()
+    public function checkMbstring(): string
     {
-        return $result = extension_loaded('mbstring') ? 'ok' : 'fail';
+        return extension_loaded('mbstring') ? 'ok' : 'fail';
     }
 
     /**
@@ -141,9 +141,9 @@ class installModel extends model
      * @access public
      * @return string   ok|fail
      */
-    public function checkZlib()
+    public function checkZlib(): string
     {
-        return $result = extension_loaded('zlib') ? 'ok' : 'fail';
+        return extension_loaded('zlib') ? 'ok' : 'fail';
     }
 
     /**
@@ -152,9 +152,9 @@ class installModel extends model
      * @access public
      * @return string   ok|fail
      */
-    public function checkCurl()
+    public function checkCurl(): string
     {
-        return $result = extension_loaded('curl') ? 'ok' : 'fail';
+        return extension_loaded('curl') ? 'ok' : 'fail';
     }
 
     /**
@@ -163,9 +163,31 @@ class installModel extends model
      * @access public
      * @return string   ok|fail
      */
-    public function checkFilter()
+    public function checkFilter(): string
     {
-        return $result = extension_loaded('filter') ? 'ok' : 'fail';
+        return extension_loaded('filter') ? 'ok' : 'fail';
+    }
+
+    /**
+     * Check filter extension.
+     *
+     * @access public
+     * @return string   ok|fail
+     */
+    public function checkXML(): string
+    {
+        return extension_loaded('xml') ? 'ok' : 'fail';
+    }
+
+    /**
+     * Check filter extension.
+     *
+     * @access public
+     * @return string   ok|fail
+     */
+    public function checkZIP(): string
+    {
+        return extension_loaded('zip') ? 'ok' : 'fail';
     }
 
     /**
@@ -174,9 +196,9 @@ class installModel extends model
      * @access public
      * @return string   ok|fail
      */
-    public function checkIconv()
+    public function checkIconv(): string
     {
-        return $result = extension_loaded('iconv') ? 'ok' : 'fail';
+        return extension_loaded('iconv') ? 'ok' : 'fail';
     }
 
     /**
@@ -432,18 +454,19 @@ class installModel extends model
     public function createDB($version)
     {
         $sql = "CREATE DATABASE `{$this->config->db->name}`";
-        if($version > 4.1) $sql .= " DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci";
+//        if($version > 4.1) $sql .= " DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci";
         return $this->dbh->query($sql);
     }
 
     /**
      * Create tables.
      *
-     * @param  string    $version
+     * @param string $version
      * @access public
      * @return bool
+     * @throws EndResponseException
      */
-    public function createTable($version)
+    public function createTable(string $version): bool
     {
         /* Add exception handling to ensure that all SQL is executed successfully. */
         try

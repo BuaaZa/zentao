@@ -16,6 +16,12 @@ use PhpOffice\PhpWord\IOFactory;
 <?php
 class testcaseModel extends model
 {
+    public datasampleModel $datasample;
+    public commonModel $common;
+    public storyModel $story;
+    public fileModel $file;
+    public scoreModel $score;
+
     /**
      * Set menu.
      *
@@ -38,83 +44,122 @@ class testcaseModel extends model
      *
      * @param int $bugID
      * @access public
-     * @return void
+     * @return false
      */
-    function create($bugID)
+    function create(int $bugID): bool|array
     {
-        $steps   = $this->post->steps;
-        $expects = $this->post->expects;
-        foreach($expects as $key => $value)
+        $this->datasample = $this->loadModel('datasample');
+        $this->common = $this->loadModel('common');
+        $this->story = $this->loadModel('story');
+        $this->file = $this->loadModel('file');
+        $this->score = $this->loadModel('score');
+
+        ChromePhp::log(fixer::input('post'));
+        ChromePhp::log(fixer::input('post')->get());
+
+        // 判定有预期结果时，前置条件不能为空
         {
-            if(!empty($value) and empty($steps[$key]))
-            {
-                dao::$errors[] = sprintf($this->lang->testcase->stepsEmpty, $key);
-                return false;
+            $steps = $this->post->steps;
+            $expects = $this->post->expects;
+            $noError = true;
+            foreach ($expects as $key => $value) {
+                if (!empty($value) and empty($steps[$key])) {
+                    dao::$errors[] = sprintf($this->lang->testcase->stepsEmpty . "\n", $key);
+                    $noError = false;
+                }
             }
+            if (!$noError) return false;
         }
 
-        $now    = helper::now();
         $status = $this->getStatus('create');
-        $case   = fixer::input('post')
+        $case = fixer::input('post')
             ->add('status', $status)
             ->add('version', 1)
             ->add('fromBug', $bugID)
             ->setDefault('openedBy', $this->app->user->account)
-            ->setDefault('openedDate', $now)
+            ->setDefault('openedDate', helper::now())
             ->setIF($this->config->systemMode == 'new' and $this->app->tab == 'project', 'project', $this->session->project)
             ->setIF($this->app->tab == 'execution', 'execution', $this->session->execution)
-            ->setIF($this->post->story != false, 'storyVersion', $this->loadModel('story')->getVersion((int)$this->post->story))
-            ->remove('steps,expects,files,labels,stepType,forceNotReview,inputs,goal_actions,eval_criterias,stepIoType,datasample')
+            ->setIF($this->post->story != false, 'storyVersion', $this->story->getVersion((int)$this->post->story))
+            /**
+             * 测试执行步骤删去字段
+             * 前置条件: steps
+             * 输入: inputs
+             * 目的和动作: goal_actions
+             * 预期结果: expects
+             * 评价准则: eval_criteria
+             *
+             * 隐藏测试执行配置
+             * 执行步骤类型: stepType
+             */
+            ->remove('steps,inputs,goal_actions,expects,eval_criterias,stepType')
+            ->remove('files')
+            ->remove('forceNotReview,stepIoType,datasample')
             ->setDefault('story', 0)
             ->cleanInt('story,product,branch,module')
             ->join('stage', ',')
             ->get();
 
         $param = '';
-        if(!empty($case->lib))$param = "lib={$case->lib}";
-        if(!empty($case->product))$param = "product={$case->product}";
-        $result = $this->loadModel('common')->removeDuplicate('case', $case, $param);
-        if($result and $result['stop']) return array('status' => 'exists', 'id' => $result['duplicate']);
+        if (!empty($case->lib)) $param = "lib=$case->lib";
+        if (!empty($case->product)) $param = "product=$case->product";
 
-        if(empty($case->product)) $this->config->testcase->create->requiredFields = str_replace('story', '', $this->config->testcase->create->requiredFields);
+        $result = $this->common->removeDuplicate('case', $case, $param);
+        if ($result and $result['stop']) return array('status' => 'exists', 'id' => $result['duplicate']);
 
-        /* Value of story may be showmore. */
-        $case->story = (int)$case->story;
-        $case->data_sample_new = fixer::input('post')->get()->datasample;
-        $this->dao->insert(TABLE_CASE)->data($case)->autoCheck()->batchCheck($this->config->testcase->create->requiredFields, 'notempty')->checkFlow()->exec();
-        if(!$this->dao->isError())
-        {
-            $caseID = $this->dao->lastInsertID();
-            $this->loadModel('file')->saveUpload('testcase', $caseID);
-            $parentStepID = 0;
-            $this->loadModel('score')->create('testcase', 'create', $caseID);
+        if (empty($case->product)) $this->config->testcase->create->requiredFields = str_replace('story', '', $this->config->testcase->create->requiredFields);
 
-            $data = fixer::input('post')->get();
-            foreach($data->steps as $stepID => $stepDesc)
-            {
-                if(empty($stepDesc)) continue;
-                $stepType      = $this->post->stepType;
-                $step          = new stdClass();
-                $step->type    = ($stepType[$stepID] == 'item' and $parentStepID == 0) ? 'step' : $stepType[$stepID];
-                $step->parent  = ($step->type == 'item') ? $parentStepID : 0;
-                $step->case    = $caseID;
-                $step->version = 1;
-                $step->desc    = rtrim(htmlSpecialString($stepDesc));
-                $judge = $step->type == 'group' || $step->type == 'item';
-                $step->input  = $judge ? '' : rtrim(htmlSpecialString($data->inputs[$stepID]));
-                $step->goal_action  = $judge ? '' : rtrim(htmlSpecialString($data->goal_actions[$stepID]));
-                $step->expect  = $judge ? '' : rtrim(htmlSpecialString($data->expects[$stepID]));
-                $step->eval_criteria  = $judge ? '' : rtrim(htmlSpecialString($data->eval_criterias[$stepID]));
-                $step->eval_criteria = strlen($step->eval_criteria) == 0 ? $step->expect : $step->eval_criteria;
-                $stepIoType      = $this->post->stepIoType;
-                $step->is_out = $stepIoType[$stepID];
-                $this->dao->insert(TABLE_CASESTEP)->data($step)->autoCheck()->exec();
-                if($step->type == 'group') $parentStepID = $this->dao->lastInsertID();
-                if($step->type == 'step')  $parentStepID = 0;
-            }
-
-            return array('status' => 'created', 'id' => $caseID, 'caseInfo' => $case);
+        /* Value of story may be show more. */
+//        $case->story = (int)$case->story;
+//        $case->data_sample_new = fixer::input('post')->get()->datasample;
+        $this->dao->insert(TABLE_CASE)->data($case)->autoCheck()
+            ->batchCheck($this->config->testcase->create->requiredFields, 'notempty')
+            ->checkFlow()->exec();
+        if ($this->dao->isError()) {
+            return false;
         }
+
+        $caseID = $this->dao->lastInsertID();
+        $this->file->saveUpload('testcase', $caseID);
+        $this->score->create('testcase', 'create', $caseID);
+
+        $data = fixer::input('post')->get();
+
+        $parentStepID = 0;
+        foreach ($data->steps as $index => $stepDesc) {
+//            if (empty($stepDesc) ) continue;
+            $stepType = $this->post->stepType;
+            $stepIoType = $this->post->stepIoType;
+
+            $step = new stdClass();
+            $step->type = ($stepType[$index] == 'item' and $parentStepID == 0) ? 'step' : $stepType[$index];
+            $step->parent = ($step->type == 'item') ? $parentStepID : 0;
+            $step->case = $caseID;
+            $step->version = 1;
+            $step->desc = rtrim(htmlSpecialString($stepDesc));
+            $judge = $step->type == 'group' || $step->type == 'item';
+            $step->input = $judge ? '' : rtrim(htmlSpecialString($data->inputs[$index]));
+            $step->goal_action = $judge ? '' : rtrim(htmlSpecialString($data->goal_actions[$index]));
+            $step->expect = $judge ? '' : rtrim(htmlSpecialString($data->expects[$index]));
+            $step->eval_criteria = $judge ? '' : rtrim(htmlSpecialString($data->eval_criterias[$index]));
+            $step->eval_criteria = strlen($step->eval_criteria) == 0 ? $step->expect : $step->eval_criteria;
+            $step->is_out = $stepIoType[$index];
+
+            $this->dao->insert(TABLE_CASESTEP)->data($step)->autoCheck()->exec();
+
+            /**
+             * deprecate
+             */
+            if ($step->type == 'group') $parentStepID = $this->dao->lastInsertID();
+            if ($step->type == 'step') $parentStepID = 0;
+
+            $obj = (string)$this->post->datasample[$index];
+
+            // 保存测试步骤关联的数据样本
+            $this->datasample->save($caseID, $index, $obj);
+        }
+
+        return array('status' => 'created', 'id' => $caseID, 'caseInfo' => $case);
     }
 
     /**
@@ -412,16 +457,16 @@ class testcaseModel extends model
     /**
      * Get case info by ID.
      *
-     * @param  int    $caseID
-     * @param  int    $version
+     * @param int $caseID
+     * @param int $version
      * @access public
      * @return object|bool
      */
-    public function getById($caseID, $version = 0)
+    public function getById(int $caseID, int $version = 0): object|bool
     {
         $case = $this->dao->findById($caseID)->from(TABLE_CASE)->fetch();
         if(!$case) return false;
-        foreach($case as $key => $value) if(strpos($key, 'Date') !== false and !(int)substr($value, 0, 4)) $case->$key = '';
+        foreach($case as $key => $value) if(str_contains($key, 'Date') and !(int)substr($value, 0, 4)) $case->$key = '';
 
         /* Get project and execution. */
         if($this->app->tab == 'project')
@@ -464,9 +509,13 @@ class testcaseModel extends model
         if($case->linkCase or $case->fromCaseID) $case->linkCaseTitles = $this->dao->select('id,title')->from(TABLE_CASE)->where('id')->in($case->linkCase)->orWhere('id')->eq($case->fromCaseID)->fetchPairs();
         if($version == 0) $version = $case->version;
         $case->files = $this->loadModel('file')->getByObject('testcase', $caseID);
-        $case->currentVersion = $version ? $version : $case->version;
+        $case->currentVersion = $version ?: $case->version;
 
-        $case->steps = $this->dao->select('*')->from(TABLE_CASESTEP)->where('`case`')->eq($caseID)->andWhere('version')->eq($version)->orderBy('id')->fetchAll('id');
+        $case->steps = $this->dao->select('*')
+            ->from(TABLE_CASESTEP)
+            ->where('`case`')->eq($caseID)
+            ->andWhere('version')->eq($version)
+            ->orderBy('id')->fetchAll('id');
 
         foreach($case->steps as $key => $step)
         {
@@ -2033,7 +2082,7 @@ class testcaseModel extends model
         $de_html_str = htmlspecialchars_decode($case->data_sample_new, ENT_QUOTES);
         $data_sample = json_decode($de_html_str, true);
 
-        if(isset($data_sample) && count($data_sample)>1){
+        if(isset($data_sample) && count($data_sample, 1)>1){
 
             if(isset($data_sample_result) && count($data_sample_result)>1){
                 array_push($data_sample, $data_sample_result);
@@ -2744,12 +2793,12 @@ class testcaseModel extends model
     /**
      * Get status for different method.
      *
-     * @param  string $methodName
-     * @param  object $case
+     * @param string $methodName
+     * @param object|bool|null $case
+     * @return mixed
      * @access public
-     * @return mixed    string | bool | array
      */
-    public function getStatus($methodName, $case = null)
+    public function getStatus(string $methodName, object|bool $case = null): mixed
     {
         if($methodName == 'create')
         {
