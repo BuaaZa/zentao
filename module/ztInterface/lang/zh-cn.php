@@ -469,14 +469,8 @@ $lang->ztinterface->stringMock[34]['description'] = "生成一个指定语言的
 $lang->ztinterface->stringMock[35]['example'] = "\$month";
 $lang->ztinterface->stringMock[35]['description'] = "生成一个月份。";
 
-$lang->ztinterface->stringMock[36]['example'] = "\$date";
-$lang->ztinterface->stringMock[36]['description'] = "生成一个日期。";
-
-$lang->ztinterface->stringMock[37]['example'] = "\$time";
-$lang->ztinterface->stringMock[37]['description'] = "生成一个时间。";
-
-$lang->ztinterface->stringMock[38]['example'] = "\$datetime";
-$lang->ztinterface->stringMock[38]['description'] = "生成一个带日期的时间。";
+$lang->ztinterface->stringMock[36]['example'] = "\$datetime(Y-m-d H:i:s)";
+$lang->ztinterface->stringMock[36]['description'] = "按格式生成一个日期/时间/日期+时间,通过Y/y/M/m/D/d/H/h/I/i/S/s进行控制。";
 
 
 $lang->ztinterface->integerMock = array();

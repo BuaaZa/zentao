@@ -311,7 +311,7 @@ class ztinterfaceModel extends model
         return $str;
     }
 
-    public function getFaker($language){
+    public function getFaker($language = 'en_US'){
         $faker = Faker\Factory::create($language);
         if(!$faker)
             $faker = Faker\Factory::create();

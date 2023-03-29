@@ -328,7 +328,7 @@ class ztinterface extends control
         return;
     }
 
-    public function mockDateTime($data = ''){
+    public function mockDatetime($data = ''){
         $response = array();
         if(!$data and !empty($_POST)){
             $data = array();
@@ -340,15 +340,12 @@ class ztinterface extends control
         $args = json_decode($data["params"]);
         $gen = $data['funcName'];
 
-        $format = '';
+        $format = 'Y-m-d H:i:s';
         if($args[0]){
             $format = $this->ztinterface->trimQuotation($args[0]);
         }
         
-        if(strtolower($data['funcName']) == 'date'){
-            $response['value'] = $faker->$gen;
-        }
-        $response['value'] = $faker->$gen;
+        $response['value'] = $this->ztinterface->mockDate($format);
         
         echo json_encode($response);
         return;
