@@ -407,6 +407,14 @@ class Base
         $regex = preg_replace('/(?<!\\\)\?/', '{0,1}', $regex);
         $regex = preg_replace('/(?<!\\\)\*/', '{0,' . static::randomDigitNotNull() . '}', $regex);
         $regex = preg_replace('/(?<!\\\)\+/', '{1,' . static::randomDigitNotNull() . '}', $regex);
+        
+        $regex = preg_replace_callback('/\[([^\]]+)\]/', function ($matches) {
+            return '[' . preg_replace('/\\\w/', 'A-Za-z0-9_', $matches[1]) . ']';
+        }, $regex);
+        $regex = preg_replace_callback('/\[([^\]]+)\]/', function ($matches) {
+            return '[' . preg_replace('/\\\d/', '0-9', $matches[1]) . ']';
+        }, $regex);
+
         // [12]{1,2} becomes [12] or [12][12]
         $regex = preg_replace_callback('/(\[[^\]]+\])\{(\d+),(\d+)\}/', function ($matches) {
             return str_repeat($matches[1], Base::randomElement(range($matches[2], $matches[3])));
@@ -426,9 +434,10 @@ class Base
         // All A-F inside of [] become ABCDEF
         $regex = preg_replace_callback('/\[([^\]]+)\]/', function ($matches) {
             return '[' . preg_replace_callback('/(\w|\d)\-(\w|\d)/', function ($range) {
-                return join(range($range[1], $range[2]), '');
+                return join('',range($range[1], $range[2]));
             }, $matches[1]) . ']';
         }, $regex);
+        
         // All [ABC] become B (or A or C)
         $regex = preg_replace_callback('/\[([^\]]+)\]/', function ($matches) {
             return Base::randomElement(str_split($matches[1]));
@@ -439,7 +448,7 @@ class Base
         $regex = preg_replace_callback('/(?<!\\\)\./', 'static::randomAscii', $regex);
         // remove remaining backslashes
         $regex = str_replace('\\', '', $regex);
-        // phew
+        //phew
         return $regex;
     }
 

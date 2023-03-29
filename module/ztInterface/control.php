@@ -222,19 +222,20 @@ class ztinterface extends control
         if($data['funcName']!='String'){
             if($data['notNull'] == 'false'){
                 if(rand(0,5) == 0){
-                    echo "null";
+                    echo json_encode(array("value" => "null"));
                     return;
                 }
             }
             $genStr =  $this->ztinterface->mockStringBykeyword($data['name']);
             if($genStr){
-                echo $genStr;
+                echo json_encode(array("value" => $genStr));
                 return;
             }
         }
 
+        $response = array();
+
         $args = json_decode($data["params"]);
-        ChromePhp::log($args);
         $min = 1;
         $max = 20;
         if(isset($args[1]) and is_numeric($args[1]) and (int)$args[1]>0){
@@ -248,11 +249,77 @@ class ztinterface extends control
             $min = $max;
             $max = $temp;
         }
-        $pre = '^[A-Za-z1-9_]';
+        $regex = '[\w]';
         if(isset($args[0])){
             $chars = $this->ztinterface->parseSymbol($args[0]);
+            if(!$chars){
+                $response["error"] = '参数不合法,按默认字符集生成';
+            }else{
+                $regex = $chars;
+            }
         }
+        $regex = $regex.'{'.$min.','.$max.'}';
+        $response['value'] = $this->ztinterface->mockStringByRegex($regex);
+        echo json_encode($response);
+        return;
     }
+
+    public function mockRegex($data = ''){
+        $response = array();
+        if(!$data and !empty($_POST)){
+            $data = array();
+            foreach($_POST as $key=>$value){
+                $data[$key] = $value;
+            }
+        }
+
+        $args = json_decode($data["params"]);
+        if(!isset($args[0])){
+            echo json_encode(array("error" => "需要正则表达式"));
+            return;
+        }
+
+        $regex = $this->ztinterface->trimQuotation($args[0]);
+        if(substr($regex,-1) !== substr($regex,0,1) or substr($regex,-1) !== '/'){
+            $regex = '/'.$regex.'/';
+        }
+        if (@preg_match($regex, '') === false) {
+            echo json_encode(array("error" => "非法的正则表达式"));
+            return;
+        }
+        $response['value'] = $this->ztinterface->mockStringByRegex($regex);
+        echo json_encode($response);
+        return;
+    }
+
+    public function mockFunc($data = ''){
+        $response = array();
+        if(!$data and !empty($_POST)){
+            $data = array();
+            foreach($_POST as $key=>$value){
+                $data[$key] = $value;
+            }
+        }
+
+        $args = json_decode($data["params"]);
+        $faker = "";
+        if($args[0]){
+            $faker = Faker\Factory::create($this->ztinterface->trimQuotation($args[0]));
+        }
+        if(!$faker){
+            $faker = Faker\Factory::create('zh_CN');
+        }
+        $gen = $data['funcName'];
+        $response['value'] = $faker->$gen;
+        if(!$response['value']){
+            $response['error'] = '生成模式不存在';
+        }
+        echo json_encode($response);
+        return;
+    }
+    
+
+    
 
 
     /**

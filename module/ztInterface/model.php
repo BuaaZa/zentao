@@ -131,7 +131,6 @@ class ztinterfaceModel extends model
         $baseURL = $this->dao->select('*')->from(TABLE_BASEURL)
                 ->where('product')->eq($productID)
                 ->fetchAll('id');
-        ChromePhp::log($baseURL);
         foreach($baseURL as $url){
             $datalist.="<option value=\"$url->url\" label=\"($url->name)\">";
         }
@@ -179,8 +178,7 @@ class ztinterfaceModel extends model
             //mock
             if($obj['type'] !== "object"){
                 $table .= "<td>" . html::input($newPath.':mock', $obj['mock'], ' class="form-control input-mock" list="'.$obj['type'].'List" placeholder="Mock"');
-                $table .= "<span id=\"error-404\" style=\"font-size:4px;color:red;display:none;\">Mock函数不存在</span>";
-                $table .= "<span id=\"error-syntax\" style=\"font-size:4px;color:red;display:none;\">Mock格式不合法</span>";
+                $table .= "<span id=\"error\" style=\"font-size:4px;color:red;display:none;\">Mock函数不存在</span>";
                 $table .= "</td>";
             }else{
                 $table .= "<td>" . html::input($newPath.':mock', $obj['mock'], 'class="form-control" disabled') . "</td>";
@@ -228,7 +226,7 @@ class ztinterfaceModel extends model
     }
 
     public function mockStringBykeyword($name){
-        $faker = Faker\Factory::create();
+        $faker = Faker\Factory::create('zh_CN');
         $regex = '/(' . implode('|', $this->lang->ztinterface->fakerOptions) . ')/i';
         $genStr = '';
         if(preg_match($regex, $name, $matches)) {
@@ -248,13 +246,59 @@ class ztinterfaceModel extends model
         return $genStr;
     }
 
+    public function mockStringByRegex($regex){
+        $faker = Faker\Factory::create();
+        return $faker->regexify($regex);
+    }
+
     public function parseSymbol($arg){
         preg_match_all('/@[\w-]+/', $arg, $matches);
-        $matches=array_unique($matches);
+        $matches=array_unique($matches[0]);
         $str = '';
+        $all = false;
+        $results = array();
         foreach($matches as $m){
-            
+            $m = $this->trimQuotation($m);
+            $results[strtolower($m)] = $m;
         }
+        foreach($results as $key => $value){
+            switch($key){
+                case "@upper":
+                    $str .= 'A-Z';
+                    break;
+                case "@lower":
+                    $str .= 'a-z';
+                    break;
+                case "@digit":
+                    $str .= '0-9';
+                    break;
+                case "@under":
+                    $str .= '_';
+                    break;
+                case "@all":
+                    $str = '\w';
+                    $all = true;
+                    break;
+                default:
+                    $str .= substr($value,1);
+                    break;
+            }
+            if($all)
+                break;
+        }
+        if($str)
+            $str = '['.$str.']';
+        return $str;
+    }
+
+    public function trimQuotation($str){
+        if(substr($str,-1) === substr($str,0,1)){
+            if(substr($str,-1) === '"')
+                $str = trim($str, '"');
+            else if(substr($args[0],-1) === "'")
+                $str = trim($str, "'");
+        }
+        return $str;
     }
 
 

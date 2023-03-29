@@ -9,12 +9,39 @@ function toggleChildren(btn) {
   btn.classList.toggle("icon-angle-right");
 }
 
+const funcTable = [
+  'username',
+  'streetname',
+  'firstname',
+  'lastname',
+  'sentence',
+  'paragraph',
+  'word',
+  'streetaddress',
+  'address',
+  'country',
+  'city',
+  'state',
+  'company',
+  'email',
+  'password',
+  'url',
+  'macaddress',
+  'ipv4',
+  'ipv6',
+  'useragent',
+  'datetime',
+  'date',
+  'time',
+  'monthname',
+  'month',
+  'year',
+  'timezone',
+  'name'
+];
+
 $('.input-mock').on('input', function() {
-  var $span = $(this).siblings('span#error-404');
-  if ($span.css('display') === 'inline') {
-    $span.css('display', 'none');
-  }
-  $span = $(this).siblings('span#error-syntax');
+  var $span = $(this).siblings('span#error');
   if ($span.css('display') === 'inline') {
     $span.css('display', 'none');
   }
@@ -26,6 +53,7 @@ $('.refresh-button').click(function() {
     parentRow = parentRow.parentNode;
   }
   const rowData = parseRow(parentRow);
+  var span = parentRow.querySelector('td:nth-child(4) span');
   if(!rowData){
     console.log('fail to parse Row');
     return;
@@ -34,20 +62,22 @@ $('.refresh-button').click(function() {
   
   if(!rowData['funcName']){
     if(rowData['mock'].value.trim()){
-      var $span = $(rowData['mock']).siblings('span#error-404');
-      if ($span.css('display') === 'inline') {
-        $span.css('display', 'none');
-      }
-      $span = $(rowData['mock']).siblings('span#error-syntax');
-      if ($span.css('display') === 'none') {
-        $span.css('display', 'inline');
-      }
+      showError(span, 'Mock格式不合法');
     }
 
     var link = createLink('ztinterface', 'mockBase', '');
-    $.post(link, postData, function(response) {
-      if(response)
-        rowData['value'].value = response;
+    $.post(link, postData, function(res) {
+      var response = {};
+      try {
+        response = JSON.parse(res);
+      } catch (error) {
+        console.log(res);
+        return;
+      }
+      rowData['value'].value = response['value'];
+      if(response['error']){
+        showError(span, response['error']);
+      }
     });
     return;
   }
@@ -57,26 +87,29 @@ $('.refresh-button').click(function() {
     var itemRowData = parseRow(itemRow);
     postData['item'] = getPostData(itemRowData);
   }
-
-  console.log(postData);
-  
-  var link = createLink('ztinterface', 'mock'+rowData['funcName'], '');
+  if(funcTable.includes(rowData['funcName'].toLowerCase())){
+    var link = createLink('ztinterface', 'mockFunc', '');
+  }else{
+    var link = createLink('ztinterface', 'mock'+rowData['funcName'], '');
+  }
   $.post(link,postData)
-  .done(function(response) {
-    if(response)
-        rowData['value'].value = response;
+  .done(function(res) {
+    var response = {};
+    try {
+      response = JSON.parse(res);
+    } catch (error) {
+      console.log(res);
+      return;
+    }
+
+    rowData['value'].value = response['value'];
+    if(response['error']){
+      showError(span, response['error']);
+    }
   })
   .fail(function() {
     console.log("fail");
-    var mockTd = parentRow.querySelector('td:nth-child(4)');
-    var $span404 =  $(mockTd).find('#error-404');
-    if ($span404.css('display') === 'none') {
-      $span404.css('display', 'inline');
-    }
-    var $spanSyntax =  $(mockTd).find('#error-syntax');
-    if ($spanSyntax.css('display') === 'inline') {
-      $spanSyntax.css('display', 'none');
-    }
+    showError(span, 'Mock函数不存在');
   });
 });
 
@@ -143,4 +176,12 @@ function getPostData(rowData){
   postData['funcName'] = rowData['funcName'];
   postData['params'] = rowData['params'];
   return postData;
+}
+function showError(span,message){
+  span.innerText = message;
+  span.style.display = 'inline';
+}
+
+function hideError(span){
+  span.style.display = 'none';
 }

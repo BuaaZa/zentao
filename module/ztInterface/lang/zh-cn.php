@@ -343,6 +343,8 @@ $lang->ztinterface->stringMock[3]['example'] = "\$String([@digit,@a-d,@under])";
 $lang->ztinterface->stringMock[3]['description'] = "指定多种可用字符(@digit: 数字, @a-d: 等价于abcd, @under: 下划线)";
 $lang->ztinterface->stringMock[4]['example'] = "\$String(@all,3,10)";
 $lang->ztinterface->stringMock[4]['description'] = "@all: 全部字符; 3: 最小长度, 10: 最大长度";
+$lang->ztinterface->stringMock[5]['example'] = "\$Regex('[0-9]{7,11}@(qq|163)\.(com|cn)')";
+$lang->ztinterface->stringMock[5]['description'] = "按正则表达式生成字符串";
 $lang->ztinterface->integerMock = array();
 
 
