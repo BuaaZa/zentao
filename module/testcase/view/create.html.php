@@ -302,7 +302,7 @@ foreach(explode(',', $config->testcase->create->requiredFields) as $field)
             <td colspan='3' class='text-center form-actions'>
                 <?php //echo html::submitButton();?>
                 <button id='submit' class="btn btn-wide btn-primary "
-                        type="submit"  onclick="take_of_cookie();">
+                        type="submit"  >
                     保存
                 </button>
                 <?php echo $gobackLink ? html::a($gobackLink, $lang->goback, '', 'class="btn btn-wide"')
@@ -331,26 +331,26 @@ foreach(explode(',', $config->testcase->create->requiredFields) as $field)
   </div>
 </div>
 <script>
-
-   function take_of_cookie(){
-       //alert($.cookie('datasample'));
-       var stepsNum = $('#steps').children('.step').length;
-       var i = 1;
-       for(i = 1; i<=stepsNum; i+=1){
-           if($.cookie('datasample['+i+']')!=null && $.cookie('datasample['+i+']').length>0){
-               //console.log($.cookie('datasample['+i+']'));
-               var nameStr = 'datasample['+i+']';
-               selector = document.getElementsByName(nameStr);
-               element = $(selector);
-               element.attr("value", $.cookie('datasample['+i+']'));
-               $.cookie('datasample['+i+']', null);
-           }
-       }
-/*       console.log($.cookie('datasample'));
-       $('#datasample').attr('value',$.cookie('datasample'));*/
-       // var result = $('#datasample').attr('value');
-       // console.log(result);
-   }
+    // console.log("start");
+//    function take_of_cookie(){
+//        //alert($.cookie('datasample'));
+//        var stepsNum = $('#steps').children('.step').length;
+//        var i = 1;
+//        for(i = 1; i<=stepsNum; i+=1){
+//            if($.cookie('datasample['+i+']')!=null && $.cookie('datasample['+i+']').length>0){
+//                //console.log($.cookie('datasample['+i+']'));
+//                var nameStr = 'datasample['+i+']';
+//                selector = document.getElementsByName(nameStr);
+//                element = $(selector);
+//                element.attr("value", $.cookie('datasample['+i+']'));
+//                $.cookie('datasample['+i+']', null);
+//            }
+//        }
+// /*       console.log($.cookie('datasample'));
+//        $('#datasample').attr('value',$.cookie('datasample'));*/
+//        // var result = $('#datasample').attr('value');
+//        // console.log(result);
+//    }
 </script>
 <?php js::set('caseModule', $lang->testcase->module)?>
 <?php include '../../common/view/footer.html.php';?>

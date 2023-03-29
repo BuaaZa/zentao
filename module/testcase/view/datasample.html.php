@@ -129,9 +129,14 @@
             }
             var matrixString = JSON.stringify(matrix); // convert array to string using JSON.stringify()
             //document.cookie = "datasam="+matrixString;
-            $.cookie("datasample["+$.cookie('curStepID')+"]", matrixString);
+            // $.cookie("datasample["+$.cookie('curStepID')+"]", matrixString);
             //alert($.cookie('datasample'));
             //alert(matrixString);
+            var stepID = $.cookie('curStepID');
+            var nameStr = 'datasample['+stepID+']';
+            selector = parent.document.getElementsByName(nameStr);
+            element = $(selector);
+            element.attr("value", matrixString);
         }
     </script>
 

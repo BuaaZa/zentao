@@ -411,9 +411,7 @@ class testcase extends control
             //$datasample = json_decode($this->post->datasample, true);
             //error_log(print_r($datasample, 1));
             $datasample = $this->post->datasample;
-            foreach($datasample as $key=>$val){
-                error_log($key . ' => ' . $val);
-            }
+            ChromePhp::log($datasample);
             die('test');
             $response['result'] = 'success';
 
