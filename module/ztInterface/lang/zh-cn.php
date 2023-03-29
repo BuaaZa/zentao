@@ -330,6 +330,51 @@ $lang->ztinterface->fakerOptions = array(
     'timezone',
     'name'    
 );
+$lang->ztinterface->fakerEN = array(
+    'userName',
+    'streetName',
+    'firstName',
+    'lastName',
+    'sentence',
+    'paragraph',
+    'word',
+    'streetAddress',
+    'address',
+    'country',
+    'city',
+    'state',
+    'company',
+    'email',
+    'password',
+    'url',
+    'macAddress',
+    'ipv4',
+    'ipv6',
+    'ip',
+    'userAgent',
+    'color',
+    'dateTime',
+    'date',
+    'time',
+    'monthName',
+    'month',
+    'year',
+    'timezone',
+    'name'    
+);
+$lang->ztinterface->fakerCN = array(
+    'firstname',
+    'state',
+    'lastname',
+    'address',
+    'country',
+    'streetName',
+    'streetAddress',
+    'state',
+    'city',
+    'company',
+    'name'    
+);
 
 $lang->ztinterface->charType = array("string","integer");
 $lang->ztinterface->stringMock = array();
@@ -345,6 +390,95 @@ $lang->ztinterface->stringMock[4]['example'] = "\$String(@all,3,10)";
 $lang->ztinterface->stringMock[4]['description'] = "@all: 全部字符; 3: 最小长度, 10: 最大长度";
 $lang->ztinterface->stringMock[5]['example'] = "\$Regex('[0-9]{7,11}@(qq|163)\.(com|cn)')";
 $lang->ztinterface->stringMock[5]['description'] = "按正则表达式生成字符串";
+$lang->ztinterface->stringMock[6]['example'] = "\$name(zh_CN)";
+$lang->ztinterface->stringMock[6]['description'] = "生成一个指定语言的名字,默认为中文";
+
+$lang->ztinterface->stringMock[7]['example'] = "\$country(zh_CN)";
+$lang->ztinterface->stringMock[7]['description'] = "生成一个指定语言的国家名称,默认为中文。";
+$lang->ztinterface->stringMock[8]['example'] = "\$state(zh_CN)";
+$lang->ztinterface->stringMock[8]['description'] = "生成一个指定语言的省/州名称,默认为中文。";
+$lang->ztinterface->stringMock[9]['example'] = "\$city(zh_CN)";
+$lang->ztinterface->stringMock[9]['description'] = "生成一个指定语言的城市名称,默认为中文。";
+$lang->ztinterface->stringMock[10]['example'] = "\$address(zh_CN)";
+$lang->ztinterface->stringMock[10]['description'] = "生成一个指定语言的地址,默认为中文。";
+$lang->ztinterface->stringMock[11]['example'] = "\$streetName(zh_CN)";
+$lang->ztinterface->stringMock[11]['description'] = "生成一个指定语言的街道名,默认为中文。";
+$lang->ztinterface->stringMock[12]['example'] = "\$streetAddress(zh_CN)";
+$lang->ztinterface->stringMock[12]['description'] = "生成一个指定语言的街道地址,默认为中文。";
+
+$lang->ztinterface->stringMock[13]['example'] = "\$sentence(en_US)";
+$lang->ztinterface->stringMock[13]['description'] = "生成一个指定语言的句子,默认为英文。";
+
+$lang->ztinterface->stringMock[14]['example'] = "\$paragraph(en_US)";
+$lang->ztinterface->stringMock[14]['description'] = "生成一个指定语言的段落,默认为英文。";
+
+$lang->ztinterface->stringMock[15]['example'] = "\$word(en_US)";
+$lang->ztinterface->stringMock[15]['description'] = "生成一个指定语言的单词,默认为英文。";
+
+$lang->ztinterface->stringMock[16]['example'] = "\$hexColor";
+$lang->ztinterface->stringMock[16]['description'] = "生成一个十六进制颜色值。";
+
+$lang->ztinterface->stringMock[17]['example'] = "\$rgbColor";
+$lang->ztinterface->stringMock[17]['description'] = "生成一个RGB颜色值。";
+
+$lang->ztinterface->stringMock[18]['example'] = "\$rgbCssColor";
+$lang->ztinterface->stringMock[18]['description'] = "生成一个CSS RGB颜色值。";
+
+$lang->ztinterface->stringMock[19]['example'] = "\$colorName(en_US)";
+$lang->ztinterface->stringMock[19]['description'] = "生成一个指定语言的颜色名称,默认为英文。";
+
+$lang->ztinterface->stringMock[20]['example'] = "\$monthName(en_US)";
+$lang->ztinterface->stringMock[20]['description'] = "生成一个指定语言的月份名称,默认为英文。";
+
+$lang->ztinterface->stringMock[23]['example'] = "\$timezone";
+$lang->ztinterface->stringMock[23]['description'] = "生成一个时区名称。";
+
+$lang->ztinterface->stringMock[24]['example'] = "\$email";
+$lang->ztinterface->stringMock[24]['description'] = "生成一个邮箱地址。";
+
+$lang->ztinterface->stringMock[25]['example'] = "\$url";
+$lang->ztinterface->stringMock[25]['description'] = "生成一个URL地址。";
+
+$lang->ztinterface->stringMock[26]['example'] = "\$ipv4";
+$lang->ztinterface->stringMock[26]['description'] = "生成一个IPv4地址。";
+
+$lang->ztinterface->stringMock[27]['example'] = "\$ipv6";
+$lang->ztinterface->stringMock[27]['description'] = "生成一个IPv6地址。";
+
+$lang->ztinterface->stringMock[28]['example'] = "\$macAddress";
+$lang->ztinterface->stringMock[28]['description'] = "生成一个MAC地址。";
+
+$lang->ztinterface->stringMock[29]['example'] = "\$userAgent";
+$lang->ztinterface->stringMock[29]['description'] = "生成一个用户代理信息。";
+
+$lang->ztinterface->stringMock[30]['example'] = "\$userName(en_US)";
+$lang->ztinterface->stringMock[30]['description'] = "生成一个指定语言的用户名,默认为英文。";
+
+$lang->ztinterface->stringMock[31]['example'] = "\$password";
+$lang->ztinterface->stringMock[31]['description'] = "生成一个密码。";
+
+$lang->ztinterface->stringMock[32]['example'] = "\$firstName(zh_CN)";
+$lang->ztinterface->stringMock[32]['description'] = "生成一个指定语言的名字（不含姓氏）,默认为中文。";
+
+$lang->ztinterface->stringMock[33]['example'] = "\$lastName(zh_CN)";
+$lang->ztinterface->stringMock[33]['description'] = "生成一个指定语言的姓氏, 默认为中文。";
+
+$lang->ztinterface->stringMock[34]['example'] = "\$company(zh_CN)";
+$lang->ztinterface->stringMock[34]['description'] = "生成一个指定语言的公司名称,默认为中文。";
+
+$lang->ztinterface->stringMock[35]['example'] = "\$month";
+$lang->ztinterface->stringMock[35]['description'] = "生成一个月份。";
+
+$lang->ztinterface->stringMock[36]['example'] = "\$date";
+$lang->ztinterface->stringMock[36]['description'] = "生成一个日期。";
+
+$lang->ztinterface->stringMock[37]['example'] = "\$time";
+$lang->ztinterface->stringMock[37]['description'] = "生成一个时间。";
+
+$lang->ztinterface->stringMock[38]['example'] = "\$datetime";
+$lang->ztinterface->stringMock[38]['description'] = "生成一个带日期的时间。";
+
+
 $lang->ztinterface->integerMock = array();
 
 

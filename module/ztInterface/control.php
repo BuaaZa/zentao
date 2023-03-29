@@ -303,17 +303,53 @@ class ztinterface extends control
 
         $args = json_decode($data["params"]);
         $faker = "";
+        $gen = $data['funcName'];
+
         if($args[0]){
-            $faker = Faker\Factory::create($this->ztinterface->trimQuotation($args[0]));
+            $faker = $this->ztinterface->getFaker($this->ztinterface->trimQuotation($args[0]));
         }
         if(!$faker){
-            $faker = Faker\Factory::create('zh_CN');
+            if(in_array(strtolower($gen),$this->lang->ztinterface->fakerCN)){
+                $faker = $this->ztinterface->getFaker('zh_CN');
+            }else{
+                $faker = $this->ztinterface->getFaker('en_US');
+            }
         }
-        $gen = $data['funcName'];
-        $response['value'] = $faker->$gen;
-        if(!$response['value']){
+        
+        if(strtolower($gen) === 'colorname')
+            $gen = 'safe'.$gen;
+        try{
+            $response['value'] = $faker->$gen;
+        }catch(Exception $e){
             $response['error'] = '生成模式不存在';
         }
+
+        echo json_encode($response);
+        return;
+    }
+
+    public function mockDateTime($data = ''){
+        $response = array();
+        if(!$data and !empty($_POST)){
+            $data = array();
+            foreach($_POST as $key=>$value){
+                $data[$key] = $value;
+            }
+        }
+
+        $args = json_decode($data["params"]);
+        $gen = $data['funcName'];
+
+        $format = '';
+        if($args[0]){
+            $format = $this->ztinterface->trimQuotation($args[0]);
+        }
+        
+        if(strtolower($data['funcName']) == 'date'){
+            $response['value'] = $faker->$gen;
+        }
+        $response['value'] = $faker->$gen;
+        
         echo json_encode($response);
         return;
     }

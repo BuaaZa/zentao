@@ -226,7 +226,7 @@ class ztinterfaceModel extends model
     }
 
     public function mockStringBykeyword($name){
-        $faker = Faker\Factory::create('zh_CN');
+        $faker = $this->getFaker('zh_CN');
         $regex = '/(' . implode('|', $this->lang->ztinterface->fakerOptions) . ')/i';
         $genStr = '';
         if(preg_match($regex, $name, $matches)) {
@@ -247,8 +247,18 @@ class ztinterfaceModel extends model
     }
 
     public function mockStringByRegex($regex){
-        $faker = Faker\Factory::create();
+        $faker = $this->getFaker();
         return $faker->regexify($regex);
+    }
+
+    public function mockDate($format){
+        $faker = $this->getFaker();
+        return $faker->date($format);
+    }
+
+    public function mocktime($format){
+        $faker = $this->getFaker();
+        return $faker->time($format);
     }
 
     public function parseSymbol($arg){
@@ -299,6 +309,15 @@ class ztinterfaceModel extends model
                 $str = trim($str, "'");
         }
         return $str;
+    }
+
+    public function getFaker($language){
+        $faker = Faker\Factory::create($language);
+        if(!$faker)
+            $faker = Faker\Factory::create();
+        if($language == 'zh_CN')
+            $faker->addProvider(new ChineseProvider($faker));
+        return $faker;
     }
 
 
@@ -2690,4 +2709,77 @@ class ztinterfaceModel extends model
         }
         return $stepData;
     }
+}
+
+use Faker\Provider\zh_CN\Address;
+
+class ChineseProvider extends Address
+{
+    protected static $provinces = array(
+        '北京市',
+        '天津市',
+        '河北省',
+        '山西省',
+        '内蒙古自治区',
+        '辽宁省',
+        '吉林省',
+        '黑龙江省',
+        '上海市',
+        '江苏省',
+        '浙江省',
+        '安徽省',
+        '福建省',
+        '江西省',
+        '山东省',
+        '河南省',
+        '湖北省',
+        '湖南省',
+        '广东省',
+        '广西壮族自治区',
+        '海南省',
+        '重庆市',
+        '四川省',
+        '贵州省',
+        '云南省',
+        '西藏自治区',
+        '陕西省',
+        '甘肃省',
+        '青海省',
+        '宁夏回族自治区',
+        '新疆维吾尔自治区',
+        '台湾省',
+        '香港特别行政区',
+        '澳门特别行政区',
+    );
+
+    protected static $streetSuffixs = array(
+        '街',
+        '胡同',
+        '路',
+        '大道',
+        '巷',        
+    );
+
+    protected static $streetAddressFormats = array(
+        '{{area}}{{streetName}}'
+    );
+
+    protected static $streetNameFormats = array(
+        '{{lastName}}{{streetSuffix}}'
+    );
+
+    protected static $addressFormats = array(
+        '{{state}} {{city}} {{streetAddress}}{{randomDigit}}{{randomDigit}}号',
+    );
+
+    public static function state()
+    {
+        return static::randomElement(static::$provinces);
+    }
+
+    public static function streetSuffix()
+    {
+        return static::randomElement(static::$streetSuffixs);
+    }
+    
 }

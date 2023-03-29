@@ -10,33 +10,40 @@ function toggleChildren(btn) {
 }
 
 const funcTable = [
-  'username',
   'streetname',
-  'firstname',
-  'lastname',
-  'sentence',
-  'paragraph',
-  'word',
   'streetaddress',
   'address',
   'country',
-  'city',
   'state',
-  'company',
-  'email',
-  'password',
-  'url',
-  'macaddress',
-  'ipv4',
-  'ipv6',
-  'useragent',
-  'datetime',
-  'date',
-  'time',
+  'city',
+
+  'sentence',
+  'paragraph',
+  'word',
+  
+  'hexcolor',
+  'rgbcolor',
+  'rgbcsscolor',
+  'colorname',
+  
   'monthname',
   'month',
   'year',
   'timezone',
+  
+  'email',
+  'url',
+  'ipv4',
+  'ipv6',
+  'macaddress',
+  
+  'useragent',
+  'username',
+  'password',
+  
+  'firstname',
+  'lastname',
+  'company',
   'name'
 ];
 
@@ -77,6 +84,8 @@ $('.refresh-button').click(function() {
       rowData['value'].value = response['value'];
       if(response['error']){
         showError(span, response['error']);
+      }else{
+        hideError(span);
       }
     });
     return;
@@ -97,14 +106,16 @@ $('.refresh-button').click(function() {
     var response = {};
     try {
       response = JSON.parse(res);
+      console.log(response);
     } catch (error) {
       console.log(res);
       return;
     }
-
     rowData['value'].value = response['value'];
     if(response['error']){
       showError(span, response['error']);
+    }else{
+      hideError(span);
     }
   })
   .fail(function() {
