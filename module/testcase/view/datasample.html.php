@@ -2,6 +2,7 @@
 
 <?php include '../../common/view/header.lite.html.php';?>
 <div id='mainContent' class='main-content'>
+
     <div class='main-header'>
         <h2>填写数据样本</h2>
     </div>
@@ -12,7 +13,7 @@
             <td><b>输入-输出项名称</b></td>
             <td><b>样本1</b></td>
         </tr>
-        <tr>
+        <tr style = "background-color: #f2f2f2;">
             <td>
                 <textarea rows='1' class='form-control autosize step-expects' name='datasample[0][0]' placeholder='预期输出'></textarea>
             </td>
@@ -24,7 +25,7 @@
         <br><br>
         <button class="btn" type="button"  onclick="addRow();">添加输入项</button>
         <button class="btn" type="button"  onclick="addCol();">添加测试样本</button>
-        <button id='submit' class="btn btn-wide btn-primary " type="submit"  onclick="save_in_cookie();">保存</button>
+        <button name="saveButton" class="btn btn-wide btn-primary" type="button" onclick="save_in_cookie();">保存</button>
         <br><br>
         </form>
     <!-- <input type="button" value="保存" onclick="save_in_cookie();"/> -->
@@ -41,7 +42,34 @@
     </style>
     <script type="text/javascript">
         var rowCount = 1;
-        var colCount = 1;
+        var colCount = 2;
+        $(function()
+        {
+            var stepID = $.cookie('curStepID');
+            var nameStr = 'datasample['+stepID+']';
+            selector = parent.document.getElementsByName(nameStr);
+            element = $(selector);
+            var curDataSample = element.attr("value");
+            if(curDataSample.length > 0){
+                curDataSample = JSON.parse(curDataSample);
+                var rowCountMax = curDataSample.length;
+                var colCountMax = curDataSample[0].length;
+                while(rowCount < rowCountMax){
+                    addRow();
+                }
+                while(colCount < colCountMax){
+                    addCol();
+                }
+                for(i = 0; i < rowCountMax; i += 1){
+                    for(j = 0; j < colCountMax; j += 1){
+                        var textName = 'datasample['+i+']['+j+']';
+                        selector = document.getElementsByName(textName);
+                        element = $(selector);
+                        element.text(curDataSample[i][j]);
+                    }
+                }
+            }
+        })
         function addRow(){
             //$('#submit').attr("disabled",false);
             var testtable = $("#testTable");
@@ -58,7 +86,7 @@
             rowCount++;
             var rowTemplate_1 = "<tr><td><textarea rows='1' class='form-control autosize step-expects' name='datasample["+(rowCount-2)+"][0]' placeholder='输入项'></textarea></td>";
             var rowTemplate_2 = '';
-            for(i = 1; i<=colCount; i++){
+            for(i = 1; i<colCount; i++){
                 var tmp_template = "<td><textarea rows='1' class='form-control autosize step-expects' name='datasample["+(rowCount-2)+"]["+i+"]'></textarea></td>";
                 rowTemplate_2 += tmp_template;
             }
@@ -82,9 +110,9 @@
             $("#testTable tr").each(function(){
                 var trHtml = '';
                 if(i === 1){
-                    trHtml = '<td><b>样本'+colCount+'</b></td>';
+                    trHtml = '<td><b>样本'+(colCount-1)+'</b></td>';
                 }else{
-                    trHtml = "<td><textarea rows='1' class='form-control autosize step-expects' name='datasample["+(i-2)+"]["+colCount+"]'></textarea></td>";
+                    trHtml = "<td><textarea rows='1' class='form-control autosize step-expects' name='datasample["+(i-2)+"]["+(colCount-1)+"]'></textarea></td>";
                 }
 
                 $(this).append(trHtml);
@@ -137,6 +165,14 @@
             selector = parent.document.getElementsByName(nameStr);
             element = $(selector);
             element.attr("value", matrixString);
+
+            submitButton = $(document.getElementsByName("saveButton"));
+            var placement =  'right';
+            submitButton.popover({trigger:'manual', content:"保存成功", placement:placement}).popover('show');
+            submitButton.next('.popover').addClass('popover-success');
+            function distroy(){submitButton.popover('destroy')}
+            setTimeout(distroy,500);
+            setTimeout($.zui.closeModal, 500);
         }
     </script>
 

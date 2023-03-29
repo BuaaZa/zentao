@@ -320,11 +320,6 @@ function initSteps(selector)
     }).on('click', '.btn-step-delete', function()
     {
         if($steps.children('.step').length == 1) return;
-
-        var $step = $(this).closest('.step');
-        var stepID = $step.find('.step-id').text();
-        $.cookie("datasample["+stepID+"]", '');
-
         $(this).closest('.step').remove();
         refreshSteps();
     }).on('change', '.step-group-toggle', function()
