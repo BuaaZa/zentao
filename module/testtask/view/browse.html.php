@@ -67,7 +67,7 @@ $status = strtolower($status);
   </div>
   <?php endif;?>
 </div>
-<div id='mainContent' class='main-row fade'>
+<div id='mainContent' class='main-table main-row fade'>
   <div class="side-col" id="sidebar">
     <div class="cell">
       <?php if(!$taskTree):?>
@@ -95,7 +95,8 @@ $status = strtolower($status);
         </p>
       </div>
       <?php else:?>
-      <table class='table has-sort-head' id='taskList'>
+      <table class='table has-sort-head'
+             id='taskList'>
         <thead>
         <?php $vars = "productID=$productID&branch=$branch&type=$scope,$status&orderBy=%s&recTotal={$pager->recTotal}&recPerPage={$pager->recPerPage}"; ?>
           <tr>

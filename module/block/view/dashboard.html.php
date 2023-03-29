@@ -31,7 +31,11 @@ $useGuest = $this->app->user->account == 'guest';
     <div class='col-main'>
       <?php foreach($longBlocks as $index => $block):?>
       <?php if(isset($config->block->closed) and strpos(",{$config->block->closed},", ",{$block->source}|{$block->block},") !== false) continue;?>
-      <div class='panel block-<?php echo $block->block;?> <?php if(isset($block->params->color)) echo 'panel-' . $block->params->color;?>' id='block<?php echo $block->id?>' data-id='<?php echo $block->id?>' data-name='<?php echo $block->title?>' data-order='<?php echo $block->order?>' data-url='<?php echo $block->blockLink?>'>
+      <div class='panel block-<?php echo $block->block;?>
+            <?php if(isset($block->params->color)) echo 'panel-' . $block->params->color;?>'
+           id='block<?php echo $block->id?>' data-id='<?php echo $block->id?>'
+           data-name='<?php echo $block->title?>' data-order='<?php echo $block->order?>'
+           data-url='<?php echo $block->blockLink?>'>
         <?php $hasHeading = ($block->block != 'welcome');?>
         <?php if($hasHeading):?>
         <div class='panel-heading'>
@@ -137,6 +141,7 @@ $(function()
     }
     setTimeout(checkRemind, 1000);
 
+    // 每个 block 渲染 panel
     $('#dashboard .row .panel').each(function()
     {
         refreshBlock($(this));
@@ -144,4 +149,9 @@ $(function()
 });
 </script>
 <?php if($extView = $this->getExtViewFile(__FILE__)){include $extView; return helper::cd();}?>
-<?php if(isset($pageJS)) js::execute($pageJS);?>
+<?php
+    if(isset($pageJS))
+    {
+//        ChromePhp::log($pageJS);
+        js::execute($pageJS);
+    }?>

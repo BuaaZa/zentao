@@ -206,179 +206,193 @@
                                         echo $branches[$caseModule->branch] . $lang->arrow;
                                     }
 
-                                    foreach ($modulePath as $key => $module) {
-                                        if ($this->app->tab == 'qa' || $this->app->tab == 'ops') {
-                                            if ($isLibCase) {
-                                                if (!common::printLink('caselib', 'browse', "libID=$case->lib&browseType=byModule&param=$module->id", $module->name)) echo $module->name;
-                                            } else {
-                                                if (!common::printLink('testcase', 'browse', "productID=$case->product&branch=$module->branch&browseType=byModule&param=$module->id", $module->name)) echo $module->name;
-                                            }
-                                        }
-                                        if ($this->app->tab == 'project' and !common::printLink('project', 'testcase', "projectID={$this->session->project}&productID=$case->product&branch=$module->branch&browseType=byModule&param=$module->id", $module->name)) echo $module->name;
-                                        if ($this->app->tab == 'execution') echo $module->name;
-                                        if (isset($modulePath[$key + 1])) echo $lang->arrow;
-                                    }
-                                }
-                                ?>
-                            </td>
-                        </tr>
-                        <?php if (!$isLibCase): ?>
-                            <tr class='nofixed'>
-                                <th><?php echo $lang->testcase->story; ?></th>
-                                <td>
-                                    <?php
-                                    $class = isonlybody() ? 'showinonlybody' : 'iframe';
-                                    $param = $this->app->tab == 'project' ? "&version=0&projectID={$this->session->project}" : '';
-                                    if (isset($case->storyTitle)) {
-                                        if (common::hasPriv('story', 'view')) {
-                                            echo html::a($this->createLink('story', 'view', "storyID=$case->story" . $param, '', true), "#$case->story:$case->storyTitle", '', "class=$class data-width='80%'");
-                                        } else {
-                                            echo "#$case->story:$case->storyTitle";
-                                        }
-                                    }
-                                    if ($case->story and $case->storyStatus == 'active' and $case->latestStoryVersion > $case->storyVersion) {
-                                        echo "(<span class='warning'>{$lang->story->changed}</span> ";
-                                        if (common::hasPriv('testcase', 'confirmStoryChange', $case)) echo html::a($this->createLink('testcase', 'confirmStoryChange', "caseID=$case->id"), $lang->confirm, 'hiddenwin');
-                                        echo ")";
-                                    }
-                                    ?>
-                                </td>
-                            </tr>
-                        <?php endif; ?>
-                        <tr>
-                            <th><?php echo $lang->testcase->type; ?></th>
-                            <td><?php echo $lang->testcase->typeList[$case->type]; ?></td>
-                        </tr>
-                        <tr>
-                            <th><?php echo $lang->testcase->stage; ?></th>
-                            <td>
-                                <?php
-                                if ($case->stage) {
-                                    $stags = explode(',', $case->stage);
-                                    foreach ($stags as $stage) {
-                                        if (empty($stage)) continue;
-                                        isset($lang->testcase->stageList[$stage]) ? print($lang->testcase->stageList[$stage]) : print($stage);
-                                        echo "<br />";
-                                    }
-                                }
-                                ?>
-                            </td>
-                        </tr>
-                        <tr>
-                            <th><?php echo $lang->testcase->pri; ?></th>
-                            <td><span class='label-pri label-pri-<?php echo $case->pri; ?>'
-                                      title='<?php echo zget($lang->testcase->priList, $case->pri); ?>'><?php echo zget($lang->testcase->priList, $case->pri) ?></span>
-                            </td>
-                        </tr>
-                        <tr>
-                            <th><?php echo $lang->testcase->status; ?></th>
-                            <td>
-                                <?php
-                                echo $this->processStatus('testcase', $case);
-                                if ($case->version > $case->currentVersion and $from == 'testtask') {
-                                    echo "(<span class='warning' title={$lang->testcase->fromTesttask}>{$lang->testcase->changed}</span> ";
-                                    if (common::hasPriv('testcase', 'confirmchange')) echo html::a($this->createLink('testcase', 'confirmchange', "caseID=$case->id&taskID=$taskID"), $lang->testcase->sync, 'hiddenwin', "class='btn btn-mini btn-info'");
-                                    echo ")";
-                                }
-                                if (isset($case->fromCaseVersion) and $case->fromCaseVersion > $case->version and $from != 'testtask' and !empty($case->product)) {
-                                    echo "(<span class='warning' title={$lang->testcase->fromCaselib}>{$lang->testcase->changed}</span> ";
-                                    if (common::hasPriv('testcase', 'confirmLibcaseChange')) echo html::a($this->createLink('testcase', 'confirmLibcaseChange', "caseID=$case->id&libcaseID=$case->fromCaseID"), $lang->testcase->sync, 'hiddenwin', "class='btn btn-mini btn-info'");
-                                    if (common::hasPriv('testcase', 'ignoreLibcaseChange')) echo html::a($this->createLink('testcase', 'ignoreLibcaseChange', "caseID=$case->id"), $lang->testcase->ignore, 'hiddenwin', "class='btn btn-mini btn-info'");
-                                    echo ")";
-                                }
-                                ?>
-                            </td>
-                        </tr>
-                        <?php if (!$isLibCase): ?>
-                            <tr>
-                                <th><?php echo $this->app->loadLang('testtask')->testtask->lastRunTime; ?></th>
-                                <td><?php if (!helper::isZeroDate($case->lastRunDate)) echo $case->lastRunDate; ?></td>
-                            </tr>
-                            <tr>
-                                <th><?php echo $this->app->loadLang('testtask')->testtask->lastRunResult; ?></th>
-                                <td><?php if ($case->lastRunResult) echo $lang->testcase->resultList[$case->lastRunResult]; ?></td>
-                            </tr>
-                        <?php endif; ?>
-                        <tr>
-                            <th><?php echo $lang->testcase->keywords; ?></th>
-                            <td><?php echo $case->keywords; ?></td>
-                        </tr>
-                        <?php if (!$isLibCase): ?>
-                            <tr>
-                                <th><?php echo $lang->testcase->linkCase; ?></th>
-                                <td class='linkCaseTitles'>
-                                    <?php
-                                    if (isset($case->linkCaseTitles)) {
-                                        foreach ($case->linkCaseTitles as $linkCaseID => $linkCaseTitle) {
-                                            echo html::a($this->createLink('testcase', 'view', "caseID=$linkCaseID", '', true), "#$linkCaseID $linkCaseTitle", '', "class='iframe' data-width='80%' title='$linkCaseTitle'") . '<br />';
-                                        }
-                                    }
-                                    ?>
-                                </td>
-                            </tr>
-                        <?php endif; ?>
-                    </table>
-                </div>
-            </details>
+                    foreach($modulePath as $key => $module)
+                    {
+                        if($this->app->tab == 'qa' || $this->app->tab == 'ops')
+                        {
+                            if($isLibCase)
+                            {
+                                if(!common::printLink('caselib', 'browse', "libID=$case->lib&browseType=byModule&param=$module->id", $module->name)) echo $module->name;
+                            }
+                            else
+                            {
+                                if(!common::printLink('testcase', 'browse', "productID=$case->product&branch=$module->branch&browseType=byModule&param=$module->id", $module->name)) echo $module->name;
+                            }
+                        }
+                        if($this->app->tab == 'project' and !common::printLink('project', 'testcase', "projectID={$this->session->project}&productID=$case->product&branch=$module->branch&browseType=byModule&param=$module->id", $module->name)) echo $module->name;
+                        if($this->app->tab == 'execution') echo $module->name;
+                        if(isset($modulePath[$key + 1])) echo $lang->arrow;
+                    }
+                }
+                ?>
+              </td>
+            </tr>
+            <?php if(!$isLibCase):?>
+            <tr class='nofixed'>
+              <th><?php echo $lang->testcase->story;?></th>
+              <td>
+                <?php
+                $class = isonlybody() ? 'showinonlybody' : 'iframe';
+                $param = $this->app->tab == 'project' ? "&version=0&projectID={$this->session->project}" : '';
+                if(isset($case->storyTitle))
+                {
+                    if(common::hasPriv('story', 'view'))
+                    {
+                        echo html::a($this->createLink('story', 'view', "storyID=$case->story" . $param, '', true), "#$case->story:$case->storyTitle", '', "class=$class data-width='80%'");
+                    }
+                    else
+                    {
+                        echo "#$case->story:$case->storyTitle";
+                    }
+                }
+                if($case->story and $case->storyStatus == 'active' and $case->latestStoryVersion > $case->storyVersion)
+                {
+                    echo "(<span class='warning'>{$lang->story->changed}</span> ";
+                    if(common::hasPriv('testcase', 'confirmStoryChange', $case)) echo html::a($this->createLink('testcase', 'confirmStoryChange', "caseID=$case->id"), $lang->confirm, 'hiddenwin');
+                    echo ")";
+                }
+                ?>
+              </td>
+            </tr>
+            <?php endif;?>
+            <tr>
+              <th><?php echo $lang->testcase->type;?></th>
+              <td><?php echo $lang->testcase->typeList[$case->type];?></td>
+            </tr>
+            <tr>
+              <th><?php echo $lang->testcase->stage;?></th>
+              <td>
+                <?php
+                if($case->stage)
+                {
+                    $stags = explode(',', $case->stage);
+                    foreach($stags as $stage)
+                    {
+                        if(empty($stage)) continue;
+                        isset($lang->testcase->stageList[$stage]) ? print($lang->testcase->stageList[$stage]) : print($stage);
+                        echo "<br />";
+                    }
+                }
+                ?>
+              </td>
+            </tr>
+            <tr>
+              <th><?php echo $lang->testcase->pri;?></th>
+              <td><span class='label-pri label-pri-<?php echo $case->pri;?>' title='<?php echo zget($lang->testcase->priList, $case->pri);?>'><?php echo zget($lang->testcase->priList, $case->pri)?></span></td>
+            </tr>
+            <tr>
+              <th><?php echo $lang->testcase->status;?></th>
+              <td>
+                <?php
+                echo $this->processStatus('testcase', $case);
+                if($case->version > $case->currentVersion and $from == 'testtask')
+                {
+                    echo "(<span class='warning' title={$lang->testcase->fromTesttask}>{$lang->testcase->changed}</span> ";
+                    if(common::hasPriv('testcase', 'confirmchange')) echo html::a($this->createLink('testcase', 'confirmchange', "caseID=$case->id&taskID=$taskID"), $lang->testcase->sync, 'hiddenwin', "class='btn btn-mini btn-info'");
+                    echo ")";
+                }
+                if(isset($case->fromCaseVersion) and $case->fromCaseVersion > $case->version and $from != 'testtask' and !empty($case->product))
+                {
+                    echo "(<span class='warning' title={$lang->testcase->fromCaselib}>{$lang->testcase->changed}</span> ";
+                    if(common::hasPriv('testcase', 'confirmLibcaseChange')) echo html::a($this->createLink('testcase', 'confirmLibcaseChange', "caseID=$case->id&libcaseID=$case->fromCaseID"), $lang->testcase->sync, 'hiddenwin', "class='btn btn-mini btn-info'");
+                    if(common::hasPriv('testcase', 'ignoreLibcaseChange')) echo html::a($this->createLink('testcase', 'ignoreLibcaseChange', "caseID=$case->id"), $lang->testcase->ignore, 'hiddenwin', "class='btn btn-mini btn-info'");
+                    echo ")";
+                }
+                ?>
+              </td>
+            </tr>
+            <?php if(!$isLibCase):?>
+             <tr>
+              <th><?php echo $this->app->loadLang('testtask')->testtask->lastRunTime;?></th>
+              <td><?php if(!helper::isZeroDate($case->lastRunDate)) echo $case->lastRunDate;?></td>
+            </tr>
+            <tr>
+              <th><?php echo $this->app->loadLang('testtask')->testtask->lastRunResult;?></th>
+              <td><?php if($case->lastRunResult) echo $lang->testcase->resultList[$case->lastRunResult];?></td>
+            </tr>
+            <?php endif;?>
+            <tr>
+              <th><?php echo $lang->testcase->keywords;?></th>
+              <td><?php echo $case->keywords;?></td>
+            </tr>
+            <?php if(!$isLibCase):?>
+            <tr>
+              <th><?php echo $lang->testcase->linkCase;?></th>
+              <td class='linkCaseTitles'>
+                <?php
+                if(isset($case->linkCaseTitles))
+                {
+                    foreach($case->linkCaseTitles as $linkCaseID => $linkCaseTitle)
+                    {
+                        echo html::a($this->createLink('testcase', 'view', "caseID=$linkCaseID", '', true), "#$linkCaseID $linkCaseTitle", '', "class='iframe' data-width='80%' title='$linkCaseTitle'") . '<br />';
+                    }
+                }
+                ?>
+              </td>
+            </tr>
+            <?php endif;?>
+          </table>
         </div>
-        <?php if (!$isLibCase): ?>
-            <div class="cell">
-                <details class="detail" open>
-                    <summary class="detail-title"><?php echo $lang->testcase->legendLinkBugs; ?></summary>
-                    <div class="detail-content">
-                        <table class='table table-data'>
-                            <?php if ($case->fromBug): ?>
-                                <tr>
-                                    <td><?php echo html::a($this->createLink('bug', 'view', "bugID=$case->fromBug", '', true), $case->fromBugTitle, '', "class='iframe' data-width='80%'"); ?></td>
-                                </tr>
-                            <?php endif; ?>
-                            <?php if ($case->toBugs): ?>
-                                <tr>
-                                    <td class='linkBugTitles'>
-                                        <?php
-                                        foreach ($case->toBugs as $bugID => $bugTitle) {
-                                            echo html::a($this->createLink('bug', 'view', "bugID=$bugID", '', true), "#$bugID " . $bugTitle, '', "class='iframe' data-width='80%' title='$bugTitle'") . '<br />';
-                                        }
-                                        ?>
-                                    </td>
-                                </tr>
-                            <?php endif; ?>
-                        </table>
-                    </div>
-                </details>
-            </div>
-        <?php endif; ?>
-        <div class="cell">
-            <details class="detail" open>
-                <summary class="detail-title"><?php echo $lang->testcase->legendOpenAndEdit; ?></summary>
-                <div class="detail-content">
-                    <table class='table table-data'>
-                        <tr>
-                            <th class='lifeThWidth'><?php echo $lang->testcase->openedBy; ?></th>
-                            <td><?php echo zget($users, $case->openedBy) . $lang->at . $case->openedDate; ?></td>
-                        </tr>
-                        <?php if ($config->testcase->needReview or !empty($config->testcase->forceReview)): ?>
-                            <tr>
-                                <th><?php echo $lang->testcase->reviewedBy; ?></th>
-                                <td><?php $reviewedBy = explode(',', $case->reviewedBy);
-                                    foreach ($reviewedBy as $account) echo ' ' . zget($users, trim($account)); ?></td>
-                            </tr>
-                            <tr>
-                                <th><?php echo $lang->testcase->reviewedDate; ?></th>
-                                <td><?php if ($case->reviewedBy) echo $case->reviewedDate; ?></td>
-                            </tr>
-                        <?php endif; ?>
-                        <tr>
-                            <th><?php echo $lang->testcase->lblLastEdited; ?></th>
-                            <td><?php if ($case->lastEditedBy) echo zget($users, $case->lastEditedBy) . $lang->at . $case->lastEditedDate; ?></td>
-                        </tr>
-                    </table>
-                </div>
-            </details>
-        </div>
-        <?php $this->printExtendFields($case, 'div', "position=right&inForm=0&inCell=1"); ?>
-        <div class='cell'><?php include '../../common/view/action.html.php'; ?></div>
+      </details>
     </div>
+    <?php if(!$isLibCase):?>
+    <div class="cell">
+      <details class="detail" open>
+        <summary class="detail-title"><?php echo $lang->testcase->legendLinkBugs;?></summary>
+        <div class="detail-content">
+          <table class='table table-data'>
+            <?php if($case->fromBug):?>
+            <tr>
+              <td><?php echo html::a($this->createLink('bug', 'view', "bugID=$case->fromBug", '', true), $case->fromBugTitle, '', "class='iframe' data-width='80%'");?></td>
+            </tr>
+            <?php endif;?>
+            <?php if($case->toBugs):?>
+            <tr>
+              <td class='linkBugTitles'>
+              <?php
+              foreach($case->toBugs as $bugID => $bugTitle)
+              {
+                  echo html::a($this->createLink('bug', 'view', "bugID=$bugID", '', true), "#$bugID " . $bugTitle, '', "class='iframe' data-width='80%' title='$bugTitle'") . '<br />';
+              }
+              ?>
+              </td>
+            </tr>
+            <?php endif;?>
+          </table>
+        </div>
+      </details>
+    </div>
+    <?php endif;?>
+    <div class="cell">
+      <details class="detail" open>
+        <summary class="detail-title"><?php echo $lang->testcase->legendOpenAndEdit;?></summary>
+        <div class="detail-content">
+          <table class='table table-data'>
+            <tr>
+              <th class='lifeThWidth'><?php echo $lang->testcase->openedBy;?></th>
+              <td><?php echo zget($users, $case->openedBy) . $lang->at . $case->openedDate;?></td>
+            </tr>
+            <?php if($config->testcase->needReview or !empty($config->testcase->forceReview)):?>
+            <tr>
+              <th><?php echo $lang->testcase->reviewedBy;?></th>
+              <td><?php $reviewedBy = explode(',', $case->reviewedBy); foreach($reviewedBy as $account) echo ' ' . zget($users, trim($account)); ?></td>
+            </tr>
+            <tr>
+              <th><?php echo $lang->testcase->reviewedDate;?></th>
+              <td><?php if($case->reviewedBy) echo $case->reviewedDate;?></td>
+            </tr>
+            <?php endif;?>
+            <tr>
+              <th><?php echo $lang->testcase->lblLastEdited;?></th>
+              <td><?php if($case->lastEditedBy) echo zget($users, $case->lastEditedBy) . $lang->at . $case->lastEditedDate;?></td>
+            </tr>
+          </table>
+        </div>
+      </details>
+    </div>
+    <?php $this->printExtendFields($case, 'div', "position=right&inForm=0&inCell=1");?>
+    <div class='cell'><?php include '../../common/view/action.html.php';?></div>
+  </div>
 </div>
 <div id="mainActions" class='main-actions'>
     <?php common::printPreAndNext($preAndNext, $this->createLink('testcase', 'view', "caseID=%s&version=&from=$from&taskID=$taskID")); ?>

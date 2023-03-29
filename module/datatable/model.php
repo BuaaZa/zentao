@@ -71,6 +71,7 @@ class datatableModel extends model
         if(!isset($this->config->$module)) $this->loadModel($module);
         if(isset($this->config->datatable->$datatableId->$key)) $setting = json_decode($this->config->datatable->$datatableId->$key);
 
+//        ChromePhp::log($setting);
         $fieldList = $this->getFieldList($module);
         if(empty($setting))
         {

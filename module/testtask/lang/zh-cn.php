@@ -12,6 +12,7 @@
 
 $lang->testtask->move             = "转移到";
 $lang->testtask->batchMove        = "批量转移";
+$lang->testtask->title            = "所属测试集";
 
 $lang->testtask->index            = "测试集首页";
 $lang->testtask->create           = "添加测试集";

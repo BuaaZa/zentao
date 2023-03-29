@@ -28,6 +28,7 @@
         <th class='c-id-xs'><?php echo $lang->idAB?></th>
         <th class='c-pri'><?php echo $lang->priAB?></th>
         <th class='c-title text-left'><?php echo $lang->case->title;?></th>
+        <th class='c-testtask'><?php echo $lang->testtask->title;?></th>
         <?php if($longBlock):?>
         <th class='c-runtime'><?php echo $lang->testtask->lastRunTime;?></th>
         <th class='c-result'><?php echo $lang->testtask->lastRunResult;?></th>
@@ -45,6 +46,9 @@
         <td class='c-id-xs'><?php echo sprintf('%03d', $case->id);?></td>
         <td class='c-pri'><span class='label-pri label-pri-<?php echo $case->pri?>' title='<?php echo zget($lang->case->priList, $case->pri, $case->pri);?>'><?php echo zget($lang->case->priList, $case->pri, $case->pri)?></span></td>
         <td class='c-title text-left' style='color: <?php echo $case->color?>' title='<?php echo $case->title?>'><?php echo $case->title?></td>
+        <td class='c-title text-left' style='color: <?php echo $case->color?>' title='<?php echo $case->title?>'>
+            <?php echo $case->title?>
+        </td>
         <?php if($longBlock):?>
         <td class='c-runtime'><?php if(!helper::isZeroDate($case->lastRunDate)) echo date(DT_MONTHTIME1, strtotime($case->lastRunDate));?></td>
         <td class='c-result'><?php if($case->lastRunResult) echo $lang->testcase->resultList[$case->lastRunResult];?></td>
