@@ -251,15 +251,13 @@ foreach(explode(',', $config->testcase->create->requiredFields) as $field)
                     <td><?php echo html::textarea('goal_actions[]', $step->goal_action, "rows='1' class='form-control autosize step-expects'") ?></td>
                     <td><?php echo html::textarea('expects[]', $step->expect, "rows='1' class='form-control autosize step-expects'") ?></td>
                     <td><?php echo html::textarea('eval_criterias[]', $step->eval_criteria, "rows='1' class='form-control autosize step-expects'") ?></td>
-                    <td class='step-actions'>
+                    <td class='step-actions stepsample-actions'>
                         <input type='hidden' name='datasample[]' id='datasample' value='' class='step-datasample'>
                       <?php
                         common::printIcon('testcase', 'datasample',"", '',
                             'list', 'edit', '', 'showinonlybody iframe btn-datasample',
                             true,'','填写' );
-                        common::printIcon('testcase', 'reset',"", '',
-                          'list', 'undo', 'hiddenwin', 'showinonlybody',
-                          false,'','重置样本数据' );
+
 //                        echo $this->loadModel('common')->buildMenu('testcase', 'datasample',"", '',
 //                            'button', 'edit', '', 'showinonlybody iframe',
 //                            true, '', '填写');
@@ -267,6 +265,9 @@ foreach(explode(',', $config->testcase->create->requiredFields) as $field)
 //                          'button', 'undo', 'hiddenwin', 'showinonlybody',
 //                          false, '', '重置');
 //                        ?>
+                        <button type='button' title="重置数据样本" class='btn datasample-undo '>
+                            <i class='icon icon-undo'></i
+                        </button>
                     </td>
                     <td class='step-actions'>
                       <div class='btn-group'>

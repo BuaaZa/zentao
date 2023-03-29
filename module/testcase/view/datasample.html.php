@@ -115,6 +115,7 @@
             //此处将表单数据存到cookie中
             var form = document.getElementById("dataform"); // get form element
             var matrix = []; // initialize empty array
+            var isEmpty = true;
             for (var i = 0; i < form.elements.length; i++) { // loop through each form element
                     var element = form.elements[i]; // get current element
                     if (element.name.startsWith("datasample")) { // if element name starts with matrix
@@ -125,6 +126,8 @@
                             matrix[row] = []; // create empty row array
                         }
                         matrix[row][col] =element.value; // assign element value to array position
+                        if(isEmpty && element.value != '')
+                            isEmpty = false;
                     }
             }
             var matrixString = JSON.stringify(matrix); // convert array to string using JSON.stringify()
@@ -137,6 +140,22 @@
             selector = parent.document.getElementsByName(nameStr);
             element = $(selector);
             element.attr("value", matrixString);
+
+            // console.log(isEmpty);
+            // console.log(parent.$('#steps tr[data-index!="'+ stepID +'"] td.stepsample-actions').find('a'));
+
+            var $otherDatasampleActions = parent.$('#steps tr[data-index!="'+ stepID +'"] td.stepsample-actions');
+
+            if(!isEmpty){
+                // console.log(parent.$('#steps tr[data-index!="'+ stepID +'"] td.stepsample-actions'));
+
+                $otherDatasampleActions.find('a').attr("disabled",true).css("pointer-events","none");
+                $otherDatasampleActions.find('button').attr("disabled",true);
+            }else{
+                $otherDatasampleActions.find('a').removeAttr("disabled").css("pointer-events","");
+                $otherDatasampleActions.find('button').removeAttr("disabled");
+            }
+
         }
     </script>
 

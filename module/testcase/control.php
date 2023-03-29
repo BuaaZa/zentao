@@ -2501,12 +2501,6 @@ class testcase extends control
         $this->display();
     }
 
-//    public function reset()
-//    {
-//        setcookie("datasample", "", time() - 3600, $this->config->webRoot, "", $this->config->cookieSecure,false);
-//        return print(js::reload('parent'));
-//    }
-
     /**
      * Case bugs.
      *

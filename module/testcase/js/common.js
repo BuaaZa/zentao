@@ -375,6 +375,28 @@ function initSteps(selector)
         var $step = $(this).closest('.step');
         var stepID = $step.find('.step-id').text();
         $.cookie('curStepID', stepID);
+    }).on('click', '.datasample-undo', function()
+    {
+        var $step = $(this).closest('.step');
+        var $stepInput = $step.find('#datasample');
+        // console.log($stepInput.attr('value'));
+        $stepInput.attr('value','');
+        // console.log($stepInput.attr('value'));
+
+        var stepID = $step.find('.step-id').text();
+
+        var $otherDatasampleActions = $('#steps tr[data-index!="'+ stepID +'"] td.stepsample-actions');
+
+        $otherDatasampleActions.find('a').removeAttr("disabled").css("pointer-events","");
+        $otherDatasampleActions.find('button').removeAttr("disabled");
+
+        new $.zui.Messager('成功清除数据样本', {
+            type: 'success',
+            close: true,
+            icon: 'exclamation-sign',
+            time: 900 // 不进行自动隐藏
+        }).show();
+
     });
     initSortable();
     refreshSteps();
