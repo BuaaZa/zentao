@@ -415,9 +415,9 @@ class testcase extends control
             //获取数据样本表的填写内容
             //$datasample = json_decode($this->post->datasample, true);
             //error_log(print_r($datasample, 1));
-            $datasample = $this->post->datasample;
-            ChromePhp::log($datasample);
-            die('test');
+//            $datasample = $this->post->datasample;
+//            ChromePhp::log($datasample);
+//            die('test');
             $response['result'] = 'success';
 
             setcookie('lastCaseModule', (int)$this->post->module, $this->config->cookieLife, $this->config->webRoot, '', $this->config->cookieSecure, false);
