@@ -241,7 +241,7 @@ $lang->testcase->exportCaseTypetList['word'] = 'Word';
 $lang->testcase->buttonToList = '返回';
 
 $lang->testcase->whichLine        = '第%s行';
-$lang->testcase->stepsEmpty       = '步骤%s不能为空';
+$lang->testcase->stepsEmpty       = '前置条件%s不能为空';
 $lang->testcase->errorEncode      = '无数据，请选择正确的编码重新上传！';
 $lang->testcase->noFunction       = '不存在iconv和mb_convert_encoding转码方法，不能将数据转成想要的编码！';
 $lang->testcase->noRequire        = "%s行的“%s”是必填字段，不能为空";

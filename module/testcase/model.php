@@ -16,6 +16,8 @@ use PhpOffice\PhpWord\IOFactory;
 <?php
 class testcaseModel extends model
 {
+    public commonModel $common;
+
     /**
      * Set menu.
      *
@@ -38,24 +40,33 @@ class testcaseModel extends model
      *
      * @param int $bugID
      * @access public
-     * @return void
+     * @return false
      */
-    function create($bugID)
+    function create(int $bugID): bool|array
     {
-        $steps   = $this->post->steps;
-        $expects = $this->post->expects;
-        foreach($expects as $key => $value)
+        $this->common = $this->loadModel('common');
+
+        ChromePhp::log($this->post->steps);
+
+        // 判定有预期结果时，前置条件不能为空
         {
-            if(!empty($value) and empty($steps[$key]))
-            {
-                dao::$errors[] = sprintf($this->lang->testcase->stepsEmpty, $key);
-                return false;
+            $steps = $this->post->steps;
+            $expects = $this->post->expects;
+            $noError = true;
+            foreach ($expects as $key => $value) {
+                if (!empty($value) and empty($steps[$key])) {
+                    dao::$errors[] = sprintf($this->lang->testcase->stepsEmpty . "\n", $key);
+                    $noError = false;
+                }
             }
+
+            if (!$noError)
+                return false;
         }
 
         $now    = helper::now();
         $status = $this->getStatus('create');
-        $case   = fixer::input('post')
+        $case = fixer::input('post')
             ->add('status', $status)
             ->add('version', 1)
             ->add('fromBug', $bugID)
@@ -71,50 +82,50 @@ class testcaseModel extends model
             ->get();
 
         $param = '';
-        if(!empty($case->lib))$param = "lib={$case->lib}";
-        if(!empty($case->product))$param = "product={$case->product}";
-        $result = $this->loadModel('common')->removeDuplicate('case', $case, $param);
-        if($result and $result['stop']) return array('status' => 'exists', 'id' => $result['duplicate']);
+        if (!empty($case->lib)) $param = "lib=$case->lib";
+        if (!empty($case->product)) $param = "product=$case->product";
 
-        if(empty($case->product)) $this->config->testcase->create->requiredFields = str_replace('story', '', $this->config->testcase->create->requiredFields);
+        $result = $this->common->removeDuplicate('case', $case, $param);
+        if ($result and $result['stop']) return array('status' => 'exists', 'id' => $result['duplicate']);
+
+        if (empty($case->product)) $this->config->testcase->create->requiredFields = str_replace('story', '', $this->config->testcase->create->requiredFields);
 
         /* Value of story may be showmore. */
         $case->story = (int)$case->story;
         $case->data_sample_new = fixer::input('post')->get()->datasample;
         $this->dao->insert(TABLE_CASE)->data($case)->autoCheck()->batchCheck($this->config->testcase->create->requiredFields, 'notempty')->checkFlow()->exec();
-        if(!$this->dao->isError())
-        {
+        if (!$this->dao->isError()) {
             $caseID = $this->dao->lastInsertID();
             $this->loadModel('file')->saveUpload('testcase', $caseID);
             $parentStepID = 0;
             $this->loadModel('score')->create('testcase', 'create', $caseID);
 
             $data = fixer::input('post')->get();
-            foreach($data->steps as $stepID => $stepDesc)
-            {
-                if(empty($stepDesc)) continue;
-                $stepType      = $this->post->stepType;
-                $step          = new stdClass();
-                $step->type    = ($stepType[$stepID] == 'item' and $parentStepID == 0) ? 'step' : $stepType[$stepID];
-                $step->parent  = ($step->type == 'item') ? $parentStepID : 0;
-                $step->case    = $caseID;
+            foreach ($data->steps as $stepID => $stepDesc) {
+                if (empty($stepDesc)) continue;
+                $stepType = $this->post->stepType;
+                $step = new stdClass();
+                $step->type = ($stepType[$stepID] == 'item' and $parentStepID == 0) ? 'step' : $stepType[$stepID];
+                $step->parent = ($step->type == 'item') ? $parentStepID : 0;
+                $step->case = $caseID;
                 $step->version = 1;
-                $step->desc    = rtrim(htmlSpecialString($stepDesc));
+                $step->desc = rtrim(htmlSpecialString($stepDesc));
                 $judge = $step->type == 'group' || $step->type == 'item';
-                $step->input  = $judge ? '' : rtrim(htmlSpecialString($data->inputs[$stepID]));
-                $step->goal_action  = $judge ? '' : rtrim(htmlSpecialString($data->goal_actions[$stepID]));
-                $step->expect  = $judge ? '' : rtrim(htmlSpecialString($data->expects[$stepID]));
-                $step->eval_criteria  = $judge ? '' : rtrim(htmlSpecialString($data->eval_criterias[$stepID]));
+                $step->input = $judge ? '' : rtrim(htmlSpecialString($data->inputs[$stepID]));
+                $step->goal_action = $judge ? '' : rtrim(htmlSpecialString($data->goal_actions[$stepID]));
+                $step->expect = $judge ? '' : rtrim(htmlSpecialString($data->expects[$stepID]));
+                $step->eval_criteria = $judge ? '' : rtrim(htmlSpecialString($data->eval_criterias[$stepID]));
                 $step->eval_criteria = strlen($step->eval_criteria) == 0 ? $step->expect : $step->eval_criteria;
-                $stepIoType      = $this->post->stepIoType;
+                $stepIoType = $this->post->stepIoType;
                 $step->is_out = $stepIoType[$stepID];
                 $this->dao->insert(TABLE_CASESTEP)->data($step)->autoCheck()->exec();
-                if($step->type == 'group') $parentStepID = $this->dao->lastInsertID();
-                if($step->type == 'step')  $parentStepID = 0;
+                if ($step->type == 'group') $parentStepID = $this->dao->lastInsertID();
+                if ($step->type == 'step') $parentStepID = 0;
             }
 
             return array('status' => 'created', 'id' => $caseID, 'caseInfo' => $case);
         }
+        return true;
     }
 
     /**

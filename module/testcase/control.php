@@ -30,6 +30,11 @@ class testcase extends control
     public $projectID = 0;
     public testcaseModel $testcase;
     public storyModel $story;
+    public userModel $user;
+    public qaModel $qa;
+    public executionModel $execution;
+    public productModel $product;
+    public actionModel $action;
 
     /**
      * Construct function, load product, tree, user auto.
@@ -367,7 +372,7 @@ class testcase extends control
 
     /**
      * Create a test case.
-     * @param        $productID
+     * @param string $productID
      * @param string $branch
      * @param int    $moduleID
      * @param string $from
@@ -375,7 +380,7 @@ class testcase extends control
      * @param int    $storyID
      * @param string $extras
      * @access public
-     * @return void
+     * @return int
      */
     public function create($productID, $branch = '', $moduleID = 0, $from = '', $param = 0, $storyID = 0, $extras = '')
     {
@@ -611,6 +616,7 @@ class testcase extends control
         $this->view->branches         = $branches;
 
         $this->display();
+        return 0;
     }
 
 

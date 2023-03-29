@@ -16112,7 +16112,7 @@ alter table zt_task
 alter table `zt_testtask`
     add `parent` int not null;
 
-create table if not exists `data_sample`
+create table if not exists `zt_data_sample`
 (
     `id`           int unsigned auto_increment primary key comment '数据样本的ID',
     `case_id`      int unsigned unique not null comment '用例外键ID',
@@ -16121,7 +16121,7 @@ create table if not exists `data_sample`
     `delete`       enum ('0', '1') default '0'
 );
 
-create table if not exists `data_sample_result`
+create table if not exists `zt_data_sample_result`
 (
     `id`             int unsigned auto_increment primary key comment '数据样本结果的ID',
     `data_sample_id` int unsigned unique not null comment '数据样本外键ID',
