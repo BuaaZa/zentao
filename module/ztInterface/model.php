@@ -311,6 +311,15 @@ class ztinterfaceModel extends model
         return $str;
     }
 
+    public function parseParams($str){
+        $args = json_decode($str);
+        foreach($args  as $key => $value){
+            $args[$key] = $this->trimQuotation($value);
+            $args[$key] = strtolower($args[$key]);
+        }
+        return $args;
+    }
+
     public function getFaker($language = 'en_US'){
         $faker = Faker\Factory::create($language);
         if(!$faker)

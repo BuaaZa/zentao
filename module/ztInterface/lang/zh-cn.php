@@ -376,10 +376,10 @@ $lang->ztinterface->fakerCN = array(
     'name'    
 );
 
-$lang->ztinterface->charType = array("string","integer");
+$lang->ztinterface->charType = array("string","integer","array","float");
 $lang->ztinterface->stringMock = array();
-$lang->ztinterface->stringMock[0]['example'] = " ";
-$lang->ztinterface->stringMock[0]['description'] = "Mock为空时,将尝试根据参数名含义生成,失败则返回随机字符串";
+$lang->ztinterface->stringMock[0]['example'] = "\$keyword";
+$lang->ztinterface->stringMock[0]['description'] = "尝试根据参数名含义生成,失败则返回随机字符串(Mock为空时默认采用此模式)";
 $lang->ztinterface->stringMock[1]['example'] = "\$String";
 $lang->ztinterface->stringMock[1]['description'] = "获取随机字符串,以大小写字母,数字,下划线组成";
 $lang->ztinterface->stringMock[2]['example'] = "\$String(@upper)";
@@ -388,7 +388,7 @@ $lang->ztinterface->stringMock[3]['example'] = "\$String([@digit,@a-d,@under])";
 $lang->ztinterface->stringMock[3]['description'] = "指定多种可用字符(@digit: 数字, @a-d: 等价于abcd, @under: 下划线)";
 $lang->ztinterface->stringMock[4]['example'] = "\$String(@all,3,10)";
 $lang->ztinterface->stringMock[4]['description'] = "@all: 全部字符; 3: 最小长度, 10: 最大长度";
-$lang->ztinterface->stringMock[5]['example'] = "\$Regex('[0-9]{7,11}@(qq|163)\.(com|cn)')";
+$lang->ztinterface->stringMock[5]['example'] = "\$Regex([0-9]{7,11}@(qq|163)\.(com|cn))";
 $lang->ztinterface->stringMock[5]['description'] = "按正则表达式生成字符串";
 $lang->ztinterface->stringMock[6]['example'] = "\$name(zh_CN)";
 $lang->ztinterface->stringMock[6]['description'] = "生成一个指定语言的名字,默认为中文";
@@ -474,6 +474,20 @@ $lang->ztinterface->stringMock[36]['description'] = "按格式生成一个日期
 
 
 $lang->ztinterface->integerMock = array();
+$lang->ztinterface->integerMock[0]['example'] = "\$integer(-10,10)";
+$lang->ztinterface->integerMock[0]['description'] = "生成一个处于给定范围中的整数";
+$lang->ztinterface->integerMock[1]['example'] = "\$regexnum(1[2-7]{0,2})";
+$lang->ztinterface->integerMock[1]['description'] = "生成一个符合正则表达式的整数";
+
+$lang->ztinterface->floatMock = array();
+$lang->ztinterface->floatMock[0]['example'] = "\$float(-10,10)";
+$lang->ztinterface->floatMock[0]['description'] = "生成一个处于给定范围中的浮点数";
+$lang->ztinterface->floatMock[1]['example'] = "\$regexnum(1[2-7]{0,1}.[0-9]{0,2})";
+$lang->ztinterface->floatMock[1]['description'] = "生成一个符合正则表达式的浮点数";
+
+$lang->ztinterface->arrayMock = array();
+$lang->ztinterface->arrayMock[0]['example'] = "\$float(-10,10)";
+$lang->ztinterface->arrayMock[0]['description'] = "生成一个处于给定范围中的浮点数";
 
 
 $lang->ztinterface->methodColor = array(

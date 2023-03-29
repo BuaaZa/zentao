@@ -165,7 +165,7 @@ function parseRow(parentRow){
 
   if(funcName){
     const paramStr = mock.replace(/^\$\w+\(|\)$/g, '');
-    const params = paramStr.match(/("[^"]*"|'[^']*'|\[[^\]]*\]|[^,]+)+/g);
+    const params = paramStr.match(/("[^"]*"|'[^']*'|\{[^}]*\}|\[[^\]]*\]|[^,]+)+/g);
     jsonData = JSON.stringify(params);
   }else{
     match = mock.match(/^\$(\w+)$/);
