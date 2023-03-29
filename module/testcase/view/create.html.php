@@ -179,6 +179,7 @@ foreach(explode(',', $config->testcase->create->requiredFields) as $field)
                           <!-- <span class='input-group-addon step-item-id'></span> -->
                         <textarea rows='1' class='form-control autosize step-steps' name='steps[]'>
                         </textarea>
+                          <input type='hidden' name='stepType[]' value='step' class='step-type'>
                         <!--<span class="input-group-addon step-type-toggle">
                           <input type='hidden' name='stepType[]' value='item' class='step-type'>
                                 <div class='checkbox-primary'>
@@ -227,6 +228,7 @@ foreach(explode(',', $config->testcase->create->requiredFields) as $field)
                             echo html::textarea('steps[]', $step->desc,
                                 "rows='1' class='form-control autosize step-steps'")
                         ?>
+                          <input type='hidden' name='stepType[]' value='step' class='step-type'>
                         <!--<span class='input-group-addon step-type-toggle'>
                           <?php /*if(!isset($step->type)) $step->type = 'step';*/?>
                           <input type='hidden' name='stepType[]' value='<?php /*echo $step->type;*/?>' class='step-type'>
@@ -256,7 +258,7 @@ foreach(explode(',', $config->testcase->create->requiredFields) as $field)
                             'list', 'edit', '', 'showinonlybody iframe btn-datasample',
                             true,'','填写' );
                         common::printIcon('testcase', 'reset',"", '',
-                          'list', 'undo', 'hiddenwin', 'showinonlybody btn-datasample',
+                          'list', 'undo', 'hiddenwin', 'showinonlybody',
                           false,'','重置样本数据' );
 //                        echo $this->loadModel('common')->buildMenu('testcase', 'datasample',"", '',
 //                            'button', 'edit', '', 'showinonlybody iframe',
@@ -329,9 +331,7 @@ foreach(explode(',', $config->testcase->create->requiredFields) as $field)
   </div>
 </div>
 <script>
-    $(function (){
-        take_of_cookie()
-    })
+
    function take_of_cookie(){
        //alert($.cookie('datasample'));
        var stepsNum = $('#steps').children('.step').length;
@@ -346,8 +346,8 @@ foreach(explode(',', $config->testcase->create->requiredFields) as $field)
                $.cookie('datasample['+i+']', null);
            }
        }
-       console.log($.cookie('datasample'));
-       $('#datasample').attr('value',$.cookie('datasample'));
+/*       console.log($.cookie('datasample'));
+       $('#datasample').attr('value',$.cookie('datasample'));*/
        // var result = $('#datasample').attr('value');
        // console.log(result);
    }
