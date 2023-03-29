@@ -36,6 +36,8 @@ class testcase extends control
     public executionModel $execution;
     public productModel $product;
     public actionModel $action;
+    public testtaskModel $testtask;
+    public datasampleModel $datasample;
 
     /**
      * Construct function, load product, tree, user auto.
@@ -793,7 +795,7 @@ class testcase extends control
      * @param int $version
      * @param string $from
      * @param int $taskID
-     * @return void
+     * @return int
      * @access public
      */
     public function view(int    $caseID,
@@ -802,62 +804,61 @@ class testcase extends control
                          int    $taskID = 0)
     {
         $this->story = $this->loadModel('story');
+        $this->testtask = $this->loadModel('testtask');
+        $this->datasample = $this->loadModel('datasample');
+
         $this->session->set('bugList', $this->app->getURI(true), $this->app->tab);
 
-        $case   = $this->testcase->getById($caseID, $version);
-        $case   = $this->story->checkNeedConfirm($case);
-        if(!$case)
-        {
-            if(defined('RUN_MODE') && RUN_MODE == 'api') return $this->send(array('status' => 'fail', 'message' => '404 Not found'));
-            return print(js::error($this->lang->notFound) . js::locate($this->createLink('qa', 'index')));
+        $case = $this->testcase->getById($caseID, $version);
+        $case = $this->story->checkNeedConfirm($case);
+        if (!$case) {
+            if (defined('RUN_MODE') && RUN_MODE == 'api')
+                return $this->send(array('status' => 'fail', 'message' => '404 Not found'));
+            else
+                return print(js::error($this->lang->notFound) . js::locate($this->createLink('qa', 'index')));
         }
 
-        if($from == 'testtask')
-        {
-            $run = $this->loadModel('testtask')->getRunByCase($taskID, $caseID);
-            $case->assignedTo    = $run->assignedTo;
-            $case->lastRunner    = $run->lastRunner;
-            $case->lastRunDate   = $run->lastRunDate;
+        if ($from == 'testtask') {
+            $run = $this->testtask->getRunByCase($taskID, $caseID);
+            $case->assignedTo = $run->assignedTo;
+            $case->lastRunner = $run->lastRunner;
+            $case->lastRunDate = $run->lastRunDate;
             $case->lastRunResult = $run->lastRunResult;
-            $case->caseStatus    = $case->status;
-            $case->status        = $run->status;
+            $case->caseStatus = $case->status;
+            $case->status = $run->status;
 
             $results = $this->testtask->getResults($run->id);
-            $result  = array_shift($results);
-            if($result)
-            {
-                $case->xml      = $result->xml;
+            $result = array_shift($results);
+            if ($result) {
+                $case->xml = $result->xml;
                 $case->duration = $result->duration;
             }
         }
 
         $isLibCase = ($case->lib and empty($case->product));
-        if($isLibCase)
-        {
+        if ($isLibCase) {
             $libraries = $this->loadModel('caselib')->getLibraries();
             $this->app->tab == 'project' ? $this->loadModel('project')->setMenu($this->session->project) : $this->caselib->setLibMenu($libraries, $case->lib);
 
-            $this->view->title      = "CASE #$case->id $case->title - " . $libraries[$case->lib];
+            $this->view->title = "CASE #$case->id $case->title - " . $libraries[$case->lib];
             $this->view->position[] = html::a($this->createLink('caselib', 'browse', "libID=$case->lib"), $libraries[$case->lib]);
 
             $this->view->libName = $libraries[$case->lib];
-        }
-        else
-        {
+        } else {
             $productID = $case->product;
-            $product   = $this->product->getByID($productID);
-            $branches  = $product->type == 'normal' ? array() : $this->loadModel('branch')->getPairs($productID);
+            $product = $this->product->getByID($productID);
+            $branches = $product->type == 'normal' ? array() : $this->loadModel('branch')->getPairs($productID);
 
-            if($this->app->tab == 'project')   $this->loadModel('project')->setMenu($this->session->project);
-            if($this->app->tab == 'execution') $this->loadModel('execution')->setMenu($this->session->execution);
-            if($this->app->tab == 'qa')        $this->testcase->setMenu($this->products, $productID, $case->branch);
+            if ($this->app->tab == 'project') $this->loadModel('project')->setMenu($this->session->project);
+            if ($this->app->tab == 'execution') $this->loadModel('execution')->setMenu($this->session->execution);
+            if ($this->app->tab == 'qa') $this->testcase->setMenu($this->products, $productID, $case->branch);
 
-            $this->view->title      = "CASE #$case->id $case->title - " . $product->name;
+            $this->view->title = "CASE #$case->id $case->title - " . $product->name;
 
-            $this->view->product     = $product;
-            $this->view->branches    = $branches;
+            $this->view->product = $product;
+            $this->view->branches = $branches;
             $this->view->productName = $product->name;
-            $this->view->branchName  = $product->type == 'normal' ? '' : zget($branches, $case->branch, '');
+            $this->view->branchName = $product->type == 'normal' ? '' : zget($branches, $case->branch, '');
         }
 
         $caseFails = $this->dao->select('COUNT(*) AS count')->from(TABLE_TESTRESULT)
@@ -869,23 +870,30 @@ class testcase extends control
 
         $this->executeHooks($caseID);
 
+        $datasamples = $this->datasample->getDataSamplesByCase($caseID);
+
         $this->view->position[] = $this->lang->testcase->common;
         $this->view->position[] = $this->lang->testcase->view;
 
-        $this->view->case       = $case;
-        $this->view->from       = $from;
-        $this->view->taskID     = $taskID;
-        $this->view->version    = $version ? $version : $case->version;
+        $this->view->case = $case;
+        $this->view->from = $from;
+        $this->view->taskID = $taskID;
+        $this->view->version = $version ? $version : $case->version;
         $this->view->modulePath = $this->tree->getParents($case->module);
         $this->view->caseModule = empty($case->module) ? '' : $this->tree->getById($case->module);
-        $this->view->users      = $this->user->getPairs('noletter');
-        $this->view->actions    = $this->loadModel('action')->getList('case', $caseID);
+        $this->view->users = $this->user->getPairs('noletter');
+        $this->view->actions = $this->loadModel('action')->getList('case', $caseID);
         $this->view->preAndNext = $this->loadModel('common')->getPreAndNextObject('testcase', $caseID);
-        $this->view->runID      = $from == 'testcase' ? 0 : $run->id;
-        $this->view->isLibCase  = $isLibCase;
-        $this->view->caseFails  = $caseFails;
+        $this->view->runID = $from == 'testcase' ? 0 : $run->id;
+        $this->view->isLibCase = $isLibCase;
+        $this->view->caseFails = $caseFails;
 
-        if(defined('RUN_MODE') and RUN_MODE == 'api' and !empty($this->app->version)) return $this->send(array('status' => 'success', 'case' => $case));
+        $this->view->datasamples = array();
+        foreach ($datasamples as $sample) {
+            $this->view->datasamples[$sample->casestep_level - 1] = $sample ?: '';
+        }
+
+        if (defined('RUN_MODE') and RUN_MODE == 'api' and !empty($this->app->version)) return $this->send(array('status' => 'success', 'case' => $case));
         $this->display();
     }
 
