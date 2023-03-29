@@ -1122,7 +1122,7 @@ class baseDAO
 
     /**
      * 根据数据库结构检查字段。
-     * Check the fields according the the database schema.
+     * Check the fields according the database schema.
      *
      * @param string $skipFields fields to skip checking
      * @access public
@@ -1204,7 +1204,7 @@ class baseDAO
      * @access public
      * @return bool
      */
-    public static function isError()
+    public static function isError(): bool
     {
         return !empty(dao::$errors);
     }
@@ -1234,7 +1234,7 @@ class baseDAO
 
     /**
      * 获取表的字段类型。
-     * Get the defination of fields of the table.
+     * Get the definition of fields of the table.
      *
      * @access public
      * @return array
