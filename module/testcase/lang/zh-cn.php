@@ -104,11 +104,12 @@ $lang->testcase->executionStatus  = '执行状态';
 $lang->case = $lang->testcase;  // 用于DAO检查时使用。因为case是系统关键字，所以无法定义该模块为case，只能使用testcase，但表还是使用的case。
 
 $lang->testcase->stepID      = '编号';
-$lang->testcase->stepDesc    = '步骤';
+$lang->testcase->stepDesc    = '前置条件';
 $lang->testcase->stepinput  = '输入';
 $lang->testcase->step_goal_action  = '目的和动作';
 $lang->testcase->stepExpect  = '预期结果';
 $lang->testcase->step_eval_criteria  = '评价准则';
+$lang->testcase->datasample  = '数据样本';
 $lang->testcase->stepVersion = '版本';
 $lang->testcase->noticegroupnum = '最多使一个步骤绑定输入输出项！';
 $lang->testcase->sample_in     = "样本输入";

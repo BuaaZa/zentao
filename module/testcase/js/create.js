@@ -22,6 +22,8 @@ function setPreview()
 
 $(function()
 {
+    //create页面加载时清除datasample的cookie
+    $.cookie('datasample','');
     var $searchStories = $('#searchStories');
     var lastSearchFn = false;
     var $searchInput = $('#storySearchInput');

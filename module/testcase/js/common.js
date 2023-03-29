@@ -236,6 +236,8 @@ function initSteps(selector)
             $step.find('[name^="expects["]').attr('name', "expects[" +stepID + ']');
             $step.find('[name^="eval_criterias["]').attr('name', "eval_criterias[" +stepID + ']');
             $step.find('[name^="stepIoType["]').attr('name', "stepIoType[" +stepID + ']');
+            $step.find('[name^="datasample["]').attr('name', "datasample[" +stepID + ']');
+
             if($step.find('.step-group-toggle2').is(':checked')){
                 $step.find('.step-iotype').val('1');
             }else{
@@ -318,6 +320,11 @@ function initSteps(selector)
     }).on('click', '.btn-step-delete', function()
     {
         if($steps.children('.step').length == 1) return;
+
+        var $step = $(this).closest('.step');
+        var stepID = $step.find('.step-id').text();
+        $.cookie("datasample["+stepID+"]", '');
+
         $(this).closest('.step').remove();
         refreshSteps();
     }).on('change', '.step-group-toggle', function()
@@ -363,6 +370,11 @@ function initSteps(selector)
                 refreshSteps();
             }
         }
+    }).on('click', '.btn-datasample', function()
+    {
+        var $step = $(this).closest('.step');
+        var stepID = $step.find('.step-id').text();
+        $.cookie('curStepID', stepID);
     });
     initSortable();
     refreshSteps();
