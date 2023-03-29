@@ -127,7 +127,7 @@ class testcaseModel extends model
 
         $parentStepID = 0;
         foreach ($data->steps as $index => $stepDesc) {
-            if (empty($stepDesc)) continue;
+//            if (empty($stepDesc) ) continue;
             $stepType = $this->post->stepType;
             $stepIoType = $this->post->stepIoType;
 
