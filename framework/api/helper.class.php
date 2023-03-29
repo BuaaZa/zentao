@@ -11,7 +11,7 @@
  *  May you share freely, never taking more than you give.
  */
 include dirname(__FILE__, 2) . '/base/helper.class.php';
-class helper extends baseHelper
+class apiHelper extends baseHelper
 {
     public static function getViewType($source = false)
     {
@@ -187,16 +187,16 @@ function isonlybody(): bool
 /**
  * Format time.
  *
- * @param  int    $time
- * @param  string $format
+ * @param int $time
+ * @param string $format
  * @access public
- * @return void
+ * @return string
  */
-function formatTime($time, $format = '')
+function formatTime(int $time, string $format = ''): string
 {
     $time = str_replace('0000-00-00', '', $time);
     $time = str_replace('00:00:00', '', $time);
-    if(trim($time) == '') return ;
+    if(trim($time) == '') return "";
     if($format) return date($format, strtotime($time));
     return trim($time);
 }

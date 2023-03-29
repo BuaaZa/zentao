@@ -95,6 +95,7 @@
                         </thead>
                         <?php
                         $stepId = $childId = 0;
+                        $step_id_for_datasample = 0;
                         foreach ($case->steps as $stepID => $step) {
                             $stepClass = "step-$step->type";
                             if ($step->type == 'group' or $step->type == 'step') {
@@ -120,13 +121,20 @@
                             echo "<td class='text-left'>" . nl2br(str_replace(' ', '&nbsp;', $step->expect)) . "</div></td>";
                             echo "<td class='text-left'>" . nl2br(str_replace(' ', '&nbsp;', $step->eval_criteria)) . "</div></td>";
 
-                            // 拼接数据样本url
-                            {
+                            $level = (int)$datasamples[$step_id_for_datasample]->casestep_level;
 
-                            }
+
+                            // 拼接数据样本url
+                            echo "<td class='text-left'>";
+                            if ($level !== 0)
+                                common::printIcon('datasample', 'view',"caseID=$case->id&casestepLevel=$level", '',
+                                'button', 'eye', '', 'showinonlybody iframe',
+                                true,'','查看' );
+                            echo "</div></td>";
 
                             echo "</tr>";
                             $childId++;
+                            $step_id_for_datasample++;
                         }
                         ?>
                     </table>

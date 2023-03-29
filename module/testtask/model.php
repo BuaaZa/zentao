@@ -440,16 +440,15 @@ class testtaskModel extends model
     }
 
 
-
     /**
      * Get taskrun by case id.
      *
-     * @param  int    $taskID
-     * @param  int    $caseID
+     * @param int $taskID
+     * @param int $caseID
+     * @return mixed
      * @access public
-     * @return void
      */
-    public function getRunByCase($taskID, $caseID)
+    public function getRunByCase($taskID, $caseID): mixed
     {
         return $this->dao->select('*')->from(TABLE_TESTRUN)->where('task')->eq($taskID)->andWhere('`case`')->eq($caseID)->fetch();
     }

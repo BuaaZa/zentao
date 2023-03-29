@@ -2318,13 +2318,13 @@ EOD;
     /**
      * Remove duplicate for story, task, bug, case, doc.
      *
-     * @param  string       $type  e.g. story task bug case doc.
-     * @param  array|object $data
-     * @param  string       $condition
+     * @param string $type  e.g. story task bug case doc.
+     * @param object|array|string $data
+     * @param string $condition
      * @access public
-     * @return array
+     * @return array|bool
      */
-    public function removeDuplicate($type, $data = '', $condition = '')
+    public function removeDuplicate(string $type, object|array|string $data = '', string $condition = ''): array|bool
     {
         $table      = $this->config->objectTables[$type];
         $titleField = $type == 'task' ? 'name' : 'title';
