@@ -158,7 +158,7 @@ foreach(explode(',', $config->testcase->create->requiredFields) as $field)
             <td colspan='2'>
               <table class='table table-form mg-0 table-bordered' id="stepform" style='border: 1px solid #ddd; '>
                 <thead>
-                  <tr>
+                  <tr class="text-center">
                     <th class='w-50px text-center'><?php echo $lang->testcase->stepID;?></th>
                     <th width="45%"><?php echo $lang->testcase->stepprecondition;?></th>
 <!--                    <th>--><?php //echo $lang->testcase->stepinput;?><!--</th>-->
@@ -171,6 +171,7 @@ foreach(explode(',', $config->testcase->create->requiredFields) as $field)
                   </tr>
                 </thead>
                 <tbody id='steps' class='sortable' data-group-name='<?php echo $lang->testcase->groupName ?>'>
+                <!--  添加行的模板页面元素，添加事件见create.js  -->
                   <tr class='template step' id='stepTemplate'>
                     <td class='step-id'></td>
                     <td>
@@ -178,30 +179,34 @@ foreach(explode(',', $config->testcase->create->requiredFields) as $field)
                           <!-- <span class='input-group-addon step-item-id'></span> -->
                         <textarea rows='1' class='form-control autosize step-steps' name='steps[]'>
                         </textarea>
-                        <span class="input-group-addon step-type-toggle">
+                        <!--<span class="input-group-addon step-type-toggle">
                           <input type='hidden' name='stepType[]' value='item' class='step-type'>
-                               <!-- <div class='checkbox-primary'>
+                                <div class='checkbox-primary'>
                             <input tabindex='-1' type="checkbox" class='step-group-toggle'>
-                            <label class="checkbox-inline"><?php //echo $lang->testcase->group ?></label>
-                          </div> -->
+                            <label class="checkbox-inline"><?php /*//echo $lang->testcase->group */?></label>
+                          </div>
                         </span>
                         <span class="input-group-addon step-type-toggle2">
                               <input type='hidden' name='stepIoType[]' value='0' class='step-iotype'>
                           <div class='checkbox-primary'>
                             <input tabindex='-1' type="checkbox" class='step-group-toggle2'>
-                            <label class="checkbox-inline"><?php echo "勾选为输出项" ?></label>
+                            <label class="checkbox-inline"><?php /*echo "勾选为输出项" */?></label>
                           </div>
-                        </span>
+                        </span>-->
                       </div>
                     </td>
-                    <td><textarea rows='1' class='form-control autosize step-expects' name='inputs[]'></textarea></td>
+<!--                    <td><textarea rows='1' class='form-control autosize step-expects' name='inputs[]'></textarea></td>-->
                     <td><textarea rows='1' class='form-control autosize step-expects' name='goal_actions[]'></textarea></td>
                     <td><textarea rows='1' class='form-control autosize step-expects' name='expects[]'></textarea></td>
                     <td><textarea rows='1' class='form-control autosize step-expects' name='eval_criterias[]'></textarea></td>
-                      <td class='step-actions'>
-                          <?php echo $this->loadModel('common')->buildMenu('testcase', 'datasample', "", '', 'button', '', '', 'showinonlybody iframe', true, '', '填写');?>
-                      </td>
-                      <td class='step-actions'>
+                    <td class='step-actions'>
+                        <?php
+
+//                        echo $this->loadModel('common')->buildMenu('testcase', 'datasample',"", '',
+//                            'button', 'edit', '', 'showinonlybody iframe', true, '', '填写');
+//                        ?>
+                    </td>
+                    <td class='step-actions'>
                       <div class='btn-group'>
                         <button type='button' class='btn btn-step-add' tabindex='-1'><i class='icon icon-plus'></i></button>
                         <button type='button' class='btn btn-step-move' tabindex='-1'><i class='icon icon-move'></i></button>
@@ -210,8 +215,9 @@ foreach(explode(',', $config->testcase->create->requiredFields) as $field)
                     </td>
 
                   </tr>
+
                   <?php foreach($steps as $stepID => $step):?>
-                  <tr class='step'>
+                  <tr class='step text-center'>
                     <td class='step-id'></td>
                     <td>
                       <div class='input-group'>
@@ -247,9 +253,16 @@ foreach(explode(',', $config->testcase->create->requiredFields) as $field)
                         common::printIcon('testcase', 'datasample',"", '',
                             'list', 'edit', '', 'showinonlybody iframe',
                             true,'','填写' );
+                        common::printIcon('testcase', 'reset',"", '',
+                          'list', 'undo', 'hiddenwin', 'showinonlybody',
+                          false,'','重置样本数据' );
 //                        echo $this->loadModel('common')->buildMenu('testcase', 'datasample',"", '',
-//                            'button', '', '', 'showinonlybody iframe', true, '', '填写');
-                        ?>
+//                            'button', 'edit', '', 'showinonlybody iframe',
+//                            true, '', '填写');
+//                      echo $this->loadModel('common')->buildMenu('testcase', 'reset',"", '',
+//                          'button', 'undo', 'hiddenwin', 'showinonlybody',
+//                          false, '', '重置');
+//                        ?>
                     </td>
                     <td class='step-actions'>
                       <div class='btn-group'>
@@ -283,10 +296,16 @@ foreach(explode(',', $config->testcase->create->requiredFields) as $field)
         <tfoot>
           <tr>
             <td colspan='3' class='text-center form-actions'>
-              <?php //echo html::submitButton();?>
-                <input type='hidden' name='datasample' id='datasample' value='null' class='step-datasample'>
-              <button id='submit' class="btn btn-wide btn-primary " type="submit"  onclick="take_of_cookie();"> 保存</button>
-              <?php echo $gobackLink ? html::a($gobackLink, $lang->goback, '', 'class="btn btn-wide"') : html::backButton();?>
+                <?php //echo html::submitButton();?>
+                <input type='hidden' name='datasample'
+                       id='datasample' value='null'
+                       class='step-datasample'>
+                <button id='submit' class="btn btn-wide btn-primary "
+                        type="submit"  onclick="take_of_cookie();">
+                    保存
+                </button>
+                <?php echo $gobackLink ? html::a($gobackLink, $lang->goback, '', 'class="btn btn-wide"')
+                    : html::backButton();?>
             </td>
           </tr>
         </tfoot>
@@ -311,9 +330,15 @@ foreach(explode(',', $config->testcase->create->requiredFields) as $field)
   </div>
 </div>
 <script>
+    $(function (){
+        take_of_cookie()
+    })
    function take_of_cookie(){
        //alert($.cookie('datasample'));
+       console.log($.cookie('datasample'));
        $('#datasample').attr('value',$.cookie('datasample'));
+       // var result = $('#datasample').attr('value');
+       // console.log(result);
    }
 </script>
 <?php js::set('caseModule', $lang->testcase->module)?>

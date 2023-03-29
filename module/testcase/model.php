@@ -81,7 +81,12 @@ class testcaseModel extends model
         /* Value of story may be showmore. */
         $case->story = (int)$case->story;
         $case->data_sample_new = fixer::input('post')->get()->datasample;
-        $this->dao->insert(TABLE_CASE)->data($case)->autoCheck()->batchCheck($this->config->testcase->create->requiredFields, 'notempty')->checkFlow()->exec();
+
+        $this->dao->insert(TABLE_CASE)->data($case)
+            ->autoCheck()
+            ->batchCheck($this->config->testcase->create->requiredFields, 'notempty')
+            ->checkFlow()
+            ->exec();
         if(!$this->dao->isError())
         {
             $caseID = $this->dao->lastInsertID();

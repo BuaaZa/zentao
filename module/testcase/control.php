@@ -13,6 +13,8 @@ class testcase extends control
 {
     public treeModel $tree;
 
+    public testcaseModel $testcase;
+
     /**
      * All products.
      *
@@ -2483,10 +2485,21 @@ class testcase extends control
     {
         if($this->server->request_method == 'POST')
         {
-            return $this->send(array('result' => 'success','message' => $this->lang->saveSuccess, 'closeModal' => true));
+            return $this->send(
+                array(
+                    'result' => 'success',
+                    'message' => $this->lang->saveSuccess,
+                    'closeModal' => true));
         }
         $this->display();
     }
+
+    public function reset()
+    {
+        setcookie("datasample", "", time() - 3600, $this->config->webRoot, "", $this->config->cookieSecure,false);
+        return print(js::reload('parent'));
+    }
+
     /**
      * Case bugs.
      *

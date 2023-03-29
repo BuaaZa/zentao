@@ -169,10 +169,10 @@ function initSteps(selector)
         var $step;
         for(var i = 0; i < count; ++i)
         {
-            $step = $stepTemplate.clone();
+            $step = $stepTemplate.clone(true);
             if($row) $row.after($step);
             else $steps.append($step);
-            $step.addClass('step-new');
+            $step.addClass('step-new').addClass('text-center');
             if(type) $step.find('.step-type').val(type);
         }
         if(!notFocus && $step) setTimeout(function(){$step.find('.step-steps').focus();}, 10);
