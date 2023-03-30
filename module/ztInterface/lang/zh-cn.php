@@ -330,37 +330,42 @@ $lang->ztinterface->fakerOptions = array(
     'timezone',
     'name'    
 );
-$lang->ztinterface->fakerEN = array(
-    'userName',
-    'streetName',
-    'firstName',
-    'lastName',
+$lang->ztinterface->funcTable = array(
+    'streetname',
+    'streetaddress',
+    'address',
+    'country',
+    'state',
+    'city',
+
     'sentence',
     'paragraph',
     'word',
-    'streetAddress',
-    'address',
-    'country',
-    'city',
-    'state',
-    'company',
-    'email',
-    'password',
-    'url',
-    'macAddress',
-    'ipv4',
-    'ipv6',
-    'ip',
-    'userAgent',
-    'color',
-    'dateTime',
-    'date',
-    'time',
-    'monthName',
+
+    'hexcolor',
+    'rgbcolor',
+    'rgbcsscolor',
+    'colorname',
+
+    'monthname',
     'month',
     'year',
     'timezone',
-    'name'    
+
+    'email',
+    'url',
+    'ipv4',
+    'ipv6',
+    'macaddress',
+
+    'useragent',
+    'username',
+    'password',
+
+    'firstname',
+    'lastname',
+    'company',
+    'name'   
 );
 $lang->ztinterface->fakerCN = array(
     'firstname',
@@ -482,12 +487,12 @@ $lang->ztinterface->integerMock[1]['description'] = "生成一个符合正则表
 $lang->ztinterface->floatMock = array();
 $lang->ztinterface->floatMock[0]['example'] = "\$float(-10,10)";
 $lang->ztinterface->floatMock[0]['description'] = "生成一个处于给定范围中的浮点数";
-$lang->ztinterface->floatMock[1]['example'] = "\$regexnum(1[2-7]{0,1}.[0-9]{0,2})";
+$lang->ztinterface->floatMock[1]['example'] = "\$regexnum(1[2-7]{0,1}\.[0-9]{1,2})";
 $lang->ztinterface->floatMock[1]['description'] = "生成一个符合正则表达式的浮点数";
 
 $lang->ztinterface->arrayMock = array();
-$lang->ztinterface->arrayMock[0]['example'] = "\$float(-10,10)";
-$lang->ztinterface->arrayMock[0]['description'] = "生成一个处于给定范围中的浮点数";
+$lang->ztinterface->arrayMock[0]['example'] = "\$array(1,4)";
+$lang->ztinterface->arrayMock[0]['description'] = "生成一个长度在给定范围内的列表";
 
 
 $lang->ztinterface->methodColor = array(

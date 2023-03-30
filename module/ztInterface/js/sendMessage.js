@@ -66,6 +66,13 @@ $('.refresh-button').click(function() {
     return;
   } 
   var postData = getPostData(rowData);
+  var itemSpan = parentRow.querySelector('td:nth-child(4) span');
+  if(rowData['type'] == 'array'){
+    var itemRow = parentRow.nextElementSibling;
+    var itemRowData = parseRow(itemRow);
+    itemSpan = itemRow.querySelector('td:nth-child(4) span')
+    postData['item'] = getPostData(itemRowData);
+  }
   
   if(!rowData['funcName']){
     if(rowData['mock'].value.trim()){
@@ -81,21 +88,25 @@ $('.refresh-button').click(function() {
         console.log(res);
         return;
       }
-      rowData['value'].value = response['value'];
+      if(response['value']){
+        rowData['value'].value = response['value'];
+      }else{
+        rowData['value'].value = '';
+      }
       if(response['error']){
         showError(span, response['error']);
       }else{
         hideError(span);
       }
+      if(postData['type'] == 'array' && response['item']['error']){
+        showError(itemSpan, response['item']['error']);
+      }else{
+        hideError(itemSpan);
+      }
     });
     return;
   }
-    
-  if(rowData['type'] == 'array'){
-    var itemRow = parentRow.nextElementSibling;
-    var itemRowData = parseRow(itemRow);
-    postData['item'] = getPostData(itemRowData);
-  }
+  
   if(funcTable.includes(rowData['funcName'].toLowerCase())){
     var link = createLink('ztinterface', 'mockFunc', '');
   }else{
@@ -108,19 +119,31 @@ $('.refresh-button').click(function() {
       response = JSON.parse(res);
       console.log(response);
     } catch (error) {
+      showError(span, "Mock函数不存在");
+      rowData['value'].value = '';
       console.log(res);
       return;
     }
-    rowData['value'].value = response['value'];
+    if(response['value']){
+      rowData['value'].value = response['value'];
+    }else{
+      rowData['value'].value = '';
+    }
     if(response['error']){
       showError(span, response['error']);
     }else{
       hideError(span);
     }
+    if(postData['type'] == 'array' && response['item'] &&response['item']['error']){
+      showError(itemSpan, response['item']['error']);
+    }else{
+      hideError(itemSpan);
+    }
   })
   .fail(function() {
     console.log("fail");
     showError(span, 'Mock函数不存在');
+    rowData['value'].value = '';
   });
 });
 

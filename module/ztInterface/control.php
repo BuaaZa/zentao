@@ -218,6 +218,17 @@ class ztinterface extends control
             return $this->mockInteger($data, $return);
         }else if($data["type"] == 'float'){
             return $this->mockFloat($data, $return);
+        }else if($data["type"] == 'array'){
+            return $this->mockArray($data, $return);
+        }
+        $response['error'] = '无此类型';
+        if($response['error']){
+            if($return){
+                return $response;
+            }else{
+                echo json_encode($response);
+                return;
+            }
         }
     }
 
@@ -231,13 +242,11 @@ class ztinterface extends control
         }
         if(!in_array(strtolower($data['type']),array('string'))){
             $response['error'] = 'Mock函数与类型不符';
-            if($response['error']){
-                if($return){
-                    return $response;
-                }else{
-                    echo json_encode($response);
-                    return;
-                }
+            if($return){
+                return $response;
+            }else{
+                echo json_encode($response);
+                return;
             }
         }
 
@@ -262,7 +271,7 @@ class ztinterface extends control
                 return;
             }
         }
-        return mockString($data, $return);
+        return $this->mockString($data, $return);
     }
 
     public function mockString($data = '', $return = false){
@@ -275,13 +284,11 @@ class ztinterface extends control
         }
         if(!in_array(strtolower($data['type']),array('string'))){
             $response['error'] = 'Mock函数与类型不符';
-            if($response['error']){
-                if($return){
-                    return $response;
-                }else{
-                    echo json_encode($response);
-                    return;
-                }
+            if($return){
+                return $response;
+            }else{
+                echo json_encode($response);
+                return;
             }
         }
         if($data['notNull'] == 'false'){
@@ -299,10 +306,10 @@ class ztinterface extends control
         $args = $this->ztinterface->parseParams($data["params"]);
         $min = 1;
         $max = 20;
-        if(isset($args[1]) and is_numeric($args[1]) and (int)$args[1]>0){
+        if(isset($args[1]) and is_numeric($args[1]) and (int)$args[1]>=0){
             $min = (int)$args[1];
         }
-        if(isset($args[2]) and is_numeric($args[2]) and (int)$args[2]>0){
+        if(isset($args[2]) and is_numeric($args[2]) and (int)$args[2]>=0){
             $max = (int)$args[2];
         }
         if($min>$max){
@@ -339,13 +346,11 @@ class ztinterface extends control
         }
         if(!in_array(strtolower($data['type']),array('string','integer','float'))){
             $response['error'] = 'Mock函数与类型不符';
-            if($response['error']){
-                if($return){
-                    return $response;
-                }else{
-                    echo json_encode($response);
-                    return;
-                }
+            if($return){
+                return $response;
+            }else{
+                echo json_encode($response);
+                return;
             }
         }
         if($data['notNull'] == 'false'){
@@ -404,13 +409,11 @@ class ztinterface extends control
         }
         if(!in_array(strtolower($data['type']),array('string'))){
             $response['error'] = 'Mock函数与类型不符';
-            if($response['error']){
-                if($return){
-                    return $response;
-                }else{
-                    echo json_encode($response);
-                    return;
-                }
+            if($return){
+                return $response;
+            }else{
+                echo json_encode($response);
+                return;
             }
         }
         if($data['notNull'] == 'false'){
@@ -466,13 +469,11 @@ class ztinterface extends control
         }
         if(!in_array(strtolower($data['type']),array('string'))){
             $response['error'] = 'Mock函数与类型不符';
-            if($response['error']){
-                if($return){
-                    return $response;
-                }else{
-                    echo json_encode($response);
-                    return;
-                }
+            if($return){
+                return $response;
+            }else{
+                echo json_encode($response);
+                return;
             }
         }
         if($data['notNull'] == 'false'){
@@ -515,13 +516,11 @@ class ztinterface extends control
         }
         if(!in_array(strtolower($data['type']),array('integer'))){
             $response['error'] = 'Mock函数与类型不符';
-            if($response['error']){
-                if($return){
-                    return $response;
-                }else{
-                    echo json_encode($response);
-                    return;
-                }
+            if($return){
+                return $response;
+            }else{
+                echo json_encode($response);
+                return;
             }
         }
         if($data['notNull'] == 'false'){
@@ -573,13 +572,11 @@ class ztinterface extends control
         }
         if(!in_array(strtolower($data['type']),array('float'))){
             $response['error'] = 'Mock函数与类型不符';
-            if($response['error']){
-                if($return){
-                    return $response;
-                }else{
-                    echo json_encode($response);
-                    return;
-                }
+            if($return){
+                return $response;
+            }else{
+                echo json_encode($response);
+                return;
             }
         }
         if($data['notNull'] == 'false'){
@@ -631,13 +628,11 @@ class ztinterface extends control
         }
         if(!in_array(strtolower($data['type']),array('float','integer'))){
             $response['error'] = 'Mock函数与类型不符';
-            if($response['error']){
-                if($return){
-                    return $response;
-                }else{
-                    echo json_encode($response);
-                    return;
-                }
+            if($return){
+                return $response;
+            }else{
+                echo json_encode($response);
+                return;
             }
         }
 
@@ -660,7 +655,7 @@ class ztinterface extends control
             }
             $n -= 1;
         }
-        if($response['value'] and is_numeric($response['value'])){
+        if($response['value'] and (is_numeric($response['value']) or $response['value']=='null')){
             if(strtolower($data['type'] == 'float')){
                 $response['value'] = (float)$response['value'];
             }
@@ -677,6 +672,106 @@ class ztinterface extends control
             echo json_encode($response);
             return;
         }
+    }
+    
+    public function mockArray($data = '', $return = false){
+        $response = array();
+        if(!$data and !empty($_POST)){
+            $data = array();
+            foreach($_POST as $key=>$value){
+                $data[$key] = $value;
+            }
+        }
+        if(!in_array(strtolower($data['type']),array('array'))){
+            $response['error'] = 'Mock函数与类型不符';
+            if($return){
+                return $response;
+            }else{
+                echo json_encode($response);
+                return;
+            }
+        }
+        if($data['notNull'] == 'false'){
+            if(rand(0,5) == 0){
+                $response["value"] = "null";
+                if($return){
+                    return $response;
+                }else{
+                    echo json_encode($response);
+                    return;
+                }
+            }
+        }
+
+        $args = $this->ztinterface->parseParams($data["params"]);
+        $min = 1;
+        $max = 10;
+
+        if(isset($args[0]) and is_numeric($args[0]) and (int)$args[0]>=0){
+            $min = (int)$args[0];
+        }
+        if(isset($args[1]) and is_numeric($args[1]) and (int)$args[1]>=0){
+            $max = (int)$args[1];
+        }
+        if($min>$max){
+            $temp = $min;
+            $min = $max;
+            $max = $temp;
+        }
+
+        $times = mt_rand($min,$max);
+        if($times == 0){
+            $response["value"] = "[]";
+            if($return){
+                return $response;
+            }else{
+                echo json_encode($response);
+                return;
+            }
+        }
+        $ans = array();
+        if(!$data['item']){
+            $data['item'] = array();
+            $data['item']['type'] = 'string';
+        }
+        $data['item']['name'] = $data['name'];
+        for($i = 0; $i < $times; $i++){
+            $res = $this->findMock($data['item']);
+            if($res['value']){
+                $ans[$i] = $res['value'];
+            }
+            if($res['error']){
+                $response['item']['error'] = $res['error'];
+            }
+        }
+        $data['item']['name'] = 'items';
+
+        if(!empty($ans))
+            $response['value'] = '['.join(',',$ans).']';
+        else{
+            $response['error'] = '生成数组为空,请检查Mock函数';
+        }
+
+        if($return){
+            return $response;
+        }else{
+            echo json_encode($response);
+            return;
+        }
+    }
+
+    public function findMock($data = ''){
+        if(!$data['funcName']){
+            return $this->mockBase($data, true);
+        }
+        if(in_array(strtolower($data['funcName']),$this->lang->ztinterface->funcTable)){
+            return $this->mockFunc($data, true);
+        }
+        $funcName = 'mock'.ucfirst(strtolower($data['funcName']));
+        if (method_exists($this, $funcName)) {
+            return $this->$funcName($data, true);
+        }
+        return array("error"=>"Mock函数不存在");
     }
     
 
