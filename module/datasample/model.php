@@ -37,4 +37,17 @@ class datasampleModel extends model
             ->andWhere('`delete`')->eq('0')
             ->fetch();
     }
+
+    // 数据样本结果
+
+    public function saveDataSampleResult(int $dataSampleID, string $object): bool
+    {
+        if ($object === '') return false;
+        $data = new stdClass();
+        $data->data_sample_id = $dataSampleID;
+        $data->object = $object;
+
+        $this->dao->insert(TABLE_DATASAMPLE_RESULT)->data($data)->exec();
+        return true;
+    }
 }
