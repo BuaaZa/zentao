@@ -31,16 +31,6 @@ class installModel extends model
     }
 
     /**
-     * Check version of zentao.
-     *
-     * @access public
-     * @return void
-     */
-    public function checkZenTaoVersion()
-    {
-    }
-
-    /**
      * get php version.
      *
      * @access public
