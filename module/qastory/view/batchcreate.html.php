@@ -13,6 +13,7 @@
 <?php include './header.html.php';?>
 <?php js::set('showFields', $showFields);?>
 <?php js::set('requiredFields', $config->qastory->create->requiredFields);?>
+<?php js::set('oldAccountList', array_keys($currentTaskPoints));?>
 <div id="mainContent" class="main-content">
   <div class="main-header">
     <h2><?php echo $storyTitle . ' - ' . $this->lang->qastory->subdivide; ?></h2>
@@ -121,7 +122,7 @@ $(function()
     $('#batchCreateForm').batchActionForm(
     {
         idStart: 1,
-        idEnd: <?php echo max((empty($titles) ? 1 : count($titles)), 10)?>,
+        idEnd: <?php echo max((empty($titles) ? 1 : count($titles)), 1)?>,
         rowCreator: function($row, index)
         {
             rowIndex = index; // Set the index for the add element operation
