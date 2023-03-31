@@ -417,9 +417,9 @@ class testcase extends control
             //获取数据样本表的填写内容
             //$datasample = json_decode($this->post->datasample, true);
             //error_log(print_r($datasample, 1));
-//            $datasample = $this->post->datasample;
-//            ChromePhp::log($datasample);
-//            die('test');
+            //$datasample = $this->post->datasample;
+            //ChromePhp::log('$datasample');
+            //die('test');
             $response['result'] = 'success';
 
             setcookie('lastCaseModule', (int)$this->post->module, $this->config->cookieLife, $this->config->webRoot, '', $this->config->cookieSecure, false);
@@ -2372,46 +2372,223 @@ class testcase extends control
         $this->view->libraries = $this->loadModel('caselib')->getLibraries();
         $this->display();
     }
+
     /**
-     * Export case to word in old way
+     * Add 2 tables to a word.
      *
      * @param  int    $caseID
+     * @param  \PhpOffice\PhpWord\PhpWord  $PHPWord
      * @access public
-     * @return void
+     * @return \PhpOffice\PhpWord\PhpWord
      */
-    public function exportToWord_old($caseID, $version = -1)
-    {
-        require_once 'vendor/autoload.php';
-        if($this->server->request_method == 'POST')
-        {
-            $results = $this->loadModel('testtask')->getResults(0, $caseID);
-            $sample_data_all = array();
-            if($version==-1){
-                foreach($results as $result){
-                    if($result->version > $version){
-                        $version = $result->version;
-                    }
-                }
+    public function addTwoTablesToWord($caseID, $PHPWord){
+
+        $case = $this->testcase->getById($caseID);
+        $steps = $case->steps;
+
+        $data_samples = array();
+        $data_sample_results = array();
+        $step_indexs = array();
+        $stepCount = count($steps);
+        for($i = 1;$i <= $stepCount;$i+=1){
+            $data_samples[$i] = '';
+            $data_sample_results[$i] = '';
+        }
+        $data_samples_by_case = $this->datasample->getDataSamplesByCase($caseID);
+
+        foreach ($data_samples_by_case as $datasample){
+            array_push($step_indexs, $datasample->casestep_level);
+            $data_samples[$datasample->casestep_level] = $datasample->object;
+            $data_sample_result_by_sample = $this->datasample->getOneResultByDataSampleIdOrderByDate($datasample->id);
+            /*error_log(print_r($datasample->id,1));
+            error_log(print_r($data_sample_result_by_sample,1));*/
+            if(isset($data_sample_result_by_sample)){
+                $data_sample_results[$datasample->casestep_level]  = $data_sample_result_by_sample->object;
             }
-            foreach($results as $result){
-                if($result->version != $version)continue;
-                if(isset($result->sample_data['sample_in']) or isset($result->sample_data['sample_out'])){
-                    array_push($sample_data_all, $result->sample_data);
-                }
-            }
-            $sample_data_all = array_reverse($sample_data_all);
-            $PHPWord = new \PhpOffice\PhpWord\PhpWord();
-            $PHPWord = $this->testcase->exportToWord_old($caseID,$sample_data_all, $PHPWord);
-            $saveTime = date("Ymd-H:i:m");
-            $filename = $caseID . '_' . $saveTime . '.docx';
-            //$filepath = 'tmp_case/' . $filename;
-            $PHPWord->save($filename, 'Word2007', true);
-            //$this->loadModel('file')->sendDownHeader($filename, 'docx', realpath('./'.$filename), 'file', false);
-            return $this->send(array('result' => 'success', 'closeModal' => true));
         }
 
-        #if(dao::isError()) return $this->send(array('result' => 'fail', 'message' => dao::getError()));
-        $this->display();
+        $cellRowSpan = ['vMerge' => 'restart', 'valign' => 'center']; // 设置可跨行，且文字在居中
+        $cellRowContinue = ['vMerge' => 'continue']; //使行连接，且无边框线
+        $cellHCentered = ['align' => 'center']; //段落居中
+        $cellLeft = ['align' => 'left'];//段落居左对齐
+        //定义样式数组
+        $styleTable = [
+            'borderSize'=>6,
+            'borderColor'=>'070707',
+            'cellMargin'=>80
+        ];
+        $SignTableStyle = [
+            'borderSize'=>6,
+            'borderColor'=>'070707',
+            'cellMargin'=>80,
+        ];
+        //定义第一行的样式
+        $styleFirstRow = [
+            'borderBottomSize'=>18,
+            'borderBottomColor'=>'070707',
+            'bgColor'=>'c3bcbb'
+        ];
+        //定义第一行的字体
+        $fontStyle = ['bold'=>true,'align'=>'center','size' => 10];
+
+        //定义单元格样式数组  居中
+        $styleCell = ['valign'=>'center'];
+        $styleCellBTLR = ['valign'=>'center'];
+        $sectionStyle = array('orientation' => 'landscape',
+            'marginLeft' => 2.54*567,
+            'marginRight' => 2.54*567,
+            'marginTop' => 3.18*567,
+            'marginBottom' => 3.18*567);
+        $section = $PHPWord->addSection($sectionStyle);
+        $section->addTitle("用例标识：" . $case->title,2);
+        $section->addTextBreak(1);
+        $PHPWord->addTableStyle('myOwnTableStyle',$styleTable,$styleFirstRow);
+        $SignTable1 = $section->addTable('myOwnTableStyle');
+        $SignTable1->addRow(250);
+        $SignTable1->addCell(2800)->addText('测试要点名称/标识',$fontStyle,$cellHCentered);
+        $SignTable1->addCell(4800)->addText('XXXX/XXXX-GN-XXXX（需求或者功能点）',$fontStyle,$cellHCentered);
+        $SignTable1->addCell(3800)->addText('测试用例名称/标识',$fontStyle,$cellHCentered);
+        //$SignTable1->addCell(3800)->addText('XXXX/XXXX-GN-XXXX-XXXX',$fontStyle,$cellHCentered);
+        $SignTable1->addCell(3800)->addText($case->title,$fontStyle,$cellHCentered);
+        $SignTable2 = $section->addTable('myOwnTableStyle');
+        $SignTable2->addRow(250);
+        $SignTable2->addCell(1280)->addText('测试步骤',$fontStyle,$cellHCentered);
+        $SignTable2->addCell(2320)->addText('前提和约束',$fontStyle,$cellHCentered);
+        $SignTable2->addCell(2320)->addText('输入',$fontStyle,$cellHCentered);
+        $SignTable2->addCell(2320)->addText('目的和动作',$fontStyle,$cellHCentered);
+        $SignTable2->addCell(2320)->addText('预期结果',$fontStyle,$cellHCentered);
+        $SignTable2->addCell(2320)->addText('评价准则',$fontStyle,$cellHCentered);
+        $SignTable2->addCell(2320)->addText('实际结果',$fontStyle,$cellHCentered);
+
+        $id = 0;
+        foreach($steps as $step){
+            if($step->type=='item')continue;
+            else $id++;
+            $SignTable2->addRow(250);
+            $SignTable2->addCell(1280)->addText($id,$fontStyle,$cellHCentered);
+            $SignTable2->addCell(2320)->addText($case->precondition,$fontStyle,$cellHCentered);
+            if(in_array($id, $step_indexs)){
+                $SignTable2->addCell(2320)->addText($case->title . '-D1',$fontStyle,$cellHCentered);
+            }else{
+                $SignTable2->addCell(2320)->addText('',$fontStyle,$cellHCentered);
+            }
+            $SignTable2->addCell(2320)->addText($step->goal_action,$fontStyle,$cellHCentered);
+            $SignTable2->addCell(2320)->addText($step->expect,$fontStyle,$cellHCentered);
+            $SignTable2->addCell(2320)->addText($step->eval_criteria,$fontStyle,$cellHCentered);
+            $SignTable2->addCell(2320)->addText('',$fontStyle,$cellHCentered);
+        }
+        $section->addTextBreak(1);
+
+        for($x = 1;$x <= $stepCount;$x += 1){
+            if(in_array($x, $step_indexs)){
+                $data_sample = json_decode($data_samples[$x],true);
+                $data_sample_result = json_decode($data_sample_results[$x],true);
+
+                $section->addTitle("步骤" . $x . "的数据样本表如下",2);
+                if(isset($data_sample) && count($data_sample, 1)>1){
+
+                    if(isset($data_sample_result) && count($data_sample_result)>1){
+                        array_push($data_sample, $data_sample_result);
+                    }else{
+                        $data_sample_result = array();
+                        for($i = 0; $i < count($data_sample[0]); $i += 1){
+                            array_push($data_sample_result, "");
+                        }
+                        $data_sample_result[0] = $data_sample[count($data_sample)-1][0] . '(实际结果)';
+                        array_push($data_sample, $data_sample_result);
+                    }
+
+                    $SignTable3 = $section->addTable('myOwnTableStyle');
+                    $SignTable3->addRow(250);
+                    $SignTable3->addCell(2800)->addText('数据样本名称/标识',$fontStyle,$cellHCentered);
+                    $SignTable3->addCell(4*3800-2800)->addText($case->title . '-D1',$fontStyle,$cellHCentered);
+                    //$SignTable3->addCell(4*3800-2800)->addText('XXXXX数据样本/XXXX-GN-MMMM-BBBB-D1',$fontStyle,$cellHCentered);
+                    $SignTable4 = $section->addTable('myOwnTableStyle');
+                    $SignTable4->addRow(250);
+                    $SignTable4->addCell(2000)->addText('输入/输出项',$fontStyle,$cellHCentered);
+                    $SignTable4->addCell(2000)->addText('输入/输出项名称',$fontStyle,$cellHCentered);
+
+                    $row_num = count($data_sample);
+                    $col_num = count($data_sample[0]);
+
+                    $sample_num = $col_num-1;
+
+                    $sample_width = (4*3800-4000)/($sample_num+1);
+                    $comment_width = 4*3800-4000-$sample_width*$sample_num;
+                    for($i = 1;$i <= $sample_num;$i++){
+                        $SignTable4->addCell($sample_width)->addText('样本'.$i,$fontStyle,$cellHCentered);
+                    }
+                    $SignTable4->addCell($comment_width)->addText('备注',$fontStyle,$cellHCentered);
+
+                    $reference_in_num = $row_num - 2;
+                    $reference_out_num = 1;
+                    $reference_result_num = 1;
+
+                    if($reference_in_num > 0){
+                        for($i = 1;$i <= $reference_in_num;$i++){
+                            $SignTable4->addRow(250);
+                            if($i==1){
+                                if($reference_in_num>1)
+                                    $SignTable4->addCell(2000,$cellRowSpan)->addText('输入项',$fontStyle,$cellHCentered);
+                                else
+                                    $SignTable4->addCell(2000)->addText('输入项',$fontStyle,$cellHCentered);
+                            }else{
+                                $SignTable4->addCell(2000, $cellRowContinue);
+                            }
+                            $SignTable4->addCell(2000)->addText($data_sample[$i-1][0],$fontStyle,$cellHCentered);
+                            for($j = 1;$j<=$sample_num;$j++){
+                                $SignTable4->addCell($sample_width)->addText($data_sample[$i-1][$j],$fontStyle,$cellHCentered);
+                            }
+                            $SignTable4->addCell($comment_width)->addText('',$fontStyle,$cellHCentered);
+                        }
+                    }
+                    if($reference_out_num > 0){
+                        for($i = 1;$i <= $reference_out_num;$i++){
+                            $SignTable4->addRow(250);
+                            if($i==1){
+                                if($reference_out_num>1)
+                                    $SignTable4->addCell(2000,$cellRowSpan)->addText('预期输出',$fontStyle,$cellHCentered);
+                                else
+                                    $SignTable4->addCell(2000)->addText('预期输出',$fontStyle,$cellHCentered);
+                            }else{
+                                $SignTable4->addCell(2000, $cellRowContinue);
+                            }
+                            $SignTable4->addCell(2000)->addText($data_sample[$reference_in_num][0],$fontStyle,$cellHCentered);
+                            for($j = 1;$j<=$sample_num;$j++){
+                                $SignTable4->addCell($sample_width)->addText($data_sample[$reference_in_num+$i-1][$j],$fontStyle,$cellHCentered);
+                            }
+                            $SignTable4->addCell($comment_width)->addText('',$fontStyle,$cellHCentered);
+                        }
+                    }
+                    if($reference_result_num > 0){
+                        for($i = 1;$i <= $reference_result_num;$i++){
+                            $SignTable4->addRow(250);
+                            if($i==1){
+                                if($reference_result_num>1)
+                                    $SignTable4->addCell(2000,$cellRowSpan)->addText('实际结果',$fontStyle,$cellHCentered);
+                                else
+                                    $SignTable4->addCell(2000)->addText('实际结果',$fontStyle,$cellHCentered);
+                            }else{
+                                $SignTable4->addCell(2000, $cellRowContinue);
+                            }
+                            $SignTable4->addCell(2000)->addText($data_sample[$row_num-1][0],$fontStyle,$cellHCentered);
+                            for($j = 1;$j<=$sample_num;$j++){
+                                $SignTable4->addCell($sample_width)->addText($data_sample[$row_num-1+$i-1][$j],$fontStyle,$cellHCentered);
+                            }
+                            $SignTable4->addCell($comment_width)->addText('',$fontStyle,$cellHCentered);
+                        }
+                    }
+                }else{
+                    $section->addTitle("步骤" . $x . "的数据样本导出失败！",2);
+                }
+            }else{
+                $section->addTitle("步骤" . $x . "无样本数据信息",2);
+            }
+
+            $section->addTextBreak(1);
+        }
+
+        return $PHPWord;
     }
 
     /**
@@ -2426,23 +2603,14 @@ class testcase extends control
         require_once 'vendor/autoload.php';
         if($this->server->request_method == 'POST')
         {
-            $results = $this->loadModel('testtask')->getResults(0, $caseID);
-            $data_sample_result = array();
-            $id = -1;
-            foreach($results as $result){
-                $tmp_result = $result->data_sample_result_new;
-                if(isset($tmp_result) && count($tmp_result)>1){
-                    if($result->id > $id){
-                        $id = $result->id;
-                        $data_sample_result = $tmp_result;
-                    }
-                }
-            }
+            $this->datasample = $this->loadModel('datasample');
             $PHPWord = new \PhpOffice\PhpWord\PhpWord();
-            $PHPWord = $this->testcase->exportToWord($caseID,$data_sample_result, $PHPWord);
+
+            $PHPWord = $this->addTwoTablesToWord($caseID, $PHPWord);
             $saveTime = date("Ymd-H:i:m");
             $filename = $caseID . '_' . $saveTime . '.docx';
             //$filepath = 'tmp_case/' . $filename;
+
             $PHPWord->save($filename, 'Word2007', true);
             //$this->loadModel('file')->sendDownHeader($filename, 'docx', realpath('./'.$filename), 'file', false);
             return $this->send(array('result' => 'success', 'closeModal' => true));
@@ -2464,25 +2632,12 @@ class testcase extends control
         require_once 'vendor/autoload.php';
         if($this->server->request_method == 'POST')
         {
+            $this->datasample = $this->loadModel('datasample');
             $caseIDList = array_slice(explode(',', $this->post->caseIdList2),0,-1);
-
             $PHPWord = new \PhpOffice\PhpWord\PhpWord();
             foreach ($caseIDList as $caseID){
                 $caseID = (int)$caseID;
-                $results = $this->loadModel('testtask')->getResults(0, $caseID);
-                $data_sample_result = array();
-                $id = -1;
-                foreach($results as $result){
-                    $tmp_result = $result->data_sample_result_new;
-                    if(isset($tmp_result) && count($tmp_result)>1){
-                        if($result->id > $id){
-                            $id = $result->id;
-                            $data_sample_result = $tmp_result;
-                        }
-                    }
-                }
-
-                $PHPWord = $this->testcase->exportToWord($caseID,$data_sample_result, $PHPWord);
+                $PHPWord = $this->addTwoTablesToWord($caseID, $PHPWord);
             }
             $saveTime = date("Ymd-H:i:m");
             $filename = '用例集合' . '_' . $saveTime . '.docx';

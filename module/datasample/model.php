@@ -58,4 +58,14 @@ class datasampleModel extends model
             ->andWhere('`delete`')->eq('0')
             ->fetchAll();
     }
+
+    public function  getOneResultByDataSampleIdOrderByDate(int $data_sample_id): object
+    {
+        return $this->dao->select()->from(TABLE_DATASAMPLE_RESULT)
+            ->where('`data_sample_id`')->eq($data_sample_id)
+            ->andWhere('`delete`')->eq('0')
+            ->orderBy('id desc')
+            ->limit(1)
+            ->fetch();
+    }
 }
