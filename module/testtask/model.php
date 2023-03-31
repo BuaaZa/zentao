@@ -1266,11 +1266,11 @@ class testtaskModel extends model
     /**
      * Get info of a test run.
      *
-     * @param  int   $runID
+     * @param int $runID
      * @access public
-     * @return void
+     * @return object
      */
-    public function getRunById($runID)
+    public function getRunById(int $runID): object
     {
         $testRun = $this->dao->findById($runID)->from(TABLE_TESTRUN)->fetch();
         $testRun->case = $this->loadModel('testcase')->getById($testRun->case, $testRun->version);
@@ -1296,11 +1296,11 @@ class testtaskModel extends model
     /**
      * Create test result
      *
-     * @param  int   $runID
+     * @param int $runID
      * @access public
      * @return void
      */
-    public function createResult($runID = 0)
+    public function createResult(int $runID = 0)
     {
         /* Compute the test result.
          *
@@ -1310,7 +1310,7 @@ class testtaskModel extends model
          *
          * */
         $postData   = fixer::input('post')->get();
-        $caseResult = isset($postData->result) ? $postData->result : 'pass';
+        $caseResult = $postData->result ?? 'pass';
         if(isset($postData->steps) and $postData->steps)
         {
             foreach($postData->steps as $stepID => $stepResult)
@@ -1332,35 +1332,23 @@ class testtaskModel extends model
             $stepResults[$stepID] = $step;
         }
 
-        $sample_data = array();
-        $sample_in = $postData->sample_in;
-        $sample_out = $postData->sample_out;
-        $sample_result = $postData->sample_result;
-        $sample_data['sample_in'] = $sample_in;
-        $sample_data['sample_out'] = $sample_out;
-        $sample_data['sample_result'] = $sample_result;
-
-        $datasample_result = $postData->datasample_result;
-
-
         /* Insert into testResult table. */
         $now = helper::now();
         $result = fixer::input('post')
             ->add('run', $runID)
             ->add('caseResult', $caseResult)
             ->setForce('stepResults', serialize($stepResults))
-            ->setForce('sample_data', serialize($sample_data))
-            ->setForce('data_sample_result_new', serialize($datasample_result))
             ->setDefault('lastRunner', $this->app->user->account)
             ->setDefault('date', $now)
             ->skipSpecial('stepResults,sample_data')
-            ->remove('steps,reals,result,sample_in,sample_out,sample_result,datasample_result')
+            ->remove('steps,reals,result,datasample_result')
             ->get();
 
         /* Remove files and labels field when uploading files for case result or step result. */
         foreach($result as $fieldName => $field)
         {
-            if((strpos($fieldName, 'files') !== false) or (strpos($fieldName, 'labels') !== false)) unset($result->$fieldName);
+            if((str_contains($fieldName, 'files')) or (str_contains($fieldName, 'labels')))
+                unset($result->$fieldName);
         }
 
         $this->dao->insert(TABLE_TESTRESULT)->data($result)->autoCheck()->exec();
