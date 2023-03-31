@@ -37,4 +37,12 @@ class datasampleModel extends model
             ->andWhere('`delete`')->eq('0')
             ->fetch();
     }
+
+    public function  getResultsByDataSampleId(int $data_sample_id): array
+    {
+        return $this->dao->select()->from(TABLE_DATASAMPLE_RESULT)
+            ->where('`data_sample_id`')->eq($data_sample_id)
+            ->andWhere('`delete`')->eq('0')
+            ->fetchAll();
+    }
 }
