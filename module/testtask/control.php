@@ -25,7 +25,13 @@ class testtask extends control
      * @var    int
      * @access public
      */
-    public $projectID = 0;
+    public int $projectID = 0;
+    public actionModel $action;
+    public commonModel $common;
+    public testtaskModel $testtask;
+    public testcaseModel $testcase;
+    public datasampleModel $datasample;
+    public userModel $user;
 
     /**
      * Construct function, load product module, assign products to view auto.
@@ -1312,15 +1318,22 @@ class testtask extends control
     }
 
     /**
-     * Run case.
+     * 执行测试用例和数据样本
      *
-     * @param  int    $runID
-     * @param  String $extras   others params, forexample, caseID=10, version=3
+     * @param int $runID
+     * @param int $caseID
+     * @param int $version
+     * @return int
      * @access public
-     * @return void
      */
-    public function runCase($runID, $caseID = 0, $version = 0)
+    public function runCase(int $runID, int $caseID = 0, int $version = 0): int
     {
+        $this->action = $this->loadModel('action');
+        $this->common = $this->loadModel('common');
+        $this->testcase = $this->loadModel('testcase');
+        $this->user = $this->loadModel('user');
+        $this->datasample = $this->loadModel('datasample');
+
         if($runID)
         {
             $run = $this->testtask->getRunById($runID);
@@ -1328,28 +1341,32 @@ class testtask extends control
         else
         {
             $run = new stdclass();
-            $run->case = $this->loadModel('testcase')->getById($caseID, $version);
+            $run->case = $this->testcase->getById($caseID, $version);
+            $run->case->datasamples = $this->datasample->getDataSamplesByCase($caseID);
         }
 
-        $caseID     = $caseID ? $caseID : $run->case->id;
-        $preAndNext = $this->loadModel('common')->getPreAndNextObject('testcase', $caseID);
+        $caseID     = $caseID ?: $run->case->id;
+        $preAndNext = $this->common->getPreAndNextObject('testcase', $caseID);
         if(!empty($_POST))
         {
             $caseResult = $this->testtask->createResult($runID);
+
+            // 保存数据样本结果
+            foreach ($this->post->datasample_result as $data_sample_id => $result)
+                $this->datasample->saveDataSampleResult((int)$data_sample_id, json_encode($result));
+
             if(dao::isError()) return print(js::error(dao::getError()));
 
             $taskID = empty($run->task) ? 0 : $run->task;
-            $this->loadModel('action')->create('case', $caseID, 'run', '', $taskID);
+            $this->action->create('case', $caseID, 'run', '', $taskID);
             if($caseResult == 'fail')
             {
-
                 $response['result']  = 'success';
                 $response['locate']  = $this->createLink('testtask', 'results',"runID=$runID&caseID=$caseID&version=$version");
-                return $this->send($response);
             }
             else
             {
-                /* set cookie for ajax load caselist when close colorbox. */
+                /* set cookie for ajax load case-list when close colorbox. */
                 setcookie('selfClose', 1, 0, $this->config->webRoot, '', $this->config->cookieSecure, false);
 
                 if($preAndNext->next and $this->app->tab != 'my')
@@ -1361,16 +1378,15 @@ class testtask extends control
                     $response['result'] = 'success';
                     $response['next']   = 'success';
                     $response['locate'] = inlink('runCase', "runID=$nextRunID&caseID=$nextCaseID&version=$nextVersion");
-                    return $this->send($response);
                 }
                 else
                 {
                     $response['result'] = 'success';
                     $response['locate'] = 'reload';
                     $response['target'] = 'parent';
-                    return $this->send($response);
                 }
             }
+            return $this->send($response);
         }
 
         $preCase  = array();
@@ -1391,12 +1407,13 @@ class testtask extends control
         $this->view->run      = $run;
         $this->view->preCase  = $preCase;
         $this->view->nextCase = $nextCase;
-        $this->view->users    = $this->loadModel('user')->getPairs('noclosed, noletter');
+        $this->view->users    = $this->user->getPairs('noclosed, noletter');
         $this->view->caseID   = $caseID;
         $this->view->version  = $version;
         $this->view->runID    = $runID;
 
         $this->display();
+        return 0;
     }
 
     /**
