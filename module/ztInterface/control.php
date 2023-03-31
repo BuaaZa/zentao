@@ -220,6 +220,8 @@ class ztinterface extends control
             return $this->mockFloat($data, $return);
         }else if($data["type"] == 'array'){
             return $this->mockArray($data, $return);
+        }else if($data["type"] == 'object'){
+            return $this->mockObject($data, $return);
         }
         $response['error'] = '无此类型';
         if($response['error']){
@@ -240,6 +242,7 @@ class ztinterface extends control
                 $data[$key] = $value;
             }
         }
+        $response['id'] = $data['id'];
         if(!in_array(strtolower($data['type']),array('string'))){
             $response['error'] = 'Mock函数与类型不符';
             if($return){
@@ -282,6 +285,7 @@ class ztinterface extends control
                 $data[$key] = $value;
             }
         }
+        $response['id'] = $data['id'];
         if(!in_array(strtolower($data['type']),array('string'))){
             $response['error'] = 'Mock函数与类型不符';
             if($return){
@@ -344,6 +348,7 @@ class ztinterface extends control
                 $data[$key] = $value;
             }
         }
+        $response['id'] = $data['id'];
         if(!in_array(strtolower($data['type']),array('string','integer','float'))){
             $response['error'] = 'Mock函数与类型不符';
             if($return){
@@ -407,6 +412,7 @@ class ztinterface extends control
                 $data[$key] = $value;
             }
         }
+        $response['id'] = $data['id'];
         if(!in_array(strtolower($data['type']),array('string'))){
             $response['error'] = 'Mock函数与类型不符';
             if($return){
@@ -467,6 +473,7 @@ class ztinterface extends control
                 $data[$key] = $value;
             }
         }
+        $response['id'] = $data['id'];
         if(!in_array(strtolower($data['type']),array('string'))){
             $response['error'] = 'Mock函数与类型不符';
             if($return){
@@ -514,6 +521,7 @@ class ztinterface extends control
                 $data[$key] = $value;
             }
         }
+        $response['id'] = $data['id'];
         if(!in_array(strtolower($data['type']),array('integer'))){
             $response['error'] = 'Mock函数与类型不符';
             if($return){
@@ -570,6 +578,7 @@ class ztinterface extends control
                 $data[$key] = $value;
             }
         }
+        $response['id'] = $data['id'];
         if(!in_array(strtolower($data['type']),array('float'))){
             $response['error'] = 'Mock函数与类型不符';
             if($return){
@@ -626,6 +635,7 @@ class ztinterface extends control
                 $data[$key] = $value;
             }
         }
+        $response['id'] = $data['id'];
         if(!in_array(strtolower($data['type']),array('float','integer'))){
             $response['error'] = 'Mock函数与类型不符';
             if($return){
@@ -655,7 +665,7 @@ class ztinterface extends control
             }
             $n -= 1;
         }
-        if($response['value'] and (is_numeric($response['value']) or $response['value']=='null')){
+        if(isset($response['value']) and (is_numeric($response['value']) or $response['value']=='null')){
             if(strtolower($data['type'] == 'float')){
                 $response['value'] = (float)$response['value'];
             }
@@ -682,6 +692,7 @@ class ztinterface extends control
                 $data[$key] = $value;
             }
         }
+        $response['id'] = $data['id'];
         if(!in_array(strtolower($data['type']),array('array'))){
             $response['error'] = 'Mock函数与类型不符';
             if($return){
@@ -736,9 +747,13 @@ class ztinterface extends control
         }
         $data['item']['name'] = $data['name'];
         for($i = 0; $i < $times; $i++){
-            $res = $this->findMock($data['item']);
-            if($res['value']){
-                $ans[$i] = $res['value'];
+            $res = $this->findMock($data['item'][0]);
+            if(isset($res['value'])){
+                if($res['value'] == 'null'){
+                    $ans[$i] = NULL;
+                }else{
+                    $ans[$i] = $res['value'];
+                }
             }
             if($res['error']){
                 $response['item']['error'] = $res['error'];
@@ -746,9 +761,14 @@ class ztinterface extends control
         }
         $data['item']['name'] = 'items';
 
-        if(!empty($ans))
-            $response['value'] = '['.join(',',$ans).']';
-        else{
+        if(!empty($ans)){
+            if($return){
+                $response['value'] = $ans;
+            }else{
+                $response['value'] = json_encode($ans);
+            }
+            
+        }else{
             $response['error'] = '生成数组为空,请检查Mock函数';
         }
 
@@ -758,6 +778,43 @@ class ztinterface extends control
             echo json_encode($response);
             return;
         }
+    }
+
+    public function mockObject($data = '',$return = false){
+        $response = array();
+        if(!$data and !empty($_POST)){
+            $data = array();
+            foreach($_POST as $key=>$value){
+                $data[$key] = $value;
+            }
+        }
+        $response['id'] = $data['id'];
+        if(!in_array(strtolower($data['type']),array('object'))){
+            $response['error'] = 'Mock函数与类型不符';
+            if($return){
+                return $response;
+            }else{
+                echo json_encode($response);
+                return;
+            }
+        }
+        if($data['notNull'] == 'false'){
+            if(rand(0,5) == 0){
+                $response["value"] = "null";
+                if($return){
+                    return $response;
+                }else{
+                    echo json_encode($response);
+                    return;
+                }
+            }
+        }
+        ChromePhp::log($data);
+
+    }
+
+    public function batchMock($data = ''){
+
     }
 
     public function findMock($data = ''){

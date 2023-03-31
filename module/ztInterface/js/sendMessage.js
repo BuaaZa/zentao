@@ -1,13 +1,35 @@
 function toggleChildren(btn) {
   var parentRow = btn.parentNode.parentNode.parentNode;
   var parentId = parentRow.getAttribute("id");
-  var childRows = document.querySelectorAll("tr[class^='" + parentId + "::child" + "']");
+  var childRows = document.querySelectorAll("tr[class^='" + parentId + "---child" + "']");
   childRows.forEach(function(childRow) {
     childRow.style.display = childRow.style.display === 'none' ? 'table-row' : 'none';
   });
   btn.classList.toggle("icon-angle-down");
   btn.classList.toggle("icon-angle-right");
 }
+
+$('select.object-chosen').change(function() {
+  var selectValue = $(this).val();
+  $(this).siblings('input.value-input').val(selectValue);
+  var parentRow = this.parentNode;
+  while(parentRow.nodeName!=="TR"){
+    parentRow = parentRow.parentNode;
+  }
+  $('tr[id^="leader-_-"]').each(function() {
+    // 选择当前行中class为value-input的input元素并将其disabled属性设置为true
+    const disValue = parseInt($(this).attr('data-dis'));
+    if(selectValue === 'null'){
+      $(this).attr('data-dis', disValue + 1);
+      $(this).find('.value-input').prop('disabled', true);
+    }else{
+      $(this).attr('data-dis', disValue - 1);
+      if(disValue-1 == 0){
+        $(this).find('.value-input').prop('disabled', false);
+      }
+    }
+  });
+}); 
 
 const funcTable = [
   'streetname',
@@ -54,6 +76,15 @@ $('.input-mock').on('input', function() {
   }
 });
 
+$('.all-refresh').click(function(){
+  fillInTable(true);
+});
+
+$('.fill-in').click(function(){
+  fillInTable(false);
+});
+
+
 $('.refresh-button').click(function() {
   var parentRow = this.parentNode;
   while(parentRow.nodeName!=="TR"){
@@ -67,11 +98,12 @@ $('.refresh-button').click(function() {
   } 
   var postData = getPostData(rowData);
   var itemSpan = parentRow.querySelector('td:nth-child(4) span');
+  
   if(rowData['type'] == 'array'){
     var itemRow = parentRow.nextElementSibling;
     var itemRowData = parseRow(itemRow);
     itemSpan = itemRow.querySelector('td:nth-child(4) span')
-    postData['item'] = getPostData(itemRowData);
+    postData['item'] = [getPostData(itemRowData)];
   }
   
   if(!rowData['funcName']){
@@ -88,17 +120,17 @@ $('.refresh-button').click(function() {
         console.log(res);
         return;
       }
-      if(response['value']){
-        rowData['value'].value = response['value'];
-      }else{
+      if(response['value'] === undefined || response['value'] === null){
         rowData['value'].value = '';
+      }else{
+        rowData['value'].value = response['value'];
       }
       if(response['error']){
         showError(span, response['error']);
       }else{
         hideError(span);
       }
-      if(postData['type'] == 'array' && response['item']['error']){
+      if(postData['type'] == 'array' && response['item'] &&  response['item']['error']){
         showError(itemSpan, response['item']['error']);
       }else{
         hideError(itemSpan);
@@ -124,10 +156,10 @@ $('.refresh-button').click(function() {
       console.log(res);
       return;
     }
-    if(response['value']){
-      rowData['value'].value = response['value'];
-    }else{
+    if(response['value'] === undefined || response['value'] === null){
       rowData['value'].value = '';
+    }else{
+      rowData['value'].value = response['value'];
     }
     if(response['error']){
       showError(span, response['error']);
@@ -170,6 +202,7 @@ function parseRow(parentRow){
   if(parentRow.nodeName!=="TR"){
     return null;
   }
+  var id = parentRow.id;
   var name = parentRow.querySelector('td:nth-child(1)').querySelector('b').innerText;
   var type = parentRow.querySelector('td:nth-child(2)').innerText;
   var notNull = parentRow.querySelector('td:nth-child(3) input').checked;
@@ -197,13 +230,14 @@ function parseRow(parentRow){
   }
 
   funcName = funcName.toLowerCase().charAt(0).toUpperCase() + funcName.toLowerCase().substring(1);
-  var data = {name:name,type:type,notNull:notNull,mock:mockInput,funcName:funcName,params:jsonData,value:valueInput};
+  var data = {id:id,name:name,type:type,notNull:notNull,mock:mockInput,funcName:funcName,params:jsonData,value:valueInput};
   
   return data;
 }
 
 function getPostData(rowData){
   var postData = {};
+  postData['id'] = rowData['id'];
   postData['name'] = rowData['name'];
   postData['type'] = rowData['type'];
   postData['notNull'] = rowData['notNull'];
@@ -218,4 +252,38 @@ function showError(span,message){
 
 function hideError(span){
   span.style.display = 'none';
+}
+
+
+
+function fillInTable(replace = false){
+  const table = $('#bodys');
+  var list = getTrData(table, 'body-key', replace);
+  var postData = {item:list,type:'object',notNull:'true'};
+  var link = createLink('ztinterface', 'mockObject', '');
+    $.post(link, postData, function(res) {
+      var response = {};
+      try {
+        response = JSON.parse(res);
+      } catch (error) {
+        console.log(res);
+        return;
+      }
+      
+    });  
+}
+
+function getTrData(body, trClass, replace = false){
+  var data = [];
+  body.find('tr.'+ trClass).each(function(){
+    if(replace || $(this).find('#value input.value-input').val() === ''){
+      var rowData = parseRow(this);
+      var postData = getPostData(rowData);
+      if(postData['type'] == 'object' || postData['type'] == 'array'){
+        postData['item'] = getTrData(body, postData['id']+'---child');
+      }
+      data.push(postData);
+    }
+  })
+  return data;
 }

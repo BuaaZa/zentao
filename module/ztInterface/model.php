@@ -144,18 +144,18 @@ class ztinterfaceModel extends model
         $table = '';
         foreach($content as $id => $obj){
             $obj['type'] = strtolower($obj['type']);
-            $newPath = $path.'-'.$obj['name'];
+            $newPath = $path.'-_-'.$obj['name'];
             if(!$path){
                 $newPath = $obj['name'];
-                $table .= "<tr id='$newPath' class='body-key'>";
+                $table .= "<tr id='$newPath' class='body-key' data-dis='0'>";
             }
             else
-                $table .= "<tr id='$newPath' class='$path::child'>";
+                $table .= "<tr id='$newPath' class='$path---child' data-dis='0'>";
             //Name
-            $table .= "<td>";
+            $table .= "<td id='name'>";
             $indent = $level*20 + ($obj["content"]?0:8);
             $table .= "<div style=\"text-indent:".$indent."px\">";
-            if($obj["content"]){
+            if(($obj["type"] == 'object' or $obj["type"] == 'array') and $obj["content"]){
                 $table .= "<button class='icon-angle-down' onclick='toggleChildren(this)'></button>";
             }
             $table .= "<b>{$obj["name"]}</b>";
@@ -166,10 +166,10 @@ class ztinterfaceModel extends model
             $table .= "</td>";
 
             //type
-            $table .= "<td style=\"text-align: center;\">{$obj["type"]}</td>";
+            $table .= "<td id='type' style=\"text-align: center;\">{$obj["type"]}</td>";
 
             //notNull
-            $table .= "<td style=\"text-align: center;\"><input tabindex='-1' type=\"checkbox\" class='notNull' disabled";
+            $table .= "<td id='notNull' style=\"text-align: center;\"><input tabindex='-1' type=\"checkbox\" class='notNull' disabled";
             if ($obj["notNull"]) {
                 $table .= " checked";
             }
@@ -177,22 +177,31 @@ class ztinterfaceModel extends model
             
             //mock
             if($obj['type'] !== "object"){
-                $table .= "<td>" . html::input($newPath.':mock', $obj['mock'], ' class="form-control input-mock" list="'.$obj['type'].'List" placeholder="Mock"');
+                $table .= "<td id='mock'>" . html::input($newPath.':mock', $obj['mock'], ' class="form-control input-mock" list="'.$obj['type'].'List" placeholder="Mock"');
                 $table .= "<span id=\"error\" style=\"font-size:4px;color:red;display:none;\">Mock函数不存在</span>";
                 $table .= "</td>";
             }else{
-                $table .= "<td>" . html::input($newPath.':mock', $obj['mock'], 'class="form-control" disabled') . "</td>";
+                $table .= "<td id='mock'>" . html::input($newPath.':mock', $obj['mock'], 'class="form-control" disabled') . "</td>";
             }
             
             //value
             $placeholder = "placeholder=".($obj['example'] ? "示例:" . $obj['example'] : "键名:".$obj['name']);
-            $table .= "<td>";
-            if($obj['type'] == 'object' or $inArray){
+            $table .= "<td id='value'>";
+            if($inArray){
                 $placeholder = $inArray ? "placeholder='请直接在父级Array中编辑数组'" : "placeholder='请直接编辑子字段的值'";
-                $table .= html::input($newPath.':value', '', 'class="form-control" disabled '.$placeholder);
+                $table .= html::input($newPath.':value', '', 'class="form-control value-input" disabled '.$placeholder);
+            }else if($obj['type'] == "object"){
+                $disabled = '';
+                if($obj["notNull"])
+                    $disabled = 'disabled';
+                $table .= "<select class=\"form-control chosen object-chosen\" >
+                            <option $disabled value=\"null\">null</option>
+                            <option selected value=\"\">请设置子键的值</option>
+                           </select>";
+                $table .= html::input($newPath.':value', '', 'class="form-control value-input" style="display: none;" '.$placeholder);
             }else{
                 $table .= "<div class=\"input-control has-icon-right\">";
-                $table .= html::input($newPath.':value', '', 'class="form-control" '. $placeholder);
+                $table .= html::input($newPath.':value', '', 'class="form-control value-input" '. $placeholder);
                 $table .= '<div class="colorpicker">
                             <button type="button" class="btn btn-link dropdown-toggle refresh-button"><i class="ic"></i></button>
                             <input type="hidden"  data-icon="refresh" data-wrapper="input-control-icon-right"  data-provide="colorpicker">

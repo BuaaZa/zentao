@@ -130,7 +130,17 @@
             </div>
           </div>
           <div class='detail'>
-            <div class='detail-title'><?php echo $lang->ztinterface->body;?></div>
+            <div class='detail-title'>
+              <span style="display: inline;"><?php echo $lang->ztinterface->body;?></span>
+              <div style="text-align: right;display: inline;">
+                <button type="button" class="btn iframe fill-in" style="float: right;">
+                  <i class="icon-task-close icon-import" title="填充空白项" data-app="execution"></i>
+                </button>
+                <button type="button" class="btn iframe all-refresh" style="float: right;">
+                  <i class="icon-task-close icon-refresh" title="全部随机" data-app="execution"></i>
+                </button>
+              </div>
+            </div>
             <div class='detail-content'>
               <table class='table table-form table-bordered'>
                 <thead>
@@ -143,7 +153,7 @@
                       <?php ChromePhp::log($data);?>
                   </tr>
                 </thead>
-                <tbody id='headers' class='table table-form' data-group-name='<?php echo $lang->testcase->groupName ?>'>
+                <tbody id='bodys' class='table table-form' data-group-name='<?php echo $lang->testcase->groupName ?>'>
                   <?php if(empty($header["content"])):?>
                     <tr>
                       <td colspan="5" class="no-data-message"><?php echo $lang->ztinterface->noBody;?></td>
@@ -157,7 +167,9 @@
             </div>
           </div>
           <div class='text-center detail form-actions'>
-            <?php echo html::submitButton(). html::backButton();;?>
+            <button type="button" class="btn iframe">
+              <i class="icon-task-close icon-refresh" title="关闭" data-app="execution"></i>
+            </button>
           </div>
         </div>
       </div>
