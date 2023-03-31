@@ -35,6 +35,15 @@
           </tr>
         </thead>
         <tbody>
+          <?php $i = 0;?>
+          <?php foreach($currentTaskPoints as $taskPoint):?>
+          <tr>
+            <td><input type="text" name="title[<?php echo $i;?>]" id="title<?php echo $i;?>" value='<?php echo $taskPoint->title;?>' class="form-control title-import input-story-title" readonly></td>
+            <td><input type="text" name="spec[<?php echo $i;?>]" id="spec<?php echo $i;?>" value='<?php echo $taskPoint->spec;?>' class="form-control title-import input-story-title" readonly></td>
+            <td><input type="text" name="verify[<?php echo $i;?>]" id="verify<?php echo $i;?>" value='<?php echo $taskPoint->verify;?>' class="form-control title-import input-story-title" readonly></td>
+          </tr>
+          <?php $i ++;?>
+          <?php endforeach;?>
           <tr class="template">
             <td style='overflow:visible'>
               <div class="input-group">
