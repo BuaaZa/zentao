@@ -436,4 +436,15 @@ class qastoryModel extends model
         $this->dao->update(TABLE_STORY)->set('estimate')->eq($estimate)->autoCheck()->where('id')->eq($storyID)->exec();
         return !dao::isError();
     }
+
+    public function getTaskPoints($storyID)
+    {
+        $taskPoints = $this->dao->select('*')->from(TABLE_STORY)->alias('t1')
+            ->leftJoin(TABLE_STORYSPEC)->alias('t2')->on('t1.id=t2.story')
+            ->where('t1.parent')->eq($storyID)
+            ->andWhere('t1.type')->eq('taskPoint')
+            ->andWhere('t1.deleted')->eq(0)
+            ->fetchAll();
+        return $taskPoints;
+    }
 }
