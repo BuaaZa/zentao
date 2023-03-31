@@ -38,7 +38,7 @@ $startTime = getTime();
 $app = new router("pms", dirname(__FILE__, 2));
 
 /* installed or not. */
-if(!isset($config->installed) or !$config->installed) die(header('location: _install.php'));
+if (!isset($config->installed) or !$config->installed) die(header('location: _install.php'));
 
 /* Check for need upgrade. */
 //$config->installedVersion = $app->getInstalledVersion();
@@ -48,17 +48,15 @@ if(!isset($config->installed) or !$config->installed) die(header('location: _ins
 $common = $app->loadCommon();
 
 /* Check the request is getconfig or not. */
-if(isset($_GET['mode']) and $_GET['mode'] == 'getconfig') die(helper::removeUTF8Bom($app->exportConfig()));
+if (isset($_GET['mode']) and $_GET['mode'] == 'getconfig') die(helper::removeUTF8Bom($app->exportConfig()));
 
 /* Remove install.php and upgrade.php. */
-if(file_exists('install.php') or file_exists('upgrade.php'))
-{
+if (file_exists('install.php') or file_exists('upgrade.php')) {
     $undeletedFiles = array();
-    if(file_exists('install.php')) $undeletedFiles[] = '<strong style="color:#ed980f">install.php</strong>';
-    if(file_exists('upgrade.php')) $undeletedFiles[] = '<strong style="color:#ed980f">upgrade.php</strong>';
+    if (file_exists('install.php')) $undeletedFiles[] = '<strong style="color:#ed980f">install.php</strong>';
+    if (file_exists('upgrade.php')) $undeletedFiles[] = '<strong style="color:#ed980f">upgrade.php</strong>';
     $wwwDir = dirname(__FILE__);
-    if($undeletedFiles)
-    {
+    if ($undeletedFiles) {
         echo "<html><head><meta charset='utf-8'></head>
             <body><table align='center' style='width:700px; margin-top:100px; border:1px solid gray; font-size:14px;'><tr><td style='padding:8px'>";
         echo "<div style='margin-bottom:8px;'>安全起见，请删除 <strong style='color:#ed980f'>$wwwDir</strong> 目录下的 " . join(' 和 ', $undeletedFiles) . " 文件。</div>";
@@ -69,10 +67,10 @@ if(file_exists('install.php') or file_exists('upgrade.php'))
 
 /* If client device is mobile and version is pro, set the default view as mthml. */
 //if($app->clientDevice == 'mobile' and (strpos($config->version, 'pro') === 0 or strpos($config->version, 'biz') === 0 or strpos($config->version, 'max') === 0) and $config->default->view == 'html') $config->default->view = 'mhtml';
-if(!empty($_GET['display']) && $_GET['display'] == 'card') $config->default->view = 'xhtml';
+if (!empty($_GET['display']) && $_GET['display'] == 'card') $config->default->view = 'xhtml';
 
 $app->parseRequest();
-if(!$app->setParams()) return;
+if (!$app->setParams()) return;
 $common->checkPriv();
 $common->checkIframe();
 $app->loadModule();

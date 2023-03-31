@@ -11,6 +11,8 @@
  */
 class my extends control
 {
+    public settingModel $setting;
+
     /**
      * Construct function.
      *
@@ -1524,7 +1526,7 @@ EOF;
      */
     public function preference($showTip = true)
     {
-        $this->loadModel('setting');
+        $this->setting = $this->loadModel('setting');
 
         if($_POST)
         {
@@ -1542,11 +1544,11 @@ EOF;
 
         $this->view->URSRList         = $this->loadModel('custom')->getURSRPairs();
         $this->view->URSR             = $this->setting->getURSR();
-        $this->view->programLink      = isset($this->config->programLink)   ? $this->config->programLink   : 'program-browse';
-        $this->view->productLink      = isset($this->config->productLink)   ? $this->config->productLink   : 'product-all';
-        $this->view->projectLink      = isset($this->config->projectLink)   ? $this->config->projectLink   : 'project-browse';
-        $this->view->executionLink    = isset($this->config->executionLink) ? $this->config->executionLink : 'execution-task';
-        $this->view->preferenceSetted = isset($this->config->preferenceSetted) ? true : false;
+        $this->view->programLink      = $this->config->programLink ?? 'program-browse';
+        $this->view->productLink      = $this->config->productLink ?? 'product-all';
+        $this->view->projectLink      = $this->config->projectLink ?? 'project-browse';
+        $this->view->executionLink    = $this->config->executionLink ?? 'execution-task';
+        $this->view->preferenceSetted = isset($this->config->preferenceSetted);
 
         $this->display();
     }
