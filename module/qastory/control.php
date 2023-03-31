@@ -441,8 +441,6 @@ class qaStory extends control
         $this->view->needReview       = ($this->app->user->account == $product->PO or $executionID > 0 or $this->config->story->needReview == 0 or !$this->story->checkForceReview()) ? 0 : 1;
         $this->view->forceReview      = $this->story->checkForceReview();
         $this->view->executionID      = $executionID;
-        
-        $this->view->currentTaskPoints = $this->qastory->getTaskPoints($storyID);
 
         $this->display();
     }
