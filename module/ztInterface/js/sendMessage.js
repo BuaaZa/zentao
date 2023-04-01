@@ -22,10 +22,12 @@ $('select.object-chosen').change(function() {
     if(selectValue === 'null'){
       $(this).attr('data-dis', disValue + 1);
       $(this).find('.value-input').prop('disabled', true);
-    }else{
-      $(this).attr('data-dis', disValue - 1);
-      if(disValue-1 == 0){
-        $(this).find('.value-input').prop('disabled', false);
+    }else if(selectValue === 'input'){
+      if(disValue>0){
+        $(this).attr('data-dis', disValue - 1);
+        if(disValue-1 == 0){
+          $(this).find('.value-input').prop('disabled', false);
+        }
       }
     }
   });
@@ -91,18 +93,18 @@ $('.refresh-button').click(function() {
     parentRow = parentRow.parentNode;
   }
   const rowData = parseRow(parentRow);
-  var span = parentRow.querySelector('td:nth-child(4) span');
+  var span = $(parentRow).find('td#mock span');
   if(!rowData){
     console.log('fail to parse Row');
     return;
   } 
   var postData = getPostData(rowData);
-  var itemSpan = parentRow.querySelector('td:nth-child(4) span');
+  var itemSpan = $(parentRow).find('td#mock span');
   
   if(rowData['type'] == 'array'){
     var itemRow = parentRow.nextElementSibling;
     var itemRowData = parseRow(itemRow);
-    itemSpan = itemRow.querySelector('td:nth-child(4) span')
+    itemSpan = $(itemRow).find('td#mock span');
     postData['item'] = [getPostData(itemRowData)];
   }
   
@@ -123,6 +125,9 @@ $('.refresh-button').click(function() {
       if(response['value'] === undefined || response['value'] === null){
         rowData['value'].value = '';
       }else{
+        if(postData['type'] == 'array'){
+          response['value'] = JSON.stringify(JSON.parse(response['value']));
+        }
         rowData['value'].value = response['value'];
       }
       if(response['error']){
@@ -159,6 +164,9 @@ $('.refresh-button').click(function() {
     if(response['value'] === undefined || response['value'] === null){
       rowData['value'].value = '';
     }else{
+      if(postData['type'] == 'array'){
+        response['value'] = JSON.stringify(JSON.parse(response['value']));
+      }
       rowData['value'].value = response['value'];
     }
     if(response['error']){
@@ -246,12 +254,12 @@ function getPostData(rowData){
   return postData;
 }
 function showError(span,message){
-  span.innerText = message;
-  span.style.display = 'inline';
+  span.text(message);
+  span.css('display', 'none');
 }
 
 function hideError(span){
-  span.style.display = 'none';
+  span.css('display', 'none');
 }
 
 
@@ -262,25 +270,71 @@ function fillInTable(replace = false){
   var postData = {item:list,type:'object',notNull:'true'};
   var link = createLink('ztinterface', 'mockObject', '');
     $.post(link, postData, function(res) {
-      var response = {};
+      var response = [];
       try {
         response = JSON.parse(res);
       } catch (error) {
         console.log(res);
         return;
       }
-      
+      console.log(response);
+      response.forEach(function(obj) {
+        var row = table.find('tr#'+obj.id);
+        var span = row.find('td#mock span');
+        var type = row.find('td#type').text();
+        var input = row.find('td#value').find('input.value-input');
+        if(type == 'object'){
+          var select =row.find('td#value').find('select.object-chosen');
+          select.val(obj.value);
+          console.log(select.val())
+          select.trigger('change');
+          return;
+        }
+        if(obj.value === undefined || obj.value === null){
+          if (input.prop('disabled')) {
+            input.prop('disabled', false);
+            input.val('');
+            input.prop('disabled', true);
+          } else {
+            input.val('');
+          }
+        }else{
+          if(type == 'array'){
+            obj.value = JSON.stringify(JSON.parse(obj.value));
+          }
+          if (input.prop('disabled')) {
+            input.prop('disabled', false);
+            input.val(obj.value);
+            input.prop('disabled', true);
+          } else {
+            input.val(obj.value);
+          }
+        }
+        if(obj.error){
+          showError(span, obj.error);
+        }else{
+          hideError(span);
+        }
+        if(type == 'array'){
+          var itemSpan = table.find('tr.'+obj.id+'---child').find('td#mock span');
+          if(obj.item && obj.item.error){
+            showError(itemSpan, obj.item.error);
+          }else{
+            hideError(itemSpan);
+          }
+        }
+      });
     });  
 }
 
 function getTrData(body, trClass, replace = false){
   var data = [];
   body.find('tr.'+ trClass).each(function(){
-    if(replace || $(this).find('#value input.value-input').val() === ''){
+    if(replace || $(this).find('#value input.value-input').val() === ''||($(this).find('td#type').text() == 'object' && $(this).find('#value input.value-input').val() === 'input')){
       var rowData = parseRow(this);
       var postData = getPostData(rowData);
       if(postData['type'] == 'object' || postData['type'] == 'array'){
-        postData['item'] = getTrData(body, postData['id']+'---child');
+        postData['item'] = getTrData(body, postData['id']+'---child', replace);
       }
       data.push(postData);
     }

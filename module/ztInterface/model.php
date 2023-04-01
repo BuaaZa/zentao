@@ -194,9 +194,9 @@ class ztinterfaceModel extends model
                 $disabled = '';
                 if($obj["notNull"])
                     $disabled = 'disabled';
-                $table .= "<select class=\"form-control chosen object-chosen\" >
+                $table .= "<select class=\"form-control chosen-single object-chosen\" >
                             <option $disabled value=\"null\">null</option>
-                            <option selected value=\"\">请设置子键的值</option>
+                            <option selected value=\"input\">请设置子键的值</option>
                            </select>";
                 $table .= html::input($newPath.':value', '', 'class="form-control value-input" style="display: none;" '.$placeholder);
             }else{
@@ -212,7 +212,7 @@ class ztinterfaceModel extends model
             $table .= "</tr>";
             
             if($obj["type"] == 'object'){
-                $table .= $this->generateBody($obj["content"],$level+1,$newPath);
+                $table .= $this->generateBody($obj["content"],$level+1,$newPath,$inArray);
             }else if($obj["type"] == 'array'){
                 $table .= $this->generateBody($obj["content"],$level+1,$newPath,true);
             }

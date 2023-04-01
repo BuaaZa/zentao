@@ -732,20 +732,21 @@ class ztinterface extends control
 
         $times = mt_rand($min,$max);
         if($times == 0){
-            $response["value"] = "[]";
             if($return){
+                $response["value"] = array();
                 return $response;
             }else{
+                $response["value"] = json_encode(array());
                 echo json_encode($response);
                 return;
             }
         }
         $ans = array();
-        if(!$data['item']){
-            $data['item'] = array();
-            $data['item']['type'] = 'string';
+        if(!$data['item'][0]){
+            $data['item'][0] = array();
+            $data['item'][0]['type'] = 'string';
         }
-        $data['item']['name'] = $data['name'];
+        $data['item'][0]['name'] = $data['name'];
         for($i = 0; $i < $times; $i++){
             $res = $this->findMock($data['item'][0]);
             if(isset($res['value'])){
@@ -759,7 +760,7 @@ class ztinterface extends control
                 $response['item']['error'] = $res['error'];
             }
         }
-        $data['item']['name'] = 'items';
+        $data['item'][0]['name'] = 'items';
 
         if(!empty($ans)){
             if($return){
@@ -767,7 +768,6 @@ class ztinterface extends control
             }else{
                 $response['value'] = json_encode($ans);
             }
-            
         }else{
             $response['error'] = '生成数组为空,请检查Mock函数';
         }
@@ -809,13 +809,47 @@ class ztinterface extends control
                 }
             }
         }
-        ChromePhp::log($data);
-
+        $response["value"] = array();
+        $response['value']['response'] = array();
+        $response['value']['object'] = new stdClass();
+        foreach($data['item'] as $it){
+            $res = $this->findMock($it);
+            if($it['type'] == 'array'){
+                if(isset($res['value'])){
+                    if($res['value'] != 'null'){
+                        $res['value'] = json_encode($res['value']);
+                    }
+                    $response['value']['object']->$it['name'] = $res['value'];
+                }else{
+                    $response['value']['object']->$it['name'] = 'mock error';
+                }
+                $response['value']['response'][] = $res;
+            }else if($it['type'] == 'object'){
+                if($res['value'] != 'null'){
+                    $response['value']['object']->$it['name'] = $res['value']['object'];
+                    $response['value']['response'][] = array('id'=>$it['id'], 'value'=>'input');
+                    $response['value']['response'] = array_merge($response['value']['response'], $res['value']['response']);
+                }else{
+                    $response['value']['object']->$it['name'] = $res['value'];
+                    $response['value']['response'][] = $res;
+                }
+            }else{
+                if(isset($res['value'])){
+                    $response['value']['object']->$it['name'] = $res['value'];
+                }else{
+                    $response['value']['object']->$it['name'] = 'mock error';
+                }
+                $response['value']['response'][] = $res;
+            }
+        }
+        if($return){
+            return $response;
+        }else{
+            echo json_encode($response['value']['response']);
+            return;
+        }
     }
 
-    public function batchMock($data = ''){
-
-    }
 
     public function findMock($data = ''){
         if(!$data['funcName']){
