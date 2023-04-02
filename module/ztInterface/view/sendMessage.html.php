@@ -92,7 +92,7 @@
               <table class='table table-form table-bordered'>
                 <thead>
                   <tr>
-                    <th width="40%"><?php echo $lang->ztinterface->key?></th>
+                    <th width="30%"><?php echo $lang->ztinterface->key?></th>
                       <th width="100px"><?php echo $lang->ztinterface->type;?></th>
                       <!-- <th width="50px"><?php echo $lang->ztinterface->canNull;?></th> -->
                       <!-- <th width="15%"><?php echo $lang->ztinterface->mock;?></th> -->
@@ -107,20 +107,21 @@
                   <?php else:?>
                     <?php foreach($header["content"] as $id => $message):?>
                     <tr class='header-key'>
-                      <td>
+                      <td id='name'>
                         <b><?php echo $message["name"];?></b>
                         <?php if(!empty($message["description"])){
                             echo "<span style=\"color: #888888;\">({$message["description"]})</span>";
                           }
                         ?>
                       </td>
-                      <td style="text-align: center;"><?php echo $message["type"];?></td>
-                      <td><?php
-                        $valueExample = '';
-                        if(!empty($message["example"])){
-                          $valueExample = "示例:".$message["example"];
-                        }
-                        echo html::textarea('header_value[]', '', "rows='1' class='form-control autosize header-value' placeholder=\"$valueExample\""); ?>
+                      <td id='type' style="text-align: center;"><?php echo $message["type"];?></td>
+                      <td id='value'><?php
+                          $valueExample = '';
+                          if(!empty($message["example"])){
+                            $valueExample = "示例:".$message["example"];
+                          }
+                          echo html::input('header_value[]', '', "rows='1' class='form-control header-value' placeholder=\"$valueExample\""); ?>
+                        <span id="error" style="font-size:4px;color:red;display:none;">类型不符</span>
                       </td>
                     </tr>
                     <?php endforeach; ?>
@@ -134,10 +135,10 @@
               <span style="display: inline;"><?php echo $lang->ztinterface->body;?></span>
               <div style="text-align: right;display: inline;">
                 <button type="button" class="btn iframe fill-in" style="float: right;">
-                  <i class="icon-task-close icon-import" title="填充空白项" data-app="execution"></i>
+                  <i class="icon-import" title="填充空白项" data-app="ztinterface"></i>
                 </button>
                 <button type="button" class="btn iframe all-refresh" style="float: right;">
-                  <i class="icon-task-close icon-refresh" title="全部随机" data-app="execution"></i>
+                  <i class="icon-refresh" title="全部随机" data-app="ztinterface"></i>
                 </button>
               </div>
             </div>
@@ -167,9 +168,7 @@
             </div>
           </div>
           <div class='text-center detail form-actions'>
-            <button type="button" class="btn iframe">
-              <i class="icon-task-close icon-refresh" title="关闭" data-app="execution"></i>
-            </button>
+            <button type="button" id="saveMock" class="btn btn-wide btn-primary">保存Mock设置</button>
           </div>
         </div>
       </div>
@@ -178,6 +177,16 @@
           <div class='detail'>
             <div class='detail-title'><?php echo $lang->ztinterface->messageView;?></div>
             <div class='detail-content'><?php echo html::textarea('messageView', '', "rows='20' class='form-control'");?></div>
+          </div>
+          <div class='text-center form-actions'>
+            <button type="button" id="genMessage" class="btn btn-wide btn-primary" data-type='gen'>
+              <i class=" icon-refresh" title="生成报文" data-app="ztinterface"></i>
+              <span>生成报文</span>
+            </button>
+            <button type="button" id="sendMessage" class="btn btn-wide btn-primary">
+              <i class=" icon-run" title="全部随机" data-app="ztinterface"></i>
+              <span>发送报文</span>
+            </button>
           </div>
         </div>
       </div>

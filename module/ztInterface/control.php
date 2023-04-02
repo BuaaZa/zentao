@@ -864,6 +864,12 @@ class ztinterface extends control
         }
         return array("error"=>"Mock函数不存在");
     }
+
+    public function saveMock($id){
+        $res = $this->ztinterface->saveMock($id,$_POST['data']);
+        if(dao::isError()) $res = dao::getError();
+        echo json_encode(array('message'=>$res));
+    }
     
 
     

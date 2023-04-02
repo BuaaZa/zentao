@@ -71,10 +71,57 @@ const funcTable = [
   'name'
 ];
 
+var alertBox = document.createElement('div');
+alertBox.style.position = 'fixed';
+alertBox.style.top = '50%';
+alertBox.style.left = '50%';
+alertBox.style.transform = 'translate(-50%, -50%)';
+alertBox.style.padding = '10px';
+alertBox.style.borderRadius = '5px';
+alertBox.style.backgroundColor = '#1E90FF';
+alertBox.style.color = 'white';
+alertBox.style.zIndex = '9999';
+alertBox.style.fontWeight = 'bold';
+document.body.appendChild(alertBox);
+alertBox.style.display = 'none';
+
 $('.input-mock').on('input', function() {
   var $span = $(this).siblings('span#error');
   if ($span.css('display') === 'inline') {
     $span.css('display', 'none');
+  }
+});
+
+$('.value-input').on('input', function() {
+  var button = $("button#genMessage")
+  button.html('同步报文');
+  button.attr('data-type', 'update');
+});
+
+$('.header-value').on('input', function() {
+  var button = $("button#genMessage")
+  button.html('同步报文');
+  button.attr('data-type', 'update');
+  var $span = $(this).siblings('span#error');
+  if ($span.css('display') === 'inline') {
+    $span.css('display', 'none');
+  }
+});
+
+$('button#genMessage').click(function(){
+  var button = $(this);
+  if(button.attr('data-type') == 'update'){
+    button.html('<i class=" icon-refresh" title="生成报文" data-app="ztinterface"></i><span>生成报文</span>');
+    button.attr('data-type', 'gen');
+  }else{
+    const table = $('#bodys');
+    var list = getTrData(table, 'body-key', true);
+    var head = getHeadData();
+    var obj = {item:list,type:'object',notNull:'true'};
+    var postData = {object:obj, head:head};
+    var link = createLink('ztinterface', 'genMessage', '');
+    $.post(link, postData, function(res) {
+    });
   }
 });
 
@@ -83,11 +130,42 @@ $('.all-refresh').click(function(){
 });
 
 $('.fill-in').click(function(){
+  var button = $("button#genMessage")
+  button.html('同步报文');
+  button.attr('data-type', 'update');
   fillInTable(false);
+});
+
+$("#saveMock").click(function() {
+  var data = [];
+  $("#bodys tr").each(function() {
+    const $row = $(this);
+    const id = $row.attr("id");
+    const $input = $row.find("#mock input.input-mock");
+    if($input && $input.val()){
+      data.push({id:id,mock:$input.val()});
+    }
+  });
+  var button = this;
+  if(data.length > 0){
+    var link = createLink('ztinterface', 'saveMock', 'id='+interfaceID);
+    $.post(link, {data:data}, function(res) {
+        message = JSON.parse(res).message;
+        if(message == 'success'){
+          showAlterbox('保存成功', '#1E90FF', button);
+        }else{
+          showAlterbox(message, '#FF6347', button);
+        }
+    });
+  }
 });
 
 
 $('.refresh-button').click(function() {
+  var button = $("button#genMessage")
+  button.html('同步报文');
+  button.attr('data-type', 'update');
+
   var parentRow = this.parentNode;
   while(parentRow.nodeName!=="TR"){
     parentRow = parentRow.parentNode;
@@ -109,7 +187,7 @@ $('.refresh-button').click(function() {
   }
   
   if(!rowData['funcName']){
-    if(rowData['mock'].value.trim()){
+    if(rowData['mock'].val().trim()){
       showError(span, 'Mock格式不合法');
     }
 
@@ -123,12 +201,12 @@ $('.refresh-button').click(function() {
         return;
       }
       if(response['value'] === undefined || response['value'] === null){
-        rowData['value'].value = '';
+        rowData['value'].val('');
       }else{
         if(postData['type'] == 'array'){
           response['value'] = JSON.stringify(JSON.parse(response['value']));
         }
-        rowData['value'].value = response['value'];
+        rowData['value'].val(response['value']);
       }
       if(response['error']){
         showError(span, response['error']);
@@ -154,20 +232,19 @@ $('.refresh-button').click(function() {
     var response = {};
     try {
       response = JSON.parse(res);
-      console.log(response);
     } catch (error) {
       showError(span, "Mock函数不存在");
-      rowData['value'].value = '';
+      rowData['value'].val('');
       console.log(res);
       return;
     }
     if(response['value'] === undefined || response['value'] === null){
-      rowData['value'].value = '';
+      rowData['value'].val('');
     }else{
       if(postData['type'] == 'array'){
         response['value'] = JSON.stringify(JSON.parse(response['value']));
       }
-      rowData['value'].value = response['value'];
+      rowData['value'].val(response['value']);
     }
     if(response['error']){
       showError(span, response['error']);
@@ -183,7 +260,7 @@ $('.refresh-button').click(function() {
   .fail(function() {
     console.log("fail");
     showError(span, 'Mock函数不存在');
-    rowData['value'].value = '';
+    rowData['value'].val('');
   });
 });
 
@@ -206,17 +283,29 @@ function cnToEn(str) {
   return str;
 }
 
+function showAlterbox(text, bgc, button){
+  alertBox.innerHTML = text;
+  alertBox.style.backgroundColor = bgc;
+  alertBox.style.display = 'block';
+  alertBox.style.top = (button.offsetTop - 300) + 'px';
+  alertBox.style.left = (button.offsetLeft + button.offsetWidth / 2 - alertBox.offsetWidth / 2 +30) + 'px';
+
+  setTimeout(function() {
+    alertBox.style.display = 'none';
+  }, 1000);
+}
+
 function parseRow(parentRow){
-  if(parentRow.nodeName!=="TR"){
+  if($(parentRow).prop("nodeName") !== "TR") {
     return null;
   }
-  var id = parentRow.id;
-  var name = parentRow.querySelector('td:nth-child(1)').querySelector('b').innerText;
-  var type = parentRow.querySelector('td:nth-child(2)').innerText;
-  var notNull = parentRow.querySelector('td:nth-child(3) input').checked;
-  var mockInput = parentRow.querySelector('td:nth-child(4) input');
-  var mock = mockInput.value.trim();
-  var valueInput = parentRow.querySelector('td:nth-child(5) input');
+  var id = $(parentRow).prop("id");
+  var name = $(parentRow).find("td#name b").text();
+  var type = $(parentRow).find("td#type").text();
+  var notNull = $(parentRow).find("td#notNull input").prop("checked");
+  var mockInput = $(parentRow).find("td#mock input");
+  var mock = mockInput.val().trim();
+  var valueInput = $(parentRow).find("td#value input");
   type = type.toLowerCase();
 
   mock = cnToEn(mock);
@@ -238,7 +327,7 @@ function parseRow(parentRow){
   }
 
   funcName = funcName.toLowerCase().charAt(0).toUpperCase() + funcName.toLowerCase().substring(1);
-  var data = {id:id,name:name,type:type,notNull:notNull,mock:mockInput,funcName:funcName,params:jsonData,value:valueInput};
+  var data = {id:id,name:name,type:type,notNull:notNull,mock:mockInput,funcName:funcName,params:jsonData,value:valueInput,nowVal:valueInput.val()};
   
   return data;
 }
@@ -251,11 +340,12 @@ function getPostData(rowData){
   postData['notNull'] = rowData['notNull'];
   postData['funcName'] = rowData['funcName'];
   postData['params'] = rowData['params'];
+  postData['value'] = rowData['nowVal'];
   return postData;
 }
 function showError(span,message){
   span.text(message);
-  span.css('display', 'none');
+  span.css('display', 'inline');
 }
 
 function hideError(span){
@@ -277,7 +367,6 @@ function fillInTable(replace = false){
         console.log(res);
         return;
       }
-      console.log(response);
       response.forEach(function(obj) {
         var row = table.find('tr#'+obj.id);
         var span = row.find('td#mock span');
@@ -286,7 +375,6 @@ function fillInTable(replace = false){
         if(type == 'object'){
           var select =row.find('td#value').find('select.object-chosen');
           select.val(obj.value);
-          console.log(select.val())
           select.trigger('change');
           return;
         }
@@ -340,4 +428,63 @@ function getTrData(body, trClass, replace = false){
     }
   })
   return data;
+}
+
+function getHeadData(){
+  var data = [];
+  $("#headers").find('tr').each(function() {
+    var typeCell = $(this).find('td#type');
+    var nameCell = $(this).find('td#name');
+    var valueInput = $(this).find('td#value input');
+    var error = $(this).find('td#value span#error');
+    if (nameCell.length > 0 && typeCell.length > 0 && valueInput.length > 0) {
+      var type = typeCell.text().trim().toLowerCase();
+      var value = valueInput.val().trim();
+      if(value == '')
+        return;
+      var name = nameCell.text().trim();
+      if(checkValue(type, value)){
+        data.push({name:name, value:value});
+      }else if(['array', 'object', 'string','integer', 'float'].includes(type)){
+        console.log(error);
+        showError(error,'类型不符');
+      }else{
+        showError(error,'类型不存在,请联系开发人员检查接口');
+      }
+    }
+  });
+  return data;
+}
+
+function checkValue(type,value){
+  type = type.trim().toLowerCase();
+  value = value.trim();
+  if (value !== '') {
+    if ((type === 'string' && typeof value === 'string') || 
+        (type === 'integer' && !isNaN(parseInt(value))) ||
+        (type === 'float' && !isNaN(parseFloat(value))) ||
+        (type === 'array' && isJsonArray(value)) ||
+        (type === 'object' && isJsonObject(value))) {
+      return true;
+    }
+  }
+  return false;
+}
+
+function isJsonArray(value) {
+  try {
+    var jsonValue = JSON.parse(value);
+    return Array.isArray(jsonValue);
+  } catch (e) {
+    return false;
+  }
+}
+
+function isJsonObject(value) {
+  try {
+    var jsonValue = JSON.parse(value);
+    return typeof jsonValue === 'object' && !Array.isArray(jsonValue);
+  } catch (e) {
+    return false;
+  }
 }

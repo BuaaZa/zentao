@@ -333,9 +333,49 @@ class ztinterfaceModel extends model
         $faker = Faker\Factory::create($language);
         if(!$faker)
             $faker = Faker\Factory::create();
-        if($language == 'zh_CN')
+        if(strtolower($language) == 'zh_cn')
             $faker->addProvider(new ChineseProvider($faker));
         return $faker;
+    }
+
+    public function setFieldByPath($obj, $pathStr, $feild, $value, $force = false){
+        $path = explode('-_-', $pathStr);
+        foreach($path as $p){
+            
+        }
+    }
+
+    public function saveMock($id,$data){
+        $interface = $this->dao->select('*')->from(TABLE_INTERFACE)
+            ->where('id')->eq((int)$id)
+            ->fetch();
+        if(!$interface)
+            return "no such interface";
+        $obj = json_decode($interface->data);
+        foreach($data as $d){
+            $path = explode('-_-', $d['id']);
+            $temp = $obj;
+            foreach($path as $p){
+                if(!$temp)
+                    break;
+                $find = '';
+                foreach($temp->content as $o){
+                    if($o->name == $p){
+                        $find = $o;
+                        break;
+                    }
+                }
+                $temp = $find;
+            }
+            if($temp){
+                $temp->mock = $d['mock'];
+            }
+        }
+        $this->dao->update(TABLE_INTERFACE)
+                ->set('data')->eq(json_encode($obj))
+                ->where('id')->eq($id)
+                ->exec();
+        return "success";
     }
 
 
