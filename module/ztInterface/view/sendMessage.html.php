@@ -176,7 +176,10 @@
         <div class='cell'>
           <div class='detail'>
             <div class='detail-title'><?php echo $lang->ztinterface->messageView;?></div>
-            <div class='detail-content'><?php echo html::textarea('messageView', '', "rows='20' class='form-control'");?></div>
+            <div class='detail-content'>
+              <?php echo html::textarea('messageHeadView', '', "rows='6' class=' form-control'");?>
+              <?php echo html::textarea('messageBodyView', '', "spellcheck=\"false\" style=\"font-size: 14px; letter-spacing: 0.1em; line-height: 1.5em;\" rows='14' class='form-control'");?>
+            </div>
           </div>
           <div class='text-center form-actions'>
             <button type="button" id="genMessage" class="btn btn-wide btn-primary" data-type='gen'>

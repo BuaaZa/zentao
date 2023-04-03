@@ -115,12 +115,40 @@ $('button#genMessage').click(function(){
     button.attr('data-type', 'gen');
   }else{
     const table = $('#bodys');
+    var baseUrl = $('input#baseURL').val();
     var list = getTrData(table, 'body-key', true);
     var head = getHeadData();
     var obj = {item:list,type:'object',notNull:'true'};
-    var postData = {object:obj, head:head};
+    var postData = {object:obj, head:head,id:interfaceID,baseUrl:baseUrl};
     var link = createLink('ztinterface', 'genMessage', '');
     $.post(link, postData, function(res) {
+      var response = {};
+      try {
+        response = JSON.parse(res);
+      } catch (error) {
+        console.log(res);
+        return;
+      }
+      console.log(response);
+      response['value']['response'].forEach(function(obj) {
+        fillInValueAndError(obj);
+      });
+      if(response['value']['message']['header']){
+        var headText = $('textarea#messageHeadView');
+        headText.val(response['value']['message']['header'].trim()); 
+        if (!headText.hasClass('autosize')) { 
+            headText.addClass('autosize'); 
+        }
+        headText.trigger('autosize.resize')
+      }
+      if(response['value']['message']['body']){
+        var bodyText = $('textarea#messageBodyView');
+        bodyText.val(JSON.stringify(JSON.parse(response['value']['message']['body'].trim()),null,2)); 
+        if (!bodyText.hasClass('autosize')) { 
+            bodyText.addClass('autosize'); 
+        }
+        bodyText.trigger('autosize.resize')
+      }
     });
   }
 });
@@ -368,51 +396,56 @@ function fillInTable(replace = false){
         return;
       }
       response.forEach(function(obj) {
-        var row = table.find('tr#'+obj.id);
-        var span = row.find('td#mock span');
-        var type = row.find('td#type').text();
-        var input = row.find('td#value').find('input.value-input');
-        if(type == 'object'){
-          var select =row.find('td#value').find('select.object-chosen');
-          select.val(obj.value);
-          select.trigger('change');
-          return;
-        }
-        if(obj.value === undefined || obj.value === null){
-          if (input.prop('disabled')) {
-            input.prop('disabled', false);
-            input.val('');
-            input.prop('disabled', true);
-          } else {
-            input.val('');
-          }
-        }else{
-          if(type == 'array'){
-            obj.value = JSON.stringify(JSON.parse(obj.value));
-          }
-          if (input.prop('disabled')) {
-            input.prop('disabled', false);
-            input.val(obj.value);
-            input.prop('disabled', true);
-          } else {
-            input.val(obj.value);
-          }
-        }
-        if(obj.error){
-          showError(span, obj.error);
-        }else{
-          hideError(span);
-        }
-        if(type == 'array'){
-          var itemSpan = table.find('tr.'+obj.id+'---child').find('td#mock span');
-          if(obj.item && obj.item.error){
-            showError(itemSpan, obj.item.error);
-          }else{
-            hideError(itemSpan);
-          }
-        }
+        fillInValueAndError(obj);
       });
     });  
+}
+
+function fillInValueAndError(obj){
+  var table = $('#bodys');
+  var row = table.find('tr#'+obj.id);
+  var span = row.find('td#mock span');
+  var type = row.find('td#type').text();
+  var input = row.find('td#value').find('input.value-input');
+  if(type == 'object'){
+    var select =row.find('td#value').find('select.object-chosen');
+    select.val(obj.value);
+    select.trigger('change');
+    return;
+  }
+  if(obj.value === undefined || obj.value === null){
+    if (input.prop('disabled')) {
+      input.prop('disabled', false);
+      input.val('');
+      input.prop('disabled', true);
+    } else {
+      input.val('');
+    }
+  }else{
+    if(type == 'array'){
+      obj.value = JSON.stringify(JSON.parse(obj.value));
+    }
+    if (input.prop('disabled')) {
+      input.prop('disabled', false);
+      input.val(obj.value);
+      input.prop('disabled', true);
+    } else {
+      input.val(obj.value);
+    }
+  }
+  if(obj.error){
+    showError(span, obj.error);
+  }else{
+    hideError(span);
+  }
+  if(type == 'array'){
+    var itemSpan = table.find('tr.'+obj.id+'---child').find('td#mock span');
+    if(obj.item && obj.item.error){
+      showError(itemSpan, obj.item.error);
+    }else{
+      hideError(itemSpan);
+    }
+  }
 }
 
 function getTrData(body, trClass, replace = false){
@@ -431,10 +464,10 @@ function getTrData(body, trClass, replace = false){
 }
 
 function getHeadData(){
-  var data = [];
+  var data = {};
   $("#headers").find('tr').each(function() {
     var typeCell = $(this).find('td#type');
-    var nameCell = $(this).find('td#name');
+    var nameCell = $(this).find('td#name b');
     var valueInput = $(this).find('td#value input');
     var error = $(this).find('td#value span#error');
     if (nameCell.length > 0 && typeCell.length > 0 && valueInput.length > 0) {
@@ -444,7 +477,7 @@ function getHeadData(){
         return;
       var name = nameCell.text().trim();
       if(checkValue(type, value)){
-        data.push({name:name, value:value});
+        data[name] = value;
       }else if(['array', 'object', 'string','integer', 'float'].includes(type)){
         console.log(error);
         showError(error,'类型不符');

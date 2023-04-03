@@ -378,6 +378,66 @@ class ztinterfaceModel extends model
         return "success";
     }
 
+    public function convertStrToNULL($data) {
+        if (is_object($data)) {
+            foreach ($data as $key => $value) {
+                if( is_object($value) || is_array($value)){
+                    $data->$key = $this->convertStrToNULL($value);
+                }elseif(is_string($value) and strtolower($value) === 'null') {
+                    $data->$key = NULL;
+                }
+            }
+        } elseif (is_array($data)) {
+            foreach ($data as $key => $value) {
+                if( is_object($value) || is_array($value)){
+                    $data[$key] = $this->convertStrToNULL($value);
+                }elseif(is_string($value) and strtolower($value) === 'null') {
+                    $data[$key] = NULL;
+                }
+            }
+        } elseif (is_string($data) and strtolower($data) === 'null') {
+            $data = NULL;
+        }
+        return $data;
+    }
+
+    public function genMessage($header, $body, $method, $url){
+        $header['Content-Type'] =  'application/json';
+        $body = json_encode($body);
+
+        $ch = curl_init();
+        $method = strtoupper(trim($method));
+
+        $headers = array();
+        foreach($header as $key => $value){
+            $headers[] = $key.': '.$value;
+        }
+        
+        curl_setopt($ch, CURLOPT_URL, $url);
+        if($method == 'POST'){
+            curl_setopt($ch, CURLOPT_POST, 1);
+            curl_setopt($ch, CURLOPT_POSTFIELDS, $body);
+        }else if($method == 'GET'){
+            curl_setopt($ch, CURLOPT_HTTPGET, true);
+        }else if($method == 'PUT'){
+            curl_setopt($ch, CURLOPT_PUT, true);
+            curl_setopt($ch, CURLOPT_POSTFIELDS, $body);
+        }else{
+            curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'METHOD');
+            curl_setopt($ch, CURLOPT_POSTFIELDS, $body);
+        }
+        curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+        //curl_setopt($ch, CURLOPT_COOKIE, $cookie);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+        curl_setopt($ch, CURLINFO_HEADER_OUT, true);
+
+        curl_exec($ch);
+        
+        $head = curl_getinfo($ch, CURLINFO_HEADER_OUT);
+        curl_close($ch);
+        return array('header'=>$head, 'body'=>$body);
+    }
+
 
 
     /**

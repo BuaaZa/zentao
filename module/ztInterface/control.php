@@ -814,30 +814,29 @@ class ztinterface extends control
         $response['value']['object'] = new stdClass();
         foreach($data['item'] as $it){
             $res = $this->findMock($it);
+            $itKey = $it['name'];
             if($it['type'] == 'array'){
                 if(isset($res['value'])){
-                    if($res['value'] != 'null'){
-                        $res['value'] = json_encode($res['value']);
-                    }
-                    $response['value']['object']->$it['name'] = $res['value'];
+                    $response['value']['object']->$itKey = $res['value'];
                 }else{
-                    $response['value']['object']->$it['name'] = 'mock error';
+                    $response['value']['object']->$itKey = 'mock error';
                 }
+                if($res['value'] != 'null')$res['value'] = json_encode($res['value']);
                 $response['value']['response'][] = $res;
             }else if($it['type'] == 'object'){
                 if($res['value'] != 'null'){
-                    $response['value']['object']->$it['name'] = $res['value']['object'];
+                    $response['value']['object']->$itKey = $res['value']['object'];
                     $response['value']['response'][] = array('id'=>$it['id'], 'value'=>'input');
                     $response['value']['response'] = array_merge($response['value']['response'], $res['value']['response']);
                 }else{
-                    $response['value']['object']->$it['name'] = $res['value'];
+                    $response['value']['object']->$itKey = $res['value'];
                     $response['value']['response'][] = $res;
                 }
             }else{
                 if(isset($res['value'])){
-                    $response['value']['object']->$it['name'] = $res['value'];
+                    $response['value']['object']->$itKey = $res['value'];
                 }else{
-                    $response['value']['object']->$it['name'] = 'mock error';
+                    $response['value']['object']->$itKey = 'mock error';
                 }
                 $response['value']['response'][] = $res;
             }
@@ -852,6 +851,8 @@ class ztinterface extends control
 
 
     public function findMock($data = ''){
+        $response = array();
+        $response['id'] = $data['id'];
         if(!$data['funcName']){
             return $this->mockBase($data, true);
         }
@@ -862,7 +863,8 @@ class ztinterface extends control
         if (method_exists($this, $funcName)) {
             return $this->$funcName($data, true);
         }
-        return array("error"=>"Mock函数不存在");
+        $response['error'] = "Mock函数不存在";
+        return $response;
     }
 
     public function saveMock($id){
@@ -870,7 +872,38 @@ class ztinterface extends control
         if(dao::isError()) $res = dao::getError();
         echo json_encode(array('message'=>$res));
     }
-    
+
+    public function genMessage(){
+        $response = array();
+        $response['error'] = array();
+        if(empty($_POST)){
+            $response['error'][] = array('message'=>'无请求体','from'=>'alter');
+            echo json_encode($response);
+            return;
+        }
+        $interface = $this->ztinterface->getByID((int)$_POST['id']);
+        if(!$interface){
+            $response['error'][] = array('message'=>'接口不存在','from'=>'alter');
+            echo json_encode($response);
+            return;
+        }
+        $url = rtrim($_POST['baseUrl'], '/') . '/' . ltrim($interface->url, '/');
+        if (filter_var($url, FILTER_VALIDATE_URL) === false) {
+            $url = 'http://127.0.0.1'. '/' . ltrim($interface->url, '/');
+            if(filter_var($url, FILTER_VALIDATE_URL) === false){
+                $response['error'][] = array('message'=>'URL部分不合法','from'=>'baseURL');
+                echo $response;
+                return;
+            }
+            $response['error'][] = array('message'=>'基地址为空或不合法,已采用http://127.0.0.1/作为基地址','from'=>'baseURL');
+        }
+        $response['value'] = $this->mockObject($_POST['object'], true)['value'];
+        $obj = $response['value']['object'];
+        $obj = $this->ztinterface->convertStrToNULL($obj);
+        $response['value']['message'] = $this->ztinterface->genMessage($_POST['head'], $obj, $interface->method, $url);
+        echo json_encode($response);
+        return;
+    }
 
     
 
