@@ -89,23 +89,21 @@
                 </tr>
             </table>
             <table align='center' class='table table-form'>
-                <caption class='text-left text-muted'><?php echo $lang->user->contactInfo; ?></caption>
-                <?php if (!empty($config->user->contactField)): ?>
-                    <?php $i = 0; ?>
-                    <?php foreach (explode(',', $config->user->contactField) as $field): ?>
-                        <?php if ($i % 2 == 0) echo '<tr>'; ?>
-                        <?php $i++; ?>
-                        <th <?php echo $i % 2 == 0 ? "class='w-130px'" : 'class="w-140px"' ?>><?php echo $lang->user->$field; ?></th>
-                        <td <?php if ($i % 2 != 0) echo "class='w-p40'" ?>><?php echo html::input($field, $user->$field, "class='form-control'"); ?></td>
-                        <?php if ($i % 2 == 0) echo '</tr>'; ?>
-                    <?php endforeach; ?>
-                <?php endif; ?>
-                <tr>
-                    <th><?php echo $lang->user->address; ?></th>
-                    <td><?php echo html::input('address', $user->address, "class='form-control'"); ?></td>
-                    <th><?php echo $lang->user->zipcode; ?></th>
-                    <td><?php echo html::input('zipcode', $user->zipcode, "class='form-control'"); ?></td>
-                </tr>
+                <caption class='text-left text-muted'>
+                    <?php echo $lang->user->contactInfo; ?>
+                </caption>
+                <?php $i = 0; ?>
+                <?php foreach (explode(',', $config->user->contactField) as $field): ?>
+                    <?php if ($i % 2 == 0) echo '<tr>'; ?>
+                    <?php $i++; ?>
+                    <th <?php echo $i % 2 == 0 ? "class='w-130px'" : 'class="w-140px"' ?>>
+                        <?php echo $lang->user->$field; ?>
+                    </th>
+                    <td <?php if ($i % 2 != 0) echo "class='w-p40'" ?>>
+                        <?php echo html::input($field, $user->$field, "class='form-control'"); ?>
+                    </td>
+                    <?php if ($i % 2 == 0) echo '</tr>'; ?>
+                <?php endforeach; ?>
             </table>
             <table align='center' class='table table-form'>
                 <caption class='text-left text-muted'><?php echo $lang->user->verify; ?></caption>
