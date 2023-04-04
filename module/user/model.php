@@ -270,7 +270,7 @@ class userModel extends model
     /**
      * Get user info by ID.
      *
-     * @param  mix     $userID
+     * @param  string|int     $userID
      * @param  string  $field id|account
      * @access public
      * @return object|bool
@@ -664,9 +664,9 @@ class userModel extends model
      * update session random.
      *
      * @access public
-     * @return void
+     * @return int
      */
-    public function updateSessionRandom()
+    public function updateSessionRandom(): int
     {
         $random = mt_rand();
         $this->session->set('rand', $random);
