@@ -176,10 +176,9 @@ foreach(explode(',', $config->testcase->create->requiredFields) as $field)
                     <td class='step-id'></td>
                     <td>
                       <div class='input-group'>
-                          <!-- <span class='input-group-addon step-item-id'></span> -->
-                        <textarea rows='1' class='form-control autosize step-steps' name='steps[]'>
-                        </textarea>
-                          <input type='hidden' name='stepType[]' value='step' class='step-type'>
+                        <!-- <span class='input-group-addon step-item-id'></span> -->
+                        <textarea rows='1' class='form-control autosize step-steps' name='steps[]'></textarea>
+                        <input type='hidden' name='stepType[]' value='step' class='step-type'>
                         <!--<span class="input-group-addon step-type-toggle">
                           <input type='hidden' name='stepType[]' value='item' class='step-type'>
                                 <div class='checkbox-primary'>
@@ -200,13 +199,19 @@ foreach(explode(',', $config->testcase->create->requiredFields) as $field)
                     <td><textarea rows='1' class='form-control autosize step-expects' name='goal_actions[]'></textarea></td>
                     <td><textarea rows='1' class='form-control autosize step-expects' name='expects[]'></textarea></td>
                     <td><textarea rows='1' class='form-control autosize step-expects' name='eval_criterias[]'></textarea></td>
-                    <td class='step-actions'>
+                    <td class='step-actions stepsample-actions'>
                         <input type='hidden' name='datasample[]' id='datasample' value='' class='step-datasample'>
                         <?php
-
+                          common::printIcon('testcase', 'datasample',"", '',
+                              'list', 'edit', '', 'showinonlybody iframe btn-datasample',
+                              true,'','填写' );
 //                        echo $this->loadModel('common')->buildMenu('testcase', 'datasample',"", '',
-//                            'button', 'edit', '', 'showinonlybody iframe', true, '', '填写');
-//                        ?>
+//                              'button', 'edit', '', 'showinonlybody iframe',
+//                              true, '', '填写');
+                        ?>
+                        <button type='button' title="重置数据样本" class='btn datasample-undo '>
+                            <i class='icon icon-undo'></i>
+                        </button>
                     </td>
                     <td class='step-actions'>
                       <div class='btn-group'>
@@ -219,16 +224,16 @@ foreach(explode(',', $config->testcase->create->requiredFields) as $field)
                   </tr>
 
                   <?php foreach($steps as $stepID => $step):?>
-                  <tr class='step text-center'>
+                  <tr class='step '>
                     <td class='step-id'></td>
                     <td>
                       <div class='input-group'>
-                          <!-- <span class='input-group-addon step-item-id'></span> -->
+                        <!-- <span class='input-group-addon step-item-id'></span> -->
                         <?php
                             echo html::textarea('steps[]', $step->desc,
                                 "rows='1' class='form-control autosize step-steps'")
                         ?>
-                          <input type='hidden' name='stepType[]' value='step' class='step-type'>
+                        <input type='hidden' name='stepType[]' value='step' class='step-type'>
                         <!--<span class='input-group-addon step-type-toggle'>
                           <?php /*if(!isset($step->type)) $step->type = 'step';*/?>
                           <input type='hidden' name='stepType[]' value='<?php /*echo $step->type;*/?>' class='step-type'>
@@ -253,20 +258,16 @@ foreach(explode(',', $config->testcase->create->requiredFields) as $field)
                     <td><?php echo html::textarea('eval_criterias[]', $step->eval_criteria, "rows='1' class='form-control autosize step-expects'") ?></td>
                     <td class='step-actions stepsample-actions'>
                         <input type='hidden' name='datasample[]' id='datasample' value='' class='step-datasample'>
-                      <?php
-                        common::printIcon('testcase', 'datasample',"", '',
-                            'list', 'edit', '', 'showinonlybody iframe btn-datasample',
-                            true,'','填写' );
-
-//                        echo $this->loadModel('common')->buildMenu('testcase', 'datasample',"", '',
+                        <?php
+                            common::printIcon('testcase', 'datasample',"", '',
+                                'list', 'edit', '', 'showinonlybody iframe btn-datasample',
+                                true,'','填写' );
+//                          echo $this->loadModel('common')->buildMenu('testcase', 'datasample',"", '',
 //                            'button', 'edit', '', 'showinonlybody iframe',
 //                            true, '', '填写');
-//                      echo $this->loadModel('common')->buildMenu('testcase', 'reset',"", '',
-//                          'button', 'undo', 'hiddenwin', 'showinonlybody',
-//                          false, '', '重置');
-//                        ?>
+                        ?>
                         <button type='button' title="重置数据样本" class='btn datasample-undo '>
-                            <i class='icon icon-undo'></i
+                            <i class='icon icon-undo'></i>
                         </button>
                     </td>
                     <td class='step-actions'>

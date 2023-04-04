@@ -176,13 +176,16 @@
 
             if(!isEmpty){
                 // console.log(parent.$('#steps tr[data-index!="'+ stepID +'"] td.stepsample-actions'));
-
                 $otherDatasampleActions.find('a').attr("disabled",true).css("pointer-events","none");
                 $otherDatasampleActions.find('button').attr("disabled",true);
+                $.cookie("isSampleEmpty",0);
             }else{
                 $otherDatasampleActions.find('a').removeAttr("disabled").css("pointer-events","");
                 $otherDatasampleActions.find('button').removeAttr("disabled");
+                $.cookie("isSampleEmpty",1);
             }
+
+
 
 
             submitButton = $(document.getElementsByName("saveButton"));

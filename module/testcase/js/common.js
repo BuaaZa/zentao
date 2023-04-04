@@ -165,6 +165,7 @@ function initSteps(selector)
     var groupNameText = $steps.data('groupName');
     var insertStepRow = function($row, count, type, notFocus)
     {
+
         if(count === undefined) count = 1;
         var $step;
         for(var i = 0; i < count; ++i)
@@ -173,6 +174,13 @@ function initSteps(selector)
             if($row) $row.after($step);
             else $steps.append($step);
             $step.addClass('step-new').addClass('text-center');
+            console.log($.cookie('isSampleEmpty'));
+            console.log($.cookie('isSampleEmpty')==0);
+            if($.cookie('isSampleEmpty')==0 && $('#steps tr td.stepsample-actions input').val()!=''){
+                var $stepSampleActions = $step.find('td.stepsample-actions');
+                $stepSampleActions.find('a').attr("disabled",true).css("pointer-events","none");
+                $stepSampleActions.find('button').attr("disabled",true);
+            }
             if(type) $step.find('.step-type').val(type);
         }
         if(!notFocus && $step) setTimeout(function(){$step.find('.step-steps').focus();}, 10);
@@ -377,6 +385,8 @@ function initSteps(selector)
         // console.log($stepInput.attr('value'));
         $stepInput.attr('value','');
         // console.log($stepInput.attr('value'));
+
+        $.removeCookie('isSampleEmpty')
 
         var stepID = $step.find('.step-id').text();
 

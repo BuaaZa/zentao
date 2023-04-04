@@ -14,6 +14,9 @@ class user extends control
     public $referer;
 
     public userModel $user;
+    public deptModel $dept;
+    public companyModel $company;
+    public groupModel $group;
 
     /**
      * Construct
@@ -614,39 +617,43 @@ class user extends control
     /**
      * Edit a user.
      *
-     * @param  string|int $userID   the int user id or account
+     * @param int|string $userID   the int user id or account
      * @access public
-     * @return void
+     * @return int
      */
-    public function edit($userID)
+    public function edit(int|string $userID): int
     {
-        $this->lang->user->menu      = $this->lang->company->menu;
-        $this->lang->user->menuOrder = $this->lang->company->menuOrder;
-        if(!empty($_POST))
-        {
-            $this->user->update($userID);
-            if(dao::isError()) return $this->send(array('result' => 'fail', 'message' => dao::getError()));
+        $this->user = $this->loadModel('user');
+        $this->company = $this->loadModel('company');
+        $this->group = $this->loadModel('group');
 
-            $link = $this->session->userList ? $this->session->userList : $this->createLink('company', 'browse');
+        $this->lang->user->menu = $this->lang->company->menu;
+        $this->lang->user->menuOrder = $this->lang->company->menuOrder;
+        if (!empty($_POST)) {
+            $this->user->update($userID);
+            if (dao::isError()) return $this->send(array('result' => 'fail', 'message' => dao::getError()));
+
+            $link = $this->session->userList ?: $this->createLink('company', 'browse');
             return $this->send(array('result' => 'success', 'message' => $this->lang->saveSuccess, 'locate' => $link));
         }
 
-        $user       = $this->user->getById($userID, 'id');
-        $userGroups = $this->loadModel('group')->getByAccount($user->account);
+        $user = $this->user->getById($userID, 'id');
+        $userGroups = $this->group->getByAccount($user->account);
 
-        $title      = $this->lang->company->common . $this->lang->colon . $this->lang->user->edit;
+        $title = $this->lang->company->common . $this->lang->colon . $this->lang->user->edit;
         $position[] = $this->lang->user->edit;
-        $this->view->title      = $title;
-        $this->view->position   = $position;
-        $this->view->user       = $user;
-        $this->view->depts      = $this->dept->getOptionMenu();
+        $this->view->title = $title;
+        $this->view->position = $position;
+        $this->view->user = $user;
+        $this->view->depts = $this->dept->getOptionMenu();
         $this->view->userGroups = implode(',', array_keys($userGroups));
-        $this->view->companies  = $this->loadModel('company')->getOutsideCompanies();
-        $this->view->groups     = $this->dao->select('id, name')->from(TABLE_GROUP)->where('project')->eq(0)->fetchPairs('id', 'name');
-        $this->view->rand       = $this->user->updateSessionRandom();
+        $this->view->companies = $this->company->getOutsideCompanies();
+        $this->view->groups = $this->dao->select('id, name')->from(TABLE_GROUP)->where('project')->eq(0)->fetchPairs('id', 'name');
+        $this->view->rand = $this->user->updateSessionRandom();
         $this->view->visionList = $this->user->getVisionList();
 
         $this->display();
+        return 0;
     }
 
     /**

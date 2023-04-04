@@ -483,6 +483,8 @@ class story extends control
             $this->view->stories          = $this->story->getParentStoryPairsTaskPoint($productID);
         }else{
             $this->view->stories = $this->story->getParentStoryPairs($productID);
+            //error_log(print_r($this->view->stories, 1));
+            
         }
         $this->view->productID        = $productID;
         $this->view->product          = $product;

@@ -168,7 +168,8 @@ $projectIDParam = $isProjectStory ? "projectID=$projectID&" : '';
         }
 
         $hidden = empty($buttonLink) ? 'hidden' : '';
-        echo html::a($buttonLink, "<i class='icon icon-plus'></i> $buttonTitle", '', "class='btn $buttonType $hidden create-story-btn' data-app='$tab'");
+        echo html::a($buttonLink, "<i class='icon icon-plus'></i> $buttonTitle", '', "class='btn $buttonType $hidden create-story-btn' data-app='$tab'","onchange=\"loadProduct(this.value,$fromExecution);\" class='form-control chosen control-product' required");
+        
       }
       ?>
       <?php if($from!='qa' and !empty($productID) and common::hasPriv($storyType, 'batchCreate') and common::hasPriv($storyType, 'create')): ?>

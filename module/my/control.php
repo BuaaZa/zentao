@@ -12,6 +12,9 @@
 class my extends control
 {
     public settingModel $setting;
+    public userModel $user;
+    public deptModel $dept;
+    public groupModel $group;
 
     /**
      * Construct function.
@@ -1499,23 +1502,29 @@ EOF;
      * View my profile.
      *
      * @access public
-     * @return void
+     * @return int
      */
-    public function profile()
+    public function profile(): int
     {
-        if($this->app->user->account == 'guest') return print(js::alert('guest') . js::locate('back'));
+        $this->user = $this->loadModel('user');
+        $this->group = $this->loadModel('group');
+        $this->dept = $this->loadModel('dept');
+
+        if ($this->app->user->account == 'guest')
+            return print(js::alert('guest') . js::locate('back'));
 
         $this->app->loadConfig('user');
         $this->app->loadLang('user');
         $user = $this->user->getById($this->app->user->account);
 
-        $this->view->title        = $this->lang->my->common . $this->lang->colon . $this->lang->my->profile;
-        $this->view->position[]   = $this->lang->my->profile;
-        $this->view->user         = $user;
-        $this->view->groups       = $this->loadModel('group')->getByAccount($this->app->user->account);
-        $this->view->deptPath     = $this->dept->getParents($user->dept);
+        $this->view->title = $this->lang->my->common . $this->lang->colon . $this->lang->my->profile;
+        $this->view->position[] = $this->lang->my->profile;
+        $this->view->user = $user;
+        $this->view->groups = $this->group->getByAccount($this->app->user->account);
+        $this->view->deptPath = $this->dept->getParents($user->dept);
         $this->view->personalData = $this->user->getPersonalData();
         $this->display();
+        return 0;
     }
 
     /**

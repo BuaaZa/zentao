@@ -206,8 +206,9 @@ foreach(explode(',', $config->story->create->requiredFields) as $field)
                   if($type == 'taskPoint'){ 
                     echo html::select('parent', $stories, $storyID, "class='form-control chosen' required");
                   }else{
-                    $stories = array(); 
+                    
                     echo html::select('parent', $stories, '', "class='form-control chosen'");
+                    
                   }?>
               </div>
             </td>
