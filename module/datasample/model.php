@@ -59,7 +59,7 @@ class datasampleModel extends model
             ->fetchAll();
     }
 
-    public function  getOneResultByDataSampleIdOrderByDate(int $data_sample_id): object
+    public function  getOneResultByDataSampleIdOrderByDate(int $data_sample_id)
     {
         return $this->dao->select()->from(TABLE_DATASAMPLE_RESULT)
             ->where('`data_sample_id`')->eq($data_sample_id)

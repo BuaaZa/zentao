@@ -1537,8 +1537,7 @@ class testtaskModel extends model
         foreach($results as $resultID => $result)
         {
             $result->stepResults = unserialize($result->stepResults);
-            $result->sample_data = unserialize($result->sample_data);
-            $result->data_sample_result_new = unserialize(htmlspecialchars_decode($result->data_sample_result_new, ENT_QUOTES));
+            //$result->data_sample_result_new = unserialize(htmlspecialchars_decode($result->data_sample_result_new, ENT_QUOTES));
 
             $result->build       = $result->run ? zget($runs, $result->run, 0) : 0;
             $result->files       = zget($resultFiles, $resultID, array()); //Get files of case result.
