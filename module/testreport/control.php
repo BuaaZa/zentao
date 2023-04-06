@@ -208,7 +208,8 @@ class testreport extends control
 
             if($this->app->tab == 'execution') $this->execution->setMenu($task->execution);
             if($this->app->tab == 'project') $this->project->setMenu($task->project);
-        }else if($objectType == 'execution')
+        }
+        else if($objectType == 'execution')
         {
             if(empty($extra)){
                 return print(js::alert("缺少productID，无法生成测试报告！") . js::locate('back'));
@@ -229,6 +230,20 @@ class testreport extends control
                 $objectID = key($executionPairs);
             }
             $this->view->taskPairs = $executionPairs;
+        }
+        else if($objectType == 'project'){
+            if(empty($extra)){
+                return print(js::alert("缺少productID，无法生成测试报告！") . js::locate('back'));
+            }
+            $productID = $extra;
+            $projectPairs = $this->product->getProjectPairsByProduct($productID);
+            if(empty($projectPairs)){
+                return print(js::alert("该产品未关联项目！") . js::locate('back'));
+            }
+            if(empty($objectID)) {
+                $objectID = key($projectPairs);
+            }
+            $this->view->taskPairs = $projectPairs;
         }
 
 
@@ -273,6 +288,7 @@ class testreport extends control
 
             $execution     = $this->execution->getById($executionID);
             $tasks         = $this->testtask->getExecutionTasks($executionID);
+            if(empty($tasks)) return print(js::alert("请在该执行下建立测试单！") . js::locate('back'));
 
             $task          = $objectID ? $this->testtask->getById($objectID) : key($tasks);
             $owners        = array();
@@ -312,8 +328,8 @@ class testreport extends control
             $builds  = $this->build->getByList($buildIdList);
             $stories = !empty($builds) ? $this->testreport->getStories4Test($builds) : $this->story->getExecutionStories($execution->id);;
 
-            $begin = !empty($begin) ? date("Y-m-d", strtotime($begin)) : $task->begin;
-            $end   = !empty($end) ? date("Y-m-d", strtotime($end)) : $task->end;
+            $begin = !empty($begin) ? date("Y-m-d", strtotime($begin)) : $execution->begin;
+            $end   = !empty($end) ? date("Y-m-d", strtotime($end)) : $execution->end;
             $owner = current($owners);
             $bugs  = $this->testreport->getBugs4Test($builds, $productIdList, $begin, $end, 'execution');
 
@@ -321,6 +337,49 @@ class testreport extends control
             $this->view->position[]  = html::a(inlink('browse', "objectID=$executionID&objectType=execution"), $execution->name);
             $this->view->position[]  = $this->lang->testreport->create;
             $this->view->reportTitle = date('Y-m-d') . " EXECUTION#{$execution->id} {$execution->name} {$this->lang->testreport->common}";
+        }
+        else if($objectType == 'project'){
+            $projectID = $this->commonAction($objectID, $objectType);
+            if($projectID != $objectID) return print(js::error($this->lang->error->accessDenied) . js::locate('back'));
+
+            $project     = $this->project->getByID($projectID);
+            $tasks         = $this->testtask->getProjectTasks($projectID);
+            $owners        = array();
+            $buildIdList   = array();
+            $productIdList = array();
+            foreach($tasks as $i => $task)
+            {
+                if($task->product != $productID) continue;
+                $owners[$task->owner] = $task->owner;
+                $productIdList[$task->product] = $task->product;
+                $this->setChartDatas($task->id);
+                if($task->build != 'trunk') $buildIdList[$task->build] = $task->build;
+            }
+            if(empty($productIdList)) return print(js::alert("请在该项目下建立测试单！") . js::locate('back'));
+            if(count($productIdList) > 1)
+            {
+                echo(js::alert($this->lang->testreport->moreProduct));
+                return print(js::locate('back'));
+            }
+            if($this->app->tab == 'qa')
+            {
+                $productID = $this->product->saveState(key($productIdList), $this->products);
+                $this->loadModel('qa')->setMenu($this->products, $productID);
+            }
+
+            $builds  = $this->build->getByList($buildIdList);
+            $stories = !empty($builds) ? $this->testreport->getStories4Test($builds) : $this->project->getStoriesByProject($project->id);
+
+            $begin = !empty($begin) ? date("Y-m-d", strtotime($begin)) : $project->begin;
+            $end   = !empty($end) ? date("Y-m-d", strtotime($end)) : $project->end;
+            $owner = current($owners);
+            $bugs  = $this->testreport->getBugs4Test($builds, $productIdList, $begin, $end, 'project');
+
+            $this->view->title       = $project->name . $this->lang->testreport->create;
+            $this->view->position[]  = html::a(inlink('browse', "objectID=$projectID&objectType=project"), $project->name);
+            $this->view->position[]  = $this->lang->testreport->create;
+            $this->view->reportTitle = date('Y-m-d') . " PROJECT#{$project->id} {$project->name} {$this->lang->testreport->common}";
+
         }
 
         $leaftasks = array();
@@ -342,6 +401,7 @@ class testreport extends control
         $this->view->stories       = $stories;
         $this->view->bugs          = $bugs;
         $this->view->execution     = $execution;
+        $this->view->project     = $project;
         $this->view->productIdList = join(',', array_keys($productIdList));
         $this->view->tasks         = join(',', array_keys($tasks));
         $this->view->storySummary  = $this->product->summary($stories);
