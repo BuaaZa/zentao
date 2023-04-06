@@ -252,6 +252,7 @@ class testtask extends control
 
         $gobackCookieArray = parse_url($gobackCookie->{$tab});
         parse_str($gobackCookieArray['query'],$cookieParam);
+        
 //        ChromePhp::log($cookieParam);
 
         if(!empty($_POST))
@@ -271,9 +272,9 @@ class testtask extends control
             if($this->app->tab == 'project') $link = $this->createLink('project', 'testtask', "projectID=$task->project");
             if($this->app->tab == 'execution') $link = $this->createLink('execution', 'testtask', "executionID=$task->execution");
 
-
+            error_log($cookieParam->productID);
             if($this->app->tab == 'qa') {
-                if(isset($cookieParam->productID)){
+                if(isset($cookieParam['productID'])){
 //                    ChromePhp::log($cookieParam->productID);
                     $link = $this->createLink($cookieParam['m'], $cookieParam['f'], "productID=" . $cookieParam['productID']);
                 }else{
@@ -281,6 +282,7 @@ class testtask extends control
                     $link = $this->createLink($cookieParam['m'], $cookieParam['f'], "taskID=" . $cookieParam['taskID']);
                 }
             }
+       
             return $this->send(array('result' => 'success', 'message' => $this->lang->saveSuccess, 'locate' => $link));
         }
 
@@ -322,7 +324,6 @@ class testtask extends control
         $this->view->build       = $build;
         $this->view->testreports = array('') + $this->loadModel('testreport')->getPairs($productID);
         $this->view->users       = $this->loadModel('user')->getPairs('noclosed|qdfirst|nodeleted');
-
         $this->view->testParent = $this->testtask->getTestParent($productID, $projectID, $excutionID);
         
         $this->display();
