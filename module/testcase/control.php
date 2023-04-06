@@ -2396,6 +2396,9 @@ class testcase extends control
         }
         $data_samples_by_case = $this->datasample->getDataSamplesByCase($caseID);
 
+        $results = current($this->testtask->getResults(0, $caseID));
+        $stepResults = $results->stepResults;
+
         foreach ($data_samples_by_case as $datasample){
             array_push($step_indexs, $datasample->casestep_level);
             $data_samples[$datasample->casestep_level] = $datasample->object;
@@ -2466,7 +2469,7 @@ class testcase extends control
             else $id++;
             $SignTable2->addRow(250);
             $SignTable2->addCell(1280)->addText($id,$fontStyle,$cellHCentered);
-            $SignTable2->addCell(2320)->addText($case->precondition,$fontStyle,$cellHCentered);
+            $SignTable2->addCell(2320)->addText($step->desc,$fontStyle,$cellHCentered);
             if(in_array($id, $step_indexs)){
                 $SignTable2->addCell(2320)->addText($case->title . '-D1',$fontStyle,$cellHCentered);
             }else{
@@ -2475,7 +2478,9 @@ class testcase extends control
             $SignTable2->addCell(2320)->addText($step->goal_action,$fontStyle,$cellHCentered);
             $SignTable2->addCell(2320)->addText($step->expect,$fontStyle,$cellHCentered);
             $SignTable2->addCell(2320)->addText($step->eval_criteria,$fontStyle,$cellHCentered);
-            $SignTable2->addCell(2320)->addText('',$fontStyle,$cellHCentered);
+            $enResult = $stepResults[$step->id]['result'];
+            $cnResult = $this->lang->testcase->resultList[$enResult];
+            $SignTable2->addCell(2320)->addText($cnResult,$fontStyle,$cellHCentered);
         }
         $section->addTextBreak(1);
 
@@ -2539,7 +2544,7 @@ class testcase extends control
                             for($j = 1;$j<=$sample_num;$j++){
                                 $SignTable4->addCell($sample_width)->addText($data_sample[$i-1][$j],$fontStyle,$cellHCentered);
                             }
-                            $SignTable4->addCell($comment_width)->addText('',$fontStyle,$cellHCentered);
+                            $SignTable4->addCell($comment_width)->addText('/代表样本1的输入',$fontStyle,$cellHCentered);
                         }
                     }
                     if($reference_out_num > 0){
@@ -2604,6 +2609,7 @@ class testcase extends control
         if($this->server->request_method == 'POST')
         {
             $this->datasample = $this->loadModel('datasample');
+            $this->testtask = $this->loadModel('testtask');
             $PHPWord = new \PhpOffice\PhpWord\PhpWord();
 
             $PHPWord = $this->addTwoTablesToWord($caseID, $PHPWord);
@@ -2633,6 +2639,7 @@ class testcase extends control
         if($this->server->request_method == 'POST')
         {
             $this->datasample = $this->loadModel('datasample');
+            $this->testtask = $this->loadModel('testtask');
             $caseIDList = array_slice(explode(',', $this->post->caseIdList2),0,-1);
             $PHPWord = new \PhpOffice\PhpWord\PhpWord();
             foreach ($caseIDList as $caseID){

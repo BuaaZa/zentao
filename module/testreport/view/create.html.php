@@ -22,8 +22,10 @@
         <div class='heading'><?php echo $lang->testreport->create;?></div>
         <?php if(!empty($taskPairs)):?>
         <div class='input-group'>
-          <span class='input-group-addon'><?php echo $lang->testtask->common;?></span>
-          <?php echo html::select('selectTask', $taskPairs, $objectID, "class='form-control chosen'");?>
+            <?php $presetObjectType = array(0 => '测试单', 1 => '执行', 2 => '项目'); ?>
+            <?php if(!isset($selectedObjectType)) $selectedObjectType = 0;?>
+          <span class='input-group-addon'><?php echo html::select('selectObjectType', $presetObjectType, $selectedObjectType, "class='form-control chosen'");?></span>
+            <?php echo html::select('selectTask', $taskPairs, $objectID, "class='form-control chosen'");?>
         </div>
         <?php endif;?>
       </h2>

@@ -168,6 +168,7 @@ class testreport extends control
      */
     public function create($objectID = 0, $objectType = 'testtask', $extra = '', $begin = '', $end = '')
     {
+
         if($_POST)
         {
             $reportID = $this->testreport->create();
@@ -207,7 +208,29 @@ class testreport extends control
 
             if($this->app->tab == 'execution') $this->execution->setMenu($task->execution);
             if($this->app->tab == 'project') $this->project->setMenu($task->project);
+        }else if($objectType == 'execution')
+        {
+            if(empty($extra)){
+                return print(js::alert("缺少productID，无法生成测试报告！") . js::locate('back'));
+            }
+            $productID = $extra;
+            $executionPairs   = array();
+            $list = $this->execution->getProductGroupList();
+            $executions = $list[$productID];
+            foreach ($executions as $execution){
+                $execution = $this->execution->getByID($execution->id);
+                if($execution->type == 'project')continue;
+                $executionPairs[$execution->id] = $execution->name;
+            }
+            if(empty($executions)){
+                return print(js::alert("该产品未关联执行！") . js::locate('back'));
+            }
+            if(empty($objectID)) {
+                $objectID = key($executionPairs);
+            }
+            $this->view->taskPairs = $executionPairs;
         }
+
 
         if(empty($objectID)) return print(js::alert($this->lang->testreport->noObjectID) . js::locate('back'));
         if($objectType == 'testtask')
@@ -250,17 +273,18 @@ class testreport extends control
 
             $execution     = $this->execution->getById($executionID);
             $tasks         = $this->testtask->getExecutionTasks($executionID);
+
             $task          = $objectID ? $this->testtask->getById($objectID) : key($tasks);
             $owners        = array();
             $buildIdList   = array();
             $productIdList = array();
             foreach($tasks as $i => $task)
             {
-                if(!empty($extra) and strpos(",{$extra},", ",{$task->id},") === false)
+/*                if(!empty($extra) and strpos(",{$extra},", ",{$task->id},") === false)
                 {
                     unset($tasks[$i]);
                     continue;
-                }
+                }*/
 
                 $owners[$task->owner] = $task->owner;
                 $productIdList[$task->product] = $task->product;
@@ -304,7 +328,9 @@ class testreport extends control
         {
             $leaftasks = $leaftasks + $this->testtask->getAllSons($taskID);
         }
-        $cases = $this->testreport->getTaskCases($leaftasks, $begin, $end);
+        $tasks = $leaftasks;
+        $cases = $this->testreport->getTaskCases($tasks, $begin, $end);
+
 
         list($bugInfo, $bugSummary) = $this->testreport->getBug4Report($tasks, $productIdList, $begin, $end, $builds);
 
@@ -343,6 +369,15 @@ class testreport extends control
         $this->view->objectID   = $objectID;
         $this->view->objectType = $objectType;
         $this->view->extra      = $extra;
+        $this->view->selectedObjectType = null;
+        if($objectType == 'testtask'){
+            $this->view->selectedObjectType = 0;
+        }else if ($objectType == 'execution'){
+            $this->view->selectedObjectType = 1;
+        }else if($objectType == 'project'){
+            $this->view->selectedObjectType = 2;
+        }
+
         $this->display();
     }
 
