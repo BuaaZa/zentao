@@ -2497,7 +2497,7 @@ class testcase extends control
                     }else{
                         $data_sample_result = array();
                         for($i = 0; $i < count($data_sample[0]); $i += 1){
-                            array_push($data_sample_result, "");
+                            array_push($data_sample_result, "-");
                         }
                         $data_sample_result[0] = $data_sample[count($data_sample)-1][0] . '(实际结果)';
                         array_push($data_sample, $data_sample_result);
@@ -2509,78 +2509,103 @@ class testcase extends control
                     $SignTable3->addCell(4*3800-2800)->addText($case->title . '-D1',$fontStyle,$cellHCentered);
                     //$SignTable3->addCell(4*3800-2800)->addText('XXXXX数据样本/XXXX-GN-MMMM-BBBB-D1',$fontStyle,$cellHCentered);
                     $SignTable4 = $section->addTable('myOwnTableStyle');
-                    $SignTable4->addRow(250);
-                    $SignTable4->addCell(2000)->addText('输入/输出项',$fontStyle,$cellHCentered);
-                    $SignTable4->addCell(2000)->addText('输入/输出项名称',$fontStyle,$cellHCentered);
 
                     $row_num = count($data_sample);
                     $col_num = count($data_sample[0]);
+                    $sample_num_total = (float)($col_num-1);
+                    $sample_num_per_group = 5.0;
+                    $groups = ceil($sample_num_total/$sample_num_per_group);
 
-                    $sample_num = $col_num-1;
+                    $sample_width = (4*3800-4000)/($sample_num_per_group+1);
+                    $comment_width = 4*3800-4000-$sample_width*$sample_num_per_group;
+                    for($g = 0;$g < $groups;$g += 1){
+                        $SignTable4->addRow(250);
+                        $SignTable4->addCell(2000)->addText('输入/输出项',$fontStyle,$cellHCentered);
+                        $SignTable4->addCell(2000)->addText('输入/输出项名称',$fontStyle,$cellHCentered);
 
-                    $sample_width = (4*3800-4000)/($sample_num+1);
-                    $comment_width = 4*3800-4000-$sample_width*$sample_num;
-                    for($i = 1;$i <= $sample_num;$i++){
-                        $SignTable4->addCell($sample_width)->addText('样本'.$i,$fontStyle,$cellHCentered);
-                    }
-                    $SignTable4->addCell($comment_width)->addText('备注',$fontStyle,$cellHCentered);
-
-                    $reference_in_num = $row_num - 2;
-                    $reference_out_num = 1;
-                    $reference_result_num = 1;
-
-                    if($reference_in_num > 0){
-                        for($i = 1;$i <= $reference_in_num;$i++){
-                            $SignTable4->addRow(250);
-                            if($i==1){
-                                if($reference_in_num>1)
-                                    $SignTable4->addCell(2000,$cellRowSpan)->addText('输入项',$fontStyle,$cellHCentered);
-                                else
-                                    $SignTable4->addCell(2000)->addText('输入项',$fontStyle,$cellHCentered);
+                        $pre_sample_num = $g * $sample_num_per_group;
+                        for($i = 1;$i <= $sample_num_per_group;$i++){
+                            if($i+$pre_sample_num>$sample_num_total){
+                                $SignTable4->addCell($sample_width)->addText('-',$fontStyle,$cellHCentered);
                             }else{
-                                $SignTable4->addCell(2000, $cellRowContinue);
+                                $SignTable4->addCell($sample_width)->addText('样本'. ($i+$pre_sample_num),$fontStyle,$cellHCentered);
                             }
-                            $SignTable4->addCell(2000)->addText($data_sample[$i-1][0],$fontStyle,$cellHCentered);
-                            for($j = 1;$j<=$sample_num;$j++){
-                                $SignTable4->addCell($sample_width)->addText($data_sample[$i-1][$j],$fontStyle,$cellHCentered);
-                            }
-                            $SignTable4->addCell($comment_width)->addText('/代表样本1的输入',$fontStyle,$cellHCentered);
+
                         }
-                    }
-                    if($reference_out_num > 0){
-                        for($i = 1;$i <= $reference_out_num;$i++){
-                            $SignTable4->addRow(250);
-                            if($i==1){
-                                if($reference_out_num>1)
-                                    $SignTable4->addCell(2000,$cellRowSpan)->addText('预期输出',$fontStyle,$cellHCentered);
-                                else
-                                    $SignTable4->addCell(2000)->addText('预期输出',$fontStyle,$cellHCentered);
-                            }else{
-                                $SignTable4->addCell(2000, $cellRowContinue);
+                        $SignTable4->addCell($comment_width)->addText('备注',$fontStyle,$cellHCentered);
+
+                        $reference_in_num = $row_num - 2;
+                        $reference_out_num = 1;
+                        $reference_result_num = 1;
+
+                        if($reference_in_num > 0){
+                            for($i = 1;$i <= $reference_in_num;$i++){
+                                $SignTable4->addRow(250);
+                                if($i==1){
+                                    if($reference_in_num>1)
+                                        $SignTable4->addCell(2000,$cellRowSpan)->addText('输入项',$fontStyle,$cellHCentered);
+                                    else
+                                        $SignTable4->addCell(2000)->addText('输入项',$fontStyle,$cellHCentered);
+                                }else{
+                                    $SignTable4->addCell(2000, $cellRowContinue);
+                                }
+                                $SignTable4->addCell(2000)->addText($data_sample[$i-1][0],$fontStyle,$cellHCentered);
+                                for($j = 1;$j<=$sample_num_per_group;$j++){
+                                    if($j+$pre_sample_num>$sample_num_total){
+                                        $SignTable4->addCell($sample_width)->addText('-',$fontStyle,$cellHCentered);
+                                    }else{
+                                        $SignTable4->addCell($sample_width)->addText($data_sample[$i-1][$j+$pre_sample_num],$fontStyle,$cellHCentered);
+                                    }
+
+                                }
+                                $SignTable4->addCell($comment_width)->addText('/代表样本1的输入',$fontStyle,$cellHCentered);
                             }
-                            $SignTable4->addCell(2000)->addText($data_sample[$reference_in_num][0],$fontStyle,$cellHCentered);
-                            for($j = 1;$j<=$sample_num;$j++){
-                                $SignTable4->addCell($sample_width)->addText($data_sample[$reference_in_num+$i-1][$j],$fontStyle,$cellHCentered);
-                            }
-                            $SignTable4->addCell($comment_width)->addText('',$fontStyle,$cellHCentered);
                         }
-                    }
-                    if($reference_result_num > 0){
-                        for($i = 1;$i <= $reference_result_num;$i++){
-                            $SignTable4->addRow(250);
-                            if($i==1){
-                                if($reference_result_num>1)
-                                    $SignTable4->addCell(2000,$cellRowSpan)->addText('实际结果',$fontStyle,$cellHCentered);
-                                else
-                                    $SignTable4->addCell(2000)->addText('实际结果',$fontStyle,$cellHCentered);
-                            }else{
-                                $SignTable4->addCell(2000, $cellRowContinue);
+                        if($reference_out_num > 0){
+                            for($i = 1;$i <= $reference_out_num;$i++){
+                                $SignTable4->addRow(250);
+                                if($i==1){
+                                    if($reference_out_num>1)
+                                        $SignTable4->addCell(2000,$cellRowSpan)->addText('预期输出',$fontStyle,$cellHCentered);
+                                    else
+                                        $SignTable4->addCell(2000)->addText('预期输出',$fontStyle,$cellHCentered);
+                                }else{
+                                    $SignTable4->addCell(2000, $cellRowContinue);
+                                }
+                                $SignTable4->addCell(2000)->addText($data_sample[$reference_in_num][0],$fontStyle,$cellHCentered);
+                                for($j = 1;$j<=$sample_num_per_group;$j++){
+                                    if($j+$pre_sample_num>$sample_num_total){
+                                        $SignTable4->addCell($sample_width)->addText('-',$fontStyle,$cellHCentered);
+                                    }else{
+                                        $SignTable4->addCell($sample_width)->addText($data_sample[$reference_in_num+$i-1][$j+$pre_sample_num],$fontStyle,$cellHCentered);
+                                    }
+
+                                }
+                                $SignTable4->addCell($comment_width)->addText('',$fontStyle,$cellHCentered);
                             }
-                            $SignTable4->addCell(2000)->addText($data_sample[$row_num-1][0],$fontStyle,$cellHCentered);
-                            for($j = 1;$j<=$sample_num;$j++){
-                                $SignTable4->addCell($sample_width)->addText($data_sample[$row_num-1+$i-1][$j],$fontStyle,$cellHCentered);
+                        }
+                        if($reference_result_num > 0){
+                            for($i = 1;$i <= $reference_result_num;$i++){
+                                $SignTable4->addRow(250);
+                                if($i==1){
+                                    if($reference_result_num>1)
+                                        $SignTable4->addCell(2000,$cellRowSpan)->addText('实际结果',$fontStyle,$cellHCentered);
+                                    else
+                                        $SignTable4->addCell(2000)->addText('实际结果',$fontStyle,$cellHCentered);
+                                }else{
+                                    $SignTable4->addCell(2000, $cellRowContinue);
+                                }
+                                $SignTable4->addCell(2000)->addText($data_sample[$row_num-1][0],$fontStyle,$cellHCentered);
+                                for($j = 1;$j<=$sample_num_per_group;$j++){
+                                    if($j+$pre_sample_num>$sample_num_total){
+                                        $SignTable4->addCell($sample_width)->addText('-',$fontStyle,$cellHCentered);
+                                    }else{
+                                        $SignTable4->addCell($sample_width)->addText($data_sample[$row_num-1+$i-1][$j+$pre_sample_num],$fontStyle,$cellHCentered);
+                                    }
+
+                                }
+                                $SignTable4->addCell($comment_width)->addText('',$fontStyle,$cellHCentered);
                             }
-                            $SignTable4->addCell($comment_width)->addText('',$fontStyle,$cellHCentered);
                         }
                     }
                 }else{
