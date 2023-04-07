@@ -909,6 +909,7 @@ class testcase extends control
     public function edit($caseID, $comment = false, $executionID = 0)
     {
         $this->loadModel('story');
+        $this->loadModel('datasample');
 
         $testtasks = $this->loadModel('testtask')->getGroupByCases($caseID);
         $testtasks = empty($testtasks[$caseID]) ? array() : $testtasks[$caseID];
@@ -957,6 +958,13 @@ class testcase extends control
         }
 
         $case = $this->testcase->getById($caseID);
+
+        $data_samples_by_case = $this->datasample->getDataSamplesByCase($caseID, $case->version);
+        $this->view->data_samples = array();
+        foreach($data_samples_by_case as $datasample){
+            $this->view->data_samples[$datasample->casestep_level] = $datasample->object;
+        }
+
         if(!$case) return print(js::error($this->lang->notFound) . js::locate('back'));
         if($case->auto == 'unit')
         {

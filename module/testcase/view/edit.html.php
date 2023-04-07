@@ -121,6 +121,7 @@
                       </div>
                     </td>
                   </tr>
+                  <?php $stepLevel = 1;?>
                   <?php foreach($case->steps as $stepID => $step):?>
                   <tr class='step'>
                     <td class='step-id'></td>
@@ -151,7 +152,13 @@
                       <td><?php echo html::textarea('expects[]', $step->expect, "rows='1' class='form-control autosize step-expects'") ?></td>
                       <td><?php echo html::textarea('eval_criterias[]', $step->eval_criteria, "rows='1' class='form-control autosize step-expects'") ?></td>
                       <td class='step-actions stepsample-actions'>
-                          <input type='hidden' name='datasample[]' id='datasample' value='' class='step-datasample'>
+                          <?php
+                            if(isset($data_samples[$stepLevel])){
+                                echo "<input type='hidden' name='datasample[]' id='datasample' value='$data_samples[$stepLevel]' class='step-datasample'>";
+                            }else{
+                                echo "<input type='hidden' name='datasample[]' id='datasample' value='' class='step-datasample'>";
+                            }
+                          ?>
                           <?php
                           common::printIcon('testcase', 'datasample',"", '',
                               'list', 'edit', '', 'showinonlybody iframe btn-datasample',
@@ -172,6 +179,7 @@
                       </div>
                     </td>
                   </tr>
+                      <?php $stepLevel += 1;?>
                   <?php endforeach; ?>
                 </tbody>
               </table>
