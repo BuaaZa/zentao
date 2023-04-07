@@ -131,15 +131,15 @@ class control extends baseControl
      * @access public
      * @return void
      */
-    public function setPreference()
+    public function setPreference(): void
     {
-        if(empty($this->app->user->account)) return true;
-        if($this->app->getModuleName() == 'user' and strpos("login,logout", $this->app->getMethodName()) !== false) return true;
-        if($this->app->getModuleName() == 'my' and $this->app->getMethodName() == 'changepassword') return true;
-        if($this->app->getModuleName() == 'my' and $this->app->getMethodName() == 'preference') return true;
+        if ((empty($this->app->user->account))
+            or ($this->app->getModuleName() == 'user' and str_contains("login,logout", $this->app->getMethodName()))
+            or ($this->app->getModuleName() == 'my' and $this->app->getMethodName() == 'changepassword')
+            or ($this->app->getModuleName() == 'my' and $this->app->getMethodName() == 'preference'))
+        return;
 
-        if(!isset($this->config->preferenceSetted) and $this->config->vision == 'rnd')
-        {
+        if (!isset($this->config->preferenceSetted) and $this->config->vision == 'rnd') {
             setcookie('tab', 'my', 0, $this->config->webRoot, '', $this->config->cookieSecure, false);
 //            $this->locate(helper::createLink('my', 'preference'));
         }

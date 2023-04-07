@@ -42,44 +42,44 @@ class settingModel extends model
     /**
      * Set value of an item.
      *
-     * @param  string      $path     system.common.global.sn | system.common.sn | system.common.global.sn@rnd
-     * @param  string      $value
+     * @param string $path     system.common.global.sn | system.common.sn | system.common.global.sn@rnd
+     * @param string $value
      * @access public
-     * @return void
+     * @return false
      */
-    public function setItem($path, $value = '')
+    public function setItem(string $path, string $value = ''): bool
     {
         /* Determine vision of config item. */
         $pathVision = explode('@', $path);
-        $vision     = isset($pathVision[1]) ? $pathVision[1] : '';
-        $path       = $pathVision[0];
+        $vision = $pathVision[1] ?? '';
+        $path = $pathVision[0];
 
         /* fix bug when account has dot. */
-        $account = isset($this->app->user->account) ? $this->app->user->account : '';
+        $account = $this->app->user->account ?? '';
         $replace = false;
-        if($account and strpos($path, $account) === 0)
-        {
+        if ($account and str_starts_with($path, $account)) {
             $replace = true;
-            $path    = preg_replace("/^{$account}/", 'account', $path);
+            $path = preg_replace("/^{$account}/", 'account', $path);
         }
 
-        $level   = substr_count($path, '.');
+        $level = substr_count($path, '.');
         $section = '';
 
-        if($level <= 1) return false;
-        if($level == 2) list($owner, $module, $key) = explode('.', $path);
-        if($level == 3) list($owner, $module, $section, $key) = explode('.', $path);
-        if($replace) $owner = $account;
+        if ($level <= 1) return false;
+        if ($level == 2) list($owner, $module, $key) = explode('.', $path);
+        if ($level == 3) list($owner, $module, $section, $key) = explode('.', $path);
+        if ($replace) $owner = $account;
 
         $item = new stdclass();
-        $item->owner   = $owner;
-        $item->module  = $module;
+        $item->owner = $owner ?? '';
+        $item->module = $module ?? '';
         $item->section = $section;
-        $item->key     = $key;
-        $item->value   = $value;
-        if(!empty($vision)) $item->vision = $vision;
+        $item->key = $key ?? '';
+        $item->value = $value;
+        if (!empty($vision)) $item->vision = $vision;
 
         $this->dao->replace(TABLE_CONFIG)->data($item)->exec();
+        return true;
     }
 
     /**
