@@ -398,7 +398,7 @@ class testcase extends control
         if(!empty($_POST))
         {
 
-            $checkGroup = $this->post->stepType;
+            /*$checkGroup = $this->post->stepType;
             $groupsNum = 0;
             foreach($checkGroup as $val){
                 if($val == 'group'){
@@ -412,7 +412,7 @@ class testcase extends control
                 $response['message'] = $noticeStr;
                 return $this->send($response);
                 //die($noticeStr);
-            }
+            }*/
 
             //获取数据样本表的填写内容
             //$datasample = json_decode($this->post->datasample, true);
@@ -915,7 +915,7 @@ class testcase extends control
 
         if(!empty($_POST))
         {
-            $checkGroup = $this->post->stepType;
+            /*$checkGroup = $this->post->stepType;
             $groupsNum = 0;
             foreach($checkGroup as $val){
                 if($val == 'group'){
@@ -929,7 +929,7 @@ class testcase extends control
                 $response['message'] = $noticeStr;
                 return $this->send($response);
                 //die($noticeStr);
-            }
+            }*/
             $changes = array();
             if($comment == false or $comment == 'false')
             {
