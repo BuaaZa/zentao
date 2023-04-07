@@ -1338,6 +1338,7 @@ class testtask extends control
         if($runID)
         {
             $run = $this->testtask->getRunById($runID);
+            $run->case->datasamples = $this->datasample->getDataSamplesByCase($run->case->id);
         }
         else
         {
