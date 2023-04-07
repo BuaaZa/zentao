@@ -54,9 +54,6 @@ class testcaseModel extends model
         $this->file = $this->loadModel('file');
         $this->score = $this->loadModel('score');
 
-        ChromePhp::log(fixer::input('post'));
-        ChromePhp::log(fixer::input('post')->get());
-
         // 判定有预期结果时，前置条件不能为空
         {
             $steps = $this->post->steps;
@@ -2485,15 +2482,21 @@ class testcaseModel extends model
 
             /* ---------------- Judge steps changed or not.-------------------- */
 
-            /* Remove the empty setps in post. */
+            /* Remove the empty steps in post. */
             if($this->post->steps)
             {
                 $data = fixer::input('post')->get();
                 foreach($data->steps as $key => $desc)
                 {
                     $desc     = trim($desc);
-                    $stepType = isset($data->stepType[$key]) ? $data->stepType[$key] : 'step';
-                    if(!empty($desc)) $steps[] = array('desc' => $desc, 'type' => $stepType, 'expect' => trim($data->expects[$key]));
+                    $stepType = $data->stepType[$key] ?? 'step';
+                    if(!empty($desc))
+                        $steps[] = array('desc' => $desc,
+                            'type' => $stepType,
+                            'expect' => trim($data->expects[$key]),
+                            'goal_action' => trim($data->goal_actions[$key]),
+                            'eval_criterion' => trim($data->eval_criterias[$key]),
+                        );
                 }
 
                 /* If step count changed, case changed. */
@@ -2505,9 +2508,13 @@ class testcaseModel extends model
                 {
                     /* Compare every step. */
                     $i = 0;
-                    foreach($case->steps as $key => $oldStep)
+                    foreach($case->steps as $oldStep)
                     {
-                        if(trim($oldStep->desc) != trim($steps[$i]['desc']) or trim($oldStep->expect) != $steps[$i]['expect'] or trim($oldStep->type) != $steps[$i]['type'])
+                        if(trim($oldStep->desc) != trim($steps[$i]['desc'])
+                            or trim($oldStep->type) != $steps[$i]['type']
+                            or trim($oldStep->expect) != $steps[$i]['expect']
+                            or trim($oldStep->goal_action) != $steps[$i]['goal_action']
+                            or trim($oldStep->eval_criteria) != $steps[$i]['eval_criterion'])
                         {
                             $stepChanged = true;
                             break;

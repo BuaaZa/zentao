@@ -49,7 +49,7 @@ class datasampleModel extends model
             ->fetch();
     }
 
-    public function getDataSampleByCasestepLevel(int $caseID, int $casestepLevel, int $version): object
+    public function getDataSampleByCasestepLevel(int $caseID, int $casestepLevel, int $version): object|bool
     {
         return $this->dao->select()->from(TABLE_DATASAMPLE)
             ->where('`case_id`')->eq($caseID)
@@ -80,7 +80,7 @@ class datasampleModel extends model
             ->fetchAll();
     }
 
-    public function  getOneResultByDataSampleIdOrderByDate(int $dataSampleID, int $version): mixed
+    public function  getOneResultByDataSampleIdOrderByDate(int $dataSampleID, int $version): bool|object
     {
         return $this->dao->select()->from(TABLE_DATASAMPLE_RESULT)
             ->where('`data_sample_id`')->eq($dataSampleID)
