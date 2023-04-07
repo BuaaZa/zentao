@@ -129,7 +129,6 @@ $('button#genMessage').click(function(){
         console.log(res);
         return;
       }
-      console.log(response);
       response['value']['response'].forEach(function(obj) {
         fillInValueAndError(obj);
       });
