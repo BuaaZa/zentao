@@ -34,11 +34,11 @@ $config->productCommonList['pt'][1]    = 'projecto';
 
 /* Project common list. */
 $config->projectCommonList['zh-cn'][0] = '项目';
-$config->projectCommonList['zh-cn'][1] = '迭代';
+$config->projectCommonList['zh-cn'][1] = '执行';
 $config->projectCommonList['zh-cn'][2] = '冲刺';
 
 $config->projectCommonList['zh-tw'][0] = '項目';
-$config->projectCommonList['zh-tw'][1] = '迭代';
+$config->projectCommonList['zh-tw'][1] = '执行';
 $config->projectCommonList['zh-tw'][2] = '冲刺';
 
 $config->projectCommonList['en'][0] = 'Project';
@@ -73,11 +73,11 @@ $config->projectCommonList['pt'][0] = 'Projecto';
 $config->projectCommonList['pt'][1] = 'Iteração';
 $config->projectCommonList['pt'][2] = 'Sprint';
 
-$config->executionCommonList['zh-cn'][0] = '迭代';
+$config->executionCommonList['zh-cn'][0] = '执行';
 $config->executionCommonList['zh-cn'][1] = '冲刺';
 $config->executionCommonList['zh-cn'][2] = '阶段';
 
-$config->executionCommonList['zh-tw'][0] = '迭代';
+$config->executionCommonList['zh-tw'][0] = '执行';
 $config->executionCommonList['zh-tw'][1] = '冲刺';
 $config->executionCommonList['zh-tw'][2] = '階段';
 
