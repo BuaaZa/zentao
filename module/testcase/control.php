@@ -401,7 +401,7 @@ class testcase extends control
         if(!empty($_POST))
         {
 
-            $checkGroup = $this->post->stepType;
+            /*$checkGroup = $this->post->stepType;
             $groupsNum = 0;
             foreach($checkGroup as $val){
                 if($val == 'group'){
