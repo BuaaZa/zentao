@@ -14,10 +14,10 @@ class datasample extends control
         $this->testcaseModel = $this->loadModel('testcase');
     }
 
-    public function view(int $caseID, int $casestepLevel): int
+    public function view(int $caseID, int $casestepLevel, int $version = -1): int
     {
         $testcase = $this->testcaseModel->getById($caseID);
-        $sample = $this->datasampleModel->getDataSampleByCasestepLevel($caseID, $casestepLevel);
+        $sample = $this->datasampleModel->getDataSampleByCasestepLevel($caseID, $casestepLevel, $version);
 
         $this->view->case = new stdClass();
         $this->view->case->id = $caseID;

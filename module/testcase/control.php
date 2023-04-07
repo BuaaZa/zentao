@@ -870,7 +870,7 @@ class testcase extends control
 
         $this->executeHooks($caseID);
 
-        $datasamples = $this->datasample->getDataSamplesByCase($caseID);
+        $datasamples = $this->datasample->getDataSamplesByCase($caseID, $version);
 
         $this->view->position[] = $this->lang->testcase->common;
         $this->view->position[] = $this->lang->testcase->view;
@@ -2394,7 +2394,7 @@ class testcase extends control
             $data_samples[$i] = '';
             $data_sample_results[$i] = '';
         }
-        $data_samples_by_case = $this->datasample->getDataSamplesByCase($caseID);
+        $data_samples_by_case = $this->datasample->getDataSamplesByCase($caseID, $case->version);
 
         $results = current($this->testtask->getResults(0, $caseID));
         $stepResults = $results->stepResults;

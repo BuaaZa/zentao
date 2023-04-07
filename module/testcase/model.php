@@ -110,8 +110,6 @@ class testcaseModel extends model
         if (empty($case->product)) $this->config->testcase->create->requiredFields = str_replace('story', '', $this->config->testcase->create->requiredFields);
 
         /* Value of story may be show more. */
-//        $case->story = (int)$case->story;
-//        $case->data_sample_new = fixer::input('post')->get()->datasample;
         $this->dao->insert(TABLE_CASE)->data($case)->autoCheck()
             ->batchCheck($this->config->testcase->create->requiredFields, 'notempty')
             ->checkFlow()->exec();
@@ -156,7 +154,7 @@ class testcaseModel extends model
             $obj = (string)$this->post->datasample[$index];
 
             // 保存测试步骤关联的数据样本
-            $this->datasample->save($caseID, $index, $obj);
+            $this->datasample->saveDataSample($caseID, $this->dao->lastInsertID(), $index, $obj, $step->version);
         }
 
         return array('status' => 'created', 'id' => $caseID, 'caseInfo' => $case);
