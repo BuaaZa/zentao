@@ -415,7 +415,7 @@ class testcase extends control
                 $response['message'] = $noticeStr;
                 return $this->send($response);
                 //die($noticeStr);
-            }
+            }*/
 
             $response['result'] = 'success';
 
@@ -916,29 +916,32 @@ class testcase extends control
         $testtasks = $this->testtask->getGroupByCases($caseID);
         $testtasks = empty($testtasks[$caseID]) ? array() : $testtasks[$caseID];
 
-        if (!empty($_POST)) {
-            $checkGroup = $this->post->stepType;
+        if(!empty($_POST))
+        {
+            /*$checkGroup = $this->post->stepType;
             $groupsNum = 0;
-            foreach ($checkGroup as $val) {
-                if ($val == 'group') {
+            foreach($checkGroup as $val){
+                if($val == 'group'){
                     $groupsNum += 1;
                 }
             }
             #如果选了两个多选框，则提示：'最多使一个步骤绑定输入输出项！'
-            if ($groupsNum >= 2) {
+            if($groupsNum >= 2){
                 $noticeStr = $this->lang->testcase->noticegroupnum;
-                $response['result'] = 'fail';
+                $response['result']  = 'fail';
                 $response['message'] = $noticeStr;
                 return $this->send($response);
                 //die($noticeStr);
-            }
+            }*/
             $changes = array();
-            if (!$comment or $comment == 'false') {
+            if($comment == false or $comment == 'false')
+            {
                 $changes = $this->testcase->update($caseID, $testtasks);
-                if (dao::isError())
-                    return print(js::error(dao::getError()));
+                if(dao::isError()) return print(js::error(dao::getError()));
             }
-            if ($this->post->comment != '' or !empty($changes)) {
+            if($this->post->comment != '' or !empty($changes))
+            {
+                $this->loadModel('action');
                 $action = !empty($changes) ? 'Edited' : 'Commented';
                 $actionID = $this->action->create('case', $caseID, $action, $this->post->comment);
                 $this->action->logHistory($actionID, $changes);
@@ -946,112 +949,128 @@ class testcase extends control
 
             $this->executeHooks($caseID);
 
-            if (defined('RUN_MODE') && RUN_MODE == 'api') {
+            if(defined('RUN_MODE') && RUN_MODE == 'api')
+            {
                 return $this->send(array('status' => 'success', 'data' => $caseID));
-            } else {
+            }
+            else
+            {
                 return print(js::locate($this->createLink('testcase', 'view', "caseID=$caseID"), 'parent'));
             }
         }
 
         $case = $this->testcase->getById($caseID);
-        if (!$case) return print(js::error($this->lang->notFound) . js::locate('back'));
-        if ($case->auto == 'unit') {
-            $this->lang->testcase->subMenu->testcase->feature['alias'] = '';
-            $this->lang->testcase->subMenu->testcase->unit['alias'] = 'view';
+        if(!$case) return print(js::error($this->lang->notFound) . js::locate('back'));
+        if($case->auto == 'unit')
+        {
+            $this->lang->testcase->subMenu->testcase->feature['alias']  = '';
+            $this->lang->testcase->subMenu->testcase->unit['alias']     = 'view';
             $this->lang->testcase->subMenu->testcase->unit['subModule'] = 'testcase';
         }
 
-        if (empty($case->steps)) {
+        if(empty($case->steps))
+        {
             $step = new stdclass();
-            $step->type = 'step';
-            $step->desc = '';
+            $step->type   = 'step';
+            $step->desc   = '';
             $step->expect = '';
             $case->steps[] = $step;
         }
 
         $isLibCase = ($case->lib and empty($case->product));
-        if ($isLibCase) {
-            $libraries = $this->caselib->getLibraries();
-            $this->app->tab == 'project' ? $this->project->setMenu($this->session->project) : $this->caselib->setLibMenu($libraries, $case->lib);
+        if($isLibCase)
+        {
+            $libraries = $this->loadModel('caselib')->getLibraries();
+            $this->app->tab == 'project' ? $this->loadModel('project')->setMenu($this->session->project) : $this->caselib->setLibMenu($libraries, $case->lib);
 
-            $title = "CASE #$case->id $case->title - " . $libraries[$case->lib];
+            $title      = "CASE #$case->id $case->title - " . $libraries[$case->lib];
             $position[] = html::a($this->createLink('caselib', 'browse', "libID=$case->lib"), $libraries[$case->lib]);
 
-            $this->view->libID = $case->lib;
-            $this->view->libName = $libraries[$case->lib];
+            $this->view->libID     = $case->lib;
+            $this->view->libName   = $libraries[$case->lib];
             $this->view->libraries = $libraries;
             $this->view->moduleOptionMenu = $this->tree->getOptionMenu($case->lib, $viewType = 'caselib', $startModuleID = 0);
-        } else {
-            $productID = $case->product;
-            $product = $this->product->getById($productID);
-            if (!isset($this->products[$productID])) $this->products[$productID] = $product->name;
+        }
+        else
+        {
+            $productID  = $case->product;
+            $product    = $this->product->getById($productID);
+            if(!isset($this->products[$productID])) $this->products[$productID] = $product->name;
 
-            $title = $this->products[$productID] . $this->lang->colon . $this->lang->testcase->edit;
+            $title      = $this->products[$productID] . $this->lang->colon . $this->lang->testcase->edit;
             $position[] = html::a($this->createLink('testcase', 'browse', "productID=$productID"), $this->products[$productID]);
 
             /* Set menu. */
-            if ($this->app->tab == 'project' or $this->app->tab == 'execution') {
-                if ($this->app->tab == 'project') $this->project->setMenu($case->project);
-                if ($this->app->tab == 'execution') {
-                    if (!$executionID) $executionID = $case->execution;
+            if($this->app->tab == 'project' or $this->app->tab == 'execution')
+            {
+                $this->loadModel('execution');
+                if($this->app->tab == 'project') $this->loadModel('project')->setMenu($case->project);
+                if($this->app->tab == 'execution')
+                {
+                    if(!$executionID) $executionID = $case->execution;
                     $this->execution->setMenu($executionID);
                 }
             }
-            if ($this->app->tab == 'qa') $this->testcase->setMenu($this->products, $productID, $case->branch);
+            if($this->app->tab == 'qa') $this->testcase->setMenu($this->products, $productID, $case->branch);
 
             $moduleOptionMenu = $this->tree->getOptionMenu($productID, $viewType = 'case', $startModuleID = 0, $case->branch);
-            if ($case->lib and $case->fromCaseID) {
-                $libName = $this->caselib->getById($case->lib)->name;
+            if($case->lib and $case->fromCaseID)
+            {
+                $libName    = $this->loadModel('caselib')->getById($case->lib)->name;
                 $libModules = $this->tree->getOptionMenu($case->lib, 'caselib');
-                foreach ($libModules as $moduleID => $moduleName) {
-                    if ($moduleID == 0) continue;
+                foreach($libModules as $moduleID => $moduleName)
+                {
+                    if($moduleID == 0) continue;
                     $moduleOptionMenu[$moduleID] = $libName . $moduleName;
                 }
             }
 
-            if (!isset($moduleOptionMenu[$case->module])) $moduleOptionMenu += $this->tree->getModulesName($case->module);
+            if(!isset($moduleOptionMenu[$case->module])) $moduleOptionMenu += $this->tree->getModulesName($case->module);
 
             /* Get product and branches. */
-            if ($this->app->tab == 'execution' or $this->app->tab == 'project') {
+            if($this->app->tab == 'execution' or $this->app->tab == 'project')
+            {
                 $objectID = $this->app->tab == 'project' ? $case->project : $executionID;
             }
 
             /* Display status of branch. */
-            $branches = $this->branch->getList($productID, $objectID ?? 0, 'all');
+            $branches = $this->loadModel('branch')->getList($productID, isset($objectID) ? $objectID : 0, 'all');
             $branchTagOption = array();
-            foreach ($branches as $branchInfo) {
+            foreach($branches as $branchInfo)
+            {
                 $branchTagOption[$branchInfo->id] = $branchInfo->name . ($branchInfo->status == 'closed' ? ' (' . $this->lang->branch->statusList['closed'] . ')' : '');
             }
-            if (!isset($branchTagOption[$case->branch])) {
+            if(!isset($branchTagOption[$case->branch]))
+            {
                 $caseBranch = $this->branch->getById($case->branch, $case->product, '');
                 $branchTagOption[$case->branch] = $case->branch == BRANCH_MAIN ? $caseBranch : ($caseBranch->name . ($caseBranch->status == 'closed' ? ' (' . $this->lang->branch->statusList['closed'] . ')' : ''));
             }
 
             $moduleIdList = $case->module;
-            if ($case->module) $moduleIdList = $this->tree->getAllChildID($case->module);
+            if($case->module) $moduleIdList = $this->tree->getAllChildID($case->module);
 
             $moduleIdList = (!in_array($this->app->tab, array('execution', 'project')) and empty($stories)) ? 0 : $moduleIdList;
-            $stories = $this->story->getProductStoryPairsTestcase($productID, $case->branch, $moduleIdList, 'all', 'id_desc', 0, 'full', 'story', false);
+            $stories = $this->story->getProductStoryPairsTestcase($productID, $case->branch, $moduleIdList, 'all','id_desc', 0, 'full', 'story', false);
 
-            $this->view->productID = $productID;
-            $this->view->product = $product;
-            $this->view->products = $this->products;
-            $this->view->branchTagOption = $branchTagOption;
-            $this->view->productName = $this->products[$productID];
+            $this->view->productID        = $productID;
+            $this->view->product          = $product;
+            $this->view->products         = $this->products;
+            $this->view->branchTagOption  = $branchTagOption;
+            $this->view->productName      = $this->products[$productID];
             $this->view->moduleOptionMenu = $moduleOptionMenu;
-            $this->view->stories = $stories;
+            $this->view->stories          = $stories;
         }
         $forceNotReview = $this->testcase->forceNotReview();
-        if ($forceNotReview) unset($this->lang->testcase->statusList['wait']);
+        if($forceNotReview) unset($this->lang->testcase->statusList['wait']);
 
-        $this->view->title = $title;
+        $this->view->title           = $title;
         $this->view->currentModuleID = $case->module;
-        $this->view->users = $this->user->getPairs('noletter');
-        $this->view->case = $case;
-        $this->view->actions = $this->loadModel('action')->getList('case', $caseID);
-        $this->view->isLibCase = $isLibCase;
-        $this->view->forceNotReview = $forceNotReview;
-        $this->view->testtasks = $testtasks;
+        $this->view->users           = $this->user->getPairs('noletter');
+        $this->view->case            = $case;
+        $this->view->actions         = $this->loadModel('action')->getList('case', $caseID);
+        $this->view->isLibCase       = $isLibCase;
+        $this->view->forceNotReview  = $forceNotReview;
+        $this->view->testtasks       = $testtasks;
 
         $this->display();
         return 0;
