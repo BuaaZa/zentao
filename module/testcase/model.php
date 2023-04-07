@@ -154,7 +154,11 @@ class testcaseModel extends model
             $obj = (string)$this->post->datasample[$index];
 
             // 保存测试步骤关联的数据样本
-            $this->datasample->saveDataSample($caseID, $this->dao->lastInsertID(), $index, $obj, $step->version);
+            $stepid = $this->dao->lastInsertID();
+            ChromePhp::log($stepid);
+            ChromePhp::log($obj);
+            ChromePhp::log($step->version);
+            $this->datasample->saveDataSample($caseID, $stepid, $index, $obj, $step->version);
         }
 
         return array('status' => 'created', 'id' => $caseID, 'caseInfo' => $case);
