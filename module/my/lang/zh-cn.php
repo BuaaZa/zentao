@@ -54,7 +54,7 @@ $lang->my->contributeAction = '我的贡献';
 $lang->my->profileAction    = '个人档案';
 $lang->my->dynamicAction    = '动态';
 
-$lang->my->myExecutions = "我参与的阶段/冲刺/迭代";
+$lang->my->myExecutions = "我参与的阶段/冲刺/执行";
 $lang->my->name         = '名称';
 $lang->my->code         = '代号';
 $lang->my->projects     = '所属项目';

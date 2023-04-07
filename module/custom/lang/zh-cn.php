@@ -240,12 +240,12 @@ global $config;
 if($config->systemMode == 'classic')
 {
     $lang->custom->sprintConceptList[0] = '产品 - 项目';
-    $lang->custom->sprintConceptList[1] = '产品 - 迭代';
+    $lang->custom->sprintConceptList[1] = '产品 - 执行';
     $lang->custom->sprintConceptList[2] = '产品 - 冲刺';
 }
 else
 {
-    $lang->custom->sprintConceptList[0] = '项目 - 产品 - 迭代';
+    $lang->custom->sprintConceptList[0] = '项目 - 产品 - 执行';
     $lang->custom->sprintConceptList[1] = '项目 - 产品 - 冲刺';
 }
 
