@@ -1355,7 +1355,7 @@ class testtask extends control
 
             // 保存数据样本结果
             foreach ($this->post->datasample_result as $data_sample_id => $result)
-                $this->datasample->saveDataSampleResult((int)$data_sample_id, json_encode($result));
+                $this->datasample->saveDataSampleResult((int)$data_sample_id, json_encode($result), $version);
 
             if(dao::isError()) return print(js::error(dao::getError()));
 

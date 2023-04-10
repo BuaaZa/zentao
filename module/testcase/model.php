@@ -853,6 +853,15 @@ class testcaseModel extends model
 
         //判断步骤是否修改仅判断了已有的三个字段，会出bug，暂时改为调用update即必定修改了
         //$stepChanged = true;
+        //判断是否数据样本有修改
+        foreach($this->post->is_updated as  $value)
+        {
+            if(!empty($value))
+            {
+                $stepChanged = true;
+                break;
+            }
+        }
 
         $version = $stepChanged ? $oldCase->version + 1 : $oldCase->version;
 
@@ -872,7 +881,7 @@ class testcaseModel extends model
             ->setForce('status', $status)
             ->cleanInt('story,product,branch,module')
             ->stripTags($this->config->testcase->editor->edit['id'], $this->config->allowedTags)
-            ->remove('comment,steps,expects,files,labels,linkBug,stepType,inputs,goal_actions,eval_criterias,stepIoType,datasample')
+            ->remove('comment,steps,expects,files,labels,linkBug,stepType,inputs,goal_actions,eval_criterias,stepIoType,datasample,is_updated')
             ->get();
 
         $requiredFields = $this->config->testcase->edit->requiredFields;
@@ -924,6 +933,11 @@ class testcaseModel extends model
                         $this->dao->insert(TABLE_CASESTEP)->data($step)->autoCheck()->exec();
                         if($step->type == 'group') $parentStepID = $this->dao->lastInsertID();
                         if($step->type == 'step')  $parentStepID = 0;
+
+                        $obj = (string)$this->post->datasample[$stepID];
+
+                        // 保存测试步骤关联的数据样本
+                        $this->datasample->saveDataSample($caseID, $this->dao->lastInsertID(), $stepID, $obj, $step->version);
                     }
                 }
                 else

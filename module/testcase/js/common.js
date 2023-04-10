@@ -245,6 +245,7 @@ function initSteps(selector)
             $step.find('[name^="eval_criterias["]').attr('name', "eval_criterias[" +stepID + ']');
             $step.find('[name^="stepIoType["]').attr('name', "stepIoType[" +stepID + ']');
             $step.find('[name^="datasample["]').attr('name', "datasample[" +stepID + ']');
+            $step.find('[name^="is_updated["]').attr('name', "is_updated[" +stepID + ']');
 
             if($step.find('.step-group-toggle2').is(':checked')){
                 $step.find('.step-iotype').val('1');

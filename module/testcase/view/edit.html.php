@@ -109,6 +109,7 @@
                           //                              'button', 'edit', '', 'showinonlybody iframe',
                           //                              true, '', '填写');
                           ?>
+                          <input type='hidden' name='is_updated[]' id='is_updated' value='' >
                           <button type='button' title="重置数据样本" class='btn datasample-undo '>
                               <i class='icon icon-undo'></i>
                           </button>
@@ -155,18 +156,17 @@
                           <?php
                             if(isset($data_samples[$stepLevel])){
                                 echo "<input type='hidden' name='datasample[]' id='datasample' value='$data_samples[$stepLevel]' class='step-datasample'>";
+                                common::printIcon('testcase', 'datasample',"", '',
+                                    'list', 'edit', '', 'showinonlybody iframe btn-datasample',
+                                    true,'','填写' );
                             }else{
                                 echo "<input type='hidden' name='datasample[]' id='datasample' value='' class='step-datasample'>";
+                                common::printIcon('testcase', 'datasample',"", '',
+                                    'list', 'edit', '', 'showinonlybody iframe btn-datasample',
+                                    true,"",'填写' );
                             }
                           ?>
-                          <?php
-                          common::printIcon('testcase', 'datasample',"", '',
-                              'list', 'edit', '', 'showinonlybody iframe btn-datasample',
-                              true,'','填写' );
-                          //                          echo $this->loadModel('common')->buildMenu('testcase', 'datasample',"", '',
-                          //                            'button', 'edit', '', 'showinonlybody iframe',
-                          //                            true, '', '填写');
-                          ?>
+                          <input type='hidden' name='is_updated[]' id='is_updated' value='' >
                           <button type='button' title="重置数据样本" class='btn datasample-undo '>
                               <i class='icon icon-undo'></i>
                           </button>
