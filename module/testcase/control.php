@@ -38,6 +38,9 @@ class testcase extends control
     public actionModel $action;
     public testtaskModel $testtask;
     public datasampleModel $datasample;
+    public caselibModel $caselib;
+    public projectModel $project;
+    public branchModel $branch;
 
     /**
      * Construct function, load product, tree, user auto.
@@ -398,7 +401,7 @@ class testcase extends control
         if(!empty($_POST))
         {
 
-            $checkGroup = $this->post->stepType;
+            /*$checkGroup = $this->post->stepType;
             $groupsNum = 0;
             foreach($checkGroup as $val){
                 if($val == 'group'){
@@ -412,14 +415,8 @@ class testcase extends control
                 $response['message'] = $noticeStr;
                 return $this->send($response);
                 //die($noticeStr);
-            }
+            }*/
 
-            //获取数据样本表的填写内容
-            //$datasample = json_decode($this->post->datasample, true);
-            //error_log(print_r($datasample, 1));
-            //$datasample = $this->post->datasample;
-            //ChromePhp::log('$datasample');
-            //die('test');
             $response['result'] = 'success';
 
             setcookie('lastCaseModule', (int)$this->post->module, $this->config->cookieLife, $this->config->webRoot, '', $this->config->cookieSecure, false);
@@ -870,7 +867,7 @@ class testcase extends control
 
         $this->executeHooks($caseID);
 
-        $datasamples = $this->datasample->getDataSamplesByCase($caseID);
+        $datasamples = $this->datasample->getDataSamplesByCase($caseID, $version);
 
         $this->view->position[] = $this->lang->testcase->common;
         $this->view->position[] = $this->lang->testcase->view;
@@ -900,22 +897,30 @@ class testcase extends control
     /**
      * Edit a case.
      *
-     * @param  int   $caseID
-     * @param  bool  $comment
-     * @param  int   $executionID
+     * @param int $caseID
+     * @param bool $comment
+     * @param int $executionID
      * @access public
-     * @return void
+     * @return int
      */
-    public function edit($caseID, $comment = false, $executionID = 0)
+    public function edit(int $caseID, bool|string $comment = false, int $executionID = 0): int
     {
+        $this->story = $this->loadModel('story');
+        $this->testtask = $this->loadModel('testtask');
+        $this->action = $this->loadModel('action');
+        $this->caselib = $this->loadModel('caselib');
+        $this->project = $this->loadModel('project');
+        $this->execution = $this->loadModel('execution');
+        $this->branch = $this->loadModel('branch');
         $this->loadModel('story');
+        $this->loadModel('datasample');
 
-        $testtasks = $this->loadModel('testtask')->getGroupByCases($caseID);
+        $testtasks = $this->testtask->getGroupByCases($caseID);
         $testtasks = empty($testtasks[$caseID]) ? array() : $testtasks[$caseID];
 
         if(!empty($_POST))
         {
-            $checkGroup = $this->post->stepType;
+            /*$checkGroup = $this->post->stepType;
             $groupsNum = 0;
             foreach($checkGroup as $val){
                 if($val == 'group'){
@@ -929,7 +934,7 @@ class testcase extends control
                 $response['message'] = $noticeStr;
                 return $this->send($response);
                 //die($noticeStr);
-            }
+            }*/
             $changes = array();
             if($comment == false or $comment == 'false')
             {
@@ -957,6 +962,13 @@ class testcase extends control
         }
 
         $case = $this->testcase->getById($caseID);
+
+        $data_samples_by_case = $this->datasample->getDataSamplesByCase($caseID, $case->version);
+        $this->view->data_samples = array();
+        foreach($data_samples_by_case as $datasample){
+            $this->view->data_samples[$datasample->casestep_level] = $datasample->object;
+        }
+
         if(!$case) return print(js::error($this->lang->notFound) . js::locate('back'));
         if($case->auto == 'unit')
         {
@@ -1070,6 +1082,7 @@ class testcase extends control
         $this->view->testtasks       = $testtasks;
 
         $this->display();
+        return 0;
     }
 
     /**
@@ -2381,7 +2394,7 @@ class testcase extends control
      * @access public
      * @return \PhpOffice\PhpWord\PhpWord
      */
-    public function addTwoTablesToWord($caseID, $PHPWord){
+    public function addTwoTablesToWord($caseID, $PHPWord, $version){
 
         $case = $this->testcase->getById($caseID);
         $steps = $case->steps;
@@ -2394,7 +2407,10 @@ class testcase extends control
             $data_samples[$i] = '';
             $data_sample_results[$i] = '';
         }
-        $data_samples_by_case = $this->datasample->getDataSamplesByCase($caseID);
+        if($version == -1){
+            $version = $case->version;
+        }
+        $data_samples_by_case = $this->datasample->getDataSamplesByCase($caseID, $version);
 
         $results = current($this->testtask->getResults(0, $caseID));
         $stepResults = $results->stepResults;
@@ -2402,7 +2418,7 @@ class testcase extends control
         foreach ($data_samples_by_case as $datasample){
             array_push($step_indexs, $datasample->casestep_level);
             $data_samples[$datasample->casestep_level] = $datasample->object;
-            $data_sample_result_by_sample = $this->datasample->getOneResultByDataSampleIdOrderByDate($datasample->id);
+            $data_sample_result_by_sample = $this->datasample->getOneResultByDataSampleIdOrderByDate($datasample->id, $version);
             /*error_log(print_r($datasample->id,1));
             error_log(print_r($data_sample_result_by_sample,1));*/
             if(isset($data_sample_result_by_sample)){
@@ -2625,10 +2641,11 @@ class testcase extends control
      * Export case to word.
      *
      * @param  int    $caseID
+     * @param  int    $version
      * @access public
      * @return void
      */
-    public function exportToWord($caseID)
+    public function exportToWord($caseID, $version = -1)
     {
         require_once 'vendor/autoload.php';
         if($this->server->request_method == 'POST')
@@ -2637,7 +2654,7 @@ class testcase extends control
             $this->testtask = $this->loadModel('testtask');
             $PHPWord = new \PhpOffice\PhpWord\PhpWord();
 
-            $PHPWord = $this->addTwoTablesToWord($caseID, $PHPWord);
+            $PHPWord = $this->addTwoTablesToWord($caseID, $PHPWord, $version);
             $saveTime = date("Ymd-H:i:m");
             $filename = $caseID . '_' . $saveTime . '.docx';
             //$filepath = 'tmp_case/' . $filename;
@@ -2658,7 +2675,7 @@ class testcase extends control
      * @access public
      * @return void
      */
-    public function batchExportToWord($caseIDList = [])
+    public function batchExportToWord($caseIDList = [], $version = -1)
     {
         require_once 'vendor/autoload.php';
         if($this->server->request_method == 'POST')
@@ -2669,7 +2686,7 @@ class testcase extends control
             $PHPWord = new \PhpOffice\PhpWord\PhpWord();
             foreach ($caseIDList as $caseID){
                 $caseID = (int)$caseID;
-                $PHPWord = $this->addTwoTablesToWord($caseID, $PHPWord);
+                $PHPWord = $this->addTwoTablesToWord($caseID, $PHPWord, $version);
             }
             $saveTime = date("Ymd-H:i:m");
             $filename = '用例集合' . '_' . $saveTime . '.docx';

@@ -169,6 +169,11 @@
             element = $(selector);
             element.attr("value", matrixString);
 
+            var nameStr2 = 'is_updated['+stepID+']';
+            selector2 = parent.document.getElementsByName(nameStr2);
+            element2 = $(selector2);
+            element2.attr("value", '1');
+
             // console.log(isEmpty);
             // console.log(parent.$('#steps tr[data-index!="'+ stepID +'"] td.stepsample-actions').find('a'));
 

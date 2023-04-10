@@ -435,7 +435,6 @@ CREATE TABLE IF NOT EXISTS `zt_case`
     `lastRunner`      varchar(30)            NOT NULL,
     `lastRunDate`     datetime               NOT NULL,
     `lastRunResult`   char(30)               NOT NULL,
-    `data_sample_new` text                   NULL,
     PRIMARY KEY (`id`),
     KEY `product` (`product`),
     KEY `story` (`story`),
@@ -456,7 +455,6 @@ CREATE TABLE IF NOT EXISTS `zt_casestep`
     `goal_action`   text                  NOT NULL,
     `expect`        text                  NOT NULL,
     `eval_criteria` text                  NOT NULL,
-    `is_out`        enum ('0','1')        NOT NULL default '0',
     PRIMARY KEY (`id`),
     KEY `case` (`case`),
     KEY `version` (`version`)
@@ -1865,20 +1863,18 @@ CREATE TABLE IF NOT EXISTS `zt_testreport`
 -- DROP TABLE IF EXISTS `zt_testresult`;
 CREATE TABLE IF NOT EXISTS `zt_testresult`
 (
-    `id`                     mediumint(8) unsigned NOT NULL auto_increment,
-    `run`                    mediumint(8) unsigned NOT NULL,
-    `case`                   mediumint(8) unsigned NOT NULL,
-    `version`                smallint(5) unsigned  NOT NULL,
-    `job`                    mediumint(8) unsigned NOT NULL,
-    `compile`                mediumint(8) unsigned NOT NULL,
-    `caseResult`             char(30)              NOT NULL,
-    `stepResults`            text                  NOT NULL,
-    `lastRunner`             varchar(30)           NOT NULL,
-    `date`                   datetime              NOT NULL,
-    `duration`               float                 NOT NULL,
-    `xml`                    text                  NOT NULL,
-    `sample_data`            text                  NULL,
-    `data_sample_result_new` text                  NULL,
+    `id`          mediumint(8) unsigned NOT NULL auto_increment,
+    `run`         mediumint(8) unsigned NOT NULL,
+    `case`        mediumint(8) unsigned NOT NULL,
+    `version`     smallint(5) unsigned  NOT NULL,
+    `job`         mediumint(8) unsigned NOT NULL,
+    `compile`     mediumint(8) unsigned NOT NULL,
+    `caseResult`  char(30)              NOT NULL,
+    `stepResults` text                  NOT NULL,
+    `lastRunner`  varchar(30)           NOT NULL,
+    `date`        datetime              NOT NULL,
+    `duration`    float                 NOT NULL,
+    `xml`         text                  NOT NULL,
     PRIMARY KEY (`id`),
     KEY `case` (`case`),
     KEY `version` (`version`),
@@ -16114,11 +16110,12 @@ alter table `zt_testtask`
 
 create table if not exists `zt_data_sample`
 (
-    `id`           int unsigned auto_increment primary key comment '数据样本的ID',
-    `case_id`      int unsigned not null comment '用例外键ID',
-    `casestep_level`  int unsigned not null comment '测试步骤编号',
-    `object`       text comment '样本实体',
-    `delete`       enum ('0', '1') default '0'
+    `id`               int unsigned auto_increment primary key comment '数据样本的ID',
+    `case_id`          int unsigned not null comment '用例外键ID',
+    `casestep_id` int unsigned not null comment '测试步骤外键ID',
+    `casestep_level`   int unsigned not null comment '测试步骤编号',
+    `object`           text comment '样本实体',
+    `version`          int unsigned not null comment '数据样本版本 对应于测试用例和步骤的版本'
 );
 
 create table if not exists `zt_data_sample_result`
@@ -16126,6 +16123,6 @@ create table if not exists `zt_data_sample_result`
     `id`             int unsigned auto_increment primary key comment '数据样本结果的ID',
     `data_sample_id` int unsigned not null comment '数据样本外键ID',
     `object`         text comment '样本结果实体',
-    `create_date`    datetime        default current_timestamp() comment '创建时间与日期',
-    `delete`         enum ('0', '1') default '0'
+    `create_date`    datetime default current_timestamp() comment '创建时间与日期',
+    `version`        int unsigned not null comment '数据样本结果版本 对应于测试用例和步骤的版本'
 );

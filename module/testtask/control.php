@@ -1338,13 +1338,13 @@ class testtask extends control
         if($runID)
         {
             $run = $this->testtask->getRunById($runID);
-            $run->case->datasamples = $this->datasample->getDataSamplesByCase($run->case->id);
+            $run->case->datasamples = $this->datasample->getDataSamplesByCase($run->case->id, $version);
         }
         else
         {
             $run = new stdclass();
             $run->case = $this->testcase->getById($caseID, $version);
-            $run->case->datasamples = $this->datasample->getDataSamplesByCase($caseID);
+            $run->case->datasamples = $this->datasample->getDataSamplesByCase($caseID, $version);
         }
 
         $caseID     = $caseID ?: $run->case->id;
@@ -1355,7 +1355,7 @@ class testtask extends control
 
             // 保存数据样本结果
             foreach ($this->post->datasample_result as $data_sample_id => $result)
-                $this->datasample->saveDataSampleResult((int)$data_sample_id, json_encode($result));
+                $this->datasample->saveDataSampleResult((int)$data_sample_id, json_encode($result), $version);
 
             if(dao::isError()) return print(js::error(dao::getError()));
 
