@@ -439,12 +439,19 @@ class qastoryModel extends model
 
     public function getTaskPoints($storyID)
     {
-        $taskPoints = $this->dao->select('*')->from(TABLE_STORY)->alias('t1')
-            ->leftJoin(TABLE_STORYSPEC)->alias('t2')->on('t1.id=t2.story')
-            ->where('t1.parent')->eq($storyID)
-            ->andWhere('t1.type')->eq('taskPoint')
-            ->andWhere('t1.deleted')->eq(0)
+        $taskPoints = $this->dao->select('*')->from(TABLE_STORY)
+            ->where('parent')->eq($storyID)
+            ->andWhere('type')->eq('taskPoint')
+            ->andWhere('deleted')->eq(0)
             ->fetchAll();
+        foreach($taskPoints as $taskPoint)
+        {
+            $storySpec = $this->dao->select('*')->from(TABLE_STORYSPEC)
+                ->where('story')->eq($taskPoint->id)
+                ->orderBy('version DESC')
+                ->fetch();
+            $taskPoint->storySpec = $storySpec;
+        }
         return $taskPoints;
     }
 }

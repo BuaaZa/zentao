@@ -40,8 +40,8 @@
           <?php foreach($currentTaskPoints as $taskPoint):?>
           <tr>
             <td><input type="text" name="title[<?php echo 'old' . $i;?>]" id="title<?php echo 'old' . $i;?>" value='<?php echo $taskPoint->title;?>' class="form-control title-import input-story-title" disabled="disabled"></td>
-            <td><input type="text" name="spec[<?php echo 'old' . $i;?>]" id="spec<?php echo 'old' . $i;?>" value='<?php echo $taskPoint->spec;?>' class="form-control title-import input-story-title" disabled="disabled"></td>
-            <td><input type="text" name="verify[<?php echo 'old' . $i;?>]" id="verify<?php echo 'old' . $i;?>" value='<?php echo $taskPoint->verify;?>' class="form-control title-import input-story-title" disabled="disabled"></td>
+            <td><input type="text" name="spec[<?php echo 'old' . $i;?>]" id="spec<?php echo 'old' . $i;?>" value='<?php echo $taskPoint->storySpec->spec;?>' class="form-control title-import input-story-title" disabled="disabled"></td>
+            <td><input type="text" name="verify[<?php echo 'old' . $i;?>]" id="verify<?php echo 'old' . $i;?>" value='<?php echo $taskPoint->storySpec->verify;?>' class="form-control title-import input-story-title" disabled="disabled"></td>
           </tr>
           <?php $i ++;?>
           <?php endforeach;?>

@@ -773,6 +773,10 @@ class story extends control
         $this->view->forceReview      = $this->story->checkForceReview();
         $this->view->executionID      = $executionID;
 
+        $this->view->currentStories = $this->story->getBatchStories($storyID);
+        //ChromePhp::log($this->story->getDataOfStorysPerPlan());
+        //ChromePhp::log($this->view->currentStories);
+
         $this->display();
     }
 
