@@ -6254,4 +6254,40 @@ class storyModel extends model
 
         return $lastReviewer;
     }
+
+    public function getBatchStories($storyID = 0)
+    {
+        $stories = $this->dao->select('*')->from(TABLE_STORY)
+            ->where('parent')->eq($storyID)
+            ->andWhere('type')->eq('story')
+            ->andWhere('deleted')->eq(0)
+            ->fetchAll();
+        
+        $modules = $this->getDataOfStorysPerModule();
+        $plans = $this->getDataOfStorysPerPlan();
+
+        foreach($stories as $story)
+        {
+            $storySpec = $this->dao->select('*')->from(TABLE_STORYSPEC)
+                ->where('story')->eq($story->id)
+                ->orderBy('version DESC')
+                ->fetch();
+            $story->storySpec = $storySpec;
+            $story->module = $modules[$story->module]->name;
+            $story->plan = $plans[$story->plan]->name;
+
+            $reviewers = $this->dao->select('*')->from(TABLE_STORYREVIEW)->alias('t1')
+                ->leftJoin(TABLE_USER)->alias('t2')->on('t1.reviewer = t2.account')
+                ->where('t1.story')->eq($story->id)
+                ->fetchAll();
+            $reviewedBy = '';
+            foreach($reviewers as $reviewer)
+            {
+                $reviewedBy = $reviewedBy . $reviewer->realname . ' ';
+            }
+            $story->reviewedBy = $reviewedBy;
+        }
+        //ChromePhp::log($stories);
+        return $this->mergePlanTitle($productID, $stories, $branch, $type);
+    }
 }
