@@ -962,8 +962,10 @@ $lang->build->methodOrder[50] = 'batchUnlinkBug';
 /* QA. */
 $lang->resource->qa = new stdclass();
 $lang->resource->qa->index = 'indexAction';
+$lang->resource->qa->story = 'storyAction';
 
 $lang->qa->methodOrder[0] = 'index';
+$lang->qa->methodOrder[5] = 'story';
 
 /* Bug. */
 $lang->resource->bug = new stdclass();

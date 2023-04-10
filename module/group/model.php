@@ -436,7 +436,11 @@ class groupModel extends model
         }
 
         /* Delete old. */
-        $this->dao->delete()->from(TABLE_GROUPPRIV)->where('`group`')->eq($groupID)->andWhere('module')->in($this->getMenuModules($menu))->exec();
+        $deleteModules = $this->getMenuModules($menu);
+        if(empty($menu) or $menu === 'qa'){
+            $deleteModules[] = 'qastory';
+        }
+        $this->dao->delete()->from(TABLE_GROUPPRIV)->where('`group`')->eq($groupID)->andWhere('module')->in($deleteModules)->exec();
 
         /* Insert new. */
         if($this->post->actions)

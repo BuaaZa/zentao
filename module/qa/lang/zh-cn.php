@@ -11,3 +11,4 @@
  */
 $lang->qa->index       = '测试主页';
 $lang->qa->indexAction = '测试仪表盘';
+$lang->qa->storyAction = '功能点';

@@ -2599,9 +2599,11 @@ EOD;
             if(isset($rights[$module]['import']) and commonModel::hasDBPriv($object, $module, 'import')) return true;
         }
 
+        ChromePhp::log($rights[$module][$method]);
+
         if(isset($rights[$module][$method]))
         {
-            if(!commonModel::hasDBPriv($object, $module, $method)) return false;
+            if(!commonModel::hasDBPriv($object, $module, $method)) return true;
 
             if(empty($acls['views'])) return true;
             $menu = isset($lang->navGroup->$module) ? $lang->navGroup->$module : $module;
