@@ -54,9 +54,6 @@ class testcaseModel extends model
         $this->file = $this->loadModel('file');
         $this->score = $this->loadModel('score');
 
-        ChromePhp::log(fixer::input('post'));
-        ChromePhp::log(fixer::input('post')->get());
-
         // 判定有预期结果时，前置条件不能为空
         {
             $steps = $this->post->steps;
@@ -110,8 +107,6 @@ class testcaseModel extends model
         if (empty($case->product)) $this->config->testcase->create->requiredFields = str_replace('story', '', $this->config->testcase->create->requiredFields);
 
         /* Value of story may be show more. */
-//        $case->story = (int)$case->story;
-//        $case->data_sample_new = fixer::input('post')->get()->datasample;
         $this->dao->insert(TABLE_CASE)->data($case)->autoCheck()
             ->batchCheck($this->config->testcase->create->requiredFields, 'notempty')
             ->checkFlow()->exec();
@@ -156,7 +151,7 @@ class testcaseModel extends model
             $obj = (string)$this->post->datasample[$index];
 
             // 保存测试步骤关联的数据样本
-            $this->datasample->save($caseID, $index, $obj);
+            $this->datasample->saveDataSample($caseID, $this->dao->lastInsertID(), $index, $obj, $step->version);
         }
 
         return array('status' => 'created', 'id' => $caseID, 'caseInfo' => $case);
@@ -836,6 +831,8 @@ class testcaseModel extends model
      */
     public function update($caseID, $testtasks = array())
     {
+        $this->datasample = $this->loadModel('datasample');
+
         $steps   = $this->post->steps;
         $expects = $this->post->expects;
         foreach($expects as $key => $value)
@@ -858,6 +855,15 @@ class testcaseModel extends model
 
         //判断步骤是否修改仅判断了已有的三个字段，会出bug，暂时改为调用update即必定修改了
         //$stepChanged = true;
+        //判断是否数据样本有修改
+        foreach($this->post->is_updated as  $value)
+        {
+            if(!empty($value))
+            {
+                $stepChanged = true;
+                break;
+            }
+        }
 
         $version = $stepChanged ? $oldCase->version + 1 : $oldCase->version;
 
@@ -877,7 +883,7 @@ class testcaseModel extends model
             ->setForce('status', $status)
             ->cleanInt('story,product,branch,module')
             ->stripTags($this->config->testcase->editor->edit['id'], $this->config->allowedTags)
-            ->remove('comment,steps,expects,files,labels,linkBug,stepType,inputs,goal_actions,eval_criterias,stepIoType')
+            ->remove('comment,steps,expects,files,labels,linkBug,stepType,inputs,goal_actions,eval_criterias,stepIoType,datasample,is_updated')
             ->get();
 
         $requiredFields = $this->config->testcase->edit->requiredFields;
@@ -929,6 +935,11 @@ class testcaseModel extends model
                         $this->dao->insert(TABLE_CASESTEP)->data($step)->autoCheck()->exec();
                         if($step->type == 'group') $parentStepID = $this->dao->lastInsertID();
                         if($step->type == 'step')  $parentStepID = 0;
+
+                        $obj = (string)$this->post->datasample[$stepID];
+
+                        // 保存测试步骤关联的数据样本
+                        $this->datasample->saveDataSample($caseID, $this->dao->lastInsertID(), $stepID, $obj, $step->version);
                     }
                 }
                 else
@@ -2487,15 +2498,21 @@ class testcaseModel extends model
 
             /* ---------------- Judge steps changed or not.-------------------- */
 
-            /* Remove the empty setps in post. */
+            /* Remove the empty steps in post. */
             if($this->post->steps)
             {
                 $data = fixer::input('post')->get();
                 foreach($data->steps as $key => $desc)
                 {
                     $desc     = trim($desc);
-                    $stepType = isset($data->stepType[$key]) ? $data->stepType[$key] : 'step';
-                    if(!empty($desc)) $steps[] = array('desc' => $desc, 'type' => $stepType, 'expect' => trim($data->expects[$key]));
+                    $stepType = $data->stepType[$key] ?? 'step';
+                    if(!empty($desc))
+                        $steps[] = array('desc' => $desc,
+                            'type' => $stepType,
+                            'expect' => trim($data->expects[$key]),
+                            'goal_action' => trim($data->goal_actions[$key]),
+                            'eval_criterion' => trim($data->eval_criterias[$key]),
+                        );
                 }
 
                 /* If step count changed, case changed. */
@@ -2507,9 +2524,13 @@ class testcaseModel extends model
                 {
                     /* Compare every step. */
                     $i = 0;
-                    foreach($case->steps as $key => $oldStep)
+                    foreach($case->steps as $oldStep)
                     {
-                        if(trim($oldStep->desc) != trim($steps[$i]['desc']) or trim($oldStep->expect) != $steps[$i]['expect'] or trim($oldStep->type) != $steps[$i]['type'])
+                        if(trim($oldStep->desc) != trim($steps[$i]['desc'])
+                            or trim($oldStep->type) != $steps[$i]['type']
+                            or trim($oldStep->expect) != $steps[$i]['expect']
+                            or trim($oldStep->goal_action) != $steps[$i]['goal_action']
+                            or trim($oldStep->eval_criteria) != $steps[$i]['eval_criterion'])
                         {
                             $stepChanged = true;
                             break;
@@ -2589,7 +2610,7 @@ class testcaseModel extends model
             $menu .= $this->buildMenu('testcase', 'confirmstorychange', $params, $case, 'view', 'confirm', 'hiddenwin', '', '', '', $this->lang->confirm);
         }
         #导出为word
-        $menu .= $this->buildMenu('testcase', 'exportToWord', $params, $case, 'view', 'export', '', 'showinonlybody iframe', true, "data-width='500px'");
+        $menu .= $this->buildMenu('testcase', 'exportToWord', "$params&version=$case->currentVersion", $case, 'view', 'export', '', 'showinonlybody iframe', true, "data-width='500px'");
         $menu .= "<div class='divider'></div>";
         $menu .= $this->buildFlowMenu('testcase', $case, 'view', 'direct');
         $menu .= "<div class='divider'></div>";
