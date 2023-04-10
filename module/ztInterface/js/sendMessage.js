@@ -125,7 +125,7 @@ $('button#genMessage').click(function(){
     var list = getTrData(table, 'body-key', true);
     var head = getHeadData();
     var obj = {item:list,type:'object',notNull:'true'};
-    var postData = {object:obj, head:head,id:interfaceID,baseUrl:baseUrl};
+    var postData = {object:obj, head:head,id:55,baseUrl:baseUrl};
     var link = createLink('ztinterface', 'genMessage', '');
     $.post(link, postData, function(res) {
       var response = {};
@@ -135,10 +135,12 @@ $('button#genMessage').click(function(){
         console.log(res);
         return;
       }
-      response['value']['response'].forEach(function(obj) {
-        fillInValueAndError(obj);
-      });
-      if(response['value']['message']['header']){
+      if(response && response['value'] && response['value']['response']){
+        response['value']['response'].forEach(function(obj) {
+          fillInValueAndError(obj);
+        });
+      }
+      if(response && response['value'] && response['value']['message'] &&response['value']['message']['header']){
         var headText = $('textarea#messageHeadView');
         headText.val(response['value']['message']['header'].trim()); 
         if (!headText.hasClass('autosize')) { 
@@ -154,6 +156,16 @@ $('button#genMessage').click(function(){
         }
         bodyText.trigger('autosize.resize')
       }
+      console.log(response);
+      response['error'].forEach(function(error) {
+        if(error['from'].toLowerCase() === 'baseurl'){
+          var span = $('div#urlError span#error');
+          showError(span,error['message']);
+        }else if(error['from'] === 'alter'){
+          console.log('alter');
+          showAlterbox(error['message'],'#FF6347',button);
+        }
+      });
     });
   }
 });
@@ -246,10 +258,12 @@ $('.refresh-button').click(function() {
       }else{
         hideError(span);
       }
-      if(postData['type'] == 'array' && response['item'] &&  response['item']['error']){
-        showError(itemSpan, response['item']['error']);
-      }else{
-        hideError(itemSpan);
+      if(postData['type'] == 'array'){
+        if(response['item'] &&response['item']['error']){
+          showError(itemSpan, response['item']['error']);
+        }else{
+          hideError(itemSpan);
+        }
       }
     });
     return;
@@ -284,10 +298,12 @@ $('.refresh-button').click(function() {
     }else{
       hideError(span);
     }
-    if(postData['type'] == 'array' && response['item'] &&response['item']['error']){
-      showError(itemSpan, response['item']['error']);
-    }else{
-      hideError(itemSpan);
+    if(postData['type'] == 'array'){
+      if(response['item'] &&response['item']['error']){
+        showError(itemSpan, response['item']['error']);
+      }else{
+        hideError(itemSpan);
+      }
     }
   })
   .fail(function() {
