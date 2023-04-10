@@ -831,6 +831,8 @@ class testcaseModel extends model
      */
     public function update($caseID, $testtasks = array())
     {
+        $this->datasample = $this->loadModel('datasample');
+
         $steps   = $this->post->steps;
         $expects = $this->post->expects;
         foreach($expects as $key => $value)
@@ -2608,7 +2610,7 @@ class testcaseModel extends model
             $menu .= $this->buildMenu('testcase', 'confirmstorychange', $params, $case, 'view', 'confirm', 'hiddenwin', '', '', '', $this->lang->confirm);
         }
         #导出为word
-        $menu .= $this->buildMenu('testcase', 'exportToWord', $params, $case, 'view', 'export', '', 'showinonlybody iframe', true, "data-width='500px'");
+        $menu .= $this->buildMenu('testcase', 'exportToWord', "$params&version=$case->version", $case, 'view', 'export', '', 'showinonlybody iframe', true, "data-width='500px'");
         $menu .= "<div class='divider'></div>";
         $menu .= $this->buildFlowMenu('testcase', $case, 'view', 'direct');
         $menu .= "<div class='divider'></div>";

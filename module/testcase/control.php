@@ -2394,7 +2394,7 @@ class testcase extends control
      * @access public
      * @return \PhpOffice\PhpWord\PhpWord
      */
-    public function addTwoTablesToWord($caseID, $PHPWord){
+    public function addTwoTablesToWord($caseID, $PHPWord, $version){
 
         $case = $this->testcase->getById($caseID);
         $steps = $case->steps;
@@ -2407,7 +2407,10 @@ class testcase extends control
             $data_samples[$i] = '';
             $data_sample_results[$i] = '';
         }
-        $data_samples_by_case = $this->datasample->getDataSamplesByCase($caseID, $case->version);
+        if($version == -1){
+            $version = $case->version;
+        }
+        $data_samples_by_case = $this->datasample->getDataSamplesByCase($caseID, $version);
 
         $results = current($this->testtask->getResults(0, $caseID));
         $stepResults = $results->stepResults;
@@ -2415,7 +2418,7 @@ class testcase extends control
         foreach ($data_samples_by_case as $datasample){
             array_push($step_indexs, $datasample->casestep_level);
             $data_samples[$datasample->casestep_level] = $datasample->object;
-            $data_sample_result_by_sample = $this->datasample->getOneResultByDataSampleIdOrderByDate($datasample->id);
+            $data_sample_result_by_sample = $this->datasample->getOneResultByDataSampleIdOrderByDate($datasample->id, $version);
             /*error_log(print_r($datasample->id,1));
             error_log(print_r($data_sample_result_by_sample,1));*/
             if(isset($data_sample_result_by_sample)){
@@ -2638,10 +2641,11 @@ class testcase extends control
      * Export case to word.
      *
      * @param  int    $caseID
+     * @param  int    $version
      * @access public
      * @return void
      */
-    public function exportToWord($caseID)
+    public function exportToWord($caseID, $version = -1)
     {
         require_once 'vendor/autoload.php';
         if($this->server->request_method == 'POST')
@@ -2650,7 +2654,7 @@ class testcase extends control
             $this->testtask = $this->loadModel('testtask');
             $PHPWord = new \PhpOffice\PhpWord\PhpWord();
 
-            $PHPWord = $this->addTwoTablesToWord($caseID, $PHPWord);
+            $PHPWord = $this->addTwoTablesToWord($caseID, $PHPWord, $version);
             $saveTime = date("Ymd-H:i:m");
             $filename = $caseID . '_' . $saveTime . '.docx';
             //$filepath = 'tmp_case/' . $filename;
@@ -2671,7 +2675,7 @@ class testcase extends control
      * @access public
      * @return void
      */
-    public function batchExportToWord($caseIDList = [])
+    public function batchExportToWord($caseIDList = [], $version = -1)
     {
         require_once 'vendor/autoload.php';
         if($this->server->request_method == 'POST')
@@ -2682,7 +2686,7 @@ class testcase extends control
             $PHPWord = new \PhpOffice\PhpWord\PhpWord();
             foreach ($caseIDList as $caseID){
                 $caseID = (int)$caseID;
-                $PHPWord = $this->addTwoTablesToWord($caseID, $PHPWord);
+                $PHPWord = $this->addTwoTablesToWord($caseID, $PHPWord, $version);
             }
             $saveTime = date("Ymd-H:i:m");
             $filename = '用例集合' . '_' . $saveTime . '.docx';

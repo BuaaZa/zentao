@@ -127,7 +127,7 @@
                             // 拼接数据样本url
                             echo "<td class='text-left'>";
                             if ($level !== 0)
-                                common::printIcon('datasample', 'view',"caseID=$case->id&casestepLevel=$level&version=$case->version", '',
+                                common::printIcon('datasample', 'view',"caseID=$case->id&casestepLevel=$level&version=$version", '',
                                 'button', 'eye', '', 'showinonlybody iframe',
                                 true,'','查看' );
                             echo "</div></td>";
