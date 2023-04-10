@@ -14,6 +14,7 @@
 <?php if($forceReview) $config->story->create->requiredFields .= ',review';?>
 <?php js::set('showFields', $showFields);?>
 <?php js::set('requiredFields', $config->story->create->requiredFields);?>
+<?php js::set('oldAccountList', array_keys($currentStories));?>
 <div id="mainContent" class="main-content">
   <div class="main-header">
     <h2><?php echo $storyID ? $storyTitle . ' - ' . $this->lang->story->subdivide : $this->lang->story->batchCreate;?></h2>
@@ -79,6 +80,20 @@
           </tr>
         </thead>
         <tbody>
+        <?php $i = 0;?>
+          <?php foreach($currentStories as $story):?>
+          <tr>
+            <td><input type="text" name="module[<?php echo 'old' . $i;?>]" id="module<?php echo 'old' . $i;?>" value='<?php echo $story->module;?>' class="form-control title-import input-story-title" disabled="disabled"></td>
+            <td><input type="text" name="plan[<?php echo 'old' . $i;?>]" id="plan<?php echo 'old' . $i;?>" value='<?php echo $story->plan;?>' class="form-control title-import input-story-title" disabled="disabled"></td>
+            <td><input type="text" name="title[<?php echo 'old' . $i;?>]" id="title<?php echo 'old' . $i;?>" value='<?php echo $story->title;?>' class="form-control title-import input-story-title" disabled="disabled"></td>
+            <td><input type="text" name="spec[<?php echo 'old' . $i;?>]" id="spec<?php echo 'old' . $i;?>" value='<?php echo $story->storySpec->spec;?>' class="form-control title-import input-story-title" disabled="disabled"></td>
+            <td><input type="text" name="category[<?php echo 'old' . $i;?>]" id="category<?php echo 'old' . $i;?>" value='<?php echo zget($this->lang->story->categoryList, $story->category);?>' class="form-control title-import input-story-title" disabled="disabled"></td>
+            <td><input type="text" name="pri[<?php echo 'old' . $i;?>]" id="pri<?php echo 'old' . $i;?>" value='<?php echo $story->pri;?>' class="form-control title-import input-story-title" disabled="disabled"></td>
+            <td><input type="text" name="estimate[<?php echo 'old' . $i;?>]" id="estimate<?php echo 'old' . $i;?>" value='<?php echo $story->estimate;?>' class="form-control title-import input-story-title" disabled="disabled"></td>
+            <td><input type="text" name="reviewedBy[<?php echo 'old' . $i;?>]" id="reviewedBy<?php echo 'old' . $i;?>" value='<?php echo $story->reviewedBy;?>' class="form-control title-import input-story-title" disabled="disabled"></td>
+          </tr>
+          <?php $i ++;?>
+          <?php endforeach;?>
           <tr class="template">
             <td class='text-left<?php echo zget($visibleFields, $product->type, ' hidden')?> branchBox'><?php echo html::select('branch[$id]', $branches, $branch, "class='form-control chosen' onchange='setModuleAndPlan(this.value, $productID, \$id)'");?></td>
             <td class='text-left' style='overflow:visible'><?php echo html::select('module[$id]', $moduleOptionMenu, $moduleID, "class='form-control chosen'");?></td>
@@ -203,7 +218,7 @@ $(function()
     $('#batchCreateForm').batchActionForm(
     {
         idStart: 1,
-        idEnd: <?php echo max((empty($titles) ? 1 : count($titles)), 10)?>,
+        idEnd: <?php echo max((empty($titles) ? 1 : count($titles)), 2)?>,
         rowCreator: function($row, index)
         {
             rowIndex = index; // Set the index for the add element operation
