@@ -103,9 +103,15 @@ $('.header-value').on('input', function() {
   button.html('同步报文');
   button.attr('data-type', 'update');
   var $span = $(this).siblings('span#error');
-  if ($span.css('display') === 'inline') {
-    $span.css('display', 'none');
-  }
+  hideError($span);
+});
+
+$('input#baseURL').on('input', function() {
+  var button = $("button#genMessage")
+  button.html('同步报文');
+  button.attr('data-type', 'update');
+  var $span = $('div#urlError span#error');
+  hideError($span);
 });
 
 $('button#genMessage').click(function(){

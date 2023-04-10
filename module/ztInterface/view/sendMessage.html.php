@@ -84,6 +84,9 @@
                 <?php echo html::input('URL', $interface->url, 'class="form-control" style="width: 40%;" disabled title="接口文档中指定"');?>
                 <?php echo $baseURLList;?>
               </div>
+              <div id="urlError">
+                <span id="error" style="font-size:4px;color:red;display:none;">Mock函数不存在</span>
+              </div>
             </div>
           </div>
           <div class='detail'>
