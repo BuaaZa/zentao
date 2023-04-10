@@ -116,58 +116,69 @@ $('input#baseURL').on('input', function() {
 
 $('button#genMessage').click(function(){
   var button = $(this);
+  const table = $('#bodys');
+  var baseUrl = $('input#baseURL').val();
+  var list = getTrData(table, 'body-key', true);
+  var head = getHeadData();
+  var obj = {item:list,type:'object',notNull:'true'};
+  var postData = {object:obj, head:head,id:interfaceID,baseUrl:baseUrl};
+  var link = '';
+  
   if(button.attr('data-type') == 'update'){
     button.html('<i class=" icon-refresh" title="生成报文" data-app="ztinterface"></i><span>生成报文</span>');
     button.attr('data-type', 'gen');
+    var link = createLink('ztinterface', 'genMessage', 'type=update');
   }else{
-    const table = $('#bodys');
-    var baseUrl = $('input#baseURL').val();
-    var list = getTrData(table, 'body-key', true);
-    var head = getHeadData();
-    var obj = {item:list,type:'object',notNull:'true'};
-    var postData = {object:obj, head:head,id:55,baseUrl:baseUrl};
-    var link = createLink('ztinterface', 'genMessage', '');
-    $.post(link, postData, function(res) {
-      var response = {};
-      try {
-        response = JSON.parse(res);
-      } catch (error) {
-        console.log(res);
-        return;
+    var link = createLink('ztinterface', 'genMessage', 'type=mock');
+  }
+
+  $.post(link, postData, function(res) {
+    var response = {};
+    try {
+      response = JSON.parse(res);
+    } catch (error) {
+      console.log(res);
+      return;
+    }
+    if(response){
+      if(response['value']){
+        if(response['value']['response']){
+          response['value']['response'].forEach(function(obj) {
+            fillInValueAndError(obj);
+          });
+        }
+        if(response['value']['message']){
+          if(response['value']['message']['header']){
+            var headText = $('textarea#messageHeadView');
+            headText.val(response['value']['message']['header'].trim()); 
+            if (!headText.hasClass('autosize')) { 
+                headText.addClass('autosize'); 
+            }
+            headText.trigger('autosize.resize')
+          }
+          if(response['value']['message']['body']){
+            var bodyText = $('textarea#messageBodyView');
+            bodyText.val(JSON.stringify(JSON.parse(response['value']['message']['body'].trim()),null,2)); 
+            if (!bodyText.hasClass('autosize')) { 
+                bodyText.addClass('autosize'); 
+            }
+            bodyText.trigger('autosize.resize')
+          }
+        }
       }
-      if(response && response['value'] && response['value']['response']){
-        response['value']['response'].forEach(function(obj) {
-          fillInValueAndError(obj);
+      if(response['error']){
+        response['error'].forEach(function(error) {
+          if(error['from'].toLowerCase() === 'baseurl'){
+            var span = $('div#urlError span#error');
+            showError(span,error['message']);
+          }else if(error['from'] === 'alter'){
+            console.log('alter');
+            showAlterbox(error['message'],'#FF6347',button);
+          }
         });
       }
-      if(response && response['value'] && response['value']['message'] &&response['value']['message']['header']){
-        var headText = $('textarea#messageHeadView');
-        headText.val(response['value']['message']['header'].trim()); 
-        if (!headText.hasClass('autosize')) { 
-            headText.addClass('autosize'); 
-        }
-        headText.trigger('autosize.resize')
-      }
-      if(response['value']['message']['body']){
-        var bodyText = $('textarea#messageBodyView');
-        bodyText.val(JSON.stringify(JSON.parse(response['value']['message']['body'].trim()),null,2)); 
-        if (!bodyText.hasClass('autosize')) { 
-            bodyText.addClass('autosize'); 
-        }
-        bodyText.trigger('autosize.resize')
-      }
-      console.log(response);
-      response['error'].forEach(function(error) {
-        if(error['from'].toLowerCase() === 'baseurl'){
-          var span = $('div#urlError span#error');
-          showError(span,error['message']);
-        }else if(error['from'] === 'alter'){
-          console.log('alter');
-          showAlterbox(error['message'],'#FF6347',button);
-        }
-      });
-    });
-  }
+    }
+  });
 });
 
 $('.all-refresh').click(function(){

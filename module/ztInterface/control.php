@@ -873,7 +873,7 @@ class ztinterface extends control
         echo json_encode(array('message'=>$res));
     }
 
-    public function genMessage(){
+    public function genMessage($type = 'update'){
         $response = array();
         $response['error'] = array();
         if(empty($_POST)){
@@ -897,8 +897,13 @@ class ztinterface extends control
             }
             $response['error'][] = array('message'=>'基地址为空或不合法,已采用http://127.0.0.1/作为基地址','from'=>'baseURL');
         }
-        $response['value'] = $this->mockObject($_POST['object'], true)['value'];
-        $obj = $response['value']['object'];
+        $obj = new stdClass();
+        if($type === 'update'){
+            ChromePhp::log($_POST);
+        }else{
+            $response['value'] = $this->mockObject($_POST['object'], true)['value'];
+            $obj = $response['value']['object'];
+        }
         $obj = $this->ztinterface->convertStrToNULL($obj);
         $response['value']['message'] = $this->ztinterface->genMessage($_POST['head'], $obj, $interface->method, $url);
         echo json_encode($response);
