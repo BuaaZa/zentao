@@ -59,45 +59,13 @@
                 .append($link)
                 .appendTo($menuMainNav);
 
-            if(item.code == 'qa'){
-                $li.append('<ul class=\'more-list dropdown-menu fade \'></ul>');
-
-
-                var url = '/zentaopms/www/index.php?m=qastory&f=story';
-                url = $.tabSession.convertUrlWithTid(url);
-                // console.log(url);
-                // console.log(document.cookie);
-                var $link= $('<a></a>')
-                    .attr('href',url + '#app=qa')
-                    .attr('data-app', 'qa')
-                    .attr('data-toggle', 'tooltip')
-                    .html('<i class=\'icon icon-usecase\'></i> 功能点');
-                $('<li></li>')
-                    .append($link)
-                    .appendTo($li.find("ul"));
-
-                url = '/zentaopms/www/index.php?m=testtask&f=browse';
-                url = $.tabSession.convertUrlWithTid(url);
-                $link= $('<a></a>')
-                    .attr('href',url)
-                    .attr('data-app', 'qa')
-                    .attr('data-toggle', 'tooltip')
-                    .html('<i class=\'icon icon-list\'></i> 测试单');
-                $('<li></li>')
-                    .append($link)
-                    .appendTo($li.find("ul"));
-
-                url = '/zentaopms/www/index.php?m=bug&f=browse';
-                url = $.tabSession.convertUrlWithTid(url);
-                $link= $('<a></a>')
-                    .attr('href',url)
-                    .attr('data-app', 'qa')
-                    .attr('data-toggle', 'tooltip')
-                    .html('<i class=\'icon icon-bug\'></i> 缺陷');
-                $('<li></li>')
-                    .append($link)
-                    .appendTo($li.find("ul"));
-            }
+            var moreLink = createLink('index', 'ajaxGetMoreList', 'checkApp='+item.code);
+            $.get(moreLink, function(data){
+                var $itemLi = $("#menuMainNav li[data-app='"+item.code+"']");
+                $itemLi.append(data);
+            });
+            
+            $li.appendTo($menuMainNav);
 
             $link.tooltip({title: item.text, container: 'body', placement: 'right', tipClass: 'menu-tip'});
 

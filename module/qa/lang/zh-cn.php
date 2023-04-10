@@ -12,3 +12,19 @@
 $lang->qa->index       = '测试主页';
 $lang->qa->indexAction = '测试仪表盘';
 $lang->qa->storyAction = '功能点';
+
+$lang->qa->moreList = array();
+$lang->qa->moreList[0]['module'] = 'qastory';
+$lang->qa->moreList[0]['method'] = 'story';
+$lang->qa->moreList[0]['icon'] = '<i class=\'icon icon-usecase\'></i>';
+$lang->qa->moreList[0]['title'] = '功能点';
+
+$lang->qa->moreList[1]['module'] = 'testtask';
+$lang->qa->moreList[1]['method'] = 'browse';
+$lang->qa->moreList[1]['icon'] = '<i class=\'icon icon-list\'></i>';
+$lang->qa->moreList[1]['title'] = '测试单';
+
+$lang->qa->moreList[2]['module'] = 'bug';
+$lang->qa->moreList[2]['method'] = 'browse';
+$lang->qa->moreList[2]['icon'] = '<i class=\'icon icon-bug\'></i>';
+$lang->qa->moreList[2]['title'] = '缺陷';

@@ -131,9 +131,10 @@ class model extends baseModel
         if($inQa and $methodName == 'batchCreate'){
             $enabled = ($data->type == 'story');
         }
-        if($inQa and $methodName == 'create' and $data->type == 'taskPoint'){
+        if($inQa and $methodName == 'create'){
             $enabled = true;
         }
+
 
         if(!$returnHtml) return $enabled;
 

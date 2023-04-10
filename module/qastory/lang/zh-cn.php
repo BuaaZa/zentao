@@ -500,3 +500,5 @@ $lang->qastory->taskPointVerify = "功能点验收标准";
 $lang->qastory->taskPointTitle = "功能点名称";
 $lang->qastory->decomposeTaskPoint = "分解功能点";
 $lang->qastory->createTaskPoint = "提功能点";
+$lang->qastory->common = "测试";
+$lang->qastory->story = "功能点";

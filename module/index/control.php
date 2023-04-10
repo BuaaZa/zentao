@@ -129,4 +129,25 @@ class index extends control
         }
         echo $method;
     }
+
+    public function ajaxGetMoreList($checkApp)
+    {
+        $lang = $this->app->loadLang('qa');
+        if(isset($lang->$checkApp->moreList)){
+            $li = '<ul class=\'more-list dropdown-menu fade \'>';
+            foreach($lang->$checkApp->moreList as $obj){
+                if(!common::hasPriv($obj['module'], $obj['method'])){
+                    continue;
+                }
+                $li .= '<li>';
+                $url = $this->createLink($obj['module'], $obj['method']).'#app='.$checkApp;
+                $li .= "<a href='$url' data-app='$checkApp' data-toggle='tooltip'>";
+                $li .= $obj['icon']." ".$obj['title'];
+                $li .= '</a>';
+                $li .= '</li>'; 
+            }
+            $li .= '</ul>';
+        }
+        echo $li;
+    }
 }
