@@ -86,9 +86,11 @@
         </tr>
       </thead>
       <?php foreach($lang->resource as $moduleName => $moduleActions):?>
+
       <?php if(!count((array)$moduleActions)) continue;?>
       <?php if(!$this->group->checkMenuModule($menu, $moduleName)) continue;?>
       <?php
+
       /* Check method in select version. */
       if($version)
       {
@@ -101,6 +103,7 @@
                   break;
               }
           }
+
           if(!$hasMethod) continue;
       }
       ?>

@@ -2515,7 +2515,7 @@ class testcase extends control
                         for($i = 0; $i < count($data_sample[0]); $i += 1){
                             array_push($data_sample_result, "-");
                         }
-                        $data_sample_result[0] = $data_sample[count($data_sample)-1][0] . '(实际结果)';
+                        $data_sample_result[0] = '实际结果';
                         array_push($data_sample, $data_sample_result);
                     }
 

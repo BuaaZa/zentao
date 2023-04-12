@@ -121,9 +121,9 @@
                     endfor;
                     ?>
                     <tr class='text-center'>
-                        <td class='text-center'><?php echo $object[$io_len - 1][0]; ?>(实际结果)</td>
+                        <td class='text-center'>实际结果</td>
                         <input type='hidden' name='datasample_result[<?php echo $datasample->id; ?>][0]'
-                               value='<?php echo $object[$io_len - 1][0]; ?>(实际结果)'>
+                               value='实际结果'>
                         <?php
                         for ($i = 1; $i <= $sample_len - 1; $i += 1):
                             echo "<td><textarea rows='1' class='form-control autosize step-expects' name='datasample_result[$datasample->id][$i]'></textarea></td>";
