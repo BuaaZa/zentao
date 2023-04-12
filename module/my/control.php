@@ -15,6 +15,7 @@ class my extends control
     public userModel $user;
     public deptModel $dept;
     public groupModel $group;
+    public customModel $custom;
 
     /**
      * Construct function.
@@ -1531,35 +1532,39 @@ EOF;
      * User preference setting.
      *
      * @access public
-     * @return void
+     * @param bool $showTip
+     * @return int
      */
-    public function preference($showTip = true)
+    public function preference(bool $showTip = true): int
     {
         $this->setting = $this->loadModel('setting');
+        $this->custom = $this->loadModel('custom');
 
-        if($_POST)
-        {
-            foreach($_POST as $key => $value) $this->setting->setItem("{$this->app->user->account}.common.$key", $value);
+        if ($_POST) {
+            foreach ($_POST as $key => $value)
+                $this->setting->setItem("{$this->app->user->account}.common.$key", $value);
 
             $this->setting->setItem("{$this->app->user->account}.common.preferenceSetted", 1);
-            if(isOnlybody()) return print(js::closeModal('parent.parent'));
-
-            return print(js::locate($this->createLink('my', 'index'), 'parent'));
+            if (isOnlybody())
+                return print(js::closeModal('parent.parent'));
+            else
+                return print(js::locate($this->createLink('my'), 'parent'));
         }
 
-        $this->view->title      = $this->lang->my->common . $this->lang->colon . $this->lang->my->preference;
+        $this->view->title = $this->lang->my->common . $this->lang->colon . $this->lang->my->preference;
         $this->view->position[] = $this->lang->my->preference;
-        $this->view->showTip    = $showTip;
+        $this->view->showTip = $showTip;
 
-        $this->view->URSRList         = $this->loadModel('custom')->getURSRPairs();
-        $this->view->URSR             = $this->setting->getURSR();
-        $this->view->programLink      = $this->config->programLink ?? 'program-browse';
-        $this->view->productLink      = $this->config->productLink ?? 'product-all';
-        $this->view->projectLink      = $this->config->projectLink ?? 'project-browse';
-        $this->view->executionLink    = $this->config->executionLink ?? 'execution-task';
+        $this->view->URSRList = $this->custom->getURSRPairs();
+        $this->view->URSR = $this->setting->getURSR();
+        $this->view->programLink = $this->config->programLink ?? 'program-browse';
+        $this->view->productLink = $this->config->productLink ?? 'product-all';
+        $this->view->projectLink = $this->config->projectLink ?? 'project-browse';
+        $this->view->executionLink = $this->config->executionLink ?? 'execution-task';
         $this->view->preferenceSetted = isset($this->config->preferenceSetted);
 
         $this->display();
+        return 0;
     }
 
     /**
