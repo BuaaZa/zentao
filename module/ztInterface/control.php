@@ -899,7 +899,10 @@ class ztinterface extends control
         }
         $obj = new stdClass();
         if($type === 'update'){
-            ChromePhp::log($_POST);
+            $res = $this->ztinterface->genObject($_POST['object']);
+            $obj = $res['object'];
+            ChromePhp::log($obj);
+            $response['error'] = array_merge($response['error'],$res['error']);
         }else{
             $response['value'] = $this->mockObject($_POST['object'], true)['value'];
             $obj = $response['value']['object'];

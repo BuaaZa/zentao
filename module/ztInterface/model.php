@@ -190,6 +190,7 @@ class ztinterfaceModel extends model
             if($inArray){
                 $placeholder = $inArray ? "placeholder='请直接在父级Array中编辑数组'" : "placeholder='请直接编辑子字段的值'";
                 $table .= html::input($newPath.':value', '', 'class="form-control value-input" disabled '.$placeholder);
+                $table .= "<span id=\"error\" style=\"font-size:4px;color:red;display:none;\">类型不符</span>";
             }else if($obj['type'] == "object"){
                 $disabled = '';
                 if($obj["notNull"])
@@ -207,6 +208,7 @@ class ztinterfaceModel extends model
                             <input type="hidden"  data-icon="refresh" data-wrapper="input-control-icon-right"  data-provide="colorpicker">
                         </div>';
                 $table .= "</div>";
+                $table .= "<span id=\"error\" style=\"font-size:4px;color:red;display:none;\">类型不符</span>";
             }
             $table .= "</td>";
             $table .= "</tr>";
@@ -413,7 +415,7 @@ class ztinterfaceModel extends model
                 $obj = new Stdclass();
                 foreach($data['item'] as $d){
                     $name = $d['name'];
-                    $res = genObject($d);
+                    $res = $this->genObject($d);
                     if(isset($res['object']) and $res['object'] !== ''){
                         $obj->$name = $res['object'];
                     }
@@ -446,9 +448,29 @@ class ztinterfaceModel extends model
             if(!isset($data['value']) or $data['value'] === ''){
                 $response['object'] = '';
             }else{
-                
+                if($this->checkType($data['value'],$data['type'])){
+                    switch($data['type']) {
+                        case 'integer':
+                            $response['object'] = (int)$data['value'];
+                            break;
+                        case 'string':
+                            $response['object'] = $data['value'];
+                            break;
+                        case 'float':
+                            $response['object'] = (float)$data['value'];
+                            break;
+                    }
+                }else{
+                    $error = array(
+                        "id"=>$data['id'],
+                        "from"=>'input',
+                        "message"=>'与类型不匹配'
+                    );
+                    $response['error'][] = $error;
+                }
             }
         }
+        return $response;
     }
 
     public function checkType($str, $type) {

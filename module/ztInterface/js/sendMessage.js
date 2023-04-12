@@ -97,6 +97,12 @@ $('.value-input').on('input', function() {
   var button = $("button#genMessage")
   button.html('同步报文');
   button.attr('data-type', 'update');
+  var now = this;
+  while(now.nodeName!=="TD"){
+    now = now.parentNode;
+  }
+  var span = $(now).find('span#error');
+  hideError(span);
 });
 
 $('.header-value').on('input', function() {
@@ -121,7 +127,7 @@ $('button#genMessage').click(function(){
   var baseUrl = $('input#baseURL').val();
   var list = getTrData(table, 'body-key', true);
   var head = getHeadData();
-  var obj = {item:list,type:'object',notNull:'true'};
+  var obj = {item:list,type:'object',notNull:'true',value:'input'};
   var postData = {object:obj, head:head,id:interfaceID,baseUrl:baseUrl};
   var link = createLink('ztinterface', 'genMessage', 'type=' + button.attr('data-type'));
   
@@ -171,8 +177,12 @@ $('button#genMessage').click(function(){
             var span = $('div#urlError span#error');
             showError(span,error['message']);
           }else if(error['from'] === 'alter'){
-            console.log('alter');
             showAlterbox(error['message'],'#FF6347',button);
+          }else if(error['from']==='input'){
+            if(error['id']){
+              var span = $('tr#'+error['id']+' td#value span#error');
+              showError(span, error['message']);
+            }
           }
         });
       }
