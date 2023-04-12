@@ -13,9 +13,10 @@
             <td><b>输入-输出项名称</b></td>
             <td><b>样本1</b></td>
         </tr>
-        <tr style = "background-color: #f2f2f2;">
-            <td>
-                <textarea rows='1' class='form-control autosize step-expects' name='datasample[0][0]' placeholder='预期输出'></textarea>
+        <tr >
+            <td >
+                预期结果
+                <textarea style="display:none;" name='datasample[0][0]'>预期结果</textarea>
             </td>
             <td>
                 <textarea rows='1' class='form-control autosize step-expects' name='datasample[0][1]' ></textarea>
