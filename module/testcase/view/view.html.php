@@ -90,7 +90,7 @@
                             <th class='text-left'><?php echo $lang->testcase->step_goal_action; ?></th>
                             <th class='text-left'><?php echo $lang->testcase->stepExpect; ?></th>
                             <th class='text-left'><?php echo $lang->testcase->step_eval_criteria; ?></th>
-                            <th class='text-left'><?php echo $lang->testcase->datasample; ?></th>
+                            <th class='text-left'><?php echo $lang->datasample->common; ?></th>
                         </tr>
                         </thead>
                         <?php
