@@ -124,7 +124,7 @@ class testcaseModel extends model
         foreach ($data->steps as $index => $stepDesc) {
 //            if (empty($stepDesc) ) continue;
             $stepType = $this->post->stepType;
-            $stepIoType = $this->post->stepIoType;
+
 
             $step = new stdClass();
             $step->type = ($stepType[$index] == 'item' and $parentStepID == 0) ? 'step' : $stepType[$index];
@@ -138,7 +138,7 @@ class testcaseModel extends model
             $step->expect = $judge ? '' : rtrim(htmlSpecialString($data->expects[$index]));
             $step->eval_criteria = $judge ? '' : rtrim(htmlSpecialString($data->eval_criterias[$index]));
             $step->eval_criteria = strlen($step->eval_criteria) == 0 ? $step->expect : $step->eval_criteria;
-            $step->is_out = $stepIoType[$index];
+
 
             $this->dao->insert(TABLE_CASESTEP)->data($step)->autoCheck()->exec();
 
@@ -930,8 +930,6 @@ class testcaseModel extends model
                         $step->expect  = $judge ? '' : rtrim(htmlSpecialString($data->expects[$stepID]));
                         $step->eval_criteria  = $judge ? '' : rtrim(htmlSpecialString($data->eval_criterias[$stepID]));
                         $step->eval_criteria = strlen($step->eval_criteria) == 0 ? $step->expect : $step->eval_criteria;
-                        $stepIoType      = $this->post->stepIoType;
-                        $step->is_out = $stepIoType[$stepID];
                         $this->dao->insert(TABLE_CASESTEP)->data($step)->autoCheck()->exec();
                         if($step->type == 'group') $parentStepID = $this->dao->lastInsertID();
                         if($step->type == 'step')  $parentStepID = 0;
