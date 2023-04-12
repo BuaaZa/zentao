@@ -1603,7 +1603,7 @@ class commonModel extends model
         $currentMethod = strtolower($method);
         if(strpos($misc, 'data-app') === false) $misc .= ' data-app="' . $app->tab . '"';
 
-        if(!commonModel::hasPriv($module, $method, $object) and !in_array("$currentModule.$currentMethod", $config->openMethods)) return false;
+        if(!commonModel::hasPriv($module, $method, $object,$vars) and !in_array("$currentModule.$currentMethod", $config->openMethods)) return false;
         echo html::a(helper::createLink($module, $method, $vars, '', $onlyBody), $label, $target, $misc, $newline);
         return true;
     }
@@ -1688,7 +1688,7 @@ EOD;
      */
     public static function buildIconButton($module, $method, $vars = '', $object = '', $type = 'button',
                                            $icon = '', $target = '', $extraClass = '', $onlyBody = false,
-                                           $misc = '', $title = '', $programID = 0, $extraEnabled = '')
+                                           $misc = '', $title = '', $programID = 0, $extraEnabled = '', $inQa = false)
     {
         if(isonlybody() and strpos($extraClass, 'showinonlybody') === false) return false;
 
@@ -1723,6 +1723,7 @@ EOD;
         if(strtolower($module) == 'bug'      and strtolower($method) == 'tostory')    ($module = 'story') and ($method = 'create');
         if(strtolower($module) == 'bug'      and strtolower($method) == 'createcase') ($module = 'testcase') and ($method = 'create');
         if($config->systemMode == 'classic' and strtolower($module) == 'project') $module = 'execution';
+        
         if(!commonModel::hasPriv($module, $method, $object, $vars)) return false;
 
         $link = helper::createLink($module, $method, $vars, '', $onlyBody, $programID);
@@ -2550,12 +2551,22 @@ EOD;
         $module = strtolower($module);
         $method = strtolower($method);
         parse_str($vars, $params);
+        ChromePhp::log($module.' '.$method);
 
         if(empty($params['storyType']) and $module == 'story' and !empty($app->params['storyType']) and strpos(",story,requirement,", ",{$app->params['storyType']},") !== false) $module = $app->params['storyType'];
         if($module == 'story' and !empty($params['storyType']) and strpos(",story,requirement,", ",{$params['storyType']},") !== false) $module = $params['storyType'];
         if($module == 'product' and $method == 'browse' and !empty($app->params['storyType']) and $app->params['storyType'] == 'requirement') $method = 'requirement';
         if($module == 'product' and $method == 'browse' and !empty($params['storyType']) and $params['storyType'] == 'requirement') $method = 'requirement';
         if($module == 'story' and $method == 'linkrequirements') $module = 'requirement';
+        if($module == 'qastory' and $method == 'batchcreate') $method = 'story';
+        if($module == 'story' and $method == 'edit' and $app->tab = 'qa'){
+            $module = 'qastory';
+            $method = 'story';
+        }
+        if($module == 'story' and $method == 'create' and !empty($params['storyType']) and strpos(",taskPoint,", ",{$params['storyType']},") !== false){
+            $module = 'qastory';
+            $method = 'story';
+        }
 
         /* If the user is doing a tutorial, have all tutorial privs. */
         if(defined('TUTORIAL'))

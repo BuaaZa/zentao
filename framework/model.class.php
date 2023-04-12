@@ -140,7 +140,7 @@ class model extends baseModel
 
         $html = '';
         $type = $type == 'browse' ? 'list' : 'button';
-        $html = common::buildIconButton($module, $method, $params, $data, $type, $icon, $target, $class, $onlyBody, $misc, $title, '', $enabled);
+        $html = common::buildIconButton($module, $method, $params, $data, $type, $icon, $target, $class, $onlyBody, $misc, $title, '', $enabled, $inQa);
         return $html;
     }
 
