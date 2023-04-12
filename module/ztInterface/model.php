@@ -194,7 +194,7 @@ class ztinterfaceModel extends model
                 $disabled = '';
                 if($obj["notNull"])
                     $disabled = 'disabled';
-                $table .= "<select class=\"form-control chosen-single object-chosen\" >
+                $table .= "<select class=\"form-control chosen-single object-chosen\" data-old=\"input\">
                             <option $disabled value=\"null\">null</option>
                             <option selected value=\"input\">请设置子键的值</option>
                            </select>";
@@ -399,6 +399,69 @@ class ztinterfaceModel extends model
             $data = NULL;
         }
         return $data;
+    }
+
+    public function genObject($data){
+        $response = array();
+        $response['error'] = array();
+        if(strtolower($data['value']) === 'null'){
+            $response['object'] = 'null';
+            return;
+        }
+        if($data['type'] === 'object'){
+            if($data['value'] === 'input'){
+                $obj = new Stdclass();
+                foreach($data['item'] as $d){
+                    $name = $d['name'];
+                    $res = genObject($d);
+                    if(isset($res['object']) and $res['object'] !== ''){
+                        $obj->$name = $res['object'];
+                    }
+                    if(isset($res['error']) and !empty($res['error'])){
+                        $response['error'] = array_merge($response['error'], $res['error']);
+                    }
+                }
+                $response['object'] = $obj;
+            }
+        }elseif($data['type'] === 'array'){
+            $value = json_decode($data['value']);
+            if($value === null){
+                $error = array(
+                    "id"=>$data['id'],
+                    "from"=>'input',
+                    "message"=>'请提供符合JSON规范的数组形式'
+                );
+                $response['error'][] = $error;
+            }elseif(!is_array($value)){
+                $error = array(
+                    "id"=>$data['id'],
+                    "from"=>'input',
+                    "message"=>'不是一个数组'
+                );
+                $response['error'][] = $error;
+            }else{
+                $response['object'] = $value;
+            }
+        }else{
+            if(!isset($data['value']) or $data['value'] === ''){
+                $response['object'] = '';
+            }else{
+                
+            }
+        }
+    }
+
+    public function checkType($str, $type) {
+        switch($type) {
+            case 'integer':
+                return is_numeric($str) && (int)$str == $str;
+            case 'string':
+                return is_string($str);
+            case 'float':
+                return is_numeric($str) && (float)$str == $str;
+            default:
+                return false;
+        }
     }
 
     public function genMessage($header, $body, $method, $url){

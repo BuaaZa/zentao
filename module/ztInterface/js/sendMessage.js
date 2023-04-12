@@ -16,21 +16,22 @@ $('select.object-chosen').change(function() {
   while(parentRow.nodeName!=="TR"){
     parentRow = parentRow.parentNode;
   }
-  $('tr[id^="leader-_-"]').each(function() {
-    // 选择当前行中class为value-input的input元素并将其disabled属性设置为true
-    const disValue = parseInt($(this).attr('data-dis'));
-    if(selectValue === 'null'){
-      $(this).attr('data-dis', disValue + 1);
-      $(this).find('.value-input').prop('disabled', true);
-    }else if(selectValue === 'input'){
-      if(disValue>0){
-        $(this).attr('data-dis', disValue - 1);
-        if(disValue-1 == 0){
-          $(this).find('.value-input').prop('disabled', false);
-        }
+  if($(this).attr('data-old') !== selectValue){
+    $(this).attr('data-old',selectValue);
+    $('tr[id^="leader-_-"]').each(function() {
+      // 选择当前行中class为value-input的input元素并将其disabled属性设置为true
+      const disValue = parseInt($(this).attr('data-dis'));
+      if(selectValue === 'null'){
+        $(this).attr('data-dis', disValue + 1);
+        $(this).find('.value-input').prop('disabled', true);
+      }else if(selectValue === 'input'){
+          $(this).attr('data-dis', disValue - 1);
+          if(disValue-1 == 0){
+            $(this).find('.value-input').prop('disabled', false);
+          }
       }
-    }
-  });
+    });
+  }
 }); 
 
 const funcTable = [
@@ -122,14 +123,12 @@ $('button#genMessage').click(function(){
   var head = getHeadData();
   var obj = {item:list,type:'object',notNull:'true'};
   var postData = {object:obj, head:head,id:interfaceID,baseUrl:baseUrl};
-  var link = '';
+  var link = createLink('ztinterface', 'genMessage', 'type=' + button.attr('data-type'));
   
   if(button.attr('data-type') == 'update'){
     button.html('<i class=" icon-refresh" title="生成报文" data-app="ztinterface"></i><span>生成报文</span>');
     button.attr('data-type', 'gen');
     var link = createLink('ztinterface', 'genMessage', 'type=update');
-  }else{
-    var link = createLink('ztinterface', 'genMessage', 'type=mock');
   }
 
   $.post(link, postData, function(res) {
@@ -182,6 +181,9 @@ $('button#genMessage').click(function(){
 });
 
 $('.all-refresh').click(function(){
+  var button = $("button#genMessage")
+  button.html('同步报文');
+  button.attr('data-type', 'update');
   fillInTable(true);
 });
 
@@ -387,7 +389,7 @@ function parseRow(parentRow){
   }
 
   funcName = funcName.toLowerCase().charAt(0).toUpperCase() + funcName.toLowerCase().substring(1);
-  var data = {id:id,name:name,type:type,notNull:notNull,mock:mockInput,funcName:funcName,params:jsonData,value:valueInput,nowVal:valueInput.val()};
+  var data = {id:id,name:name,type:type,notNull:notNull,mock:mockInput,funcName:funcName,params:jsonData,value:valueInput,nowVal:valueInput.prop('value')};
   
   return data;
 }
@@ -446,24 +448,12 @@ function fillInValueAndError(obj){
     return;
   }
   if(obj.value === undefined || obj.value === null){
-    if (input.prop('disabled')) {
-      input.prop('disabled', false);
-      input.val('');
-      input.prop('disabled', true);
-    } else {
-      input.val('');
-    }
+    input.prop('value', '');
   }else{
     if(type == 'array'){
       obj.value = JSON.stringify(JSON.parse(obj.value));
     }
-    if (input.prop('disabled')) {
-      input.prop('disabled', false);
-      input.val(obj.value);
-      input.prop('disabled', true);
-    } else {
-      input.val(obj.value);
-    }
+    input.prop('value',obj.value);
   }
   if(obj.error){
     showError(span, obj.error);
