@@ -72,6 +72,7 @@ $lang->moduleOrder[225] = 'mr';
 $lang->moduleOrder[230] = 'app';
 $lang->moduleOrder[235] = 'gogs';
 $lang->moduleOrder[240] = 'gitea';
+$lang->moduleOrder[245] = 'datasample';
 
 $lang->resource = new stdclass();
 
@@ -1055,6 +1056,8 @@ $lang->resource->testcase->confirmLibcaseChange    = 'confirmLibcaseChange';
 $lang->resource->testcase->ignoreLibcaseChange     = 'ignoreLibcaseChange';
 $lang->resource->testcase->batchConfirmStoryChange = 'batchConfirmStoryChange';
 $lang->resource->testcase->importToLib             = 'importToLib';
+$lang->resource->testcase->datasample              = 'datasample';
+$lang->resource->testcase->exportToWord            = 'exportToWord';
 
 $lang->testcase->methodOrder[0]   = 'index';
 $lang->testcase->methodOrder[5]   = 'browse';
@@ -1085,6 +1088,13 @@ $lang->testcase->methodOrder[125] = 'confirmLibcaseChange';
 $lang->testcase->methodOrder[130] = 'ignoreLibcaseChange';
 $lang->testcase->methodOrder[135] = 'batchConfirmStoryChange';
 $lang->testcase->methodOrder[140] = 'importToLib';
+$lang->testcase->methodOrder[145] = 'datasample';
+$lang->testcase->methodOrder[150] = 'exportToWord';
+
+/* Datasample. */
+$lang->resource->datasample = new stdclass();
+$lang->resource->datasample->view = 'view';
+$lang->datasample->methodOrder[0] = 'view';
 
 /* Test task. */
 $lang->resource->testtask = new stdclass();

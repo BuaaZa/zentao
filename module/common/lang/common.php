@@ -25,6 +25,7 @@ $lang->qa          = new stdclass();
 $lang->doc         = new stdclass();
 $lang->system      = new stdclass();
 $lang->testcase    = new stdclass();
+$lang->datasample  = new stdclass();
 $lang->testtask    = new stdclass();
 $lang->testreport  = new stdclass();
 $lang->score       = new stdclass();

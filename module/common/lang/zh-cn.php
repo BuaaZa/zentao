@@ -178,6 +178,7 @@ $lang->story->common      = $lang->SRCommon;
 $lang->task->common       = '任务';
 $lang->bug->common        = '缺陷';
 $lang->testcase->common   = '用例';
+$lang->datasample->common = '数据样本';
 $lang->testtask->common   = '测试单';
 $lang->score->common      = '我的积分';
 $lang->build->common      = '版本';
