@@ -74,6 +74,38 @@ function createBug(obj)
     config.onlybody = onlybody;
 }
 
+function viewBug(obj, bugID)
+{
+
+    var onlybody    = config.onlybody;
+    config.onlybody = 'no';
+    var link = createLink('bug', 'view', 'bugID=' + bugID);
+    if(onlybody = 'yes') link += '#app=qa';
+    if(tab == 'my')
+    {
+        window.parent.$.apps.open(link, 'qa');
+    }
+    else
+    {
+        window.open(link, '_blank');
+    }
+    config.onlybody = onlybody;
+}
+
+function linkBug(obj,rid)
+{
+    var tr = obj;
+    while(tr.nodeName!=='TR'){
+        tr = tr.parentNode;
+    }
+    var select = $(tr).find("select#bugSelect");
+    var link = createLink("testtask","runLinkToBug","resultID="+rid+"&bugID="+select.val());
+    $.get(link,function(res){
+        window.location.reload();
+    });
+}
+
+
 /**
  * Load execution related
  *

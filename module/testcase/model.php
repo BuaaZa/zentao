@@ -2767,4 +2767,22 @@ class testcaseModel extends model
         }
         return $stepData;
     }
+
+    public function getBugList($caseID)
+    {
+        $bugList =  $this->dao->select('t1.id, t1.title')->from(TABLE_BUG)->alias('t1')
+            ->where('t1.deleted')->eq('0')
+            ->andWhere('t1.case')->eq((int)$caseID)
+            ->fetchPairs();
+        return $bugList;
+    }
+
+    public function runLinkToBug($resultID, $bugID)
+    {
+        $this->dao->update(TABLE_TESTRESULT)
+        ->set('`bug`')->eq($bugID)
+        ->where('`id`')->eq($resultID)
+        ->exec();
+        
+    }
 }

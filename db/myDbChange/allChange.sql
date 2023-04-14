@@ -19,4 +19,5 @@ source casestepChange.sql;
 source zt_testtask_parent.sql;
 source testresultChange.sql;
 source caseChange.sql;
-source datasampleChange.sql
+source datasampleChange.sql;
+source zt_testresult_bug.sql;
