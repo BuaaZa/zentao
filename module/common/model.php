@@ -496,15 +496,15 @@ class commonModel extends model
 
                 echo '<li>' . html::a(helper::createLink('my', 'profile', '', '', true), "<i class='icon icon-account'></i> " . $lang->profile, '', "class='iframe' data-width='700'") . '</li>';
 
-                if($app->config->vision === 'rnd')
+                /*if($app->config->vision === 'rnd')
                 {
 
                     echo '<li>' . html::a(helper::createLink('my', 'preference', 'showTip=false', '', true), "<i class='icon icon-controls'></i> " . $lang->preference, '', "class='iframe' data-width='700'") . '</li>';
-                }
+                }*/
 
-                if(common::hasPriv('my', 'changePassword')) echo '<li>' . html::a(helper::createLink('my', 'changepassword', '', '', true), "<i class='icon icon-cog-outline'></i> " . $lang->changePassword, '', "class='iframe' data-width='600'") . '</li>';
+                //if(common::hasPriv('my', 'changePassword')) echo '<li>' . html::a(helper::createLink('my', 'changepassword', '', '', true), "<i class='icon icon-cog-outline'></i> " . $lang->changePassword, '', "class='iframe' data-width='600'") . '</li>';
 
-                echo "<li class='divider'></li>";
+                //echo "<li class='divider'></li>";
             }
 
             echo "<li class='dropdown-submenu top'>";
@@ -515,13 +515,13 @@ class commonModel extends model
             }
             echo '</ul></li>';
 
-            echo "<li class='dropdown-submenu top'>";
+            /*echo "<li class='dropdown-submenu top'>";
             echo "<a href='javascript:;'>" . "<i class='icon icon-lang'></i> " . $lang->lang . "</a><ul class='dropdown-menu pull-left'>";
             foreach ($app->config->langs as $key => $value)
             {
                 echo "<li " . ($app->cookie->lang == $key ? "class='selected'" : '') . "><a href='javascript:selectLang(\"$key\");'>" . $value . "</a></li>";
             }
-            echo '</ul></li>';
+            echo '</ul></li>';*/
 
             //if(!$isGuest and !commonModel::isTutorialMode() and $app->viewType != 'mhtml')
             //{
