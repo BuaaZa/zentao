@@ -1875,7 +1875,7 @@ CREATE TABLE IF NOT EXISTS `zt_testresult`
     `date`        datetime              NOT NULL,
     `duration`    float                 NOT NULL,
     `xml`         text                  NOT NULL,
-    `bug`       mediumint(8) unsigned NOT NULL   default -1,	     
+    `bug`         mediumint(8)          NOT NULL   default -1,
     PRIMARY KEY (`id`),
     KEY `case` (`case`),
     KEY `version` (`version`),
