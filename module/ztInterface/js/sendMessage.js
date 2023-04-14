@@ -190,6 +190,23 @@ $('button#genMessage').click(function(){
   });
 });
 
+$('button#sendMessage').click(function(){
+  var headText = $('textarea#messageHeadView').val();
+  var bodyText = $('textarea#messageBodyView').val();
+  var postData = {head:headText, body:bodyText, id:interfaceID};
+  var link = createLink('ztinterface', 'checkAndSend', '');
+  $.post(link, postData, function(res) {
+    var response = {};
+    try {
+      response = JSON.parse(res);
+    } catch (error) {
+      console.log(res);
+      return;
+    }
+    
+  });
+});
+
 $('.all-refresh').click(function(){
   var button = $("button#genMessage")
   button.html('同步报文');
@@ -233,6 +250,13 @@ $('.refresh-button').click(function() {
   var button = $("button#genMessage")
   button.html('同步报文');
   button.attr('data-type', 'update');
+
+  var now = this;
+  while(now.nodeName!=="TD"){
+    now = now.parentNode;
+  }
+  var span = $(now).find('span#error');
+  hideError(span);
 
   var parentRow = this.parentNode;
   while(parentRow.nodeName!=="TR"){

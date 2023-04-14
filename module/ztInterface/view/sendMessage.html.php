@@ -154,7 +154,6 @@
                       <th width="50px"><?php echo $lang->ztinterface->notNull;?></th>
                       <th width="25%"><?php echo $lang->ztinterface->mock;?></th>
                       <th><?php echo $lang->ztinterface->value;?></th>
-                      <?php ChromePhp::log($data);?>
                   </tr>
                 </thead>
                 <tbody id='bodys' class='table table-form' data-group-name='<?php echo $lang->testcase->groupName ?>'>

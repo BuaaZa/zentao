@@ -185,8 +185,11 @@ class ztinterfaceModel extends model
             }
             
             //value
+            $must = "";
+            if($obj['must'])
+                $must = "class='required'";
             $placeholder = "placeholder=".($obj['example'] ? "示例:" . $obj['example'] : "键名:".$obj['name']);
-            $table .= "<td id='value'>";
+            $table .= "<td id='value' $must>";
             if($inArray){
                 $placeholder = $inArray ? "placeholder='请直接在父级Array中编辑数组'" : "placeholder='请直接编辑子字段的值'";
                 $table .= html::input($newPath.':value', '', 'class="form-control value-input" disabled '.$placeholder);
@@ -206,7 +209,7 @@ class ztinterfaceModel extends model
                 $table .= '<div class="colorpicker">
                             <button type="button" class="btn btn-link dropdown-toggle refresh-button"><i class="ic"></i></button>
                             <input type="hidden"  data-icon="refresh" data-wrapper="input-control-icon-right"  data-provide="colorpicker">
-                        </div>';
+                           </div>';       
                 $table .= "</div>";
                 $table .= "<span id=\"error\" style=\"font-size:4px;color:red;display:none;\">类型不符</span>";
             }
@@ -408,7 +411,7 @@ class ztinterfaceModel extends model
         $response['error'] = array();
         if(strtolower($data['value']) === 'null'){
             $response['object'] = 'null';
-            return;
+            return $response;
         }
         if($data['type'] === 'object'){
             if($data['value'] === 'input'){
@@ -426,23 +429,27 @@ class ztinterfaceModel extends model
                 $response['object'] = $obj;
             }
         }elseif($data['type'] === 'array'){
-            $value = json_decode($data['value']);
-            if($value === null){
-                $error = array(
-                    "id"=>$data['id'],
-                    "from"=>'input',
-                    "message"=>'请提供符合JSON规范的数组形式'
-                );
-                $response['error'][] = $error;
-            }elseif(!is_array($value)){
-                $error = array(
-                    "id"=>$data['id'],
-                    "from"=>'input',
-                    "message"=>'不是一个数组'
-                );
-                $response['error'][] = $error;
+            if(!isset($data['value']) || $data['value'] === ''){
+                $response['object'] = '';
             }else{
-                $response['object'] = $value;
+                $value = json_decode($data['value']);
+                if($value === null){
+                    $error = array(
+                        "id"=>$data['id'],
+                        "from"=>'input',
+                        "message"=>'请提供符合JSON规范的数组形式'
+                    );
+                    $response['error'][] = $error;
+                }elseif(!is_array($value)){
+                    $error = array(
+                        "id"=>$data['id'],
+                        "from"=>'input',
+                        "message"=>'不是一个数组'
+                    );
+                    $response['error'][] = $error;
+                }else{
+                    $response['object'] = $value;
+                }
             }
         }else{
             if(!isset($data['value']) or $data['value'] === ''){

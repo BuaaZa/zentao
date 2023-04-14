@@ -901,7 +901,6 @@ class ztinterface extends control
         if($type === 'update'){
             $res = $this->ztinterface->genObject($_POST['object']);
             $obj = $res['object'];
-            ChromePhp::log($obj);
             $response['error'] = array_merge($response['error'],$res['error']);
         }else{
             $response['value'] = $this->mockObject($_POST['object'], true)['value'];
@@ -911,6 +910,19 @@ class ztinterface extends control
         $response['value']['message'] = $this->ztinterface->genMessage($_POST['head'], $obj, $interface->method, $url);
         echo json_encode($response);
         return;
+    }
+
+    public function checkAndSend(){
+        $response = array();
+        $response['error'] = array();
+        $body = json_decode($_POST['body']);
+        ChromePhp::log($body);
+        $interface = $this->ztinterface->getByID((int)$_POST['id']);
+        if(!$interface){
+            $response['error'][] = array('message'=>'接口不存在','from'=>'alter');
+            echo json_encode($response);
+            return;
+        }
     }
 
     
