@@ -2779,12 +2779,10 @@ class testcaseModel extends model
 
     public function runLinkToBug($resultID, $bugID)
     {
-        ChromePhp::log($bugID);
-        ChromePhp::log($resultID);
         $this->dao->update(TABLE_TESTRESULT)
         ->set('`bug`')->eq($bugID)
         ->where('`id`')->eq($resultID)
-        -exec();
+        ->exec();
         
     }
 }
