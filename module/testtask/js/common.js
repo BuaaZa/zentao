@@ -74,6 +74,19 @@ function createBug(obj)
     config.onlybody = onlybody;
 }
 
+function linkBug(obj,rid)
+{
+    var tr = obj;
+    while(tr.nodeName!=='TR'){
+        tr = tr.parentNode;
+    }
+    var select = $(tr).find("select#bugSelect");
+    var link = createLink("testtask","runLinkToBug","resultID="+rid+"&bugID="+select.val());
+    $.get(link,function(res){
+        
+    });
+}
+
 /**
  * Load execution related
  *

@@ -1553,6 +1553,7 @@ class testtask extends control
         $this->view->case    = $case;
         $this->view->runID   = $runID;
         $this->view->results = $results;
+        $this->view->bugList = $this->loadModel('testcase')->getBugList($case->id);
         $this->view->builds  = $this->loadModel('build')->getBuildPairs($case->product, $branch = 0, $params = '');
         $this->view->users   = $this->loadModel('user')->getPairs('noclosed, noletter');
 
@@ -1769,5 +1770,10 @@ class testtask extends control
         }else{
             return print("true");
         }
+    }
+
+    public function runLinkToBug($resultID, $bugID)
+    {
+        $this->loadModel('testcase')->runLinkToBug($resultID, $bugID);
     }
 }

@@ -119,8 +119,13 @@
                   <?php endforeach;?>
                   <?php if($result->caseResult == 'fail' and common::hasPriv('testcase', 'createBug')):?>
                   <tr>
-                    <td></td><td></td><td></td><td></td><td></td><td></td>
-                    <td><?php echo html::commonButton($lang->testcase->createBug, "onclick='createBug(this)'", "btn btn-primary createBtn");?></td>
+                    <td colspan='5'>
+                      <?php echo html::select('bugSelect', $bugList, 0, 'class="form-control" style="display:inline"');?>
+                    </td>
+                    <td colspan='4'>
+                      <?php echo html::commonButton($lang->testtask->linkBug, "style=\"display:inline\" onclick='linkBug(this,$result->id)'", "btn btn-primary linkBtn");?>
+                      <?php echo html::commonButton($lang->testtask->createBug, "style=\"display:inline\" onclick='createBug(this)'", "btn btn-primary createBtn");?>
+                    </td>
                   </tr>
                   <?php endif;?>
                 </tbody>

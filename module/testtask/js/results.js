@@ -23,5 +23,5 @@ $(function()
     $('#casesResults table caption .result-tip').html($('#resultTip').html());
 
     $('tr:first').click();
-});
 
+});

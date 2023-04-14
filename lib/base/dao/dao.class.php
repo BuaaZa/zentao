@@ -612,7 +612,7 @@ class baseDAO
 
         if ($record) self::$querys[] = $this->processKeywords($sql);
 //        对MySQL执行情况进行debug，解注释这条语句即可
-//        ChromePhp::log("[MySQL]: " . $sql);
+        ChromePhp::log("[MySQL]: " . $sql);
         //error_log("[MySQL]: " . $sql);
         return $sql;
     }
