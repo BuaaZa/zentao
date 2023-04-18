@@ -8,7 +8,10 @@ RUN set -x ; \
     sed -i "s@deb.debian.org@mirrors.aliyun.com@g" /etc/apt/sources.list ; \
     apt update && apt install -yqq libzip-dev libxml2-dev ; \
     apt autoclean && apt autoremove ; \
-    docker-php-ext-install pdo pdo_mysql zip xml
+    docker-php-ext-install pdo pdo_mysql zip xml ; \
+    php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');" \
+    && php composer-setup.php --install-dir=/usr/local/bin --filename=composer \
+    && php -r "unlink('composer-setup.php');"
 
 ADD --chown=${USER}:${GROUP} . ${APACHE_DOCUMENT_ROOT}/zentaopms
 
