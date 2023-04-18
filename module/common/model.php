@@ -3358,11 +3358,12 @@ EOD;
         global $app, $lang;
 
         $tab = $app->tab;
-
+        
         $isTutorialMode = common::isTutorialMode();
         $currentModule  = $isTutorialMode ? $app->moduleName : $app->rawModule;
         $currentMethod  = $isTutorialMode ? $app->methodName : $app->rawMethod;
         $currentMethod  = strtolower($currentMethod);
+
 
         /* If homeMenu is not exists or unset, display menu. */
         if(!isset($lang->$tab->homeMenu))
@@ -3407,6 +3408,7 @@ EOD;
         /* Default, display menu. */
         $lang->menu      = isset($lang->$tab->menu) ? $lang->$tab->menu : array();
         $lang->menuOrder = isset($lang->$tab->menuOrder) ? $lang->$tab->menuOrder : array();
+
     }
 
     /**

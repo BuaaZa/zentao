@@ -37,7 +37,9 @@ $(function()
         }
     };
     $('#main .main-table').on('tableReload', addSettingButton);
-    addSettingButton();
+    <?php if($currentModule !== 'ztinterface'):?>
+      addSettingButton();
+    <?php endif;?>
 
     $('#setShowModule').click(function()
     {

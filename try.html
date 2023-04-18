@@ -1,0 +1,59 @@
+好的，你可以按照如下方式修改HTML代码来实现：
+
+html
+Copy code
+<!DOCTYPE html>
+<html>
+<head>
+	<title>生成JSON</title>
+	<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+	<script type="text/javascript">
+		$(document).ready(function() {
+			$("#generate-json-btn").click(function() {
+				// 获取表格数据
+				var tableData = [];
+				$("#key-value-table tbody tr").each(function() {
+					var key = $(this).find(".key-input").val();
+					var value = $(this).find(".value-input").val();
+					tableData.push({
+						key: key,
+						value: value
+					});
+				});
+
+				// 生成JSON字符串
+				var jsonString = JSON.stringify(tableData);
+
+				// 显示JSON字符串
+				$("#json-string").val(jsonString);
+			});
+		});
+	</script>
+</head>
+<body>
+	<h1>生成JSON</h1>
+	<table id="key-value-table">
+		<thead>
+			<tr>
+				<th>键</th>
+				<th>值</th>
+			</tr>
+		</thead>
+		<tbody>
+			<tr>
+				<td><input type="text" class="key-input"></td>
+				<td><input type="text" class="value-input"></td>
+			</tr>
+			<tr>
+				<td><input type="text" class="key-input"></td>
+				<td><input type="text" class="value-input"></td>
+			</tr>
+			<!-- 添加更多的键值对行 -->
+		</tbody>
+	</table>
+	<br>
+	<input type="button" id="generate-json-btn" value="生成JSON">
+	<br>
+	<textarea id="json-string" rows="10" cols="50"></textarea>
+</body>
+</html>

@@ -1,0 +1,91 @@
+{
+    "content": [
+        {
+            "name": "Connection",
+            "type": "String",
+            "example": "keep-alive",
+            "description": "连接方式"
+        },
+        {
+            "name": "User-Agent",
+            "type": "String",
+            "example": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)",
+            "description": "用户代理信息"
+        }
+    ]
+}
+
+{
+    "type": "object",
+    "content": [
+        {
+            "mock": "$keyword",
+            "must": true,
+            "name": "name",
+            "type": "String",
+            "content": [],
+            "example": "xiaoli",
+            "notNull": true,
+            "description": "用户名"
+        },
+        {
+            "mock": "$integer(0,8)",
+            "must": false,
+            "name": "day",
+            "type": "integer",
+            "content": [],
+            "example": 7,
+            "notNull": true,
+            "description": "剩余天数"
+        },
+        {
+            "mock": "$array(1,5)",
+            "must": true,
+            "name": "studentlist",
+            "type": "array",
+            "content": [
+                {
+                    "mock": "$firstName(zh_CN)",
+                    "must": false,
+                    "name": "items",
+                    "type": "string",
+                    "notNull": true
+                }
+            ],
+            "example": "[\"xiaoli\",\"xiaowang\"]",
+            "notNull": false,
+            "description": "学员名单"
+        },
+        {
+            "mock": null,
+            "must": true,
+            "name": "leader",
+            "type": "object",
+            "content": [
+                {
+                    "mock": "$firstName(en_US)",
+                    "must": true,
+                    "name": "name",
+                    "type": "String",
+                    "content": [],
+                    "example": "xiaoli",
+                    "notNull": false,
+                    "description": "用户名"
+                },
+                {
+                    "mock": "$integer(0,7)",
+                    "must": false,
+                    "name": "day",
+                    "type": "integer",
+                    "content": [],
+                    "example": 7,
+                    "notNull": true,
+                    "description": "剩余天数"
+                }
+            ],
+            "example": "",
+            "notNull": false,
+            "description": "领导"
+        }
+    ]
+}

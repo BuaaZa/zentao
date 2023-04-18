@@ -58,6 +58,13 @@ class productModel extends model
         return $pageNav;
     }
 
+    public function getAllProduct()
+    {
+        return $this->dao->select('id')->from(TABLE_PRODUCT)
+            //->where('deleted')->eq(0)
+            ->fetchAll();
+    }
+
     /**
      * Create the select code of products.
      *
@@ -606,7 +613,6 @@ class productModel extends model
     {
         $currentModule = $this->app->moduleName;
         $currentMethod = $this->app->methodName;
-
         /* Init currentModule and currentMethod for report and story. */
         if($currentModule == 'story')
         {
@@ -617,6 +623,7 @@ class productModel extends model
         if($currentModule == 'testcase' and strpos(',view,edit,', ",$currentMethod,") !== false) $currentMethod = 'browse';
         if($currentModule == 'bug' and $currentMethod == 'edit') $currentMethod = 'browse';
         if($currentMethod == 'report') $currentMethod = 'browse';
+        if($currentModule == 'ztinterface' and strpos(',view,edit,create,', ",$currentMethod,") !== false) $currentMethod = 'browse';
 
         $currentProductName = $this->lang->product->common;
         if($productID)
@@ -626,8 +633,8 @@ class productModel extends model
             $this->session->set('currentProductType', $currentProduct->type);
         }
 
-        $fromModule   = $this->lang->navGroup->qa == 'qa' ? 'qa' : '';
-        $dropMenuLink = helper::createLink($this->app->tab == 'qa' ? 'product' : $this->app->tab, 'ajaxGetDropMenu', "objectID=$productID&module=$currentModule&method=$currentMethod&extra=$extra&from=$fromModule");
+        $fromModule   = $this->app->tab == 'qa' ? 'qa' : '';
+        $dropMenuLink = helper::createLink(($this->app->tab == 'qa' or $this->app->tab == 'ztinterface') ? 'product' : $this->app->tab, 'ajaxGetDropMenu', "objectID=$productID&module=$currentModule&method=$currentMethod&extra=$extra&from=$fromModule");
 
         if($this->app->viewType == 'mhtml' and $productID) return $this->getModuleNav(array($productID => $currentProductName), $productID, $extra, $branch);
 
@@ -2327,6 +2334,9 @@ class productModel extends model
         elseif($module == 'qastory')
         {
             return helper::createLink('qastory', 'story', "productID=%s");
+        }
+        elseif($module == 'ztinterface'){
+            $link = helper::createLink($module, $method, "productID=%s");
         }
 
         return $link;
