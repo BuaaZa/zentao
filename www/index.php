@@ -29,6 +29,7 @@ include '../framework/helper.class.php';
 
 require '../module/common/ChromePhp.php';
 
+
 /* Log the time and define the run mode. */
 $startTime = getTime();
 

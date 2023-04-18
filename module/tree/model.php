@@ -90,7 +90,8 @@ class treeModel extends model
             return $this->dao->select('*')->from(TABLE_MODULE)
                 ->where('root')->eq((int)$rootID)
                 ->beginIF($type == 'task')->andWhere('type')->eq('task')->fi()
-                ->beginIF($type != 'task')->andWhere('type')->in("story,$type")->fi()
+                ->beginIF($type == 'ztinterface')->andWhere('type')->eq('ztinterface')->fi()
+                ->beginIF(strpos('task,ztinterface',$type)===false)->andWhere('type')->in("story,$type")->fi()
                 ->beginIF($startModulePath)->andWhere('path')->like($startModulePath)->fi()
                 ->beginIF($branch !== 'all' and $branch !== '' and $branch !== false)
                 ->andWhere("(branch")->eq(0)
@@ -950,46 +951,48 @@ class treeModel extends model
     public function buildTree(& $treeMenu, $module, $type, $userFunc, $extra, $branch = 'all')
     {
         /* Add for task #1945. check the module has case or no. */
-        if((isset($extra['rootID']) and isset($extra['branch']) and $branch === 'null') or ($type == 'case' and is_numeric($extra)))
-        {
-            static $objects = array();
-            if(empty($objects))
+        if($type != 'ztinterface'){
+            if((isset($extra['rootID']) and isset($extra['branch']) and $branch === 'null') or ($type == 'case' and is_numeric($extra)))
             {
-                if(is_array($extra))
+                static $objects = array();
+                if(empty($objects))
                 {
-                    $table   = $this->config->objectTables[$type];
-                    $objects = $this->dao->select('module')->from($table)->where('product')->eq((int)$extra['rootID'])->andWhere('branch')->eq($extra['branch'])->fetchAll('module');
+                    if(is_array($extra))
+                    {
+                        $table   = $this->config->objectTables[$type];
+                        $objects = $this->dao->select('module')->from($table)->where('product')->eq((int)$extra['rootID'])->andWhere('branch')->eq($extra['branch'])->fetchAll('module');
+                    }
+                    else
+                    {
+                        $objects = $this->dao->select('t1.*,t2.module')->from(TABLE_TESTRUN)->alias('t1')
+                            ->leftJoin(TABLE_CASE)->alias('t2')->on('t1.case = t2.id')
+                            ->where('t1.task')->eq((int)$extra)
+                            ->fetchAll('module');
+                    }
                 }
-                else
+                static $modules = array();
+                if(empty($modules))
                 {
-                    $objects = $this->dao->select('t1.*,t2.module')->from(TABLE_TESTRUN)->alias('t1')
-                        ->leftJoin(TABLE_CASE)->alias('t2')->on('t1.case = t2.id')
-                        ->where('t1.task')->eq((int)$extra)
-                        ->fetchAll('module');
+                    $typeCondition = "type='story'";
+                    if($type != 'story') $typeCondition .= " or type='{$type}'";
+                    $modules = $this->dao->select('id,path')->from(TABLE_MODULE)->where('root')->eq($module->root)->andWhere("({$typeCondition})")->fetchPairs('id', 'path');
                 }
-            }
-            static $modules = array();
-            if(empty($modules))
-            {
-                $typeCondition = "type='story'";
-                if($type != 'story') $typeCondition .= " or type='{$type}'";
-                $modules = $this->dao->select('id,path')->from(TABLE_MODULE)->where('root')->eq($module->root)->andWhere("({$typeCondition})")->fetchPairs('id', 'path');
-            }
-            $childModules = array();
-            foreach($modules as $moduleID => $modulePath)
-            {
-                if(strpos($modulePath, $module->path) === 0) $childModules[$moduleID] = $moduleID;
-            }
-            $hasObjects = false;
-            foreach($childModules as $moduleID)
-            {
-                if(isset($objects[$moduleID]))
+                $childModules = array();
+                foreach($modules as $moduleID => $modulePath)
                 {
-                    $hasObjects = true;
-                    break;
+                    if(strpos($modulePath, $module->path) === 0) $childModules[$moduleID] = $moduleID;
                 }
+                $hasObjects = false;
+                foreach($childModules as $moduleID)
+                {
+                    if(isset($objects[$moduleID]))
+                    {
+                        $hasObjects = true;
+                        break;
+                    }
+                }
+                if(!$hasObjects) return;
             }
-            if(!$hasObjects) return;
         }
 
         if(is_array($extra)) $extra['branchID'] = $branch;
@@ -1313,6 +1316,13 @@ class treeModel extends model
         $methodName = strpos(',project,execution,', ",{$this->app->tab},") !== false ? 'testcase' : 'browse';
         $param      = $this->app->tab == 'project' ? "projectID={$this->session->project}&" : "";
         $param      = $this->app->tab == 'execution' ? "executionID={$extra['executionID']}&" : $param;
+        return html::a(helper::createLink($moduleName, $methodName, $param . "root={$module->root}&branch={$extra['branchID']}&type=byModule&param={$module->id}"), $module->name, '_self', "id='module{$module->id}' data-app='{$this->app->tab}' title='{$module->name}'");
+    }
+
+    public function createInterfaceLink($type, $module, $extra = array())
+    {
+        $moduleName = 'ztinterface';
+        $methodName = 'browse';
         return html::a(helper::createLink($moduleName, $methodName, $param . "root={$module->root}&branch={$extra['branchID']}&type=byModule&param={$module->id}"), $module->name, '_self', "id='module{$module->id}' data-app='{$this->app->tab}' title='{$module->name}'");
     }
 

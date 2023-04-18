@@ -52,9 +52,13 @@ class tree extends control
             if(!$rootID) $rootID = key($products);
             $this->loadModel('feedback')->setMenu($rootID, $viewType, $viewType);
         }
+        else if($this->app->tab == 'ztinterface')
+        {
+            $this->loadModel('ztinterface')->setMenu($rootID);
+        }
 
         /* According to the type, set the module root and modules. */
-        if(strpos('story|bug|case', $viewType) !== false)
+        if(strpos('story|bug|case|ztinterface', $viewType) !== false)
         {
             $product = $this->loadModel('product')->getById($rootID);
             if(empty($product))
@@ -157,6 +161,15 @@ class tree extends control
             $title      = $this->lang->tree->manageCase;
             $position[] = html::a($this->createLink('testcase', 'browse', "product=$rootID"), $product->name);
             $position[] = $this->lang->tree->manageCase;
+        }
+        elseif($viewType == 'ztinterface')
+        {
+            $this->app->loadConfig('ztinterface');
+            $this->app->rawModule = 'ztinterface';
+
+            $title      = $this->lang->tree->manageZtinterface;
+            $position[] = html::a($this->createLink('ztinterface', 'browse', "product=$rootID"), $product->name);
+            $position[] = $this->lang->tree->manageZtinterface;
         }
         elseif($viewType == 'caselib')
         {

@@ -1,0 +1,6 @@
+{
+    "require": {
+        "hoa/regex": "~1.0",
+        "fzaninotto/faker": "^1.5"
+    }
+}
