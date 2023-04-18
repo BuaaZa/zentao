@@ -494,6 +494,88 @@ class ztinterfaceModel extends model
     }
 
     public function genMessage($header, $body, $method, $url){
+        
+        $header['Content-Type'] =  'application/json';
+        $body = json_encode($body);
+        $method = strtoupper($method);
+
+        $headersString = '';
+        foreach ($header as $key => $value) {
+            $headersString .= "$key: $value\r\n";
+        }
+        
+        $urlParts = parse_url($url);
+        $path = $urlParts['path'];
+        if (isset($urlParts['query'])) {
+            $path .= '?' . $urlParts['query'];
+        }
+
+        $request = "$method $path HTTP/1.1\r\n";
+        $request .= "Host: {$urlParts['host']}\r\n";
+        $request .= $headersString;
+
+        return array('header'=>$request, 'body'=>$body);
+    }
+
+    public function checkObject($obj, $data, $id){
+        $response = array();
+        $response['error'] = array();
+        switch(strtolower($data['type'])){
+            case 'object':
+                foreach($data['content'] as $item){
+                    $key = $item['name'];
+                    $newID = $key;
+                    if($id !== ''){
+                        $newID = $id.' / '.$key;
+                    }
+                    if(!property_exists($obj,$key)){
+                        if($item['must']){
+                            $error = array( "id"=>$newID,
+                                            "message"=>"该字段为必填字段",
+                                            "from"=>"checkObject"); 
+                            $response['error'][]=$error;
+                        }
+                    }else if($obj->$key === NULL){
+                        if($item['notNull']){
+                            $error = array( "id"=>$newID,
+                                            "message"=>"该字段不能为Null",
+                                            "from"=>"checkObject"); 
+                            $response['error'][]=$error;
+                        }
+                    }else{
+                        $res = $this->checkObject($obj->$key, $item, $newID);
+                        $response['error'] = array_merge($response['error'], $res['error']);
+                    }
+                }
+                break;
+            case 'array':
+                if(!is_array($obj)){
+                    $error = array( "id"=>$id,
+                                    "message"=>"该字段应该为array类型",
+                                    "from"=>"checkObject"); 
+                    $response['error'][]=$error;
+                }else{
+                    foreach($obj as $key => $item){
+                        $res = $this->checkObject($item, $data['content'][0], $id.'['.$key.']');
+                        $response['error'] = array_merge($response['error'], $res['error']);
+                    }
+                }
+                break;
+            default:
+                if(!$this->checkType($obj, strtolower($data['type']))){
+                    $error = array( "id"=>$id,
+                                    "message"=>"该字段应该为".strtolower($data['type'])."类型",
+                                    "from"=>"checkObject"); 
+                    $response['error'][]=$error;
+                }
+        }
+        return $response;
+    }
+
+    public function sendMessage($header, $body, $method, $url){
+        $response = array();
+        $response['error'] = array();
+
         $header['Content-Type'] =  'application/json';
         $body = json_encode($body);
 
@@ -521,13 +603,20 @@ class ztinterfaceModel extends model
         curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
         //curl_setopt($ch, CURLOPT_COOKIE, $cookie);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-        curl_setopt($ch, CURLINFO_HEADER_OUT, true);
-
-        curl_exec($ch);
         
-        $head = curl_getinfo($ch, CURLINFO_HEADER_OUT);
+        $res = curl_exec($ch);
+
+        if ($res === false) {
+            $error = array( "message"=>curl_error($ch),
+                            "from"=>"curl"); 
+            $response['error'][]=$error;
+        }else{
+            $response['response'] = $res;
+            $response['code'] = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        }
+        
         curl_close($ch);
-        return array('header'=>$head, 'body'=>$body);
+        return $response;
     }
 
 

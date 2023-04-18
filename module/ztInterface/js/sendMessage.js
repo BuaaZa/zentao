@@ -34,44 +34,6 @@ $('select.object-chosen').change(function() {
   }
 }); 
 
-const funcTable = [
-  'streetname',
-  'streetaddress',
-  'address',
-  'country',
-  'state',
-  'city',
-
-  'sentence',
-  'paragraph',
-  'word',
-  
-  'hexcolor',
-  'rgbcolor',
-  'rgbcsscolor',
-  'colorname',
-  
-  'monthname',
-  'month',
-  'year',
-  'timezone',
-  
-  'email',
-  'url',
-  'ipv4',
-  'ipv6',
-  'macaddress',
-  
-  'useragent',
-  'username',
-  'password',
-  
-  'firstname',
-  'lastname',
-  'company',
-  'name'
-];
-
 var alertBox = document.createElement('div');
 alertBox.style.position = 'fixed';
 alertBox.style.top = '50%';
@@ -191,9 +153,10 @@ $('button#genMessage').click(function(){
 });
 
 $('button#sendMessage').click(function(){
-  var headText = $('textarea#messageHeadView').val();
+  var head = getHeadData();
   var bodyText = $('textarea#messageBodyView').val();
-  var postData = {head:headText, body:bodyText, id:interfaceID};
+  var baseUrl = $('input#baseURL').val();
+  var postData = {head:head, body:bodyText, id:interfaceID, baseUrl:baseUrl};
   var link = createLink('ztinterface', 'checkAndSend', '');
   $.post(link, postData, function(res) {
     var response = {};
@@ -203,7 +166,78 @@ $('button#sendMessage').click(function(){
       console.log(res);
       return;
     }
-    
+    var div = $("div#response");
+    var codeSpan = div.find("span#code");
+    var statusSpan = div.find("span#status");
+    var responseView = div.find("textarea#responseView");
+    var errorDiv = $("div#messageWrong");
+    if (response['response']) {
+      try {
+        jsonObj = JSON.parse(response['response']);
+        responseView.val(JSON.stringify(jsonObj,null,2));
+      } catch (error) {
+        responseView.val(response['response']);
+      }
+    } else {
+      responseView.val('');
+    }
+    if (response['code']) {
+      codeSpan.show().text(response['code']);
+      if (httpStatusMap[response['code']]) {
+        statusSpan.show().text(httpStatusMap[response['code']]);
+      } else {
+        statusSpan.hide();
+      }
+      var codePrefix = String(response['code']).charAt(0);
+      switch (codePrefix) {
+        case '2':
+          codeSpan.css('color', 'green');
+          statusSpan.css('color', 'green');
+          break;
+        case '4':
+          codeSpan.css('color', '#FFC107');
+          statusSpan.css('color', '#FFC107');
+          break;
+        case '5':
+          codeSpan.css('color', 'red');
+          statusSpan.css('color', 'red');
+          break;
+        default:
+          codeSpan.css("color", "#999999");
+          statusSpan.css("color", "#999999");
+          break;
+      }
+    } else {
+      codeSpan.hide(); 
+      statusSpan.hide();
+    }
+    var errorMessage = '';
+    if(response['error']){
+      response['error'].forEach(function(error) {
+        if(error['from'].toLowerCase() === 'baseurl'){
+          var span = $('div#urlError span#error');
+          showError(span,error['message']);
+        }else if(error['from'] === 'alter'){
+          showAlterbox(error['message'],'#FF6347',button);
+        }else if(error['from']==='input'){
+          if(error['id']){
+            var span = $('tr#'+error['id']+' td#value span#error');
+            showError(span, error['message']);
+          }
+        }else if(error['from'] === 'checkObject'){
+          errorMessage = errorMessage+error['id']+': '+error['message']+'\r\n';
+        }
+      });
+    }
+    if(errorMessage === ''){
+      errorDiv.hide();
+      div.show();
+    }else{
+      errorDiv.show();
+      errorMessage = "报文校验失败:\r\n" + errorMessage;
+      errorDiv.find("textarea#wrongView").val(errorMessage);
+      div.hide();
+    }
   });
 });
 
@@ -577,3 +611,106 @@ function isJsonObject(value) {
     return false;
   }
 }
+
+const funcTable = [
+  'streetname',
+  'streetaddress',
+  'address',
+  'country',
+  'state',
+  'city',
+
+  'sentence',
+  'paragraph',
+  'word',
+  
+  'hexcolor',
+  'rgbcolor',
+  'rgbcsscolor',
+  'colorname',
+  
+  'monthname',
+  'month',
+  'year',
+  'timezone',
+  
+  'email',
+  'url',
+  'ipv4',
+  'ipv6',
+  'macaddress',
+  
+  'useragent',
+  'username',
+  'password',
+  
+  'firstname',
+  'lastname',
+  'company',
+  'name'
+];
+
+const httpStatusMap = {
+  100: 'Continue',
+  101: 'Switching Protocols',
+  102: 'Processing',
+  103: 'Early Hints',
+  200: 'OK',
+  201: 'Created',
+  202: 'Accepted',
+  203: 'Non-Authoritative Information',
+  204: 'No Content',
+  205: 'Reset Content',
+  206: 'Partial Content',
+  207: 'Multi-Status',
+  208: 'Already Reported',
+  226: 'IM Used',
+  300: 'Multiple Choices',
+  301: 'Moved Permanently',
+  302: 'Found',
+  303: 'See Other',
+  304: 'Not Modified',
+  305: 'Use Proxy',
+  307: 'Temporary Redirect',
+  308: 'Permanent Redirect',
+  400: 'Bad Request',
+  401: 'Unauthorized',
+  402: 'Payment Required',
+  403: 'Forbidden',
+  404: 'Not Found',
+  405: 'Method Not Allowed',
+  406: 'Not Acceptable',
+  407: 'Proxy Authentication Required',
+  408: 'Request Timeout',
+  409: 'Conflict',
+  410: 'Gone',
+  411: 'Length Required',
+  412: 'Precondition Failed',
+  413: 'Payload Too Large',
+  414: 'URI Too Long',
+  415: 'Unsupported Media Type',
+  416: 'Range Not Satisfiable',
+  417: 'Expectation Failed',
+  418: 'I\'m a teapot',
+  421: 'Misdirected Request',
+  422: 'Unprocessable Entity',
+  423: 'Locked',
+  424: 'Failed Dependency',
+  425: 'Too Early',
+  426: 'Upgrade Required',
+  428: 'Precondition Required',
+  429: 'Too Many Requests',
+  431: 'Request Header Fields Too Large',
+  451: 'Unavailable For Legal Reasons',
+  500: 'Internal Server Error',
+  501: 'Not Implemented',
+  502: 'Bad Gateway',
+  503: 'Service Unavailable',
+  504: 'Gateway Timeout',
+  505: 'HTTP Version Not Supported',
+  506: 'Variant Also Negotiates',
+  507: 'Insufficient Storage',
+  508: 'Loop Detected',
+  510: 'Not Extended',
+  511: 'Network Authentication Required'
+};

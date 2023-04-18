@@ -1,5 +1,5 @@
 {
-    "content":[
+    "content": [
         {
             "name": "Connection",
             "type": "String",
@@ -16,75 +16,76 @@
 }
 
 {
-    "content":[
+    "type": "object",
+    "content": [
         {
+            "mock": "$keyword",
+            "must": true,
             "name": "name",
             "type": "String",
-            "must": true,
-            "notNull": true,
-            "mock": null,
+            "content": [],
             "example": "xiaoli",
-            "description": "用户名",
-            "content":[]
+            "notNull": true,
+            "description": "用户名"
         },
         {
+            "mock": "$integer(0,8)",
+            "must": false,
             "name": "day",
             "type": "integer",
-            "must": false,
-            "notNull": true,
-            "mock": null,
+            "content": [],
             "example": 7,
-            "description": "剩余天数",
-            "content":[]
+            "notNull": true,
+            "description": "剩余天数"
         },
         {
+            "mock": "$array(1,5)",
+            "must": true,
             "name": "studentlist",
             "type": "array",
-            "must": true,
-            "notNull": false,
-            "mock": null,
-            "example": "[\"xiaoli\",\"xiaowang\"]",
-            "description": "学员名单",
-            "content":[
+            "content": [
                 {
+                    "mock": "$firstName(zh_CN)",
+                    "must": false,
                     "name": "items",
                     "type": "string",
-                    "must": false,
-                    "notNull": true,
-                    "mock": null
+                    "notNull": true
                 }
-            ]
+            ],
+            "example": "[\"xiaoli\",\"xiaowang\"]",
+            "notNull": false,
+            "description": "学员名单"
         },
         {
+            "mock": null,
+            "must": true,
             "name": "leader",
             "type": "object",
-            "must": true,
-            "notNull": false,
-            "mock": null,
-            "example": "",
-            "description": "领导",
-            "content":[
+            "content": [
                 {
+                    "mock": "$firstName(en_US)",
+                    "must": true,
                     "name": "name",
                     "type": "String",
-                    "must": true,
-                    "notNull": false,
-                    "mock": null,
+                    "content": [],
                     "example": "xiaoli",
-                    "description": "用户名",
-                    "content":[]
+                    "notNull": false,
+                    "description": "用户名"
                 },
                 {
+                    "mock": "$integer(0,7)",
+                    "must": false,
                     "name": "day",
                     "type": "integer",
-                    "must": false,
-                    "notNull": true,
-                    "mock": null,
+                    "content": [],
                     "example": 7,
-                    "description": "剩余天数",
-                    "content":[]
+                    "notNull": true,
+                    "description": "剩余天数"
                 }
-            ]
+            ],
+            "example": "",
+            "notNull": false,
+            "description": "领导"
         }
     ]
 }

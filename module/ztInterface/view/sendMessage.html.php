@@ -76,7 +76,12 @@
       <div class='main-col col-7'>
         <div class='cell'>
           <div class='detail'>
-            <div class='detail-title'><?php echo $lang->ztinterface->url;?></div>
+            <div class='detail-title' style="display: flex; justify-content: space-between;">
+              <?php echo $lang->ztinterface->url;?>
+              <button id="tableCustomBtn" type="button" class="btn btn-link" style="float: right;">
+                <i class="icon-cog-outline"></i>
+              </button>
+            </div>
             <div class="detail-content">
               <div class="input-control" style="display: flex; align-items: center;">
                 <?php #echo '<span style="font-size: 1.3rem; letter-spacing: 0.05em;">' . $interface->url . '</span>';?>
@@ -179,7 +184,7 @@
           <div class='detail'>
             <div class='detail-title'><?php echo $lang->ztinterface->messageView;?></div>
             <div class='detail-content'>
-              <?php echo html::textarea('messageHeadView', '', "rows='6' class=' form-control'");?>
+              <?php echo html::textarea('messageHeadView', '', "disabled rows='6' class=' form-control'");?>
               <?php echo html::textarea('messageBodyView', '', "spellcheck=\"false\" style=\"font-size: 14px; letter-spacing: 0.1em; line-height: 1.5em;\" rows='14' class='form-control'");?>
             </div>
           </div>
@@ -192,6 +197,26 @@
               <i class=" icon-run" title="全部随机" data-app="ztinterface"></i>
               <span>发送报文</span>
             </button>
+          </div>
+          <div id='response' class='detail'>
+            <div class='detail-title'>
+              <?php echo $lang->ztinterface->response;?>
+              <span>&nbsp;&nbsp;&nbsp;&nbsp;</span>
+              <span id='code' style="color: #777777;display: none;">200</span>
+              <span>&nbsp;</span>
+              <span id='status' style="color: #777777;display: none;">OK</span>
+            </div>
+            <div class='detail-content'>
+              <?php echo html::textarea('responseView', '', "disabled rows='8' class=' form-control'");?>
+            </div>
+          </div>
+          <div id='messageWrong' class='detail'>
+            <div class='detail-title'>
+              <?php echo $lang->ztinterface->messageWrong;?>
+            </div>
+            <div class='detail-content'>
+              <?php echo html::textarea('wrongView', '', "disabled rows='8' class=' form-control'");?>
+            </div>
           </div>
         </div>
       </div>

@@ -916,13 +916,49 @@ class ztinterface extends control
         $response = array();
         $response['error'] = array();
         $body = json_decode($_POST['body']);
-        ChromePhp::log($body);
         $interface = $this->ztinterface->getByID((int)$_POST['id']);
         if(!$interface){
             $response['error'][] = array('message'=>'接口不存在','from'=>'alter');
             echo json_encode($response);
             return;
         }
+        if(!$body){
+            if(!$_POST['body']){
+                $need[] = "请求体";
+            }else if(!$body){
+                $need[] = "合法的请求体";
+            }
+            $response['error'][] = array('message'=>'请提供'.join(',',$need),'from'=>'alter');
+            echo json_encode($response);
+            return;
+        }
+
+        $url = rtrim($_POST['baseUrl'], '/') . '/' . ltrim($interface->url, '/');
+        if (filter_var($url, FILTER_VALIDATE_URL) === false) {
+            $url = 'http://127.0.0.1'. '/' . ltrim($interface->url, '/');
+            if(filter_var($url, FILTER_VALIDATE_URL) === false){
+                $response['error'][] = array('message'=>'URL部分不合法','from'=>'baseURL');
+                echo $response;
+                return;
+            }
+            $response['error'][] = array('message'=>'基地址为空或不合法,已采用http://127.0.0.1/作为基地址','from'=>'baseURL');
+        }
+
+        $data = json_decode($interface->data, true);
+        $res = $this->ztinterface->checkObject($body, $data,'');
+        if(!empty($res['error'])){
+            $response['error'] = array_merge($response['error'], $res['error']);
+        }else{
+            $res = $this->ztinterface->sendMessage($_POST['head'], $body, $interface->method, $url);
+            if(isset($res['error'])){
+                $response['error'] = array_merge($response['error'], $res['error']);
+            }
+            if(isset($res['response'])){
+                $response['response'] = $res['response'];
+                $response['code'] = $res['code'];
+            }
+        }
+        echo json_encode($response);
     }
 
     
