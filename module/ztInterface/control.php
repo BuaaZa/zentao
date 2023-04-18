@@ -849,7 +849,6 @@ class ztinterface extends control
         }
     }
 
-
     public function findMock($data = ''){
         $response = array();
         $response['id'] = $data['id'];

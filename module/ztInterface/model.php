@@ -3080,5 +3080,12 @@ class ChineseProvider extends Address
     {
         return static::randomElement(static::$streetSuffixs);
     }
+
+    protected static $phoneFormats = array('1##########');
+    
+    public static function phoneNumber()
+    {
+        return static::numerify(static::randomElement(static::$phoneFormats));
+    }
     
 }

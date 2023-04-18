@@ -11,6 +11,7 @@ CREATE TABLE `zt_interface`  (
   `module` mediumint NOT NULL DEFAULT 0,
   `header` json,
   `data` json,
+  `format` CHAR(50) NOT NULL DEFAULT 'json',
   `deleted` enum('0','1') CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`) USING BTREE
 ) ENGINE = InnoDB CHARACTER SET = utf8 COLLATE = utf8_general_ci ROW_FORMAT = Dynamic;

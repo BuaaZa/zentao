@@ -330,6 +330,7 @@ $lang->ztinterface->fakerOptions = array(
     'month',
     'year',
     'timezone',
+    'phonenumber',
     'name'    
 );
 $lang->ztinterface->funcTable = array(
@@ -355,6 +356,7 @@ $lang->ztinterface->funcTable = array(
     'timezone',
 
     'email',
+    'phonenumber',
     'url',
     'ipv4',
     'ipv6',
@@ -380,6 +382,7 @@ $lang->ztinterface->fakerCN = array(
     'state',
     'city',
     'company',
+    'phonenumber',
     'name'    
 );
 
@@ -478,6 +481,9 @@ $lang->ztinterface->stringMock[35]['description'] = "生成一个月份。";
 
 $lang->ztinterface->stringMock[36]['example'] = "\$datetime(Y-m-d H:i:s)";
 $lang->ztinterface->stringMock[36]['description'] = "按格式生成一个日期/时间/日期+时间,通过Y/y/M/m/D/d/H/h/I/i/S/s进行控制。";
+
+$lang->ztinterface->stringMock[37]['example'] = "\$phoneNumber";
+$lang->ztinterface->stringMock[37]['description'] = "生成一个手机号码";
 
 
 $lang->ztinterface->integerMock = array();

@@ -635,6 +635,7 @@ const funcTable = [
   'timezone',
   
   'email',
+  'phonenumber',
   'url',
   'ipv4',
   'ipv6',

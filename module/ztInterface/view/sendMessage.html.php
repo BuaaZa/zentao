@@ -67,7 +67,11 @@
 <div id='mainContent' class='main-content'>
   <div class='main-header'>
     <h2>
-      <?php echo "<b style=\"margin-right: 10px;font-size: 1.3em;color:{$this->lang->ztinterface->methodColor[$interface->method]};\">$interface->method</b>";?>
+      <?php 
+        $browseLink  = $app->session->beforeMessage ? $app->session->beforeMessage : $this->createLink('ztinterface', 'browse', "productID=$interface->product");
+        echo html::a($browseLink, '<i class="icon icon-back icon-sm"></i>', "class='btn btn-secondary'");
+      ?>
+      <?php echo "<b style=\"margin-left: 10px;margin-right: 10px;font-size: 1.3em;color:{$this->lang->ztinterface->methodColor[$interface->method]};\">$interface->method</b>";?>
       <?php echo "<b style=\"font-size: 1.3em;\">$interface->name</b>";?>
     </h2>
   </div>
@@ -210,7 +214,7 @@
               <?php echo html::textarea('responseView', '', "disabled rows='8' class=' form-control'");?>
             </div>
           </div>
-          <div id='messageWrong' class='detail'>
+          <div id='messageWrong' class='detail' style='display: none;'>
             <div class='detail-title'>
               <?php echo $lang->ztinterface->messageWrong;?>
             </div>
