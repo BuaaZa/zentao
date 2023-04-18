@@ -11,7 +11,7 @@
  *  May you share freely, never taking more than you give.
  */
 include dirname(__FILE__, 2) . '/base/helper.class.php';
-class apiHelper extends baseHelper
+class helper extends baseHelper
 {
     public static function getViewType($source = false)
     {

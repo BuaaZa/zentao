@@ -42,4 +42,4 @@ $app->loadModule();
 $output = ob_get_clean();
 
 /* Flush the buffer. */
-echo $app->formatData(apiHelper::removeUTF8Bom($output));
+echo $app->formatData(helper::removeUTF8Bom($output));
