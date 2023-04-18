@@ -63,6 +63,7 @@ class ztinterface extends control
 
     public function browse($productID = 0, $browseType = 'all', $param = 0, $orderBy = 'id_desc', $recTotal = 0, $recPerPage = 20, $pageID = 1, $projectID = 0)
     {
+        ChromePhp::log("in");
         $response['result'] = 'success';
 
         /* Set browse type. */
@@ -73,6 +74,8 @@ class ztinterface extends control
         //$productID = $this->product->saveState($productID, $this->products);
         setcookie('preProductID', $productID, $this->config->cookieLife, $this->config->webRoot, '', $this->config->cookieSecure, true);
         
+        ChromePhp::log("after set Menu");
+
         if($this->cookie->preProductID != $productID)
         {
             $_COOKIE['caseModule'] = 0;
@@ -89,6 +92,7 @@ class ztinterface extends control
         $this->session->set('browseType', $browseType);
         $this->session->set('orderBy', $orderBy);
 
+        ChromePhp::log("after session");
 
         /* Load pager. */
         $this->app->loadClass('pager', $static = true);
@@ -103,9 +107,12 @@ class ztinterface extends control
             $interfaces = $this->ztinterface->getInterfaces($productID, $moduleID, $sort, $pager);
         }
 
+        ChromePhp::log("after get interface");
+
         /* Get module tree.*/
         $moduleTree = $this->tree->getTreeMenu($productID, 'ztinterface', 0, array('treeModel', 'createInterfaceLink'), array('productID' => $productID), $branch);
         
+        ChromePhp::log("after get moduleTree");
 
         $showBranch      = false;
         $branchOption    = array();
