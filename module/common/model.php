@@ -2551,7 +2551,6 @@ EOD;
         $module = strtolower($module);
         $method = strtolower($method);
         parse_str($vars, $params);
-        ChromePhp::log($module.' '.$method);
 
         if(empty($params['storyType']) and $module == 'story' and !empty($app->params['storyType']) and strpos(",story,requirement,", ",{$app->params['storyType']},") !== false) $module = $app->params['storyType'];
         if($module == 'story' and !empty($params['storyType']) and strpos(",story,requirement,", ",{$params['storyType']},") !== false) $module = $params['storyType'];
