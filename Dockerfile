@@ -10,7 +10,7 @@ RUN set -x ; \
     apt autoclean && apt autoremove ; \
     docker-php-ext-install pdo pdo_mysql zip xml ; \
     php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');" \
-    && php composer-setup.php --install-dir=/usr/local/bin --filename=composer \
+    && php composer-setup.php --install-dir=${APACHE_DOCUMENT_ROOT}/zentaopms --filename=composer \
     && php -r "unlink('composer-setup.php');"
 
 ADD --chown=${USER}:${GROUP} . ${APACHE_DOCUMENT_ROOT}/zentaopms
