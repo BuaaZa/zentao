@@ -73,10 +73,10 @@
                     "description": "用户名"
                 },
                 {
-                    "mock": "$integer(0,7)",
+                    "mock": "$float(0,7)",
                     "must": false,
                     "name": "day",
-                    "type": "integer",
+                    "type": "float",
                     "content": [],
                     "example": 7,
                     "notNull": true,
