@@ -16135,3 +16135,11 @@ create table if not exists `zt_data_sample_result`
     `create_date`    datetime default current_timestamp() comment '创建时间与日期',
     `version`        int unsigned not null comment '数据样本结果版本 对应于测试用例和步骤的版本'
 );
+
+CREATE TABLE `zt_baseurl`  (
+  `id` mediumint NOT NULL AUTO_INCREMENT,
+  `product` mediumint NOT NULL,
+  `name` CHAR(50),
+  `url` TEXT NOT NULL,
+  PRIMARY KEY (`id`) USING BTREE
+) ENGINE = InnoDB CHARACTER SET = utf8 COLLATE = utf8_general_ci ROW_FORMAT = Dynamic;
