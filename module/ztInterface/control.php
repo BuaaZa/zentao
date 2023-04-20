@@ -873,6 +873,27 @@ class ztinterface extends control
         return $response;
     }
 
+    public function parseStrMock($mock = ''){
+        $match = preg_match('/^\$(\w+)\(.*\)$/', $mock, $matches);
+        if ($match) {
+            $funcName = $matches[1];
+
+            if ($funcName) {
+                $paramStr = preg_replace('/^\$\w+\(|\)$/', '', $mock);
+                preg_match_all('/("[^"]*"|\'[^\']*\'|\{[^}]*\}|\[[^\]]*\]|[^,]+)+/', $paramStr, $params);
+            } else {
+                $match = preg_match('/^\$(\w+)$/', $mock, $matches);
+                if ($match) {
+                $funcName = $matches[1];
+                }
+            }
+
+            $funcName = ucfirst(strtolower($funcName));
+        }
+        ChromePhp::log($funcName);
+        ChromePhp::log($params[0]);
+    }
+
     public function saveMock($id){
         $res = $this->ztinterface->saveMock($id,$_POST['data']);
         if(dao::isError()) $res = dao::getError();
