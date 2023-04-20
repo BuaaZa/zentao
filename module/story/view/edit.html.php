@@ -123,6 +123,7 @@
           <?php include '../../common/view/action.html.php';?>
         </div>
       </div>
+      <?php if($story->type !== 'taskPoint'):?>
       <div class='side-col col-4'>
         <div class='cell'>
           <div class='detail'>
@@ -333,6 +334,7 @@
           </div>
         </div>
       </div>
+      <?php endif;?>
     </div>
   </form>
 </div>
