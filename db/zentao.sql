@@ -451,7 +451,6 @@ CREATE TABLE IF NOT EXISTS `zt_casestep`
     `version`       smallint(3) unsigned  NOT NULL default '0',
     `type`          varchar(10)           NOT NULL DEFAULT 'step',
     `desc`          text                  NOT NULL,
-    `input`         text                  NOT NULL comment '弃用 at 20230327',
     `goal_action`   text                  NOT NULL,
     `expect`        text                  NOT NULL,
     `eval_criteria` text                  NOT NULL,
