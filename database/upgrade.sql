@@ -51,7 +51,7 @@ alter table zt_bug
     modify status enum ('active', 'resolved', 'closed', 'tobedeliberated') default 'active' not null;
 
 alter table zt_casestep
-    add goal_action text not null after input;
+    add goal_action text not null;
 
 alter table zt_casestep
     add eval_criteria text not null;
