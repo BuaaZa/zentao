@@ -89,7 +89,7 @@ class testcaseModel extends model
              * 隐藏测试执行配置
              * 执行步骤类型: stepType
              */
-            ->remove('steps,inputs,goal_actions,expects,eval_criterias,stepType')
+            ->remove('steps,goal_actions,expects,eval_criterias,stepType')
             ->remove('files')
             ->remove('forceNotReview,stepIoType,datasample')
             ->setDefault('story', 0)
@@ -133,7 +133,6 @@ class testcaseModel extends model
             $step->version = 1;
             $step->desc = rtrim(htmlSpecialString($stepDesc));
             $judge = $step->type == 'group' || $step->type == 'item';
-            $step->input = $judge ? '' : rtrim(htmlSpecialString($data->inputs[$index]));
             $step->goal_action = $judge ? '' : rtrim(htmlSpecialString($data->goal_actions[$index]));
             $step->expect = $judge ? '' : rtrim(htmlSpecialString($data->expects[$index]));
             $step->eval_criteria = $judge ? '' : rtrim(htmlSpecialString($data->eval_criterias[$index]));
@@ -883,7 +882,7 @@ class testcaseModel extends model
             ->setForce('status', $status)
             ->cleanInt('story,product,branch,module')
             ->stripTags($this->config->testcase->editor->edit['id'], $this->config->allowedTags)
-            ->remove('comment,steps,expects,files,labels,linkBug,stepType,inputs,goal_actions,eval_criterias,stepIoType,datasample,is_updated')
+            ->remove('comment,steps,expects,files,labels,linkBug,stepType,goal_actions,eval_criterias,stepIoType,datasample,is_updated')
             ->get();
 
         $requiredFields = $this->config->testcase->edit->requiredFields;
@@ -925,7 +924,6 @@ class testcaseModel extends model
                         $step->version = $version;
                         $step->desc    = rtrim(htmlSpecialString($stepDesc));
                         $judge = $step->type == 'group' || $step->type == 'item';
-                        $step->input  = $judge ? '' : rtrim(htmlSpecialString($data->inputs[$stepID]));
                         $step->goal_action  = $judge ? '' : rtrim(htmlSpecialString($data->goal_actions[$stepID]));
                         $step->expect  = $judge ? '' : rtrim(htmlSpecialString($data->expects[$stepID]));
                         $step->eval_criteria  = $judge ? '' : rtrim(htmlSpecialString($data->eval_criterias[$stepID]));

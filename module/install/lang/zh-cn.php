@@ -124,17 +124,22 @@ $lang->install->chmodLinux   = '需要修改目录 "%s" 的权限。<br />命令
 
 $lang->install->timezone       = '时区设置';
 $lang->install->defaultLang    = '默认语言';
+$lang->install->installType    = '安装方式';
 $lang->install->dbHost         = '数据库服务器';
 $lang->install->dbHostNote     = '如果127.0.0.1无法访问，尝试使用localhost';
 $lang->install->dbPort         = '服务器端口';
 $lang->install->dbEncoding     = '数据库编码';
 $lang->install->dbUser         = '数据库用户名';
 $lang->install->dbPassword     = '数据库密码';
-$lang->install->dbName         = 'PMS使用的库';
+$lang->install->dbName         = '数据库名';
 $lang->install->dbPrefix       = '建表使用的前缀';
 $lang->install->clearDB        = '清空现有数据';
 $lang->install->importDemoData = '导入demo数据';
 $lang->install->working        = '工作方式';
+
+$lang->install->installTypes['install'] = "直接安装";
+$lang->install->installTypes['upgrade'] = "从禅道17.7平滑升级";
+$lang->install->installTypes['connect'] = "连接已有数据库";
 
 $lang->install->requestTypes['GET']       = '普通方式';
 $lang->install->requestTypes['PATH_INFO'] = '静态友好方式';
@@ -144,10 +149,10 @@ $lang->install->workingList['full']      = '完整研发管理工具';
 $lang->install->errorConnectDB      = '数据库连接失败 ';
 $lang->install->errorDBName         = '数据库名不能含有 “.” ';
 $lang->install->errorCreateDB       = '数据库创建失败';
+$lang->install->errorUpdateDB       = '数据库升级失败';
 $lang->install->errorTableExists    = '数据表已经存在，您之前应该有安装过禅道，继续安装请返回前页并选择清空数据';
 $lang->install->errorCreateTable    = '创建表失败';
 $lang->install->errorEngineInnodb   = '您当前的数据库不支持使用InnoDB数据表引擎，请修改为MyISAM后重试。';
-$lang->install->errorImportDemoData = '导入demo数据失败';
 
 $lang->install->setConfig          = '生成配置文件';
 $lang->install->key                = '配置项';

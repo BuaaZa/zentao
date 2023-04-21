@@ -9,8 +9,7 @@
  * @version     $Id: model.php 5006 2013-07-03 08:52:21Z wyd621@gmail.com $
  * @link        http://www.zentao.net
  */
-?>
-<?php
+
 class installModel extends model
 {
     /**
@@ -302,8 +301,9 @@ class installModel extends model
      *
      * @access public
      * @return stdclass
+     * @throws EndResponseException
      */
-    public function checkConfig(): stdclass
+    public function initDatabase(): stdclass
     {
         $return = new stdclass();
         $return->result = 'ok';
@@ -311,6 +311,8 @@ class installModel extends model
         /* Connect to database. */
         $this->setDBParam();
         $this->dbh = $this->connectDB();
+
+        /* 检查安装前基本配置 */
         if(str_contains($this->post->dbName, '.'))
         {
             $return->result = 'fail';
@@ -324,32 +326,56 @@ class installModel extends model
             return $return;
         }
 
-        /* Get mysql version. */
-        $version = $this->getMysqlVersion();
-
-        /* If database no exits, try to create it. */
-        if(!$this->dbExists())
+        /* 根据规则进行安装 */
+        // 如果直接安装，则和之前逻辑一致
+        if ($this->post->installType === 'install')
         {
-            if(!$this->createDB($version))
+            /* Get mysql version. */
+            $version = $this->getMysqlVersion();
+
+            /* If database no exits, try to create it. */
+            if(!$this->dbExists())
+            {
+                if(!$this->createDB())
+                {
+                    $return->result = 'fail';
+                    $return->error  = $this->lang->install->errorCreateDB;
+                    return $return;
+                }
+            }
+            elseif($this->tableExits() and !$this->post->clearDB)
             {
                 $return->result = 'fail';
-                $return->error  = $this->lang->install->errorCreateDB;
+                $return->error  = $this->lang->install->errorTableExists;
+                return $return;
+            }
+
+            /* Create tables. */
+            if(!$this->createTable($version))
+            {
+                $return->result = 'fail';
+                $return->error  = $this->lang->install->errorCreateTable;
                 return $return;
             }
         }
-        elseif($this->tableExits() and $this->post->clearDB == false)
+        elseif ($this->post->installType === 'upgrade')
         {
-            $return->result = 'fail';
-            $return->error  = $this->lang->install->errorTableExists;
-            return $return;
+            if(!$this->dbExists())
+            {
+                $return->result = 'fail';
+                $return->error  = "所迁移数据库不存在";
+                return $return;
+            }
+            if(!$this->upgradeDB())
+            {
+                $return->result = 'fail';
+                $return->error  = $this->lang->install->errorUpdateDB;
+                return $return;
+            }
         }
-
-        /* Create tables. */
-        if(!$this->createTable($version))
+        else if ($this->post->installType === 'connect')
         {
-            $return->result = 'fail';
-            $return->error  = $this->lang->install->errorCreateTable;
-            return $return;
+            // do nothing
         }
 
         return $return;
@@ -402,7 +428,7 @@ class installModel extends model
      * @access public
      * @return bool
      */
-    public function dbExists()
+    public function dbExists(): bool | stdClass
     {
         $sql = "SHOW DATABASES like '{$this->config->db->name}'";
         return $this->dbh->query($sql)->fetch();
@@ -437,15 +463,42 @@ class installModel extends model
     /**
      * Create database.
      *
-     * @param  string    $version
      * @access public
      * @return bool
      */
-    public function createDB($version)
+    public function createDB(): bool
     {
         $sql = "CREATE DATABASE `{$this->config->db->name}`";
-//        if($version > 4.1) $sql .= " DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci";
         return $this->dbh->query($sql);
+    }
+
+    /**
+     * 升级数据库
+     *
+     * @return bool|stdClass
+     * @throws EndResponseException
+     */
+    public function upgradeDB(): bool | stdClass
+    {
+        try
+        {
+            $dbFile = $this->app->getAppRoot() . 'database' . DS . 'upgrade.sql';
+            $commands = explode(';', file_get_contents($dbFile));
+
+            if (trim(end($commands)) === '')
+                array_pop($commands);
+
+            $this->dbh->exec("USE {$this->config->db->name}");
+            foreach($commands as $command)
+                if(!$this->dbh->query($command))
+                    return false;
+        }
+        catch (PDOException $exception)
+        {
+            echo $exception->getMessage();
+            helper::end();
+        }
+        return true;
     }
 
     /**
@@ -657,39 +710,5 @@ class installModel extends model
                 $this->dao->update(TABLE_BASICMEAS)->set('name')->eq($basic['name'])->set('unit')->eq($basic['unit'])->set('definition')->eq($basic['definition'])->where('id')->eq($id)->exec();
             }
         }
-    }
-
-    /**
-     * Import demo data.
-     *
-     * @access public
-     * @return void
-     */
-    public function importDemoData()
-    {
-        $demoDataFile = $this->app->clientLang == 'en' ? 'endemo.sql' : 'demo.sql';
-        $demoDataFile = $this->app->getAppRoot() . 'db' . DS . $demoDataFile;
-        $insertTables = explode(";\n", file_get_contents($demoDataFile));
-        foreach($insertTables as $table)
-        {
-            $table = trim($table);
-            if(empty($table)) continue;
-
-            $table = str_replace('`zt_', $this->config->db->name . '.`zt_', $table);
-            $table = str_replace('zt_', $this->config->db->prefix, $table);
-            if(!$this->dbh->query($table)) return false;
-
-            /* Make the deleted user of demo data undeleted.*/
-            if($this->config->edition == 'open') $this->dao->update(TABLE_USER)->set('deleted')->eq('0')->where('deleted')->eq('1')->exec();
-        }
-
-        $config = new stdclass();
-        $config->module  = 'common';
-        $config->owner   = 'system';
-        $config->section = 'global';
-        $config->key     = 'showDemoUsers';
-        $config->value   = '1';
-        $this->dao->replace(TABLE_CONFIG)->data($config)->exec();
-        return true;
     }
 }

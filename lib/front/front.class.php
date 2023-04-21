@@ -53,14 +53,14 @@ class html extends baseHTML
      * @access public
      * @return string
      */
-    static public function input($name, $value = "", $attrib = "", $autocomplete = false)
+    static public function input($name, $value = "", $attrib = "", $autocomplete = false, $type = 'text')
     {
         $id = "id='$name'";
         if(strpos($attrib, 'id=') !== false) $id = '';
         if(is_null($value)) $value = '';
         $value = str_replace("'", '&#039;', $value);
         $autocomplete = $autocomplete ? 'autocomplete="on"' : 'autocomplete="off"';
-        return "<input type='text' name='$name' {$id} value='$value' $attrib $autocomplete />\n";
+        return "<input type='$type' name='$name' {$id} value='$value' $attrib $autocomplete />\n";
     }
 
     /**

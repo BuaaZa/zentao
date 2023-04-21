@@ -149,7 +149,7 @@ class install extends control
     {
         if(!empty($_POST))
         {
-            $return = $this->install->checkConfig();
+            $return = $this->install->initDatabase();
             if($return->result == 'ok')
             {
                 /* Set the session save path when the session save path is null. */
@@ -240,9 +240,6 @@ class install extends control
 
             $this->install->updateLang();
             if(dao::isError()) return print(js::error(dao::getError()));
-
-            if($this->post->importDemoData) $this->install->importDemoData();
-            if(dao::isError()) return print(js::alert($this->lang->install->errorImportDemoData));
 
             $this->loadModel('setting');
             $this->setting->updateVersion($this->config->version);

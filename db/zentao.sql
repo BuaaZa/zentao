@@ -451,7 +451,6 @@ CREATE TABLE IF NOT EXISTS `zt_casestep`
     `version`       smallint(3) unsigned  NOT NULL default '0',
     `type`          varchar(10)           NOT NULL DEFAULT 'step',
     `desc`          text                  NOT NULL,
-    `input`         text                  NOT NULL comment '弃用 at 20230327',
     `goal_action`   text                  NOT NULL,
     `expect`        text                  NOT NULL,
     `eval_criteria` text                  NOT NULL,
@@ -16074,7 +16073,6 @@ alter table zt_action
 alter table `zt_effort`
     add `syncStatus` enum ('0', '1') default '0' not null after `work`;
 
-# zt_actionarchive
 -- DROP TABLE IF EXISTS `zt_actionarchive`;
 create table if not exists `zt_actionarchive`
 (
@@ -16118,6 +16116,7 @@ alter table zt_task
 alter table `zt_testtask`
     add `parent` int not null;
 
+-- DROP TABLE IF EXISTS `zt_data_sample`;
 create table if not exists `zt_data_sample`
 (
     `id`               int unsigned auto_increment primary key comment '数据样本的ID',
@@ -16128,6 +16127,7 @@ create table if not exists `zt_data_sample`
     `version`          int unsigned not null comment '数据样本版本 对应于测试用例和步骤的版本'
 );
 
+-- DROP TABLE IF EXISTS `zt_data_sample_result`;
 create table if not exists `zt_data_sample_result`
 (
     `id`             int unsigned auto_increment primary key comment '数据样本结果的ID',
@@ -16136,11 +16136,27 @@ create table if not exists `zt_data_sample_result`
     `create_date`    datetime default current_timestamp() comment '创建时间与日期',
     `version`        int unsigned not null comment '数据样本结果版本 对应于测试用例和步骤的版本'
 );
+
+-- DROP TABLE IF EXISTS `zt_interface`;
+create table if not exists zt_interface
+(
+    id      int auto_increment
+        primary key,
+    product int                                                                          not null,
+    name    char(50)                                                                     null,
+    method  enum ('GET', 'POST', 'PUT', 'DELETE', 'HEAD', 'OPTIONS', 'TRACE', 'CONNECT') not null,
+    url     text                                                                         not null,
+    module  int             default 0                                                    not null,
+    header  json                                                                         null,
+    data    json                                                                         null,
+    format  char(50)        default 'json'                                               not null,
+    deleted enum ('0', '1') default '0'                                                  not null
+);
+
 -- DROP TABLE IF EXISTS `zt_baseurl`;
 CREATE TABLE `zt_baseurl`  (
-  `id` mediumint NOT NULL AUTO_INCREMENT,
+  `id` mediumint NOT NULL AUTO_INCREMENT primary key ,
   `product` mediumint NOT NULL,
   `name` CHAR(50),
-  `url` TEXT NOT NULL,
-  PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB CHARACTER SET = utf8 COLLATE = utf8_general_ci ROW_FORMAT = Dynamic;
+  `url` TEXT NOT NULL
+);
