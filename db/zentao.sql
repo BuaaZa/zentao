@@ -16150,6 +16150,7 @@ create table if not exists zt_interface
     deleted enum ('0', '1') default '0'                                                  not null
 );
 
+-- DROP TABLE IF EXISTS `zt_baseurl`;
 CREATE TABLE `zt_baseurl`  (
   `id` mediumint NOT NULL AUTO_INCREMENT primary key ,
   `product` mediumint NOT NULL,
