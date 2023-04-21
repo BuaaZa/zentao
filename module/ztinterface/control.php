@@ -502,7 +502,7 @@ class ztinterface extends control
             }
         }
 
-        $args = $this->ztinterface->parseParams($data["params"]);
+        $args = json_decode($data["params"]);
         $gen = $data['funcName'];
 
         $format = 'Y-m-d H:i:s';

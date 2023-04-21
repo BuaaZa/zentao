@@ -174,46 +174,75 @@ class datasampleModel extends model
         return $response;
     }
 
-    public function mockFloat($params = ''){
+    public function mockFloat($params = '', $except = false){
+        $response = array();
+        $response['exception'] = array();
         $min = NULL;
         $max = NULL;
 
         if(isset($params[0]) and is_numeric($params[0])){
             $min = (float)$args[0];
+            $minFlag = true;
         }
         if(isset($params[1]) and is_numeric($params[1])){
             $max = (float)$args[1];
+            $maxFlag = true;
         }
         if($min and $max and $min > $max){
             $temp = $min;
             $min = $max;
             $max = $temp;
+
+            $temp = $minFlag;
+            $minFlag = $maxFlag;
+            $maxFlag = $temp;
         }
 
-        $faker = $this->loadModule('ztinterface')->getFaker('en_US');
-        $response['value'] = $faker->randomFloat(NULL, $min, $max);
+        if($except){
+            if($minFlag){
+                $response['exception'][] = array('value'=>$min,'type'=>'下边界');
+                $response['exception'][] = array('value'=>$min-1,'type'=>'下越界');
+            }
+            if($maxFlag){
+                $response['exception'][] = array('value'=>$max,'type'=>'上边界');
+                $response['exception'][] = array('value'=>$max+1,'type'=>'上越界');
+            }
+        }else{
+            $faker = $this->loadModule('ztinterface')->getFaker('en_US');
+            $response['value'] = $faker->randomFloat(NULL, $min, $max);
+        }
 
         return $response;
     }
 
-    public function mockString($params = ''){
+    public function mockString($params = '', $except = false){
         $response = array();
+        $response['exception'] = array();
         $args = $this->loadModule('ztinterface')->parseParams($params);
         $min = 1;
-        $max = 20;
+        $max = 50;
+
+        $minFlag = false;
+        $maxFlag = false;
         if(isset($args[1]) and is_numeric($args[1]) and (int)$args[1]>=0){
             $min = (int)$args[1];
             if($min != (float)$args[1]){
                 $min = $min + 1;
             }
+            $minFlag = true;
         }
         if(isset($args[2]) and is_numeric($args[2]) and (int)$args[2]>=0){
             $max = (int)$args[2];
+            $maxFlag = true;
         }
         if($min > $max){
             $temp = $min;
             $min = $max;
             $max = $temp;
+
+            $temp = $minFlag;
+            $minFlag = $maxFlag;
+            $maxFlag = $temp;
         }
         $regex = '[\w]';
         if(isset($args[0])){
@@ -224,14 +253,32 @@ class datasampleModel extends model
                 $regex = $chars;
             }
         }
-        $regex = $regex.'{'.$min.','.$max.'}';
-        $response['value'] = $this->ztinterface->mockStringByRegex($regex);
+        if($except){
+            if($minFlag){
+                $regexMin = $regex.'{'.$min.','.$min.'}';
+                $response['exception'][] = array('value'=>$this->ztinterface->mockStringByRegex($regexMin),'type'=>'下边界');
+                if($min > 1){
+                    $regexBelowMin = $regex.'{'.(1).','.($min - 1).'}';
+                    $response['exception'][] = array('value'=>$this->ztinterface->mockStringByRegex($regexBelowMin),'type'=>'下越界');
+                }
+            }
+            if($maxFlag){
+                $regexMax = $regex.'{'.$max.','.$max.'}';
+                $response['exception'][] = array('value'=>$this->ztinterface->mockStringByRegex($regexMax),'type'=>'上边界');
+                $regexBeyondMax = $regex.'{'.($max + 1).','.($max + 10).'}';
+                $response['exception'][] = array('value'=>$this->ztinterface->mockStringByRegex($regexBeyondMax),'type'=>'上越界');
+            }
+        }else{
+            $regex = $regex.'{'.$min.','.$max.'}';
+            $response['value'] = $this->ztinterface->mockStringByRegex($regex);
+        }
+
         return $response;
     }
 
     public function mockDatetime($params = ''){
         $response = array();
-        $args = $this->loadModule('ztinterface')->parseParams($params);
+        $args = json_decode($params);
 
         $format = 'Y-m-d H:i:s';
         if($args[0]){
