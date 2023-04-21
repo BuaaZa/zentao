@@ -290,20 +290,46 @@ class datasampleModel extends model
             $format = $this->loadModule('ztinterface')->trimQuotation($args[0]);
         }
         
-        $response['value'] = $this->loadModule('ztinterface')->mockDate($format);
-        return $response;
-    }
-
-    public function mockFakeDatetime($params = ''){
-        $response = array();
-        $args = json_decode($params);
-
-        $format = 'Y-m-d H:i:s';
-        if($args[0]){
-            $format = $this->ztinterface->trimQuotation($args[0]);
+        if($except){
+            if(strpos($format, "m") or strpos($format, "M")){
+                if(strpos($format, "d") or strpos($format, "D")){
+                    $fakeDate = array(  '1' => '32',
+                                        '2' => '30',
+                                        '3' => '32',
+                                        '4' => '31',
+                                        '5' => '32',
+                                        '6' => '31',
+                                        '7' => '32',
+                                        '8' => '32',
+                                        '9' => '31',
+                                        '10' => '32',
+                                        '11' => '31',
+                                        '12' => '32',
+                                    );
+                    $month = '' . rand(1,12);
+                    $format = str_replace("m", $month, $format);
+                    $format = str_replace("M", $month, $format);
+                    $format = str_replace("d", $fakeDate[$month], $format);
+                    $format = str_replace("D", $fakeDate[$month], $format);
+                }else{
+                    $format = str_replace("m", '' . rand(13,20), $format);
+                    $format = str_replace("M", '' . rand(13,20), $format);
+                }
+            }else{
+                if(strpos($format, "d") or strpos($format, "D")){
+                    $format = str_replace("d", '' . rand(32,40), $format);
+                    $format = str_replace("D", '' . rand(32,40), $format);
+                }
+                else{
+                    $response['exception'] = array();
+                    return $response;
+                }
+            }
+            $response['exception'][] = array('value'=>$this->loadModule('ztinterface')->mockDate($format),'type'=>'错误日期');
+        }else{
+            $response['value'] = $this->loadModule('ztinterface')->mockDate($format);
         }
         
-        $response['value'] = $this->ztinterface->mockDate($format);
         return $response;
     }
 
