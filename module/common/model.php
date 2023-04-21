@@ -2973,7 +2973,8 @@ EOD;
         $this->actionModel->create('user', $user->id, 'login');
         $this->scoreModel->create('user', 'login');
 
-        if($isFreepasswd) die(js::locate($this->config->webRoot));
+        if($isFreepasswd)
+            die(js::locate($this->config->webRoot . "index.php?m=" . $this->get->module . "&f=" . $this->get->method . "&" . $this->get->ext));
 
         $this->session->set('ENTRY_CODE', $this->get->code);
         $this->session->set('VALID_ENTRY', md5(md5($this->get->code) . helper::getRemoteIp()));
