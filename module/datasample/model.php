@@ -89,4 +89,105 @@ class datasampleModel extends model
             ->limit(1)
             ->fetch();
     }
+
+    public function parseStrMock($mock = ''){
+        $match = preg_match('/^\$(\w+)\(.*\)$/', $mock, $matches);
+        if ($match) {
+            $funcName = $matches[1];
+
+            if ($funcName) {
+                $paramStr = preg_replace('/^\$\w+\(|\)$/', '', $mock);
+                preg_match_all('/("[^"]*"|\'[^\']*\'|\{[^}]*\}|\[[^\]]*\]|[^,]+)+/', $paramStr, $params);
+            } else {
+                $match = preg_match('/^\$(\w+)$/', $mock, $matches);
+                if ($match) {
+                $funcName = $matches[1];
+                }
+            }
+
+            $funcName = ucfirst(strtolower($funcName));
+        }
+        
+    }
+
+    public function mockInteger($params = ''){
+        $min = -65535;
+        $max = 65535;
+
+        if(isset($params[0]) and is_numeric($params[0])){
+            $min = (int)$params[0];
+            if($min != (float)$params[0]){
+                $min = $min + 1;
+            }
+        }
+        if(isset($params[1]) and is_numeric($params[1])){
+            $max = (int)$params[1];
+        }
+
+        if($min > $max){
+            $temp = $min;
+            $min = $max;
+            $max = $temp;
+        }
+
+        $faker = $this->loadModule('ztinterface')->getFaker('en_US');
+        $response['value'] = $faker->numberBetween($min,$max);
+
+        return $response;
+    }
+
+    public function mockFloat($params = ''){
+        $min = NULL;
+        $max = NULL;
+
+        if(isset($params[0]) and is_numeric($params[0])){
+            $min = (float)$args[0];
+        }
+        if(isset($params[1]) and is_numeric($params[1])){
+            $max = (float)$args[1];
+        }
+        if($min and $max and $min > $max){
+            $temp = $min;
+            $min = $max;
+            $max = $temp;
+        }
+
+        $faker = $this->loadModule('ztinterface')->getFaker('en_US');
+        $response['value'] = $faker->randomFloat(NULL, $min, $max);
+
+        return $response;
+    }
+
+    public function mockString($params = ''){
+        $response = array();
+        $args = $this->loadModule('ztinterface')->parseParams($data["params"]);
+        $min = 1;
+        $max = 20;
+        if(isset($params[1]) and is_numeric($params[1]) and (int)$params[1]>=0){
+            $min = (int)$params[1];
+            if($min != (float)$params[1]){
+                $min = $min + 1;
+            }
+        }
+        if(isset($params[2]) and is_numeric($params[2]) and (int)$params[2]>=0){
+            $max = (int)$params[2];
+        }
+        if($min > $max){
+            $temp = $min;
+            $min = $max;
+            $max = $temp;
+        }
+        $regex = '[\w]';
+        if(isset($params[0])){
+            $chars = $this->ztinterface->parseSymbol($params[0]);
+            if(!$chars){
+                $response["error"] = '参数不合法,按默认字符集生成';
+            }else{
+                $regex = $chars;
+            }
+        }
+        $regex = $regex.'{'.$min.','.$max.'}';
+        $response['value'] = $this->ztinterface->mockStringByRegex($regex);
+        return $response;
+    }
 }
