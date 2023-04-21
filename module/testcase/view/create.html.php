@@ -201,6 +201,7 @@ foreach(explode(',', $config->testcase->create->requiredFields) as $field)
                     <td><textarea rows='1' class='form-control autosize step-expects' name='expects[]'></textarea></td>
                     <td><textarea rows='1' class='form-control autosize step-expects' name='eval_criterias[]'></textarea></td>
                     <td class='step-actions stepsample-actions'>
+                        <input type='hidden' name='inputs_rules[]' id='inputs_rules' value='' class='step-inputs-rules'>
                         <input type='hidden' name='datasample[]' id='datasample' value='' class='step-datasample'>
                         <?php
                           common::printIcon('testcase', 'datasample',"", '',
@@ -257,9 +258,9 @@ foreach(explode(',', $config->testcase->create->requiredFields) as $field)
                     <td><?php echo html::textarea('goal_actions[]', $step->goal_action, "rows='1' class='form-control autosize step-expects'") ?></td>
                     <td><?php echo html::textarea('expects[]', $step->expect, "rows='1' class='form-control autosize step-expects'") ?></td>
                     <td><?php echo html::textarea('eval_criterias[]', $step->eval_criteria, "rows='1' class='form-control autosize step-expects'") ?></td>
-                    <td class='stepsample-actions'>
+                    <td class='step-actions stepsample-actions'>
+                        <input type='hidden' name='inputs_rules[]' id='inputs_rules' value='' class='step-inputs-rules'>
                         <input type='hidden' name='datasample[]' id='datasample' value='' class='step-datasample'>
-                        <input type='hidden' name='datasampleItem[]' id='datasample' value='' class='step-datasample'>
                         <?php
                             common::printIcon('testcase', 'datasample',"", '',
                                 'list', 'edit', '', 'showinonlybody iframe btn-datasample',
@@ -271,9 +272,6 @@ foreach(explode(',', $config->testcase->create->requiredFields) as $field)
 //                            'button', 'edit', '', 'showinonlybody iframe',
 //                            true, '', '填写');
                         ?>
-<!--                        <button type='button' title="显示数据样本" class='btn datasample-generate ' >-->
-<!--                          <i class='icon icon-list'></i>-->
-<!--                        </button>-->
                         <button type='button' title="重置数据样本" class='btn datasample-undo '>
                             <i class='icon icon-undo'></i>
                         </button>
