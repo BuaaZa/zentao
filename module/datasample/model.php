@@ -109,6 +109,23 @@ class datasampleModel extends model
         }
         
     }
+    
+    public function findMock($params = '', $funcName = ''){
+        $response = array();
+        if(!$funcName){
+            $response['value'] = '';
+            return $response;
+        }
+        if(in_array(strtolower($funcName), $this->lang->ztinterface->funcTable)){
+            return $this->mockFunc($params, $funcName);
+        }
+        $funcName = 'mock'.ucfirst(strtolower($funcName));
+        if (method_exists($this, $funcName)) {
+            return $this->datasample->$funcName($params);
+        }
+        $response['error'] = "Mock函数不存在";
+        return $response;
+    }
 
     public function mockInteger($params = ''){
         $min = -65535;
@@ -160,17 +177,17 @@ class datasampleModel extends model
 
     public function mockString($params = ''){
         $response = array();
-        $args = $this->loadModule('ztinterface')->parseParams($data["params"]);
+        $args = $this->loadModule('ztinterface')->parseParams($params);
         $min = 1;
         $max = 20;
-        if(isset($params[1]) and is_numeric($params[1]) and (int)$params[1]>=0){
-            $min = (int)$params[1];
-            if($min != (float)$params[1]){
+        if(isset($args[1]) and is_numeric($args[1]) and (int)$args[1]>=0){
+            $min = (int)$args[1];
+            if($min != (float)$args[1]){
                 $min = $min + 1;
             }
         }
-        if(isset($params[2]) and is_numeric($params[2]) and (int)$params[2]>=0){
-            $max = (int)$params[2];
+        if(isset($args[2]) and is_numeric($args[2]) and (int)$args[2]>=0){
+            $max = (int)$args[2];
         }
         if($min > $max){
             $temp = $min;
@@ -178,8 +195,8 @@ class datasampleModel extends model
             $max = $temp;
         }
         $regex = '[\w]';
-        if(isset($params[0])){
-            $chars = $this->ztinterface->parseSymbol($params[0]);
+        if(isset($args[0])){
+            $chars = $this->ztinterface->parseSymbol($args[0]);
             if(!$chars){
                 $response["error"] = '参数不合法,按默认字符集生成';
             }else{
@@ -188,6 +205,92 @@ class datasampleModel extends model
         }
         $regex = $regex.'{'.$min.','.$max.'}';
         $response['value'] = $this->ztinterface->mockStringByRegex($regex);
+        return $response;
+    }
+
+    public function mockDatetime($params = ''){
+        $response = array();
+        $args = $this->loadModule('ztinterface')->parseParams($params);
+
+        $format = 'Y-m-d H:i:s';
+        if($args[0]){
+            $format = $this->ztinterface->trimQuotation($args[0]);
+        }
+        
+        $response['value'] = $this->ztinterface->mockDate($format);
+        return $response;
+    }
+
+    public function mockRegex($params = ''){
+        $response = array();
+        $args = $this->loadModule('ztinterface')->parseParams($params);
+        
+        if(!isset($args[0])){
+            $response["error"] = "需要正则表达式";
+            return $response;
+        }
+        $regex = join(',',$args);
+
+        if(substr($regex,-1) !== substr($regex,0,1) or substr($regex,-1) !== '/'){
+            $regex = '/'.$regex.'/';
+        }
+        if (@preg_match($regex, '') === false) {
+            $response["error"] = "非法的正则表达式";
+            return $response;
+        }
+        $response['value'] = $this->ztinterface->mockStringByRegex($regex);
+        return $response;
+    }
+
+    public function mockRegexnum($params = ''){
+        $response = array();
+        $n = 5;
+        while($n > 0){
+            $response = $this->datasample->mockRegex($params);
+            if($response['value']){
+                if(is_numeric($response['value']) or $response['value']=='null')
+                    break;
+                $n -= 1;
+                continue;
+            }
+            if($response['error']){
+                return $response;
+            }
+            $n -= 1;
+        }
+        if(isset($response['value']) and (is_numeric($response['value']) or $response['value']=='null')){
+            $response['value'] = (float)$response['value'];
+        }else if(!$response['error']){
+            $response['error'] = '正则表达式无法产生合法的数据';
+        }
+
+        return $response;
+    }
+
+    public function mockFunc($params = '', $funcName = ''){
+        $response = array();
+        $args = $this->loadModule('ztinterface')->parseParams($params);
+        $faker = "";
+        $gen = $funcName;
+
+        if($args[0]){
+            $faker = $this->ztinterface->getFaker($this->ztinterface->trimQuotation($args[0]));
+        }
+        if(!$faker){
+            if(in_array(strtolower($gen),$this->lang->ztinterface->fakerCN)){
+                $faker = $this->ztinterface->getFaker('zh_CN');
+            }else{
+                $faker = $this->ztinterface->getFaker('en_US');
+            }
+        }
+        
+        if(strtolower($gen) === 'colorname')
+            $gen = 'safe'.$gen;
+        try{
+            $response['value'] = $faker->$gen;
+        }catch(Exception $e){
+            $response['error'] = '生成模式不存在';
+        }
         return $response;
     }
 }
