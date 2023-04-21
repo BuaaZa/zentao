@@ -1,3 +1,5 @@
+-- 从禅道17.7升级至当前版本的数据库迁移脚本
+
 alter table zt_action
     add ip char(15) default '' not null after commentExId;
 
