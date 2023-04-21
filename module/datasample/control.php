@@ -30,4 +30,31 @@ class datasample extends control
         return 0;
     }
 
+    public function singleMock(){
+        $response = array();
+        $data = $this->datasample->parseStrMock($_POST);
+        if($data['error']) {
+            echo json_encode($data);
+            return;
+        }
+        if(in_array(strtolower($data['funcName']),$this->lang->ztinterface->funcTable)){
+            echo json_encode($this->datasample->mockFunc($data['params'], $data['funcName']));
+            return;
+        }
+        $funcName = 'mock'.ucfirst(strtolower($data['funcName']));
+        if (method_exists($this, $funcName)) {
+            $response = $this->datasample->$funcName($params);
+            if($response['error']) {
+                echo json_encode($response);
+                return;
+            }
+            $response['exception'] = $this->datasample->$funcName($params, true)['exception'];
+            echo json_encode($response);
+            return;
+        }
+        $response['error'] = "Mock函数不存在";
+        echo json_encode($response);
+        return;
+    }
+
 }

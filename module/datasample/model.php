@@ -91,6 +91,7 @@ class datasampleModel extends model
     }
 
     public function parseStrMock($mock = ''){
+        $response = array();
         $match = preg_match('/^\$(\w+)\(.*\)$/', $mock, $matches);
         if ($match) {
             $funcName = $matches[1];
@@ -101,13 +102,17 @@ class datasampleModel extends model
             } else {
                 $match = preg_match('/^\$(\w+)$/', $mock, $matches);
                 if ($match) {
-                $funcName = $matches[1];
+                    $funcName = $matches[1];
+                }
+                else {
+                    $response['error'] = '无funcName';
                 }
             }
-
             $funcName = ucfirst(strtolower($funcName));
         }
-        
+        $response['funcName'] = $funcName;
+        $response['params'] = $params;
+        return $response;
     }
     
     public function findMock($params = '', $funcName = ''){
@@ -117,7 +122,7 @@ class datasampleModel extends model
             return $response;
         }
         if(in_array(strtolower($funcName), $this->lang->ztinterface->funcTable)){
-            return $this->mockFunc($params, $funcName);
+            return $this->datasample->mockFunc($params, $funcName);
         }
         $funcName = 'mock'.ucfirst(strtolower($funcName));
         if (method_exists($this, $funcName)) {
@@ -276,7 +281,20 @@ class datasampleModel extends model
         return $response;
     }
 
-    public function mockDatetime($params = ''){
+    public function mockDatetime($params = '', $except = false){
+        $response = array();
+        $args = json_decode($params);
+
+        $format = 'Y-m-d H:i:s';
+        if($args[0]){
+            $format = $this->loadModule('ztinterface')->trimQuotation($args[0]);
+        }
+        
+        $response['value'] = $this->loadModule('ztinterface')->mockDate($format);
+        return $response;
+    }
+
+    public function mockFakeDatetime($params = ''){
         $response = array();
         $args = json_decode($params);
 
