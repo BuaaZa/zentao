@@ -16116,6 +16116,7 @@ alter table zt_task
 alter table `zt_testtask`
     add `parent` int not null;
 
+-- DROP TABLE IF EXISTS `zt_data_sample`;
 create table if not exists `zt_data_sample`
 (
     `id`               int unsigned auto_increment primary key comment '数据样本的ID',
@@ -16126,6 +16127,7 @@ create table if not exists `zt_data_sample`
     `version`          int unsigned not null comment '数据样本版本 对应于测试用例和步骤的版本'
 );
 
+-- DROP TABLE IF EXISTS `zt_data_sample_result`;
 create table if not exists `zt_data_sample_result`
 (
     `id`             int unsigned auto_increment primary key comment '数据样本结果的ID',
@@ -16135,6 +16137,7 @@ create table if not exists `zt_data_sample_result`
     `version`        int unsigned not null comment '数据样本结果版本 对应于测试用例和步骤的版本'
 );
 
+-- DROP TABLE IF EXISTS `zt_interface`;
 create table if not exists zt_interface
 (
     id      int auto_increment
