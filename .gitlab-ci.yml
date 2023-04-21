@@ -62,7 +62,7 @@ deploy-to-production:
     - echo "This project's root directory is ${CI_PROJECT_NAME}"
     - echo "This job deploys something from the $CI_COMMIT_BRANCH branch."
     - echo "Deploying application..."
-    - echo ${RUNNER_PASSWD} | sudo -S cp -fr ../${CI_PROJECT_NAME} ${PROJECT_FULLPATH}
+    - echo sudo cp -fr ../${CI_PROJECT_NAME} ${PROJECT_FULLPATH}
     - echo "Fix /tmp access issue..."
     - echo sudo chmod -R 777  ${PROJECT_FULLPATH}/${CI_PROJECT_NAME}/tmp
     - echo "Change database..."

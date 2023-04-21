@@ -482,6 +482,7 @@ class bug extends control
             /* Set from param if there is a object to transfer bug. */
             setcookie('lastBugModule', (int)$this->post->module, $this->config->cookieLife, $this->config->webRoot, '', $this->config->cookieSecure, false);
             $bugResult = $this->bug->create('', $extras);
+            $lastBugID = $this->dao->lastInsertID();
             if (!$bugResult or dao::isError()) {
                 $response['result'] = 'fail';
                 $response['message'] = dao::getError();
@@ -502,6 +503,14 @@ class bug extends control
 
             $extras = str_replace(array(',', ' '), array('&', ''), $extras);
             parse_str($extras, $output);
+            extract($output);
+            if ($resultID)
+            {
+                $this->dao->update(TABLE_TESTRESULT)
+                    ->set('bug')->eq($lastBugID)
+                    ->where('id')->eq($resultID)
+                    ->exec();
+            }
             if (isset($output['todoID'])) {
                 $this->dao->update(TABLE_TODO)->set('status')->eq('done')->where('id')->eq($output['todoID'])->exec();
                 $this->action->create('todo', $output['todoID'], 'finished', '', "BUG:$bugID");
