@@ -2558,7 +2558,7 @@ EOD;
         if($module == 'product' and $method == 'browse' and !empty($params['storyType']) and $params['storyType'] == 'requirement') $method = 'requirement';
         if($module == 'story' and $method == 'linkrequirements') $module = 'requirement';
         if($module == 'qastory' and $method == 'batchcreate') $method = 'story';
-        if($module == 'story' and $method == 'edit' and $app->tab = 'qa'){
+        if($module == 'story' and $method == 'edit' and $app->tab == 'qa'){
             $module = 'qastory';
             $method = 'story';
         }
