@@ -88,7 +88,11 @@ include '../../common/view/header.lite.html.php'; ?>
                         <td>
                             <?php echo html::select('installType', $lang->install->installTypes, 'install', "class='form-control'"); ?>
                         </td>
-                        <td><?php echo html::checkBox('clearDB', $lang->install->clearDB, '', 'style="display: none"'); ?></td>
+                        <td>
+                            <div id="step2_js_clearDB">
+                                <?php echo html::checkBox('clearDB', $lang->install->clearDB); ?>
+                            </div>
+                        </td>
                     </tr>
                 </table>
             </div>
