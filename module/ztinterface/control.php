@@ -985,6 +985,14 @@ class ztinterface extends control
     }
 
     public function editbaseurl($productID){
+        if(!empty($_POST)){
+            if(isset($_POST['delete']) and $_POST['delete'] === 'on'){
+                $this->ztinterface->editBaseURL($productID, 1);
+            }else{
+                $this->ztinterface->editBaseURL($productID, 0);
+            }
+        }
+        $this->view->product = $this->loadModel('product')->getById($productID);
         $this->view->baseURLList = $this->ztinterface->getBaseURLList($productID);
         $this->view->baseURLPairs = $this->ztinterface->getBaseURLPairs($productID);
         $this->display();

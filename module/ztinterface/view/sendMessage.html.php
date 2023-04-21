@@ -82,9 +82,9 @@
           <div class='detail'>
             <div class='detail-title' style="display: flex; justify-content: space-between;">
               <?php echo $lang->ztinterface->url;?>
-              <button id="tableCustomBtn" type="button" class="btn btn-link" style="float: right;">
-                <i class="icon-cog-outline"></i>
-              </button>
+              <?php 
+                echo html::a($this->createLink('ztinterface','editbaseurl',"productID=$interface->product&onlybody=yes"), '<i class="icon-cog-outline"></i>', '', "class=\"btn iframe\" title=\"修改基地址集\" data-app=\"ztinterface\" style=\"float: right;\"")
+              ?>
             </div>
             <div class="detail-content">
               <div class="input-control" style="display: flex; align-items: center;">

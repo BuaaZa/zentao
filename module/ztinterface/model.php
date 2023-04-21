@@ -148,9 +148,31 @@ class ztinterfaceModel extends model
 
     public function getBaseURLPairs($productID)
     {
-        return $this->dao->select('id,name')->from(TABLE_BASEURL)
+        return array(0=>'新建') + $this->dao->select('id,name')->from(TABLE_BASEURL)
                 ->where('product')->eq($productID)
                 ->fetchPairs();
+    }
+
+    public function editBaseURL($productID, $delete = 0){
+        if($delete){
+            $this->dao->delete()->from(TABLE_BASEURL)->where('id')->eq((int)$_POST['method'])->exec();
+            return;
+        }
+        $id = (int)$_POST['method'];
+        $url = fixer::input('post')
+            ->setIF((int)$productID, 'product', $productID)
+            ->remove('delete,method')
+            ->get();
+        if((int)$id === 0){
+            $this->dao->insert(TABLE_BASEURL)->data($url)
+                ->autoCheck()
+                ->exec();
+        }else{
+            $this->dao->update(TABLE_BASEURL)->data($url)
+                ->where('id')->eq($id)
+                ->exec();
+        }
+        return;
     }
     
     public function generateBody($content, $level, $path, $inArray = false)

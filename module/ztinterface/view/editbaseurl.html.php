@@ -12,33 +12,36 @@
 ?>
 <?php include '../../common/view/header.html.php';?>
 <?php include '../../common/view/kindeditor.html.php';?>
+<?php js::set('urls', $baseURLList);?>
 <div id='mainContent' class='main-content'>
   <div class='main-header'>
     <h2>
-      <span class='prefix label-id'><strong><?php echo $project->id;?></strong></span>
-      <?php echo isonlybody() ? ("<span title='$project->name'>" . $project->name . '</span>') : html::a($this->createLink('project', 'view', 'project=' . $project->id), $project->name, '_blank');?>
-      <?php if(!isonlybody()):?>
-      <small><?php echo $lang->arrow . $lang->{$project->type}->suspend;?></small>
-      <?php endif;?>
+      <?php echo "<span title='$product->name'>" . $product->name . '-基地址</span>'; ?>
     </h2>
   </div>
   <form class='load-indicator main-form' method='post' target='hiddenwin'>
     <table class='table table-form'>
-      <tr class='hide'>
-        <th><?php echo $lang->project->status;?></th>
-        <td><?php echo html::hidden('status', 'suspended');?></td>
-      </tr>
-      <?php $this->printExtendFields($project, 'table');?>
       <tr>
-        <th class='w-50px'><?php echo $lang->comment;?></th>
-        <td><?php echo html::textarea('comment', '', "rows='6' class='form-control kindeditor' hidefocus='true'");?></td>
+        <th class='w-120px'><?php echo "新建/修改"?></th>
+        <td colspan='7'><?php echo html::select('method', $baseURLPairs, 0,"class='form-control chosen'");?></td>
       </tr>
       <tr>
-        <td colspan='2' class='text-center form-actions'><?php echo html::submitButton($lang->{$project->type}->suspend) . html::linkButton($lang->goback, $this->session->taskList, 'self', '', 'btn btn-wide'); ?></td>
+        <th class='w-120px'><?php echo "名称"?></th>
+        <td colspan='6'>
+            <?php echo html::input('name', "", "class='form-control'");?>
+        </td>
+        <td><input tabindex='-1' id="delete" name="delete" disabled type="checkbox" class='notNull'>删除该条目</input></td>
+      </tr>
+      <tr>
+        <th class='w-120px'><?php echo "基地址"?></th>
+        <td colspan='7'><?php echo html::input('url', "", "class='form-control'");?></td>
+      </tr>
+      <tr>
+        <td colspan='8' class='text-center form-actions'>
+          <?php echo html::submitButton();?>
+        </td>
       </tr>
     </table>
   </form>
-  <hr class='small' />
-  <div class='main'><?php include '../../common/view/action.html.php';?></div>
 </div>
 <?php include '../../common/view/footer.html.php';?>
