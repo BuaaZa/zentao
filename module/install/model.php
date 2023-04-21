@@ -711,38 +711,4 @@ class installModel extends model
             }
         }
     }
-
-    /**
-     * Import demo data.
-     *
-     * @access public
-     * @return void
-     */
-    public function importDemoData()
-    {
-        $demoDataFile = $this->app->clientLang == 'en' ? 'endemo.sql' : 'demo.sql';
-        $demoDataFile = $this->app->getAppRoot() . 'db' . DS . $demoDataFile;
-        $insertTables = explode(";\n", file_get_contents($demoDataFile));
-        foreach($insertTables as $table)
-        {
-            $table = trim($table);
-            if(empty($table)) continue;
-
-            $table = str_replace('`zt_', $this->config->db->name . '.`zt_', $table);
-            $table = str_replace('zt_', $this->config->db->prefix, $table);
-            if(!$this->dbh->query($table)) return false;
-
-            /* Make the deleted user of demo data undeleted.*/
-            if($this->config->edition == 'open') $this->dao->update(TABLE_USER)->set('deleted')->eq('0')->where('deleted')->eq('1')->exec();
-        }
-
-        $config = new stdclass();
-        $config->module  = 'common';
-        $config->owner   = 'system';
-        $config->section = 'global';
-        $config->key     = 'showDemoUsers';
-        $config->value   = '1';
-        $this->dao->replace(TABLE_CONFIG)->data($config)->exec();
-        return true;
-    }
 }

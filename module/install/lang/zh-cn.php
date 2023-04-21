@@ -153,7 +153,6 @@ $lang->install->errorUpdateDB       = '数据库升级失败';
 $lang->install->errorTableExists    = '数据表已经存在，您之前应该有安装过禅道，继续安装请返回前页并选择清空数据';
 $lang->install->errorCreateTable    = '创建表失败';
 $lang->install->errorEngineInnodb   = '您当前的数据库不支持使用InnoDB数据表引擎，请修改为MyISAM后重试。';
-$lang->install->errorImportDemoData = '导入demo数据失败';
 
 $lang->install->setConfig          = '生成配置文件';
 $lang->install->key                = '配置项';

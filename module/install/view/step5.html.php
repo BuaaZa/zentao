@@ -63,9 +63,6 @@
             <th><?php echo $lang->install->password;?></th>
             <td><?php echo html::input('password', '', "class='form-control' placeholder='{$lang->install->placeholder->password}' oninput=\"this.value = this.value.replace(/[^\\x00-\\xff]/g, '');\"");?></td>
           </tr>
-          <tr>
-            <th></th><td><?php echo html::checkBox('importDemoData', $lang->install->importDemoData);?></td>
-          </tr>
           <tr class='text-center'>
             <td colspan='2'><?php echo html::submitButton();?></td>
           </tr>
