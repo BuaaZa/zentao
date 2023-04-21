@@ -127,29 +127,50 @@ class datasampleModel extends model
         return $response;
     }
 
-    public function mockInteger($params = ''){
-        $min = -65535;
-        $max = 65535;
+    public function mockInteger($params = '', $except = false){
+        $response = array();
+        $response['exception'] = array();
+        $min = -2147483646;
+        $max = 2147483646;
 
+        $minFlag = false;
+        $maxFlag = false;
         if(isset($params[0]) and is_numeric($params[0])){
             $min = (int)$params[0];
             if($min != (float)$params[0]){
                 $min = $min + 1;
             }
+            $minFlag = true;
         }
         if(isset($params[1]) and is_numeric($params[1])){
             $max = (int)$params[1];
+            $maxFlag = true;
         }
 
         if($min > $max){
             $temp = $min;
             $min = $max;
             $max = $temp;
+
+            $temp = $minFlag;
+            $minFlag = $maxFlag;
+            $maxFlag = $temp;
         }
 
-        $faker = $this->loadModule('ztinterface')->getFaker('en_US');
-        $response['value'] = $faker->numberBetween($min,$max);
-
+        if($except){
+            if($minFlag){
+                $response['exception'][] = array('value'=>$min,'type'=>'下边界');
+                $response['exception'][] = array('value'=>$min-1,'type'=>'下越界');
+            }
+            if($maxFlag){
+                $response['exception'][] = array('value'=>$max,'type'=>'上边界');
+                $response['exception'][] = array('value'=>$max+1,'type'=>'上越界');
+            }
+        }else{
+            $faker = $this->loadModule('ztinterface')->getFaker('en_US');
+            $response['value'] = $faker->numberBetween($min,$max);
+        }
+        
         return $response;
     }
 
