@@ -176,13 +176,14 @@ function initSteps(selector)
             $step.addClass('step-new').addClass('text-center');
             console.log($.cookie('isSampleEmpty'));
             console.log($.cookie('isSampleEmpty')==0);
-            if($.cookie('isSampleEmpty')==0 && $('#steps tr td.stepsample-actions input').val()!=''){
+            if($row.find('.step-type').val()=='step' && $.cookie('isSampleEmpty')==0 && $('#steps tr td.stepsample-actions input').val()!=''){
                 var $stepSampleActions = $step.find('td.stepsample-actions');
                 $stepSampleActions.find('a').attr("disabled",true).css("pointer-events","none");
                 $stepSampleActions.find('button').attr("disabled",true);
             }
             if(type) $step.find('.step-type').val(type);
         }
+
         if(!notFocus && $step) setTimeout(function(){$step.find('.step-steps').focus();}, 10);
     };
     var updateStepType = function($step, type, defaultText)
@@ -217,6 +218,12 @@ function initSteps(selector)
                 stepID = parentId++;
                 $step.find('.step-id').text(stepID);
                 childId = 0;
+            }else if(type == 'sampleInput'){
+                $step.removeClass('step-item').removeClass('step-group').addClass('step-step');
+                stepID = parentId++;
+                $step.find('.step-id').text(stepID);
+                childId = 0;
+                defaultText = '输入项名称';
             }
             else // step type is not set
             {
@@ -246,11 +253,13 @@ function initSteps(selector)
             $step.find('[name^="stepIoType["]').attr('name', "stepIoType[" +stepID + ']');
             $step.find('[name^="datasample["]').attr('name', "datasample[" +stepID + ']');
             $step.find('[name^="is_updated["]').attr('name', "is_updated[" +stepID + ']');
+            $step.find('[name^="inputs_rules["]').attr('name', "inputs_rules[" +stepID + ']');
 
-            if($step.find('.step-group-toggle2').is(':checked')){
-                $step.find('.step-iotype').val('1');
-            }else{
-                $step.find('.step-iotype').val('0');
+            if(type == 'sampleInput'){
+                $step.find('[id^="inputs"]').attr('name', "inputs_rules[" +stepID + "][0]");
+                $step.find('[id^="rules"]').attr('name', "inputs_rules[" +stepID + "][1]");
+                $step.find('[name^="normal_examples["]').attr('name', "normal_examples[" +stepID + ']');
+                $step.find('[name^="abnormal_examples["]').attr('name', "abnormal_examples[" +stepID + ']');
             }
             updateStepType($step, type, defaultText);
         });

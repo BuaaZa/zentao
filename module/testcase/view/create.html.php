@@ -200,6 +200,7 @@ foreach(explode(',', $config->testcase->create->requiredFields) as $field)
                     <td><textarea rows='1' class='form-control autosize step-expects' name='expects[]'></textarea></td>
                     <td><textarea rows='1' class='form-control autosize step-expects' name='eval_criterias[]'></textarea></td>
                     <td class='step-actions stepsample-actions'>
+                        <input type='hidden' name='inputs_rules[]' id='inputs_rules' value='' class='step-inputs-rules'>
                         <input type='hidden' name='datasample[]' id='datasample' value='' class='step-datasample'>
                         <?php
                           common::printIcon('testcase', 'datasample',"", '',
@@ -257,6 +258,7 @@ foreach(explode(',', $config->testcase->create->requiredFields) as $field)
                     <td><?php echo html::textarea('expects[]', $step->expect, "rows='1' class='form-control autosize step-expects'") ?></td>
                     <td><?php echo html::textarea('eval_criterias[]', $step->eval_criteria, "rows='1' class='form-control autosize step-expects'") ?></td>
                     <td class='step-actions stepsample-actions'>
+                        <input type='hidden' name='inputs_rules[]' id='inputs_rules' value='' class='step-inputs-rules'>
                         <input type='hidden' name='datasample[]' id='datasample' value='' class='step-datasample'>
                         <?php
                             common::printIcon('testcase', 'datasample',"", '',
