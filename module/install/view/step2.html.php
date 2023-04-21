@@ -81,14 +81,14 @@ include '../../common/view/header.lite.html.php'; ?>
                         <td>
                             <?php echo html::input('dbPrefix', 'zt_', "class='form-control'"); ?>
                         </td>
-                        <td><?php echo html::checkBox('clearDB', $lang->install->clearDB); ?></td>
+                        <td></td>
                     </tr>
                     <tr>
                         <th><?php echo $lang->install->installType; ?></th>
                         <td>
                             <?php echo html::select('installType', $lang->install->installTypes, 'install', "class='form-control'"); ?>
                         </td>
-                        <td></td>
+                        <td><?php echo html::checkBox('clearDB', $lang->install->clearDB, '', 'style="display: none"'); ?></td>
                     </tr>
                 </table>
             </div>

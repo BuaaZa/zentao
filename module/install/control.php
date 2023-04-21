@@ -149,7 +149,7 @@ class install extends control
     {
         if(!empty($_POST))
         {
-            $return = $this->install->checkConfig();
+            $return = $this->install->initDatabase();
             if($return->result == 'ok')
             {
                 /* Set the session save path when the session save path is null. */
