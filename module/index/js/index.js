@@ -59,13 +59,15 @@
                 .append($link)
                 .appendTo($menuMainNav);
 
-            var moreLink = createLink('index', 'ajaxGetMoreList', 'checkApp='+item.code);
-            $.get(moreLink, function(data){
-                var $itemLi = $("#menuMainNav li[data-app='"+item.code+"']");
-                $itemLi.append(data);
-            });
-            
-            $li.appendTo($menuMainNav);
+            if(item.code== 'qa'){
+                var moreLink = createLink('index', 'ajaxGetMoreList', 'checkApp='+item.code);
+                $.get(moreLink, function(data){
+                    var $itemLi = $("#menuMainNav li[data-app='"+item.code+"']");
+                    $itemLi.append(data);
+                });
+
+                $li.appendTo($menuMainNav);
+            }
 
             $link.tooltip({title: item.text, container: 'body', placement: 'right', tipClass: 'menu-tip'});
 

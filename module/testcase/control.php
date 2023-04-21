@@ -2719,6 +2719,19 @@ class testcase extends control
         $this->display();
     }
 
+    public function generatedatasample()
+    {
+        if($this->server->request_method == 'POST')
+        {
+            return $this->send(
+                array(
+                    'result' => 'success',
+                    'message' => $this->lang->saveSuccess,
+                    'closeModal' => true));
+        }
+        $this->display();
+    }
+
     /**
      * Case bugs.
      *
