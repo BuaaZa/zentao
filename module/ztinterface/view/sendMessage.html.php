@@ -198,7 +198,7 @@
               <span>生成报文</span>
             </button>
             <button type="button" id="sendMessage" class="btn btn-wide btn-primary">
-              <i class=" icon-run" title="全部随机" data-app="ztinterface"></i>
+              <i class=" icon-run" title="发送报文" data-app="ztinterface"></i>
               <span>发送报文</span>
             </button>
           </div>
@@ -220,6 +220,9 @@
             </div>
             <div class='detail-content'>
               <?php echo html::textarea('wrongView', '', "disabled rows='8' class=' form-control'");?>
+              <button type="button" id="confirmSend" class="btn btn-wide btn-primary">
+                <span>仍要发送</span>
+              </button>
             </div>
           </div>
         </div>

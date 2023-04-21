@@ -495,7 +495,7 @@ class ztinterface extends control
             }
         }
 
-        $args = $this->ztinterface->parseParams($data["params"]);
+        $args = json_decode($data["params"]);
         $gen = $data['funcName'];
 
         $format = 'Y-m-d H:i:s';
@@ -935,7 +935,9 @@ class ztinterface extends control
         return;
     }
 
-    public function checkAndSend(){
+    public function checkAndSend($confirm = false){
+        if($confirm === 'true')
+            $confirm = true;
         $response = array();
         $response['error'] = array();
         $body = json_decode($_POST['body']);
@@ -946,14 +948,13 @@ class ztinterface extends control
             return;
         }
         if(!$body){
-            if(!$_POST['body']){
-                $need[] = "请求体";
-            }else if(!$body){
-                $need[] = "合法的请求体";
+            if($_POST['body']){
+                $response['error'][] = array('message'=>'请提供合法的请求体','from'=>'alter');
+                echo json_encode($response);
+                return;
+            }else{
+                $body = new stdClass();
             }
-            $response['error'][] = array('message'=>'请提供'.join(',',$need),'from'=>'alter');
-            echo json_encode($response);
-            return;
         }
 
         $url = rtrim($_POST['baseUrl'], '/') . '/' . ltrim($interface->url, '/');
@@ -969,7 +970,7 @@ class ztinterface extends control
 
         $data = json_decode($interface->data, true);
         $res = $this->ztinterface->checkObject($body, $data,'');
-        if(!empty($res['error'])){
+        if(!$confirm and !empty($res['error'])){
             $response['error'] = array_merge($response['error'], $res['error']);
         }else{
             $res = $this->ztinterface->sendMessage($_POST['head'], $body, $interface->method, $url);
@@ -991,6 +992,8 @@ class ztinterface extends control
             }else{
                 $this->ztinterface->editBaseURL($productID, 0);
             }
+            $newDataList = $this->ztinterface->getBaseURLDataList($productID);
+            return print(js::closeModal('parent.parent', '', "parent.parent.updateBaseURL('$newDataList')"));
         }
         $this->view->product = $this->loadModel('product')->getById($productID);
         $this->view->baseURLList = $this->ztinterface->getBaseURLList($productID);
@@ -998,3 +1001,4 @@ class ztinterface extends control
         $this->display();
     }
 }
+

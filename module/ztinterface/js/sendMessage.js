@@ -152,12 +152,16 @@ $('button#genMessage').click(function(){
   });
 });
 
-$('button#sendMessage').click(function(){
+$('button#sendMessage, button#confirmSend').click(function(){
   var head = getHeadData();
+  var button = $(this);
   var bodyText = $('textarea#messageBodyView').val();
   var baseUrl = $('input#baseURL').val();
   var postData = {head:head, body:bodyText, id:interfaceID, baseUrl:baseUrl};
   var link = createLink('ztinterface', 'checkAndSend', '');
+  if($(this).attr('id') == 'confirmSend'){
+    var link = createLink('ztinterface', 'checkAndSend', 'confirm=true');
+  }
   $.post(link, postData, function(res) {
     var response = {};
     try {
@@ -212,13 +216,18 @@ $('button#sendMessage').click(function(){
       statusSpan.hide();
     }
     var errorMessage = '';
+    var canSend = true;
     if(response['error']){
       response['error'].forEach(function(error) {
         if(error['from'].toLowerCase() === 'baseurl'){
           var span = $('div#urlError span#error');
           showError(span,error['message']);
+          if(error['message'] == 'URL部分不合法'){
+            canSend = false;
+          }
         }else if(error['from'] === 'alter'){
           showAlterbox(error['message'],'#FF6347',button);
+          canSend = false;
         }else if(error['from']==='input'){
           if(error['id']){
             var span = $('tr#'+error['id']+' td#value span#error');
@@ -231,11 +240,17 @@ $('button#sendMessage').click(function(){
     }
     if(errorMessage === ''){
       errorDiv.hide();
+      $('button#confirmSend').hide();
       div.show();
     }else{
       errorDiv.show();
       errorMessage = "报文校验失败:\r\n" + errorMessage;
       errorDiv.find("textarea#wrongView").val(errorMessage);
+      if(canSend){
+        $('button#confirmSend').show();
+      }else{
+        $('button#confirmSend').hide();
+      }
       div.hide();
     }
   });
@@ -610,6 +625,11 @@ function isJsonObject(value) {
   } catch (e) {
     return false;
   }
+}
+
+function updateBaseURL(dataList){
+  var newDataList = $(dataList);
+  $('datalist#baseUrlList').replaceWith(newDataList);
 }
 
 const funcTable = [

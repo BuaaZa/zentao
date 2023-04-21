@@ -1,6 +1,7 @@
 {
     "require": {
         "hoa/regex": "~1.0",
-        "fzaninotto/faker": "^1.5"
+        "fzaninotto/faker": "^1.5",
+        "jms/serializer": "^3.0"
     }
 }

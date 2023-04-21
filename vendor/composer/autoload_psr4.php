@@ -6,6 +6,10 @@ $vendorDir = dirname(__DIR__);
 $baseDir = dirname($vendorDir);
 
 return array(
+    'Psr\\Cache\\' => array($vendorDir . '/psr/cache/src'),
+    'PHPStan\\PhpDocParser\\' => array($vendorDir . '/phpstan/phpdoc-parser/src'),
+    'Metadata\\' => array($vendorDir . '/jms/metadata/src'),
+    'JMS\\Serializer\\' => array($vendorDir . '/jms/serializer/src'),
     'Hoa\\Zformat\\' => array($vendorDir . '/hoa/zformat'),
     'Hoa\\Visitor\\' => array($vendorDir . '/hoa/visitor'),
     'Hoa\\Ustring\\' => array($vendorDir . '/hoa/ustring'),
@@ -20,4 +24,8 @@ return array(
     'Hoa\\Consistency\\' => array($vendorDir . '/hoa/consistency'),
     'Hoa\\Compiler\\' => array($vendorDir . '/hoa/compiler'),
     'Faker\\' => array($vendorDir . '/fzaninotto/faker/src/Faker'),
+    'Doctrine\\Instantiator\\' => array($vendorDir . '/doctrine/instantiator/src/Doctrine/Instantiator'),
+    'Doctrine\\Deprecations\\' => array($vendorDir . '/doctrine/deprecations/lib/Doctrine/Deprecations'),
+    'Doctrine\\Common\\Lexer\\' => array($vendorDir . '/doctrine/lexer/src'),
+    'Doctrine\\Common\\Annotations\\' => array($vendorDir . '/doctrine/annotations/lib/Doctrine/Common/Annotations'),
 );
