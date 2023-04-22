@@ -1,94 +1,21 @@
 <?php include '../../common/view/header.lite.html.php'; ?>
 <div id='mainContent' class='main-content'>
-
     <div class='main-header'>
         <h2>填写数据样本</h2>
     </div>
+
     <div style="text-align:center">
         <form class='load-indicator main-form form-ajax'
               method='post' enctype='multipart/form-data'
               id='dataform' data-type='ajax'>
-            <table id="testTable"
+            <table id="sampleTable"
                    class='table table-form mg-0 table-bordered'>
                 <thead>
                     <tr class="text-center">
                     </tr>
                 </thead>
 
-                <tbody id='steps' class='sortable' data-group-name='<?php echo $lang->testcase->groupName ?>'>
-
-                <?php foreach ($steps as $stepID => $step): ?>
-                    <tr class='step '>
-
-                        <td class='step-id'></td>
-                        <td>
-                            <div class='input-group'>
-                                <!-- <span class='input-group-addon step-item-id'></span> -->
-                                <?php
-                                echo html::textarea('steps[]', $step->desc,
-                                    "rows='1' class='form-control autosize step-steps'")
-                                ?>
-                                <input type='hidden' name='stepType[]' value='step' class='step-type'>
-                                <!--<span class='input-group-addon step-type-toggle'>
-                          <?php /*if(!isset($step->type)) $step->type = 'step';*/ ?>
-                          <input type='hidden' name='stepType[]' value='<?php /*echo $step->type;*/ ?>' class='step-type'>
-                               <div class='checkbox-primary'>
-                            <input tabindex='-1' type="checkbox" class='step-group-toggle'<?php /*//if($step->type === 'group') echo ' checked' */ ?>>
-                            <label><?php /*//echo $lang->testcase->group */ ?></label>
-                          </div>
-                        </span>
-                        <span class='input-group-addon step-type-toggle2'>
-                          <?php /*if(!isset($step->iotype)) $step->iotype = '0';*/ ?>
-                          <input type='hidden' name='stepIoType[]' value='<?php /*echo $step->iotype;*/ ?>' class='step-iotype'>
-                          <div class='checkbox-primary'>
-                            <input tabindex='-1' type="checkbox" class='step-group-toggle2'<?php /*if($step->iotype === '1') echo ' checked' */ ?>>
-                            <label><?php /*echo "勾选为输出项" */ ?></label>
-                          </div>
-                        </span>-->
-                            </div>
-                        </td>
-                        <!--                    <td>-->
-                        <?php //echo html::textarea('inputs[]', $step->input, "rows='1' class='form-control autosize step-expects'") ?><!--</td>-->
-                        <td><?php echo html::textarea('goal_actions[]', $step->goal_action, "rows='1' class='form-control autosize step-expects'") ?></td>
-                        <td><?php echo html::textarea('expects[]', $step->expect, "rows='1' class='form-control autosize step-expects'") ?></td>
-                        <td><?php echo html::textarea('eval_criterias[]', $step->eval_criteria, "rows='1' class='form-control autosize step-expects'") ?></td>
-                        <td class='stepsample-actions'>
-                            <input type='hidden' name='datasample[]' id='datasample' value='' class='step-datasample'>
-                            <?php
-                            common::printIcon('testcase', 'datasample', "", '',
-                                'list', 'edit', '', 'showinonlybody iframe btn-datasample',
-                                true, '', '填写');
-                            common::printIcon('testcase', 'generatedatasample', "", '',
-                                'list', 'list', '', 'showinonlybody iframe btn-generatedatasample',
-                                true, '', '显示数据样本');
-                            //                          echo $this->loadModel('common')->buildMenu('testcase', 'datasample',"", '',
-                            //                            'button', 'edit', '', 'showinonlybody iframe',
-                            //                            true, '', '填写');
-                            ?>
-                            <!--                        <button type='button' title="显示数据样本" class='btn datasample-generate ' >-->
-                            <!--                          <i class='icon icon-list'></i>-->
-                            <!--                        </button>-->
-                            <button type='button' title="重置数据样本" class='btn datasample-undo '>
-                                <i class='icon icon-undo'></i>
-                            </button>
-                        </td>
-
-                        <td class='step-actions'>
-                            <div class='btn-group'>
-                                <button type='button' class='btn btn-step-add' tabindex='-1'>
-                                    <i class='icon icon-plus'></i>
-                                </button>
-                                <button type='button' class='btn btn-step-move' tabindex='-1'>
-                                    <i class='icon icon-move'></i>
-                                </button>
-                                <button type='button' class='btn btn-step-delete' tabindex='-1'>
-                                    <i class='icon icon-close'></i>
-                                </button>
-                            </div>
-                        </td>
-
-                    </tr>
-                <?php endforeach; ?>
+                <tbody id='steps' class='sortable'>
                 </tbody>
 
             </table>
@@ -96,8 +23,8 @@
             <!--<button class="btn" type="button" onclick="addRow();">添加输入项</button>
             <button class="btn" type="button" onclick="addCol();">添加测试样本</button>-->
             <button name="generateSampleButton" class="btn btn-wide btn-info"
-                    type="button" onclick="generateDataSample();">
-                生成示例样本
+                    type="button" onclick="regenerateDataSample();">
+                重新生成示例样本
             </button>
             <button name="saveButton" class="btn btn-wide btn-primary"
                     type="button" onclick="save_in_cookie();">
@@ -119,61 +46,78 @@
     let dataSampleRuleFromInput;
     //  ajax请求得到的样本示例
     let dataSampleItemJson;
+    //  当前数据样本，二维数组，内容是string
+    let curDataSample
 
     $(function () {
         stepID = $.cookie('curStepID');
-        let nameStr = 'datasample[' + stepID + ']';
+        // 获得数据输入项及规则
+        let nameStr = 'inputs_rules[' + stepID + ']';
         let selector = parent.document.getElementsByName(nameStr);
         let element = $(selector);
         dataSampleRuleFromInput = element.attr("value");
+        // console.log(dataSampleRuleFromInput)
 
-        // TODO: MOCK
-        let jsonRule = [
-            ['密码', 'int'],
-            ['用户名', 'string'],
-            ['邮箱', 'string'],
-            ['电话', 'string'],
-            // ['邮箱', 'int'],
-        ];
-        dataSampleRuleFromInput = JSON.stringify(jsonRule);
+        // 获得已填数据样本
+        let nameStr2 = 'datasample[' + stepID + ']';
+        let selector2 = parent.document.getElementsByName(nameStr2);
+        let element2 = $(selector2);
+        curDataSample = element2.attr("value");
+        console.log(curDataSample)
 
         if (dataSampleRuleFromInput.length > 0) {
             dataSampleRuleFromInput = JSON.parse(dataSampleRuleFromInput);
+            // console.log(dataSampleRuleFromInput)
             ruleCountMax = dataSampleRuleFromInput.length;
 
             addHead();
-
             generateTemplate();
 
-            generateDataSample();
-        }
-
-        initStepsForDataSample();
-
-        // 根据历史填写 显示样本
-        /*if (curDataSample.length > 0) {
-            curDataSample = JSON.parse(curDataSample);
-            let rowCountMax = curDataSample.length;
-            let colCountMax = curDataSample[0].length;
-            while (rowCount < rowCountMax) {
-                addRow();
-            }
-            while (colCount < colCountMax) {
-                addCol();
-            }
-            for (i = 0; i < rowCountMax; i += 1) {
-                for (j = 0; j < colCountMax; j += 1) {
-                    let textName = 'datasample[' + i + '][' + j + ']';
-                    selector = document.getElementsByName(textName);
-                    element = $(selector);
-                    element.text(curDataSample[i][j]);
+            if(!curDataSample.length > 0){
+                // dataSampleItemJson = ajaxGetDataSampleJson()
+                dataSampleItemJson = {
+                    error: [
+                        {
+                            id: '0',
+                            message: 'error'
+                        }
+                    ],
+                    samples: [
+                        [
+                            {
+                                id: '0',
+                                value: '123456'
+                            },
+                            {
+                                id: '1',
+                                value: 'za'
+                            }
+                        ],
+                        [
+                            {
+                                id: '0',
+                                value: '123456'
+                            },
+                            {
+                                id: '1',
+                                value: 'za'
+                            }
+                        ]
+                    ]
                 }
+                curDataSample = sampleJsonConvertToArray(dataSampleItemJson)
+            }else{
+                curDataSample = JSON.parse(curDataSample)
             }
-        }*/
+
+            generateDataSample()
+        }
+        initSteps();
+
     })
 
     function addHead() {
-        let testTableHead = $('#testTable thead tr');
+        let testTableHead = $('#sampleTable thead tr');
         // let rowTemplate = "<th class='step-id'> <b>样本编号</b> </th>"
 
         let rowTemplate = "<th class='sample-id'> <b>样本编号</b> </th>"
@@ -188,19 +132,24 @@
     }
 
     function generateTemplate(){
-        let testTableBody = $('#testTable tbody');
+        let testTableBody = $('#sampleTable tbody');
 
-        let sampleTemplate = "<tr class='sample step template' id='stepTemplate'>"
+        let sampleTemplate = "<tr class='step template' data-type='sample' id='stepTemplate'>"
         sampleTemplate += "<td class='sample-id step-id'></td>";
+        sampleTemplate += "<input type='hidden' name='stepType[]' value='sample' class='step-type'>"
 
+        //  列从 0 开始
         for (let i = 0; i < ruleCountMax; i++) {
             sampleTemplate += `<td>
-                                    <textarea rows='1' class='form-control autosize step-expects'>
-                                    </textarea>
+                                <textarea rows='1' class='form-control autosize step-expects input_value'
+                                          name='datasampleitem[][]' data-rule=` +
+                                 i +
+                                ">"+
+                                `</textarea>
                                 </td>`
         }
         sampleTemplate += `
-                <td class='sample-actions'>
+                <td class='sample-actions step-actions'>
                     <div class='btn-group'>
                         <button type='button' class='btn btn-step-add' tabindex='-1'>
                             <i class='icon icon-plus'></i>
@@ -213,17 +162,16 @@
                         </button>
                     </div>
                 </td>`
-
         sampleTemplate += "</tr>"
-
         testTableBody.append(sampleTemplate);
     }
 
-    function generateDataSample() {
+    function ajaxGetDataSampleJson(){
         // TODO: ajax请求获取数据样本
         $.ajaxSettings.async = false;
         // url: /module=datasample&method=batchGenerate
         let ajaxGenerateDataSampleLink = createLink('datasample', 'batchGenerate');
+        // 准备数据
         let ruleList =[];
         for (let i = 0; i < ruleCountMax; i++) {
             ruleList.push({
@@ -231,6 +179,8 @@
                 mock: dataSampleRuleFromInput[i][1]
             })
         }
+
+        let ret;
 
         $.ajax(
             {
@@ -257,7 +207,8 @@
                             time: 900 // 不进行自动隐藏
                         }).show();
                     }else{
-                        dataSampleItemJson = response
+                        // dataSampleItemJson = response
+                        ret = response
                     }
                 },
                 error: function () {
@@ -267,55 +218,29 @@
         )
         $.ajaxSettings.async = true;
 
+        return ret
+    }
 
-        dataSampleItemJson = {
-            error: [
-                {
-                    id: '0',
-                    message: 'error'
-                }
-            ],
-            samples: [
-                [
-                    {
-                        id: '0',
-                        value: '123456'
-                    },
-                    {
-                        id: '1',
-                        value: 'za'
-                    }
-                ],
-                [
-                    {
-                        id: '0',
-                        value: '123456'
-                    },
-                    {
-                        id: '1',
-                        value: 'za'
-                    }
-                ]
-            ]
-        }
-
-        let sampleNum = dataSampleItemJson.samples.length;
-
-        let testTableBody = $('#testTable tbody');
-
+    // 根据curDataSample 重新生成数据样本
+    function generateDataSample() {
+        let testTableBody = $('#sampleTable tbody');
         testTableBody.find('tr:not(.template)').remove()
 
-        for (let i = 0; i < sampleNum; i++) {
-            let curSample = dataSampleItemJson.samples[i];
+        let sampleNum = curDataSample.length;
+
+        for (let i = 1; i <= sampleNum; i++) {
+            let curSample = curDataSample[i-1];
             // let sampleTemplate = "<tr class='step '>"
-            let sampleTemplate = "<tr class='sample step'>"
-            sampleTemplate += "<td class='sample-id step-id'>"+(i+1)+"</td>";
+            let sampleTemplate = "<tr class='step' data-type='sample'>"
+            sampleTemplate += "<td class='sample-id step-id'>"+ i +"</td>";
+            sampleTemplate += "<input type='hidden' name='stepType[]' value='sample' class='step-type'>"
 
             for (let j = 0; j < ruleCountMax; j++) {
                 sampleTemplate += "<td><textarea rows='1' class='form-control autosize step-expects' " +
-                    "name='datasampleitem[" + i + "][" + j + "]'>" +
-                    (parseInt(curSample.id)  == j ? curSample.value : '') +
-                    "</textarea></td>"
+                    "name='datasampleitem[" + i + "][" + j + "]' data-rule="+ j + ">" +
+                    ((curSample[j]) ? curSample[j] : '') +
+                    "</textarea>" +
+                    "</td>"
             }
             sampleTemplate += `
                 <td class='sample-actions'>
@@ -336,134 +261,51 @@
 
             testTableBody.append(sampleTemplate);
         }
-    }
-
-    function addRow(index) {
-        //$('#submit').attr("disabled",false);
-        let testtable = $("#testTable");
-        let lastRow = testtable.find("tr:last");
-        let lastRowTexts = lastRow.find("textarea");
-        lastRowTexts.each(function () {
-            let indices = $(this).attr('name').match(/\d+/g);
-            let row = parseInt(indices[0]); // get row index as number
-            let col = parseInt(indices[1]); // get column index as number
-            row += 1;
-            $(this).attr('name', 'datasample[' + row + '][' + col + ']');
-        });
-
-        rowCount++;
-        let rowTemplate_1 = "<tr><td><textarea rows='1' class='form-control autosize step-expects' name='datasample[" + (rowCount - 2) + "][0]' placeholder='输入项'></textarea></td>";
-        let rowTemplate_2 = '';
-        for (i = 1; i < colCount; i++) {
-            let tmp_template = "<td><textarea rows='1' class='form-control autosize step-expects' name='datasample[" + (rowCount - 2) + "][" + i + "]'></textarea></td>";
-            rowTemplate_2 += tmp_template;
-        }
-        let rowTemplate_3 = '</tr>';
-        let rowTemplate = rowTemplate_1 + rowTemplate_2 + rowTemplate_3;
-
-        if (lastRow.length) {
-            lastRow.before(rowTemplate);
-        } else {
-            testtable.append(rowTemplate);
-        }
 
     }
 
-    function delRow(_id) {
-        $("#testTable .tr_" + _id).hide();
-        rowCount--;
+    function regenerateDataSample(){
+        // Todo
+        dataSampleItemJson = ajaxGetDataSampleJson()
+        curDataSample = sampleJsonConvertToArray(dataSampleItemJson)
+        generateDataSample()
     }
 
-    function addCol() {
-        colCount++;
-        let i = 1;
-        $("#testTable tr").each(function () {
-            let trHtml = '';
-            if (i === 1) {
-                trHtml = '<td><b>样本' + (colCount - 1) + '</b></td>';
-            } else {
-                trHtml = "<td><textarea rows='1' class='form-control autosize step-expects' name='datasample[" + (i - 2) + "][" + (colCount - 1) + "]'></textarea></td>";
+    function sampleJsonConvertToArray(sampleJson){
+        let ret = [];
+        let samples = sampleJson.samples
+        for (let i = 0; i < samples.length ; i++) {
+            let sample =[];
+            for (let j = 0; j < samples[i].length; j++) {
+                sample.push(samples[i][j].value)
             }
-
-            $(this).append(trHtml);
-            i++;
-        });
-    }
-
-    function delCol(_id) {
-        $("#testTable tr").each(function () {
-            $("td:eq(" + _id + ")", this).hide();
-        });
-        colCount--;
-    }
-
-    function mover(_id) {
-        $("#testTable tr:not(:first)").each(function () {
-            $("td:eq(" + _id + ")", this).removeClass("cl1");
-            $("td:eq(" + _id + ")", this).addClass("cl2");
-        });
-    }
-
-    function mout(_id) {
-        $("#testTable tr:not(:first)").each(function () {
-            $("td:eq(" + _id + ")", this).removeClass("cl2");
-            $("td:eq(" + _id + ")", this).addClass("cl1");
-        });
+            ret.push(sample)
+        }
+        return ret
     }
 
     function save_in_cookie() {
-        //history.go(-1)
-        //console.log("1");
-        //此处将表单数据存到cookie中
         let form = document.getElementById("dataform"); // get form element
         let matrix = []; // initialize empty array
-        let isEmpty = true;
         for (let i = 0; i < form.elements.length; i++) { // loop through each form element
             let element = form.elements[i]; // get current element
-            if (element.name.startsWith("datasample")) { // if element name starts with matrix
+            if (element.name.startsWith("datasampleitem")) { // if element name starts with matrix
                 let indices = element.name.match(/\d+/g); // get row and column indices from name
-                let row = parseInt(indices[0]); // get row index as number
+                let row = parseInt(indices[0])-1; // get row index as number
                 let col = parseInt(indices[1]); // get column index as number
                 if (!matrix[row]) { // if row does not exist in array yet
                     matrix[row] = []; // create empty row array
                 }
                 matrix[row][col] = element.value; // assign element value to array position
-                if (isEmpty && element.value != '')
-                    isEmpty = false;
             }
         }
         let matrixString = JSON.stringify(matrix); // convert array to string using JSON.stringify()
-        //document.cookie = "datasam="+matrixString;
-        // $.cookie("datasample["+$.cookie('curStepID')+"]", matrixString);
-        //alert($.cookie('datasample'));
-        //alert(matrixString);
+
         let stepID = $.cookie('curStepID');
         let nameStr = 'datasample[' + stepID + ']';
         selector = parent.document.getElementsByName(nameStr);
         element = $(selector);
         element.attr("value", matrixString);
-
-        let nameStr2 = 'is_updated[' + stepID + ']';
-        selector2 = parent.document.getElementsByName(nameStr2);
-        element2 = $(selector2);
-        element2.attr("value", '1');
-
-        // console.log(isEmpty);
-        // console.log(parent.$('#steps tr[data-index!="'+ stepID +'"] td.stepsample-actions').find('a'));
-
-        let $otherDatasampleActions = parent.$('#steps tr[data-index!="' + stepID + '"] td.stepsample-actions');
-
-        if (!isEmpty) {
-            // console.log(parent.$('#steps tr[data-index!="'+ stepID +'"] td.stepsample-actions'));
-            $otherDatasampleActions.find('a').attr("disabled", true).css("pointer-events", "none");
-            $otherDatasampleActions.find('button').attr("disabled", true);
-            $.cookie("isSampleEmpty", 0);
-        } else {
-            $otherDatasampleActions.find('a').removeAttr("disabled").css("pointer-events", "");
-            $otherDatasampleActions.find('button').removeAttr("disabled");
-            $.cookie("isSampleEmpty", 1);
-        }
-
 
         submitButton = $(document.getElementsByName("saveButton"));
         let placement = 'right';
@@ -481,17 +323,10 @@
 
 
 <style type="text/css">
-    #testTable {
+    #sampleTable {
         border: 1px solid #ddd;
     }
 
-    .cl1 {
-        background-color: #FFFFFF;
-    }
-
-    .cl2 {
-        background-color: #FFFF99;
-    }
 </style>
 
 

@@ -165,7 +165,6 @@ function initSteps(selector)
     var groupNameText = $steps.data('groupName');
     var insertStepRow = function($row, count, type, notFocus)
     {
-
         if(count === undefined) count = 1;
         var $step;
         for(var i = 0; i < count; ++i)
@@ -174,8 +173,7 @@ function initSteps(selector)
             if($row) $row.after($step);
             else $steps.append($step);
             $step.addClass('step-new').addClass('text-center');
-            console.log($.cookie('isSampleEmpty'));
-            console.log($.cookie('isSampleEmpty')==0);
+
             if($row.find('.step-type').val()=='step' && $.cookie('isSampleEmpty')==0 && $('#steps tr td.stepsample-actions input').val()!=''){
                 var $stepSampleActions = $step.find('td.stepsample-actions');
                 $stepSampleActions.find('a').attr("disabled",true).css("pointer-events","none");
@@ -224,6 +222,11 @@ function initSteps(selector)
                 $step.find('.step-id').text(stepID);
                 childId = 0;
                 defaultText = '输入项名称';
+            }else if(type == 'sample'){
+                $step.removeClass('step-item').removeClass('step-group').addClass('step-step');
+                stepID = parentId++;
+                $step.find('.step-id').text(stepID);
+                childId = 0;
             }
             else // step type is not set
             {
@@ -260,6 +263,14 @@ function initSteps(selector)
                 $step.find('[id^="rules"]').attr('name', "inputs_rules[" +stepID + "][1]");
                 $step.find('[name^="normal_examples["]').attr('name', "normal_examples[" +stepID + ']');
                 $step.find('[name^="abnormal_examples["]').attr('name', "abnormal_examples[" +stepID + ']');
+            }else if(type == 'sample'){
+                $step.find('[name^="datasampleitem["]').each(function ()
+                    {
+                        let rule = $(this).attr('data-rule');
+                        $(this).attr('name',"datasampleitem[" +stepID + ']['+ rule +']')
+                    }
+                )
+
             }
             updateStepType($step, type, defaultText);
         });
