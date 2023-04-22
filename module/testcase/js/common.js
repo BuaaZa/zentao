@@ -388,6 +388,11 @@ function initSteps(selector)
         var $step = $(this).closest('.step');
         var stepID = $step.find('.step-id').text();
         $.cookie('curStepID', stepID);
+    }).on('click', '.btn-generatedatasample', function()
+    {
+        var $step = $(this).closest('.step');
+        var stepID = $step.find('.step-id').text();
+        $.cookie('curStepID', stepID);
     }).on('click', '.datasample-undo', function()
     {
         var $step = $(this).closest('.step');

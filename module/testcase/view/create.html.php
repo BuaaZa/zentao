@@ -156,7 +156,8 @@ foreach(explode(',', $config->testcase->create->requiredFields) as $field)
           <tr>
             <th><?php echo $lang->testcase->steps;?></th>
             <td colspan='2'>
-              <table class='table table-form mg-0 table-bordered' id="stepform" style='border: 1px solid #ddd; '>
+              <table class='table table-form mg-0 table-bordered' id="stepform"
+                     style='border: 1px solid #ddd; '>
                 <thead>
                   <tr class="text-center">
                     <th class='w-50px text-center'><?php echo $lang->testcase->stepID;?></th>
@@ -165,8 +166,8 @@ foreach(explode(',', $config->testcase->create->requiredFields) as $field)
                     <th><?php echo $lang->testcase->step_goal_action;?></th>
                     <th><?php echo $lang->testcase->stepExpect;?></th>
                     <th><?php echo $lang->testcase->step_eval_criteria;?></th>
-                      <th class='step-actions text-center'><?php echo "数据样本";?></th>
-                      <th class='step-actions'><?php echo $lang->actions;?></th>
+                    <th class='step-actions text-center'><?php echo "数据样本";?></th>
+                    <th class='step-actions'><?php echo $lang->actions;?></th>
 
                   </tr>
                 </thead>
@@ -264,6 +265,9 @@ foreach(explode(',', $config->testcase->create->requiredFields) as $field)
                             common::printIcon('testcase', 'datasample',"", '',
                                 'list', 'edit', '', 'showinonlybody iframe btn-datasample',
                                 true,'','填写' );
+                        common::printIcon('testcase', 'generatedatasample',"", '',
+                            'list', 'list', '', 'showinonlybody iframe btn-generatedatasample',
+                            true,'','显示数据样本' );
 //                          echo $this->loadModel('common')->buildMenu('testcase', 'datasample',"", '',
 //                            'button', 'edit', '', 'showinonlybody iframe',
 //                            true, '', '填写');
@@ -286,6 +290,7 @@ foreach(explode(',', $config->testcase->create->requiredFields) as $field)
               </table>
             </td>
           </tr>
+
           <?php $hiddenKeywords = strpos(",$showFields,", ',keywords,') !== false ? '' : 'hidden';?>
           <tr class="<?php echo $hiddenKeywords?> keywordsBox">
             <th><?php echo $lang->testcase->keywords;?></th>
