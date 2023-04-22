@@ -30,7 +30,7 @@
                     </td>
                     <td>
 
-                        <?php echo html::input('inputs_rules[][]','', "id='rules' list='rule_list'");?>
+                        <?php echo html::input('inputs_rules[][]','', "id='rules' list='rule_list' class='step-rules'");?>
                     </td>
                     <td><textarea rows='1' class='form-control autosize step-expects' name='normal_examples[]'></textarea></td>
                     <td><textarea rows='1' class='form-control autosize step-expects' name='abnormal_examples[]'></textarea></td>
@@ -78,7 +78,7 @@
                 for(i = 1; i <= rowCountMax; i += 1){
                     $stepTemplate = $('#stepTemplate').clone(true).removeClass('template').attr('id', null);
                     var $step = $stepTemplate.clone(true);
-                    $steps.append($stepTemplate);
+                    $steps.append($step);
                     $step.addClass('step-new').addClass('text-center').addClass('step-step');
                     $step.find('.step-id').text(i);
                     $step.find('[id^="inputs"]').attr('name', "inputs_rules["+i+"][0]").attr('value', curInputsRules[i-1][0]);
@@ -91,7 +91,7 @@
 
             }else{
                 var $step = $stepTemplate.clone(true);
-                $steps.append($stepTemplate);
+                $steps.append($step);
                 $step.addClass('step-new').addClass('text-center').addClass('step-step');
                 $step.find('.step-id').text('1');
                 $step.find('[id^="inputs"]').attr('name', "inputs_rules[1][0]");
