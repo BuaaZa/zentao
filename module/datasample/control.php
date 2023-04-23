@@ -33,6 +33,12 @@ class datasample extends control
     public function singleMock(){
         $response = array();
         $data = $this->datasample->parseStrMock($_POST['mock']);
+        if(!empty($_POST['mock']) and empty($data['funcName'])){
+            $response['error'] = 'Mock格式有误';
+            $response['message'] = 'error';
+            echo json_encode($response);
+            return;
+        }
         $notNull = true;
         if($_POST['notNull'] === '0'){
             $notNull = false;

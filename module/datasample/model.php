@@ -98,9 +98,47 @@ class datasampleModel extends model
         if ($match) {
             $funcName = $matches[1];
         }
+
         if ($funcName) {
             $paramStr = preg_replace('/^\$\w+\(|\)$/', '', $mock);
-            $paramStr = str_replace(',',' ,',$paramStr);
+            $tempStr = '';
+            for ($i = 0; $i < strlen($paramStr); $i++) {
+                if($paramStr[$i] === ','){
+                    $tempStr .= ' ';
+                }
+                if($paramStr[$i] === '('){
+                    while($i < strlen($paramStr) and $paramStr[$i] != ')'){
+                        $tempStr .= $paramStr[$i];
+                        $i += 1;
+                    }
+                }
+                if($paramStr[$i] === '['){
+                    while($i < strlen($paramStr) and $paramStr[$i] != ']'){
+                        $tempStr .= $paramStr[$i];
+                        $i += 1;
+                    }
+                }
+                if($paramStr[$i] === '{'){
+                    while($i < strlen($paramStr) and $paramStr[$i] != '}'){
+                        $tempStr .= $paramStr[$i];
+                        $i += 1;
+                    }
+                }
+                if($paramStr[$i] === "'"){
+                    while($i < strlen($paramStr) and $paramStr[$i] != "'"){
+                        $tempStr .= $paramStr[$i];
+                        $i += 1;
+                    }
+                }
+                if($paramStr[$i] === '"'){
+                    while($i < strlen($paramStr) and $paramStr[$i] != '"'){
+                        $tempStr .= $paramStr[$i];
+                        $i += 1;
+                    }
+                }
+                if($i < strlen($paramStr))$tempStr .= $paramStr[$i];
+            }
+            $paramStr = $tempStr;
             preg_match_all('/("[^"]*"|\'[^\']*\'|\{[^}]*\}|\[[^\]]*\]|[^,]+)+/', $paramStr, $params);
         } else {
             $match = preg_match('/^\$(\w+)$/', $mock, $matches);
@@ -206,12 +244,15 @@ class datasampleModel extends model
         $min = NULL;
         $max = NULL;
 
+        $minFlag = false;
+        $maxFlag = false;
+
         if(isset($params[0]) and is_numeric($params[0])){
-            $min = (float)$args[0];
+            $min = (float)$params[0];
             $minFlag = true;
         }
         if(isset($params[1]) and is_numeric($params[1])){
-            $max = (float)$args[1];
+            $max = (float)$params[1];
             $maxFlag = true;
         }
         if($min and $max and $min > $max){
@@ -253,7 +294,7 @@ class datasampleModel extends model
         if($notNull and $except){
             $response['exception'][] = array('value'=>'','type'=>'值为空');
         }
-        $args = $this->loadModel('ztinterface')->parseParams($params);
+        $args = $params;
         $min = 1;
         $max = 50;
 
@@ -322,7 +363,7 @@ class datasampleModel extends model
         if($notNull and $except){
             $response['exception'][] = array('value'=>'','type'=>'值为空');
         }
-        $args = json_decode($params);
+        $args = $params;
 
         $format = 'Y-m-d H:i:s';
         if($args[0]){
@@ -383,7 +424,11 @@ class datasampleModel extends model
         if($notNull and $except){
             $response['exception'][] = array('value'=>'','type'=>'值为空');
         }
-        $args = $this->loadModel('ztinterface')->parseParams($params);
+        $args = $params;
+        //error_log(print_r($args,1));
+//        foreach($args as $key=>$a){
+//            $args[$key] = $this->loadModel('ztinterface')->trimQuotation(trim($a));
+//        }
         
         if(!isset($args[0])){
             $response["error"] = "需要正则表达式";
@@ -447,7 +492,7 @@ class datasampleModel extends model
         if($notNull and $except){
             $response['exception'][] = array('value'=>'','type'=>'值为空');
         }
-        $args = $this->loadModel('ztinterface')->parseParams($params);
+        $args = $params;
         $faker = "";
         $gen = $funcName;
 

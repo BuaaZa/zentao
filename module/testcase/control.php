@@ -401,21 +401,6 @@ class testcase extends control
         if(!empty($_POST))
         {
 
-            /*$checkGroup = $this->post->stepType;
-            $groupsNum = 0;
-            foreach($checkGroup as $val){
-                if($val == 'group'){
-                    $groupsNum += 1;
-                }
-            }
-            #如果选了两个多选框，则提示：'最多使一个步骤绑定输入输出项！'
-            if($groupsNum >= 2){
-                $noticeStr = $this->lang->testcase->noticegroupnum;
-                $response['result']  = 'fail';
-                $response['message'] = $noticeStr;
-                return $this->send($response);
-                //die($noticeStr);
-            }*/
 
             $response['result'] = 'success';
 

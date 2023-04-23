@@ -91,7 +91,7 @@ class testcaseModel extends model
              */
             ->remove('steps,goal_actions,expects,eval_criterias,stepType')
             ->remove('files')
-            ->remove('forceNotReview,stepIoType,datasample')
+            ->remove('forceNotReview,stepIoType,datasample,inputs_rules')
             ->setDefault('story', 0)
             ->cleanInt('story,product,branch,module')
             ->join('stage', ',')
@@ -147,7 +147,8 @@ class testcaseModel extends model
             if ($step->type == 'group') $parentStepID = $this->dao->lastInsertID();
             if ($step->type == 'step') $parentStepID = 0;
 
-            ChromePhp::log("this->post->inputs_rules: ", $this->post->inputs_rules);
+            //error_log(print_r($this->post->inputs_rules,1));
+            //ChromePhp::log("this->post->inputs_rules: ", $this->post->inputs_rules);
             $rules = (string)$this->post->inputs_rules[$index];
             $obj = (string)$this->post->datasample[$index];
 

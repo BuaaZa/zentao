@@ -267,26 +267,40 @@ function initSteps(selector)
     {
         var $step = $(this).closest('.step');
         var $mockRule = $step.find('#rules').val();
-        var $notNull = '0';
+        var $notNull = $step.find('#notNull').val();
         var testUrl = createLink('datasample', 'singleMock');
         $.post(testUrl, {'mock': $mockRule, 'notNull': $notNull}, function(result){
-            console.log(result);
             var resultObject = JSON.parse(result);
             if(resultObject['message'] === 'success'){
+                console.log(resultObject);
+                $step.find('[name^="normal_examples["]').val(resultObject['value']);
 
-                /*new $.zui.Messager('成功刷新mock示例值', {
+                if(resultObject['exception'] && resultObject['exception'].length>0){
+                    var exceptions_len = resultObject['exception'].length;
+                    var selected_exception_index = Math.floor(Math.random()*exceptions_len);
+                    $step.find('[name^="abnormal_examples["]').val(resultObject['exception'][selected_exception_index]['value']);
+                }else{
+                    $step.find('[name^="abnormal_examples["]').val('');
+                }
+
+                /*var exceptions = "";
+                for(let exception of resultObject['exception']){
+                    exceptions += ('['+exception['type']+']'+exception['value']+'\n');
+                }
+                $step.find('[name^="abnormal_examples["]').val(exceptions).autosize();*/
+                new $.zui.Messager('成功刷新mock示例值', {
                     type: 'success',
                     close: true,
                     icon: 'exclamation-sign',
                     time: 500 // 不进行自动隐藏
-                }).show();*/
+                }).show();
             }else{
-                /*new $.zui.Messager('请填写正确的mock规则', {
+                new $.zui.Messager(resultObject['error'], {
                     type: 'warning',
                     close: true,
                     icon: 'exclamation-sign',
                     time: 500 // 不进行自动隐藏
-                }).show();*/
+                }).show();
             }
 
         });
@@ -394,6 +408,7 @@ var refreshSteps = function(skipAutoAddStep = true,$steps)
         if(type == 'sampleInput'){
             $step.find('[id^="inputs"]').attr('name', "inputs_rules[" +stepID + "][0]");
             $step.find('[id^="rules"]').attr('name', "inputs_rules[" +stepID + "][1]");
+            $step.find('[id^="notNull"]').attr('name', "inputs_rules[" +stepID + "][2]");
             $step.find('[name^="normal_examples["]').attr('name', "normal_examples[" +stepID + ']');
             $step.find('[name^="abnormal_examples["]').attr('name', "abnormal_examples[" +stepID + ']');
         }else if(type == 'sample'){
