@@ -6,8 +6,6 @@ drop table zt_action;
 
 drop table zt_actionarchive;
 
-drop table zt_activity;
-
 drop table zt_api;
 
 drop table zt_api_lib_release;
@@ -51,8 +49,6 @@ drop table zt_baseimage;
 drop table zt_baseimagebrowser;
 
 drop table zt_baseurl;
-
-drop table zt_basicmeas;
 
 drop table zt_block;
 
@@ -236,8 +232,6 @@ drop table zt_pipeline;
 
 drop table zt_planstory;
 
-drop table zt_process;
-
 drop table zt_product;
 
 drop table zt_productplan;
@@ -389,31 +383,3 @@ drop table zt_webhook;
 drop table zt_weeklyreport;
 
 drop table zt_workestimation;
-
-drop table zt_workflow;
-
-drop table zt_workflowaction;
-
-drop table zt_workflowdatasource;
-
-drop table zt_workflowfield;
-
-drop table zt_workflowlabel;
-
-drop table zt_workflowlayout;
-
-drop table zt_workflowlinkdata;
-
-drop table zt_workflowrelation;
-
-drop table zt_workflowrelationlayout;
-
-drop table zt_workflowreport;
-
-drop table zt_workflowrule;
-
-drop table zt_workflowsql;
-
-drop table zt_workflowversion;
-
-drop table zt_zoutput;

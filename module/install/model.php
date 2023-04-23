@@ -12,6 +12,8 @@
 
 class installModel extends model
 {
+    public userModel $user;
+
     /**
      * Get license according the client lang.
      *
@@ -333,40 +335,69 @@ class installModel extends model
             /* Get mysql version. */
             $version = $this->getMysqlVersion();
 
-            /* If database no exits, try to create it. */
-            if(!$this->dbExists())
+            // if database not exists, try to create it.
+            if(!$this->databaseExists())
             {
-                if(!$this->createDB())
+                if(!$this->createDatabase())
                 {
                     $return->result = 'fail';
                     $return->error  = $this->lang->install->errorCreateDB;
                     return $return;
                 }
             }
-            elseif($this->tableExits() and !$this->post->clearDB)
+            // if database exists and table exists, judge the clear DB tag
+            elseif($this->tableExists())
+            {
+                if ($this->post->clearDB)
+                {
+                    if (!$this->dropTable())
+                    {
+                        $return->result = 'fail';
+                        $return->error  = $this->lang->install->errorCreateTable . " in createTable2";
+                        return $return;
+                    }
+                }
+                else
+                {
+                    $return->result = 'fail';
+                    $return->error = $this->lang->install->errorTableExists;
+                    return $return;
+                }
+            }
+
+            // create table
+            if (!$this->createTable2())
             {
                 $return->result = 'fail';
-                $return->error  = $this->lang->install->errorTableExists;
+                $return->error  = $this->lang->install->errorCreateTable . " in createTable2";
+                return $return;
+            }
+
+            // insert the metadata
+            if (!$this->initData())
+            {
+                $return->result = 'fail';
+                $return->error  = $this->lang->install->errorCreateTable . "在初始化数据阶段";
                 return $return;
             }
 
             /* Create tables. */
-            if(!$this->createTable($version))
-            {
-                $return->result = 'fail';
-                $return->error  = $this->lang->install->errorCreateTable;
-                return $return;
-            }
+//            if(!$this->createTable($version))
+//            {
+//                $return->result = 'fail';
+//                $return->error  = $this->lang->install->errorCreateTable;
+//                return $return;
+//            }
         }
         elseif ($this->post->installType === 'upgrade')
         {
-            if(!$this->dbExists())
+            if (!$this->databaseExists())
             {
                 $return->result = 'fail';
                 $return->error  = "所迁移数据库不存在";
                 return $return;
             }
-            if(!$this->upgradeDB())
+            if (!$this->upgradeDatabase())
             {
                 $return->result = 'fail';
                 $return->error  = $this->lang->install->errorUpdateDB;
@@ -387,7 +418,7 @@ class installModel extends model
      * @access public
      * @return void
      */
-    public function setDBParam()
+    public function setDBParam(): void
     {
         $this->config->db->host     = $this->post->dbHost;
         $this->config->db->name     = $this->post->dbName;
@@ -426,21 +457,27 @@ class installModel extends model
      * Check db exits or not.
      *
      * @access public
-     * @return bool
+     * @return bool | stdClass
      */
-    public function dbExists(): bool | stdClass
+    public function databaseExists(): bool | stdClass
     {
         $sql = "SHOW DATABASES like '{$this->config->db->name}'";
         return $this->dbh->query($sql)->fetch();
+    }
+
+    public function createDatabase(): bool
+    {
+        $sql = "CREATE DATABASE `{$this->config->db->name}`";
+        return $this->dbh->query($sql);
     }
 
     /**
      * Check table exits or not.
      *
      * @access public
-     * @return void
+     * @return bool | stdClass
      */
-    public function tableExits()
+    public function tableExists(): bool | stdClass
     {
         $configTable = str_replace('`', "'", TABLE_CONFIG);
         $sql = "SHOW TABLES FROM {$this->config->db->name} like $configTable";
@@ -478,19 +515,76 @@ class installModel extends model
      * @return bool|stdClass
      * @throws EndResponseException
      */
-    public function upgradeDB(): bool | stdClass
+    public function upgradeDatabase(): bool | stdClass
     {
         try
         {
             $dbFile = $this->app->getAppRoot() . 'database' . DS . 'upgrade.sql';
             $commands = explode(';', file_get_contents($dbFile));
 
-            if (trim(end($commands)) === '')
-                array_pop($commands);
+            $this->dbh->exec("USE {$this->config->db->name}");
+            foreach($commands as $command)
+                if(!empty(trim($command)) && !$this->dbh->query($command))
+                    return false;
+        }
+        catch (PDOException $exception)
+        {
+            echo $exception->getMessage();
+            helper::end();
+        }
+        return true;
+    }
+
+    public function createTable2(): bool
+    {
+        try
+        {
+            $dbFile = $this->app->getAppRoot() . 'database' . DS . 'table' . DS . 'create.sql';
+            $commands = explode(';', file_get_contents($dbFile));
 
             $this->dbh->exec("USE {$this->config->db->name}");
             foreach($commands as $command)
-                if(!$this->dbh->query($command))
+                if(!empty(trim($command)) && !$this->dbh->query($command))
+                    return false;
+        }
+        catch (PDOException $exception)
+        {
+            echo $exception->getMessage();
+            helper::end();
+        }
+        return true;
+    }
+
+    public function dropTable(): bool
+    {
+        try
+        {
+            $dbFile = $this->app->getAppRoot() . 'database' . DS . 'table' . DS . 'drop.sql';
+            $commands = explode(';', file_get_contents($dbFile));
+
+            $this->dbh->exec("USE {$this->config->db->name}");
+            foreach($commands as $command)
+                if(!empty(trim($command)) && !$this->dbh->query($command))
+                    return false;
+        }
+        catch (PDOException $exception)
+        {
+            echo $exception->getMessage();
+            helper::end();
+        }
+        return true;
+    }
+
+    public function initData(): bool
+    {
+        try
+        {
+            $dbFile = $this->app->getAppRoot() . 'database' . DS . 'metadata.sql';
+            $commands = explode(';', file_get_contents($dbFile));
+
+            $this->dbh->exec("USE {$this->config->db->name}");
+            foreach($commands as $command)
+                if(!empty(trim($command)) && !$this->dbh->query($command))
                     return false;
         }
         catch (PDOException $exception)
@@ -588,12 +682,12 @@ class installModel extends model
         return true;
     }
     /**
-     * Create a comapny, set admin.
+     * Create a company, set admin.
      *
      * @access public
-     * @return void
+     * @return bool
      */
-    public function grantPriv()
+    public function grantPriv(): bool
     {
         $data = fixer::input('post')
             ->stripTags('company')
@@ -609,13 +703,13 @@ class installModel extends model
             }
         }
 
-        $this->loadModel('user');
+        $this->user = $this->loadModel('user');
         $this->app->loadConfig('admin');
         /* Check password. */
         if(!validater::checkReg($this->post->password, '|(.){6,}|')) dao::$errors['password'][] = $this->lang->error->passwordrule;
         if($this->user->computePasswordStrength($this->post->password) < 1) dao::$errors['password'][] = $this->lang->user->placeholder->passwordStrengthCheck[1];
         if(!isset($this->config->safe->weak)) $this->app->loadConfig('admin');
-        if(strpos(",{$this->config->safe->weak},", ",{$this->post->password},") !== false) dao::$errors['password'] = sprintf($this->lang->user->errorWeak, $this->config->safe->weak);
+        if(str_contains(",{$this->config->safe->weak},", ",{$this->post->password},")) dao::$errors['password'] = sprintf($this->lang->user->errorWeak, $this->config->safe->weak);
         if(dao::isError()) return false;
 
         /* Insert a company. */
@@ -634,6 +728,7 @@ class installModel extends model
             $admin->visions  = 'rnd,lite';
             $this->dao->replace(TABLE_USER)->data($admin)->exec();
         }
+        return true;
     }
 
     /**
@@ -669,46 +764,6 @@ class installModel extends model
         {
             $this->dao->update(TABLE_LANG)->set('value')->eq($value)->where('`key`')->eq($key)->exec();
             $this->dao->update(TABLE_STAGE)->set('name')->eq($value)->where('`type`')->eq($key)->exec();
-        }
-
-        if($this->config->edition != 'open')
-        {
-            /* Update flowdatasource by lang. */
-            foreach($this->lang->install->workflowdatasource as $id => $name)
-            {
-                $this->dao->update(TABLE_WORKFLOWDATASOURCE)->set('name')->eq($name)->where('id')->eq($id)->exec();
-            }
-
-            /* Update workflowrule by lang. */
-            foreach($this->lang->install->workflowrule as $id => $name)
-            {
-                $this->dao->update(TABLE_WORKFLOWRULE)->set('name')->eq($name)->where('id')->eq($id)->exec();
-            }
-        }
-
-        if($this->config->edition == 'max')
-        {
-            /* Update process by lang. */
-            foreach($this->lang->install->processList as $id => $name)
-            {
-                $this->dao->update(TABLE_PROCESS)->set('name')->eq($name)->where('id')->eq($id)->exec();
-            }
-
-            foreach($this->lang->install->activity as $id => $name)
-            {
-                $this->dao->update(TABLE_ACTIVITY)->set('name')->eq($name)->where('id')->eq($id)->exec();
-            }
-
-            foreach($this->lang->install->zoutput as $id => $name)
-            {
-                $this->dao->update(TABLE_ZOUTPUT)->set('name')->eq($name)->where('id')->eq($id)->exec();
-            }
-
-            /* Update basicmeas by lang. */
-            foreach($this->lang->install->basicmeasList as $id => $basic)
-            {
-                $this->dao->update(TABLE_BASICMEAS)->set('name')->eq($basic['name'])->set('unit')->eq($basic['unit'])->set('definition')->eq($basic['definition'])->where('id')->eq($id)->exec();
-            }
         }
     }
 }
