@@ -161,7 +161,7 @@ function initSteps(selector)
     });
 
     var $steps = $(selector || '#steps');
-    var $stepTemplate = $('#stepTemplate').detach().removeClass('template').attr('id', null);
+    var $stepTemplate = $('#stepTemplate').clone(true).removeClass('template').attr('id', null);
     var groupNameText = $steps.data('groupName');
 
     $steps.on('click', '.btn-step-add', function()
@@ -323,7 +323,7 @@ var updateStepType = function($step, type, defaultText)
 };
 var getStepsElements = function($steps)
 {
-    return $steps.children('.step:not(.drag-shadow)');
+    return $steps.children('.step:not(.drag-shadow, .template)');
 };
 var refreshSteps = function(skipAutoAddStep = true,$steps)
 {

@@ -22,6 +22,7 @@
                 </thead>
 
                 <tbody id='steps' class='sortable'>
+
                 </tbody>
 
             </table>
@@ -31,11 +32,18 @@
             <div id="modalAction">
                 <button name="generateSampleButton" class="btn btn-wide btn-info"
                         type="button" onclick="regenerateDataSample();">
-                    生成示例样本
+                    <i class="icon icon-lightbulb"></i>
+                    &nbsp;生成示例样本
+                </button>
+                <button name="clearButton" class="btn btn-wide btn-warning"
+                        type="button" onclick="clearDataSample();">
+                    <i class="icon icon-trash"></i>
+                    &nbsp;一键清空
                 </button>
                 <button name="saveButton" class="btn btn-wide btn-primary"
                         type="button" onclick="save_in_cookie();">
-                    保存
+                    <i class="icon icon-save"></i>
+                    &nbsp;保存
                 </button>
             </div>
             <br><br>
@@ -52,6 +60,7 @@
     let stepID;
     //  从隐藏input获得的json序列化的rule
     let dataSampleRuleFromInput;
+    let inputArray =[]
     //  ajax请求得到的样本示例
     let dataSampleItemJson;
     //  当前数据样本，二维数组，内容是string
@@ -75,13 +84,13 @@
 
         if (dataSampleRuleFromInput.length > 0) {
             dataSampleRuleFromInput = JSON.parse(dataSampleRuleFromInput);
-            console.log(dataSampleRuleFromInput)
+            // console.log(dataSampleRuleFromInput)
             ruleCountMax = dataSampleRuleFromInput.length;
 
             addHead();
             generateTemplate();
 
-            if (curDataSample.length > 0) {
+            if (curDataSample.length > 0 && JSON.parse(curDataSample).length>0) {
                 curDataSample = JSON.parse(curDataSample)
             } else {
                 // dataSampleItemJson = ajaxGetDataSampleJson()
@@ -110,6 +119,7 @@
 
         for (let i = 0; i < ruleCountMax; i++) {
             rowTemplate += "<th> <b>" + dataSampleRuleFromInput[i][0] + "</b></th>"
+            inputArray.push(dataSampleRuleFromInput[i][0])
         }
         // rowTemplate += "<th class='step-actions'> <b>操作</b> </th>";
         rowTemplate += "<th class='sample-actions'> <b>操作</b> </th>";
@@ -118,7 +128,7 @@
     }
 
     function generateTemplate(){
-        let testTableBody = $('#sampleTable tbody');
+        let $steps = $('#steps');
 
         let sampleTemplate = "<tr class='step template' data-type='sample' id='stepTemplate'>"
         sampleTemplate += "<td class='sample-id step-id'></td>";
@@ -127,12 +137,9 @@
         //  列从 0 开始
         for (let i = 0; i < ruleCountMax; i++) {
             sampleTemplate += `<td>
-                                <textarea rows='1' class='form-control autosize step-expects input_value'
-                                          name='datasampleitem[][]' data-rule=` +
-                                 i +
-                                ">"+
-                                `</textarea>
-                                </td>`
+                                <textarea rows='1' class='form-control autosize step-expects'
+                                          name='datasampleitem[][]' data-rule=` + i + ">"+
+                                `</textarea></td>`
         }
         sampleTemplate += `
                 <td class='sample-actions step-actions'>
@@ -149,7 +156,86 @@
                     </div>
                 </td>`
         sampleTemplate += "</tr>"
-        testTableBody.append(sampleTemplate);
+        $steps.append(sampleTemplate);
+    }
+
+    // 根据curDataSample 重新生成数据样本
+    /**
+     * @param {boolean} clear 是否清空已有填写
+     */
+    function generateDataSample(clear = false){
+        let $steps = $('#steps');
+        if(clear){
+            $steps.find('tr:not(.template)').remove()
+        }
+
+        let sampleNum = curDataSample.length;
+        // console.log($('#stepTemplate'))
+        let $stepTemplate = $('#stepTemplate').clone(true).removeClass('template')
+                                            .attr('id', null);
+        let $step;
+
+        for (let i = 1; i <= sampleNum; i++) {
+            $step = $stepTemplate.clone(true);
+            $steps.append($step);
+            $step.addClass('step-new').addClass('text-center').addClass('step-step');
+            $step.find('.step-id').text(i);
+
+            let curSample = curDataSample[i-1];
+
+            $step.find('[name^="datasampleitem["]').each(function ()
+                {
+                    let rule = $(this).attr('data-rule');
+                    $(this).attr('name',"datasampleitem[" +stepID + ']['+ rule +']')
+                        .attr('value',(curSample[rule]?curSample[rule]:''))
+                    $.autoResizeTextarea(this);
+                }
+            )
+        }
+
+        refreshSteps(true,$steps)
+
+    }
+
+    function regenerateDataSample(){
+        bootbox.dialog({
+            title: '<b>生成示例样本</b>',
+            message: `<p>是否生成示例样本?  注意『<b> 重置生成 </b>』会清空已有填写.</p>`,
+            size: 'large',
+            buttons: {
+                cancel: {
+                    label: '<i class="icon icon-close"></i> 取消',
+                    className: 'btn-danger',
+                    callback: function(){
+                    }
+                },
+                reload: {
+                    label: '<i class="icon icon-exchange"></i> 重置生成',
+                    className: 'btn-warning',
+                    callback: function() {
+                        dataSampleItemJson = ajaxGetDataSampleJson()
+                        // console.log(dataSampleItemJson)
+                        curDataSample = sampleJsonConvertToArray(dataSampleItemJson)
+                        // console.log(curDataSample)
+                        generateDataSample(true)
+                        // 阻止关闭
+                        // return false;
+                    }
+                },
+                add: {
+                    label: '<i class="icon icon-check"></i> 添加生成',
+                    className: 'btn-primary',
+                    callback: function() {
+                        // Todo : ajax
+                        dataSampleItemJson = ajaxGetDataSampleJson()
+                        curDataSample = sampleJsonConvertToArray(dataSampleItemJson)
+                        generateDataSample()
+                    }
+                }
+            },
+            callback: function (result) {
+            }
+        })
     }
 
     function ajaxGetDataSampleJson(){
@@ -161,15 +247,14 @@
         let ruleList =[];
         for (let i = 0; i < ruleCountMax; i++) {
             ruleList.push({
-                id: i,
+                id: dataSampleRuleFromInput[i][0],
                 mock: dataSampleRuleFromInput[i][1]
             })
         }
 
-        console.log(ruleList)
-
+        // console.log("ajax body数据")
+        // console.log(ruleList)
         let ret;
-
         $.ajax(
             {
                 method: "POST",
@@ -205,146 +290,9 @@
         )
         $.ajaxSettings.async = true;
 
-        console.log(ret)
+        // console.log(ret)
 
         return ret
-    }
-
-    // 根据curDataSample 重新生成数据样本
-    /**
-     * @param {boolean} clear 是否清空已有填写
-     */
-    function generateDataSample(clear = false){
-        let testTableBody = $('#sampleTable tbody');
-        if(clear){
-            testTableBody.find('tr:not(.template)').remove()
-        }
-
-        let sampleNum = curDataSample.length;
-
-        for (let i = 1; i <= sampleNum; i++) {
-            let curSample = curDataSample[i-1];
-            // let sampleTemplate = "<tr class='step '>"
-            let sampleTemplate = "<tr class='step' data-type='sample'>"
-            sampleTemplate += "<td class='sample-id step-id'>"+ i +"</td>";
-            sampleTemplate += "<input type='hidden' name='stepType[]' value='sample' class='step-type'>"
-
-            for (let j = 0; j < ruleCountMax; j++) {
-                sampleTemplate += "<td><textarea rows='1' class='form-control autosize step-expects' " +
-                    "name='datasampleitem[" + i + "][" + j + "]' data-rule="+ j + ">" +
-                    ((curSample[j]) ? curSample[j] : '') +
-                    "</textarea>" +
-                    "</td>"
-            }
-            sampleTemplate += `
-                <td class='sample-actions'>
-                    <div class='btn-group'>
-                        <button type='button' class='btn btn-step-add' tabindex='-1'>
-                            <i class='icon icon-plus'></i>
-                        </button>
-                        <button type='button' class='btn btn-step-move' tabindex='-1'>
-                            <i class='icon icon-move'></i>
-                        </button>
-                        <button type='button' class='btn btn-step-delete' tabindex='-1'>
-                            <i class='icon icon-close'></i>
-                        </button>
-                    </div>
-                </td>`
-
-            sampleTemplate += "</tr>"
-
-            testTableBody.append(sampleTemplate);
-            if(!clear){
-                let $steps = $('#steps');
-                refreshSteps(true,$steps)
-            }
-        }
-
-    }
-
-    function regenerateDataSample(){
-        bootbox.dialog({
-            title: '<b>生成示例样本</b>',
-            message: `<p>是否生成示例样本?  注意『<b> 重置生成 </b>』会清空已有填写.</p>`,
-            size: 'large',
-            buttons: {
-                cancel: {
-                    label: '<i class="icon icon-close"></i> 取消',
-                    className: 'btn-danger',
-                    callback: function(){
-                    }
-                },
-                reload: {
-                    label: '<i class="icon icon-exchange"></i> 重置生成',
-                    className: 'btn-warning',
-                    callback: function() {
-                        // Todo : ajax
-                        dataSampleItemJson = ajaxGetDataSampleJson()
-                        curDataSample = sampleJsonConvertToArray(dataSampleItemJson)
-                        console.log(curDataSample)
-                        generateDataSample(true)
-                        // 阻止关闭
-                        // return false;
-                    }
-                },
-                add: {
-                    label: '<i class="icon icon-check"></i> 添加生成',
-                    className: 'btn-primary',
-                    callback: function() {
-                        // Todo : ajax
-                        // dataSampleItemJson = ajaxGetDataSampleJson()
-                        dataSampleItemJson = {
-                            error: [
-                                {
-                                    id: '0',
-                                    message: 'error'
-                                }
-                            ],
-                            samples: [
-                                [
-                                    {
-                                        type: 'int',
-                                        content:{
-                                            id: '0',
-                                            value: '123456'
-                                        }
-                                    },
-                                    {
-                                        type: 'int',
-                                        content:{
-                                            id: '0',
-                                            value: '123456'
-                                        }
-                                    }
-
-                                ],
-                                [
-                                    {
-                                        type: 'int',
-                                        content:{
-                                            id: '0',
-                                            value: '123456'
-                                        }
-                                    },
-                                    {
-                                        type: 'int',
-                                        content:{
-                                            id: '0',
-                                            value: '123456'
-                                        }
-                                    }
-
-                                ],
-                            ]
-                        }
-                        curDataSample = sampleJsonConvertToArray(dataSampleItemJson)
-                        generateDataSample()
-                    }
-                }
-            },
-            callback: function (result) {
-            }
-        })
     }
 
     function sampleJsonConvertToArray(sampleJson){
@@ -352,16 +300,29 @@
         let samples = sampleJson.samples
         for (let i = 0; i < samples.length ; i++) {
             let sample =[];
-            let curSample = samples[i]
-            for (let j = 0; j < curSample.content.length; j++) {
-                sample.push(curSample.content[j].value)
+            let curSampleContent = samples[i].content
+            curSampleContent.sort(
+                (a,b)=>{
+                    return inputArray.indexOf(a.id) -  inputArray.indexOf(b.id)
+                }
+            )
+            for (let j = 0; j < curSampleContent.length; j++) {
+                sample.push(curSampleContent[j].value)
             }
             ret.push(sample)
         }
         return ret
     }
 
+    function clearDataSample(){
+        let $steps = $('#steps');
+        $steps.find('tr:not(.template, [data-index="1"])').remove()
+
+    }
+
     function save_in_cookie() {
+        $('#stepTemplate').remove()
+
         let form = document.getElementById("dataform"); // get form element
         let matrix = []; // initialize empty array
         for (let i = 0; i < form.elements.length; i++) { // loop through each form element

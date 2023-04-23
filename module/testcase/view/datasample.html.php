@@ -106,6 +106,7 @@
 
 
         function save_in_cookie(){
+            $('#stepTemplate').remove()
 
             var form = document.getElementById("dataform"); // get form element
             var matrix = []; // initialize empty array
