@@ -115,13 +115,15 @@
         let testTableHead = $('#sampleTable thead tr');
         // let rowTemplate = "<th class='step-id'> <b>样本编号</b> </th>"
 
-        let rowTemplate = "<th class='sample-id'> <b>样本编号</b> </th>"
+        let rowTemplate = "<th class='sample-id w-50px step-id'> <b>编号</b> </th>"
 
-        for (let i = 0; i < ruleCountMax; i++) {
+        let i;
+        for (i = 0; i < ruleCountMax; i++) {
             rowTemplate += "<th> <b>" + dataSampleRuleFromInput[i][0] + "</b></th>"
             inputArray.push(dataSampleRuleFromInput[i][0])
         }
         // rowTemplate += "<th class='step-actions'> <b>操作</b> </th>";
+        rowTemplate += "<th> <b> 预期结果 </b> </th>";
         rowTemplate += "<th class='sample-actions'> <b>操作</b> </th>";
 
         testTableHead.append(rowTemplate);
@@ -131,7 +133,7 @@
         let $steps = $('#steps');
 
         let sampleTemplate = "<tr class='step template' data-type='sample' id='stepTemplate'>"
-        sampleTemplate += "<td class='sample-id step-id'></td>";
+        sampleTemplate += "<td class='sample-id w-50px step-id'></td>";
         sampleTemplate += "<input type='hidden' name='stepType[]' value='sample' class='step-type'>"
 
         //  列从 0 开始
@@ -141,6 +143,10 @@
                                           name='datasampleitem[][]' data-rule=` + i + ">"+
                                 `</textarea></td>`
         }
+        sampleTemplate += `<td>
+                                <textarea rows='1' class='form-control autosize step-expects'
+                                          name='datasampleitem[][]' data-rule=` + ruleCountMax + ">"+
+            `</textarea></td>`
         sampleTemplate += `
                 <td class='sample-actions step-actions'>
                     <div class='btn-group'>

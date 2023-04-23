@@ -9,6 +9,12 @@ $(function()
             $(this).parent().toggleClass('active');
         });
     }
+
+    $('*').submit(
+        function (event){
+
+        }
+    )
 })
 
 var newRowID = 0;
@@ -161,7 +167,10 @@ function initSteps(selector)
     });
 
     var $steps = $(selector || '#steps');
-    var $stepTemplate = $('#stepTemplate').clone(true).removeClass('template').attr('id', null);
+    var $stepTemplate = $('#stepTemplate')
+    if($stepTemplate.attr('data-type') == 'sample'){
+        $stepTemplate = $stepTemplate.clone(true).removeClass('template').attr('id', null);
+    }else $stepTemplate = $stepTemplate.detach().removeClass('template').attr('id', null);
     var groupNameText = $steps.data('groupName');
 
     $steps.on('click', '.btn-step-add', function()
