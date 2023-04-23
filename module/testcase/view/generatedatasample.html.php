@@ -75,7 +75,7 @@
 
         if (dataSampleRuleFromInput.length > 0) {
             dataSampleRuleFromInput = JSON.parse(dataSampleRuleFromInput);
-            // console.log(dataSampleRuleFromInput)
+            console.log(dataSampleRuleFromInput)
             ruleCountMax = dataSampleRuleFromInput.length;
 
             addHead();
@@ -166,6 +166,8 @@
             })
         }
 
+        console.log(ruleList)
+
         let ret;
 
         $.ajax(
@@ -175,11 +177,10 @@
                 url: ajaxGenerateDataSampleLink,
                 data:
                     {
-                        "account": account,
                         "list":ruleList
                     },
                 success: function (response) {
-                    response = JSON.parse(response);
+                    // console.log(response)
                     if (response == null ) {
                         new $.zui.Messager('返回数据为空', {
                             type: 'danger',
@@ -203,6 +204,8 @@
             }
         )
         $.ajaxSettings.async = true;
+
+        console.log(ret)
 
         return ret
     }
@@ -276,52 +279,9 @@
                     className: 'btn-warning',
                     callback: function() {
                         // Todo : ajax
-                        // dataSampleItemJson = ajaxGetDataSampleJson()
-                        dataSampleItemJson = {
-                            error: [
-                                {
-                                    id: '0',
-                                    message: 'error'
-                                }
-                            ],
-                            samples: [
-                                [
-                                    {
-                                        type: 'int',
-                                        content:{
-                                            id: '0',
-                                            value: '123456'
-                                        }
-                                    },
-                                    {
-                                        type: 'int',
-                                        content:{
-                                            id: '0',
-                                            value: '123456'
-                                        }
-                                    }
-
-                                ],
-                                [
-                                    {
-                                        type: 'int',
-                                        content:{
-                                            id: '0',
-                                            value: '123456'
-                                        }
-                                    },
-                                    {
-                                        type: 'int',
-                                        content:{
-                                            id: '0',
-                                            value: '123456'
-                                        }
-                                    }
-
-                                ],
-                            ]
-                        }
+                        dataSampleItemJson = ajaxGetDataSampleJson()
                         curDataSample = sampleJsonConvertToArray(dataSampleItemJson)
+                        console.log(curDataSample)
                         generateDataSample(true)
                         // 阻止关闭
                         // return false;
@@ -392,8 +352,9 @@
         let samples = sampleJson.samples
         for (let i = 0; i < samples.length ; i++) {
             let sample =[];
-            for (let j = 0; j < samples[i].length; j++) {
-                sample.push(samples[i][j].content.value)
+            let curSample = samples[i]
+            for (let j = 0; j < curSample.content.length; j++) {
+                sample.push(curSample.content[j].value)
             }
             ret.push(sample)
         }
