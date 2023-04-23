@@ -98,6 +98,7 @@ class datasampleModel extends model
 
             if ($funcName) {
                 $paramStr = preg_replace('/^\$\w+\(|\)$/', '', $mock);
+                $paramStr = str_replace(',',' ,',$paramStr);
                 preg_match_all('/("[^"]*"|\'[^\']*\'|\{[^}]*\}|\[[^\]]*\]|[^,]+)+/', $paramStr, $params);
             } else {
                 $match = preg_match('/^\$(\w+)$/', $mock, $matches);
@@ -111,7 +112,7 @@ class datasampleModel extends model
             $funcName = ucfirst(strtolower($funcName));
         }
         $response['funcName'] = $funcName;
-        $response['params'] = $params;
+        $response['params'] = $params[0];
         return $response;
     }
     
@@ -137,7 +138,7 @@ class datasampleModel extends model
         $response = array();
         $response['exception'] = array();
         if(!$notNull and !$except){
-            if(rand(0,5) == 0){
+            if(rand(0,8) == 0){
                 $response["value"] = "";
                 return $response;
             }
@@ -193,7 +194,7 @@ class datasampleModel extends model
         $response = array();
         $response['exception'] = array();
         if(!$notNull and !$except){
-            if(rand(0,5) == 0){
+            if(rand(0,8) == 0){
                 $response["value"] = "";
                 return $response;
             }
@@ -243,7 +244,7 @@ class datasampleModel extends model
         $response = array();
         $response['exception'] = array();
         if(!$notNull and !$except){
-            if(rand(0,5) == 0){
+            if(rand(0,8) == 0){
                 $response["value"] = "";
                 return $response;
             }
@@ -312,7 +313,7 @@ class datasampleModel extends model
     public function mockDatetime($params = '', $notNull = true, $except = false){
         $response = array();
         if(!$notNull and !$except){
-            if(rand(0,5) == 0){
+            if(rand(0,8) == 0){
                 $response["value"] = "";
                 return $response;
             }
@@ -373,7 +374,7 @@ class datasampleModel extends model
     public function mockRegex($params = '', $notNull = true, $except = false){
         $response = array();
         if(!$notNull and !$except){
-            if(rand(0,5) == 0){
+            if(rand(0,8) == 0){
                 $response["value"] = "";
                 return $response;
             }
@@ -403,7 +404,7 @@ class datasampleModel extends model
     public function mockRegexnum($params = '', $notNull = true, $except = false){
         $response = array();
         if(!$notNull and !$except){
-            if(rand(0,5) == 0){
+            if(rand(0,8) == 0){
                 $response["value"] = "";
                 return $response;
             }
@@ -437,7 +438,7 @@ class datasampleModel extends model
     public function mockFunc($params = '', $funcName = '', $notNull = true, $except = false){
         $response = array();
         if(!$notNull and !$except){
-            if(rand(0,5) == 0){
+            if(rand(0,8) == 0){
                 $response["value"] = "";
                 return $response;
             }
