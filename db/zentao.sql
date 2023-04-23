@@ -16123,6 +16123,7 @@ create table if not exists `zt_data_sample`
     `case_id`          int unsigned not null comment '用例外键ID',
     `casestep_id` int unsigned not null comment '测试步骤外键ID',
     `casestep_level`   int unsigned not null comment '测试步骤编号',
+    `rules`            text comment '样本规则',
     `object`           text comment '样本实体',
     `version`          int unsigned not null comment '数据样本版本 对应于测试用例和步骤的版本'
 );
@@ -16134,4 +16135,27 @@ create table if not exists `zt_data_sample_result`
     `object`         text comment '样本结果实体',
     `create_date`    datetime default current_timestamp() comment '创建时间与日期',
     `version`        int unsigned not null comment '数据样本结果版本 对应于测试用例和步骤的版本'
+);
+
+CREATE TABLE `zt_baseurl`  (
+  `id` mediumint NOT NULL AUTO_INCREMENT,
+  `product` mediumint NOT NULL,
+  `name` CHAR(50),
+  `url` TEXT NOT NULL,
+  PRIMARY KEY (`id`) USING BTREE
+) ENGINE = InnoDB CHARACTER SET = utf8 COLLATE = utf8_general_ci ROW_FORMAT = Dynamic;
+
+
+CREATE TABLE `zt_interface`  (
+  `id` mediumint NOT NULL AUTO_INCREMENT,
+  `product` mediumint NOT NULL,
+  `name` CHAR(50),
+  `method` ENUM('GET', 'POST', 'PUT', 'DELETE', 'HEAD', 'OPTIONS', 'TRACE', 'CONNECT') NOT NULL,
+  `url` TEXT NOT NULL,
+  `module` mediumint NOT NULL DEFAULT 0,
+  `header` json,
+  `data` json,
+  `format` CHAR(50) NOT NULL DEFAULT 'json',
+  `deleted` enum('0','1') CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL DEFAULT '0',
+  PRIMARY KEY (`id`) USING BTREE
 );

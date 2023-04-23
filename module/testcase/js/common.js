@@ -263,6 +263,34 @@ function initSteps(selector)
             time: 900 // 不进行自动隐藏
         }).show();
 
+    }).on('click', '.mock-refresh', function()
+    {
+        var $step = $(this).closest('.step');
+        var $mockRule = $step.find('#rules').val();
+        var $notNull = '0';
+        var testUrl = createLink('datasample', 'singleMock');
+        $.post(testUrl, {'mock': $mockRule, 'notNull': $notNull}, function(result){
+            console.log(result);
+            var resultObject = JSON.parse(result);
+            if(resultObject['message'] === 'success'){
+
+                /*new $.zui.Messager('成功刷新mock示例值', {
+                    type: 'success',
+                    close: true,
+                    icon: 'exclamation-sign',
+                    time: 500 // 不进行自动隐藏
+                }).show();*/
+            }else{
+                /*new $.zui.Messager('请填写正确的mock规则', {
+                    type: 'warning',
+                    close: true,
+                    icon: 'exclamation-sign',
+                    time: 500 // 不进行自动隐藏
+                }).show();*/
+            }
+
+        });
+
     });
     initSortable($steps);
     refreshSteps(true,$steps);

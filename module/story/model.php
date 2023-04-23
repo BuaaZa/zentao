@@ -2863,7 +2863,6 @@ class storyModel extends model
             ->orderBy('t1.`order` desc, t1.`story` desc')
             ->fetchAll('id');
         if(!$stories) return array();
-        #include "../common/ChromePhp.php";
         $taskpoint = $this->dao->select('*')->from(TABLE_STORY)
             ->where('deleted')->eq(0)
             ->andWhere('type')->eq('taskPoint')

@@ -270,7 +270,7 @@ foreach(explode(',', $config->testcase->create->requiredFields) as $field)
                         <?php
                         common::printIcon('testcase', 'datasample',"", '',
                             'list', 'edit', '', 'showinonlybody iframe btn-datasample',
-                            true,'','填写' );
+                            true,'','填写数据规则' );
                         common::printIcon('testcase', 'generatedatasample',"", '',
                             'list', 'list', '', 'showinonlybody iframe btn-generatedatasample',
                             true,'','显示数据样本' );

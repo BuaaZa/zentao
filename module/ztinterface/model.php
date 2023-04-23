@@ -9,7 +9,7 @@
  * @version     $Id: model.php 5108 2013-07-12 01:59:04Z chencongzhi520@gmail.com $
  * @link        http://www.zentao.net
  */
-
+require_once __DIR__ . '/../../vendor/autoload.php';
 use PhpOffice\PhpWord\TemplateProcessor;
 use PhpOffice\PhpWord\IOFactory;
 ?>
@@ -126,7 +126,7 @@ class ztinterfaceModel extends model
         return $menu;
     }
 
-    public function getBaseURL($productID)
+    public function getBaseURLDataList($productID)
     {
         $datalist   = '<datalist id="baseUrlList">';
         $baseURL = $this->dao->select('*')->from(TABLE_BASEURL)
@@ -138,6 +138,20 @@ class ztinterfaceModel extends model
         
         $datalist.="</datalist>";
         return $datalist;
+    }
+
+    public function getBaseURLList($productID)
+    {
+        return $this->dao->select('*')->from(TABLE_BASEURL)
+                ->where('product')->eq($productID)
+                ->fetchAll('id');
+    }
+
+    public function getBaseURLPairs($productID)
+    {
+        return $this->dao->select('id,name')->from(TABLE_BASEURL)
+                ->where('product')->eq($productID)
+                ->fetchPairs();
     }
     
     public function generateBody($content, $level, $path, $inArray = false)

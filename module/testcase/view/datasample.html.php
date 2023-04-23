@@ -36,7 +36,7 @@
                     <td><textarea rows='1' class='form-control autosize step-expects' name='abnormal_examples[]'></textarea></td>
                     <td class='step-actions'>
                         <div class='btn-group'>
-                            <button type='button' title="刷新" class='btn datasample-undo '>
+                            <button type='button' title="刷新示例值" class='btn mock-refresh'>
                                 <i class='icon icon-undo'></i>
                             </button>
                             <button type='button' class='btn btn-step-add' tabindex='-1'><i class='icon icon-plus'></i></button>
