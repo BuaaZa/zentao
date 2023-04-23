@@ -98,9 +98,47 @@ class datasampleModel extends model
         if ($match) {
             $funcName = $matches[1];
         }
+
         if ($funcName) {
             $paramStr = preg_replace('/^\$\w+\(|\)$/', '', $mock);
-            $paramStr = str_replace(',',' ,',$paramStr);
+            $tempStr = '';
+            for ($i = 0; $i < strlen($paramStr); $i++) {
+                if($paramStr[$i] === ','){
+                    $tempStr .= ' ';
+                }
+                if($paramStr[$i] === '('){
+                    while($i < strlen($paramStr) and $paramStr[$i] != ')'){
+                        $tempStr .= $paramStr[$i];
+                        $i += 1;
+                    }
+                }
+                if($paramStr[$i] === '['){
+                    while($i < strlen($paramStr) and $paramStr[$i] != ']'){
+                        $tempStr .= $paramStr[$i];
+                        $i += 1;
+                    }
+                }
+                if($paramStr[$i] === '{'){
+                    while($i < strlen($paramStr) and $paramStr[$i] != '}'){
+                        $tempStr .= $paramStr[$i];
+                        $i += 1;
+                    }
+                }
+                if($paramStr[$i] === "'"){
+                    while($i < strlen($paramStr) and $paramStr[$i] != "'"){
+                        $tempStr .= $paramStr[$i];
+                        $i += 1;
+                    }
+                }
+                if($paramStr[$i] === '"'){
+                    while($i < strlen($paramStr) and $paramStr[$i] != '"'){
+                        $tempStr .= $paramStr[$i];
+                        $i += 1;
+                    }
+                }
+                if($i < strlen($paramStr))$tempStr .= $paramStr[$i];
+            }
+            $paramStr = $tempStr;
             preg_match_all('/("[^"]*"|\'[^\']*\'|\{[^}]*\}|\[[^\]]*\]|[^,]+)+/', $paramStr, $params);
         } else {
             $match = preg_match('/^\$(\w+)$/', $mock, $matches);
@@ -383,7 +421,11 @@ class datasampleModel extends model
         if($notNull and $except){
             $response['exception'][] = array('value'=>'','type'=>'值为空');
         }
-        $args = $this->loadModel('ztinterface')->parseParams($params);
+        $args = $params;
+        //error_log(print_r($args,1));
+//        foreach($args as $key=>$a){
+//            $args[$key] = $this->loadModel('ztinterface')->trimQuotation(trim($a));
+//        }
         
         if(!isset($args[0])){
             $response["error"] = "需要正则表达式";
