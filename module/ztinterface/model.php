@@ -9,7 +9,7 @@
  * @version     $Id: model.php 5108 2013-07-12 01:59:04Z chencongzhi520@gmail.com $
  * @link        http://www.zentao.net
  */
-
+require_once __DIR__ . '/../../vendor/autoload.php';
 use PhpOffice\PhpWord\TemplateProcessor;
 use PhpOffice\PhpWord\IOFactory;
 ?>
