@@ -1087,7 +1087,7 @@ class task extends control
         ChromePhp::log($extra);
         $extra = str_replace(array(',', ' '), array('&', ''), $extra);
         parse_str($extra, $output);
-
+        ChromePhp::log($output);
 
         $task = $this->task->getById($taskID);
 
@@ -1205,7 +1205,6 @@ class task extends control
                     }
                 }
             }
-
             if(isonlybody())
             {
                 $execution     = $this->execution->getByID($task->execution);
