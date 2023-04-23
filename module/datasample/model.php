@@ -294,7 +294,7 @@ class datasampleModel extends model
         if($notNull and $except){
             $response['exception'][] = array('value'=>'','type'=>'值为空');
         }
-        $args = $this->loadModel('ztinterface')->parseParams($params);
+        $args = $params;
         $min = 1;
         $max = 50;
 
@@ -363,7 +363,7 @@ class datasampleModel extends model
         if($notNull and $except){
             $response['exception'][] = array('value'=>'','type'=>'值为空');
         }
-        $args = json_decode($params);
+        $args = $params;
 
         $format = 'Y-m-d H:i:s';
         if($args[0]){
@@ -492,7 +492,7 @@ class datasampleModel extends model
         if($notNull and $except){
             $response['exception'][] = array('value'=>'','type'=>'值为空');
         }
-        $args = $this->loadModel('ztinterface')->parseParams($params);
+        $args = $params;
         $faker = "";
         $gen = $funcName;
 
