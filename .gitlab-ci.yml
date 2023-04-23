@@ -6,6 +6,19 @@ stages:
 variables:
   PROJECT: "121.89.178.134:5050/15-test-group/zentaopms"
 
+build-for-develop:
+  stage: build
+  tags:
+    - docker
+  only:
+    - main
+  script:
+    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+    - docker buildx use gitlab_builder
+    - docker buildx build --tag $PROJECT/zentaopms-amd64-develop:$(date "+%Y-%m-%d") --platform linux/amd64 --load .
+    - docker push $PROJECT/zentaopms-amd64:$(date "+%Y-%m-%d")
+    - docker image prune -f
+
 build-to-amd64:
   stage: build
   tags:
