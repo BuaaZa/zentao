@@ -673,45 +673,5 @@ class installModel extends model
             $this->dao->update(TABLE_LANG)->set('value')->eq($value)->where('`key`')->eq($key)->exec();
             $this->dao->update(TABLE_STAGE)->set('name')->eq($value)->where('`type`')->eq($key)->exec();
         }
-
-//        if($this->config->edition != 'open')
-//        {
-//            /* Update flowdatasource by lang. */
-//            foreach($this->lang->install->workflowdatasource as $id => $name)
-//            {
-//                $this->dao->update(TABLE_WORKFLOWDATASOURCE)->set('name')->eq($name)->where('id')->eq($id)->exec();
-//            }
-//
-//            /* Update workflowrule by lang. */
-//            foreach($this->lang->install->workflowrule as $id => $name)
-//            {
-//                $this->dao->update(TABLE_WORKFLOWRULE)->set('name')->eq($name)->where('id')->eq($id)->exec();
-//            }
-//        }
-
-//        if($this->config->edition == 'max')
-//        {
-//            /* Update process by lang. */
-//            foreach($this->lang->install->processList as $id => $name)
-//            {
-//                $this->dao->update(TABLE_PROCESS)->set('name')->eq($name)->where('id')->eq($id)->exec();
-//            }
-//
-//            foreach($this->lang->install->activity as $id => $name)
-//            {
-//                $this->dao->update(TABLE_ACTIVITY)->set('name')->eq($name)->where('id')->eq($id)->exec();
-//            }
-//
-//            foreach($this->lang->install->zoutput as $id => $name)
-//            {
-//                $this->dao->update(TABLE_ZOUTPUT)->set('name')->eq($name)->where('id')->eq($id)->exec();
-//            }
-//
-//            /* Update basicmeas by lang. */
-//            foreach($this->lang->install->basicmeasList as $id => $basic)
-//            {
-//                $this->dao->update(TABLE_BASICMEAS)->set('name')->eq($basic['name'])->set('unit')->eq($basic['unit'])->set('definition')->eq($basic['definition'])->where('id')->eq($id)->exec();
-//            }
-//        }
     }
 }

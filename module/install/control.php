@@ -252,11 +252,6 @@ class install extends control
             $this->setting->setItem('system.common.safe.changeWeak', '1');
             $this->setting->setItem('system.common.global.cron', 1);
 
-//            if(strpos($this->app->getClientLang(), 'zh') === 0)
-//            {
-//                $this->api = $this->loadModel('api');
-//                $this->api->createDemoData($this->lang->api->zentaoAPI, 'http://' . $_SERVER['HTTP_HOST'] . $this->app->config->webRoot . 'api.php/v1', '16.0');
-//            }
             return print(js::locate(inlink('step6'), 'parent'));
         }
 
