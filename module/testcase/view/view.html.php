@@ -86,11 +86,12 @@
                         <tr>
                             <th class='w-50px'><?php echo $lang->testcase->stepID; ?></th>
                             <th class='w-p60 text-left'><?php echo $lang->testcase->stepDesc; ?></th>
-<!--                            <th class='text-left'>--><?php //echo $lang->testcase->stepinput; ?><!--</th>-->
+
                             <th class='text-left'><?php echo $lang->testcase->step_goal_action; ?></th>
                             <th class='text-left'><?php echo $lang->testcase->stepExpect; ?></th>
                             <th class='text-left'><?php echo $lang->testcase->step_eval_criteria; ?></th>
                             <th class='text-left'><?php echo $lang->datasample->common; ?></th>
+                            <th class='text-left'><?php echo $lang->datasample->rule; ?></th>
                         </tr>
                         </thead>
                         <?php
@@ -116,7 +117,6 @@
                             echo "<td class='text-left'><div class='input-group'>";
                             //if($step->type == 'item') echo "<span class='step-item-id'>{$stepId}.{$childId}</span>";
                             echo nl2br(str_replace(' ', '&nbsp;', $step->desc)) . "</td>";
-//                            echo "<td class='text-left'>" . nl2br(str_replace(' ', '&nbsp;', $step->input)) . "</div></td>";
                             echo "<td class='text-left'>" . nl2br(str_replace(' ', '&nbsp;', $step->goal_action)) . "</div></td>";
                             echo "<td class='text-left'>" . nl2br(str_replace(' ', '&nbsp;', $step->expect)) . "</div></td>";
                             echo "<td class='text-left'>" . nl2br(str_replace(' ', '&nbsp;', $step->eval_criteria)) . "</div></td>";
@@ -132,13 +132,82 @@
                                 true,'','查看' );
                             echo "</div></td>";
 
+
+                            //查看数据规则
+                            echo "<td class='text-left'>";
+                            if ($level !== 0)
+                                common::printIcon('datasample', 'viewrule',"caseID=$case->id&casestepLevel=$level&version=$version", '',
+                                'button', 'eye', '', 'showinonlybody iframe',
+                                true,'','查看' );
+                            echo "</div></td>";
+
                             echo "</tr>";
+
+
                             $childId++;
                             $step_id_for_datasample++;
                         }
                         ?>
                     </table>
                 </div>
+
+             <div class="cell">
+    <details class="detail" open>
+        <summary class="detail-title"><?php echo $lang->datasample->common;?></summary>
+        <div class="detail-content">
+        <?php
+// 假设你有一个数组，存储了样本序列和对应的数据输出项、用户名、密码、邮箱
+        $data = array(
+                array("sample1", "output1", "user1", "pass1", "email1"),
+                array("sample2", "output2", "user2", "pass2", "email2"),
+                array("sample3", "output3", "user3", "pass3", "email3")
+        );
+
+         // 创建一个html表格
+            echo "<table class='table table-condensed table-hover table-striped table-bordered' id='samples'>";
+            // 创建第一行，包含列名
+            echo "<tr>";
+            echo "<th>数据输出项</th>";
+            echo "<th>用户名</th>";
+            echo "<th>密码</th>";
+            echo "<th>邮箱</th>";
+            echo "</tr>";
+
+        // 遍历数组，创建后面的行
+        foreach ($data as $row) {
+            echo "<tr>";
+        // 遍历每一行的元素，创建单元格
+            foreach ($row as $cell) {
+             echo "<td class='text-left'>$cell</td>";
+            }
+        echo "</tr>";
+}
+
+// 结束表格
+        echo "</table>";
+?>
+          <table class='table table-data'>
+            <?php if($case->fromBug):?>
+            <tr>
+              <td><?php echo html::a($this->createLink('bug', 'view', "bugID=$case->fromBug", '', true), $case->fromBugTitle, '', "class='iframe' data-width='80%'");?></td>
+            </tr>
+            <?php endif;?>
+            <?php if($case->toBugs):?>
+            <tr>
+              <td class='linkBugTitles'>
+              <?php
+              foreach($case->toBugs as $bugID => $bugTitle)
+              {
+                  echo html::a($this->createLink('bug', 'view', "bugID=$bugID", '', true), "#$bugID " . $bugTitle, '', "class='iframe' data-width='80%' title='$bugTitle'") . '<br />';
+              }
+              ?>
+              </td>
+            </tr>
+            <?php endif;?>
+          </table>
+        </div>
+    </details>
+    </div>  
             </div>
             <?php if (!empty($case->xml)): ?>
                 <div class='detail'>
@@ -149,6 +218,7 @@
             <?php echo $this->fetch('file', 'printFiles', array('files' => $case->files, 'fieldset' => 'true', 'object' => $case, 'method' => 'view', 'showDelete' => false)); ?>
         </div>
         <?php $this->printExtendFields($case, 'div', "position=left&inForm=0&inCell=1"); ?>
+        
         <div class='main-actions'>
             <div class="btn-toolbar">
                 <?php common::printBack($browseLink); ?>
@@ -159,6 +229,9 @@
                 <?php echo $this->testcase->buildOperateMenu($case, 'view'); ?>
             </div>
         </div>
+
+    
+
     </div>
     <div class='side-col col-4'>
         <div class="cell">
