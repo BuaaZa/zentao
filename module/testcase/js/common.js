@@ -274,9 +274,13 @@ function initSteps(selector)
             if(resultObject['message'] === 'success'){
                 console.log(resultObject);
                 $step.find('[name^="normal_examples["]').val(resultObject['value']);
-                var exceptions_len = resultObject['exception'].length;
-                var selected_exception_index = Math.floor(Math.random()*exceptions_len);
-                $step.find('[name^="abnormal_examples["]').val(resultObject['exception'][selected_exception_index]['value']);
+
+                if(resultObject['exception'] && resultObject['exception'].length>0){
+                    var exceptions_len = resultObject['exception'].length;
+                    var selected_exception_index = Math.floor(Math.random()*exceptions_len);
+                    $step.find('[name^="abnormal_examples["]').val(resultObject['exception'][selected_exception_index]['value']);
+                }
+
                 /*var exceptions = "";
                 for(let exception of resultObject['exception']){
                     exceptions += ('['+exception['type']+']'+exception['value']+'\n');
