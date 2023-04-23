@@ -45,6 +45,9 @@ class datasample extends control
         if(!$response['error']){
             $res = $this->datasample->findMock($data['params'], $data['funcName'],$notNull,true);
             $response = $res['exception'];
+            $response['message'] = 'success';
+        }else{
+            $response['message'] = 'error';
         }
         echo json_encode($response);
         return;
