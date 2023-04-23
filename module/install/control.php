@@ -12,6 +12,8 @@
 class install extends control
 {
     public installModel $install;
+    public settingModel $setting;
+    public apiModel $api;
 
     /**
      * Construct function.
@@ -229,9 +231,9 @@ class install extends control
      * Create company, admin.
      *
      * @access public
-     * @return void
+     * @return int
      */
-    public function step5()
+    public function step5(): int
     {
         if(!empty($_POST))
         {
@@ -241,7 +243,8 @@ class install extends control
             $this->install->updateLang();
             if(dao::isError()) return print(js::error(dao::getError()));
 
-            $this->loadModel('setting');
+            $this->setting = $this->loadModel('setting');
+
             $this->setting->updateVersion($this->config->version);
             $this->setting->setSN();
             $this->setting->setItem('system.common.global.flow', $this->post->flow);
@@ -249,7 +252,11 @@ class install extends control
             $this->setting->setItem('system.common.safe.changeWeak', '1');
             $this->setting->setItem('system.common.global.cron', 1);
 
-            if(strpos($this->app->getClientLang(), 'zh') === 0) $this->loadModel('api')->createDemoData($this->lang->api->zentaoAPI, 'http://' . $_SERVER['HTTP_HOST'] . $this->app->config->webRoot . 'api.php/v1', '16.0');
+//            if(strpos($this->app->getClientLang(), 'zh') === 0)
+//            {
+//                $this->api = $this->loadModel('api');
+//                $this->api->createDemoData($this->lang->api->zentaoAPI, 'http://' . $_SERVER['HTTP_HOST'] . $this->app->config->webRoot . 'api.php/v1', '16.0');
+//            }
             return print(js::locate(inlink('step6'), 'parent'));
         }
 
@@ -259,12 +266,9 @@ class install extends control
         if(!isset($this->config->installed) or !$this->config->installed)
         {
             $this->view->error = $this->lang->install->errorNotSaveConfig;
-            $this->display();
         }
-        else
-        {
-            $this->display();
-        }
+        $this->display();
+        return 0;
     }
 
     /**
