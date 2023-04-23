@@ -8,6 +8,12 @@
         <form class='load-indicator main-form form-ajax'
               method='post' enctype='multipart/form-data'
               id='dataform' data-type='ajax'>
+            <div class='alert with-icon alert-pure' id="datasamplealert">
+                <i class='icon-exclamation-sign'></i>
+                <div class='content'>
+                    <b>请先填写数据规则</b>
+                </div>
+            </div>
             <table id="sampleTable"
                    class='table table-form mg-0 table-bordered'>
                 <thead>
@@ -22,14 +28,16 @@
             <br><br>
             <!--<button class="btn" type="button" onclick="addRow();">添加输入项</button>
             <button class="btn" type="button" onclick="addCol();">添加测试样本</button>-->
-            <button name="generateSampleButton" class="btn btn-wide btn-info"
-                    type="button" onclick="regenerateDataSample();">
-                重新生成示例样本
-            </button>
-            <button name="saveButton" class="btn btn-wide btn-primary"
-                    type="button" onclick="save_in_cookie();">
-                保存
-            </button>
+            <div id="modalAction">
+                <button name="generateSampleButton" class="btn btn-wide btn-info"
+                        type="button" onclick="regenerateDataSample();">
+                    生成示例样本
+                </button>
+                <button name="saveButton" class="btn btn-wide btn-primary"
+                        type="button" onclick="save_in_cookie();">
+                    保存
+                </button>
+            </div>
             <br><br>
         </form>
         <!-- <input type="button" value="保存" onclick="save_in_cookie();"/> -->
@@ -63,7 +71,7 @@
         let selector2 = parent.document.getElementsByName(nameStr2);
         let element2 = $(selector2);
         curDataSample = element2.attr("value");
-        console.log(curDataSample)
+        // console.log(curDataSample)
 
         if (dataSampleRuleFromInput.length > 0) {
             dataSampleRuleFromInput = JSON.parse(dataSampleRuleFromInput);
@@ -73,44 +81,22 @@
             addHead();
             generateTemplate();
 
-            if(!curDataSample.length > 0){
-                // dataSampleItemJson = ajaxGetDataSampleJson()
-                dataSampleItemJson = {
-                    error: [
-                        {
-                            id: '0',
-                            message: 'error'
-                        }
-                    ],
-                    samples: [
-                        [
-                            {
-                                id: '0',
-                                value: '123456'
-                            },
-                            {
-                                id: '1',
-                                value: 'za'
-                            }
-                        ],
-                        [
-                            {
-                                id: '0',
-                                value: '123456'
-                            },
-                            {
-                                id: '1',
-                                value: 'za'
-                            }
-                        ]
-                    ]
-                }
-                curDataSample = sampleJsonConvertToArray(dataSampleItemJson)
-            }else{
+            if (curDataSample.length > 0) {
                 curDataSample = JSON.parse(curDataSample)
+            } else {
+                // dataSampleItemJson = ajaxGetDataSampleJson()
+                curDataSample = []
+                curDataSample.push([]);
+                for (let i = 0; i < ruleCountMax; i++) {
+                    curDataSample[0].push('')
+                }
             }
 
             generateDataSample()
+        }else{
+            $('#datasamplealert').css('display',"table")
+            $("button").css('display',"none")
+            $('br').remove()
         }
         initSteps();
 
@@ -222,9 +208,14 @@
     }
 
     // 根据curDataSample 重新生成数据样本
-    function generateDataSample() {
+    /**
+     * @param {boolean} clear 是否清空已有填写
+     */
+    function generateDataSample(clear = false){
         let testTableBody = $('#sampleTable tbody');
-        testTableBody.find('tr:not(.template)').remove()
+        if(clear){
+            testTableBody.find('tr:not(.template)').remove()
+        }
 
         let sampleNum = curDataSample.length;
 
@@ -260,15 +251,140 @@
             sampleTemplate += "</tr>"
 
             testTableBody.append(sampleTemplate);
+            if(!clear){
+                let $steps = $('#steps');
+                refreshSteps(true,$steps)
+            }
         }
 
     }
 
     function regenerateDataSample(){
-        // Todo
-        dataSampleItemJson = ajaxGetDataSampleJson()
-        curDataSample = sampleJsonConvertToArray(dataSampleItemJson)
-        generateDataSample()
+        bootbox.dialog({
+            title: '<b>生成示例样本</b>',
+            message: `<p>是否生成示例样本?  注意『<b> 重置生成 </b>』会清空已有填写.</p>`,
+            size: 'large',
+            buttons: {
+                cancel: {
+                    label: '<i class="icon icon-close"></i> 取消',
+                    className: 'btn-danger',
+                    callback: function(){
+                    }
+                },
+                reload: {
+                    label: '<i class="icon icon-exchange"></i> 重置生成',
+                    className: 'btn-warning',
+                    callback: function() {
+                        // Todo : ajax
+                        // dataSampleItemJson = ajaxGetDataSampleJson()
+                        dataSampleItemJson = {
+                            error: [
+                                {
+                                    id: '0',
+                                    message: 'error'
+                                }
+                            ],
+                            samples: [
+                                [
+                                    {
+                                        type: 'int',
+                                        content:{
+                                            id: '0',
+                                            value: '123456'
+                                        }
+                                    },
+                                    {
+                                        type: 'int',
+                                        content:{
+                                            id: '0',
+                                            value: '123456'
+                                        }
+                                    }
+
+                                ],
+                                [
+                                    {
+                                        type: 'int',
+                                        content:{
+                                            id: '0',
+                                            value: '123456'
+                                        }
+                                    },
+                                    {
+                                        type: 'int',
+                                        content:{
+                                            id: '0',
+                                            value: '123456'
+                                        }
+                                    }
+
+                                ],
+                            ]
+                        }
+                        curDataSample = sampleJsonConvertToArray(dataSampleItemJson)
+                        generateDataSample(true)
+                        // 阻止关闭
+                        // return false;
+                    }
+                },
+                add: {
+                    label: '<i class="icon icon-check"></i> 添加生成',
+                    className: 'btn-primary',
+                    callback: function() {
+                        // Todo : ajax
+                        // dataSampleItemJson = ajaxGetDataSampleJson()
+                        dataSampleItemJson = {
+                            error: [
+                                {
+                                    id: '0',
+                                    message: 'error'
+                                }
+                            ],
+                            samples: [
+                                [
+                                    {
+                                        type: 'int',
+                                        content:{
+                                            id: '0',
+                                            value: '123456'
+                                        }
+                                    },
+                                    {
+                                        type: 'int',
+                                        content:{
+                                            id: '0',
+                                            value: '123456'
+                                        }
+                                    }
+
+                                ],
+                                [
+                                    {
+                                        type: 'int',
+                                        content:{
+                                            id: '0',
+                                            value: '123456'
+                                        }
+                                    },
+                                    {
+                                        type: 'int',
+                                        content:{
+                                            id: '0',
+                                            value: '123456'
+                                        }
+                                    }
+
+                                ],
+                            ]
+                        }
+                        curDataSample = sampleJsonConvertToArray(dataSampleItemJson)
+                        generateDataSample()
+                    }
+                }
+            },
+            callback: function (result) {
+            }
+        })
     }
 
     function sampleJsonConvertToArray(sampleJson){
@@ -277,7 +393,7 @@
         for (let i = 0; i < samples.length ; i++) {
             let sample =[];
             for (let j = 0; j < samples[i].length; j++) {
-                sample.push(samples[i][j].value)
+                sample.push(samples[i][j].content.value)
             }
             ret.push(sample)
         }
@@ -320,15 +436,6 @@
         setTimeout($.zui.closeModal, 500);
     }
 </script>
-
-
-<style type="text/css">
-    #sampleTable {
-        border: 1px solid #ddd;
-    }
-
-</style>
-
 
 <?php include '../../common/view/footer.lite.html.php'; ?>
 

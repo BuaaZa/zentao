@@ -275,7 +275,7 @@ foreach(explode(',', $config->testcase->create->requiredFields) as $field)
                             'list', 'list', '', 'showinonlybody iframe btn-generatedatasample',
                             true,'','显示数据样本' );
                         ?>
-                        <button type='button' title="重置数据样本" class='btn datasample-undo '>
+                        <button type='button' title="清空数据样本" class='btn datasample-undo '>
                             <i class='icon icon-undo'></i>
                         </button>
                     </td>

@@ -1,1 +1,17 @@
 .sample-actions {width: 110px;text-align: center}
+#sampleTable {
+    border: 1px solid #ddd;
+}
+
+#datasamplealert{
+    width:50% ;
+    margin: 5px auto;
+    display: none;
+}
+
+#modalAction{
+    margin: auto;
+    width: 50%;
+    display: flex;
+    justify-content: space-evenly;
+}
