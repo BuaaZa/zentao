@@ -885,7 +885,7 @@ class testcaseModel extends model
             ->setForce('status', $status)
             ->cleanInt('story,product,branch,module')
             ->stripTags($this->config->testcase->editor->edit['id'], $this->config->allowedTags)
-            ->remove('comment,steps,expects,files,labels,linkBug,stepType,goal_actions,eval_criterias,stepIoType,datasample,is_updated')
+            ->remove('comment,steps,expects,files,labels,linkBug,stepType,goal_actions,eval_criterias,stepIoType,datasample,is_updated,inputs_rules')
             ->get();
 
         $requiredFields = $this->config->testcase->edit->requiredFields;
@@ -935,7 +935,7 @@ class testcaseModel extends model
                         if($step->type == 'group') $parentStepID = $this->dao->lastInsertID();
                         if($step->type == 'step')  $parentStepID = 0;
 
-                        ChromePhp::log("this->post->inputs_rules: ", $this->post->inputs_rules);
+                        //ChromePhp::log("this->post->inputs_rules: ", $this->post->inputs_rules);
                         $rules = (string)$this->post->inputs_rules[$stepID];
                         $obj = (string)$this->post->datasample[$stepID];
 

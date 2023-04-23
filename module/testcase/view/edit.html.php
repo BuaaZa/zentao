@@ -62,12 +62,12 @@
                 <thead>
                   <tr class="text-center">
                     <th class='w-45px text-center'><?php echo $lang->testcase->stepID;?></th>
-                    <th width="40%"><?php echo $lang->testcase->stepprecondition;?></th>
+                    <th width="20%"><?php echo $lang->testcase->stepprecondition;?></th>
                       <!-- <th><?php #echo $lang->testcase->stepinput;?></th> -->
                       <th><?php echo $lang->testcase->step_goal_action;?></th>
                       <th><?php echo $lang->testcase->stepExpect;?></th>
                       <th><?php echo $lang->testcase->step_eval_criteria;?></th>
-                      <th class='step-actions text-center'><?php echo "数据样本";?></th>
+                      <th class='text-center'><?php echo "数据样本";?></th>
                     <th class='step-actions'><?php echo $lang->actions;?></th>
                   </tr>
                 </thead>
@@ -100,14 +100,15 @@
                       <td><textarea rows='1' class='form-control autosize step-expects' name='expects[]'></textarea></td>
                       <td><textarea rows='1' class='form-control autosize step-expects' name='eval_criterias[]'></textarea></td>
                       <td class='step-actions stepsample-actions'>
+                          <input type='hidden' name='inputs_rules[]' id='inputs_rules' value='' class='step-inputs-rules'>
                           <input type='hidden' name='datasample[]' id='datasample' value='' class='step-datasample'>
                           <?php
                           common::printIcon('testcase', 'datasample',"", '',
                               'list', 'edit', '', 'showinonlybody iframe btn-datasample',
-                              true,'','填写' );
-                          //                        echo $this->loadModel('common')->buildMenu('testcase', 'datasample',"", '',
-                          //                              'button', 'edit', '', 'showinonlybody iframe',
-                          //                              true, '', '填写');
+                              true,'','填写数据规则' );
+                          common::printIcon('testcase', 'generatedatasample',"", '',
+                              'list', 'list', '', 'showinonlybody iframe btn-generatedatasample',
+                              true,'','显示数据样本' );
                           ?>
                           <input type='hidden' name='is_updated[]' id='is_updated' value='' >
                           <button type='button' title="重置数据样本" class='btn datasample-undo '>
@@ -155,15 +156,25 @@
                       <td class='step-actions stepsample-actions'>
                           <?php
                             if(isset($data_samples[$stepLevel])){
-                                echo "<input type='hidden' name='datasample[]' id='datasample' value='$data_samples[$stepLevel]' class='step-datasample'>";
+                                $rules = $data_samples[$stepLevel]['rules'];
+                                $datasample = $data_samples[$stepLevel]['obj'];
+                                echo "<input type='hidden' name='inputs_rules[]' id='inputs_rules' value='$rules' class='step-inputs-rules'>";
+                                echo "<input type='hidden' name='datasample[]' id='datasample' value='$datasample' class='step-datasample'>";
                                 common::printIcon('testcase', 'datasample',"", '',
                                     'list', 'edit', '', 'showinonlybody iframe btn-datasample',
-                                    true,'','填写' );
+                                    true,'','填写数据规则' );
+                                common::printIcon('testcase', 'generatedatasample',"", '',
+                                    'list', 'list', '', 'showinonlybody iframe btn-generatedatasample',
+                                    true,'','显示数据样本' );
                             }else{
+                                echo "<input type='hidden' name='inputs_rules[]' id='inputs_rules' value='' class='step-inputs-rules'>";
                                 echo "<input type='hidden' name='datasample[]' id='datasample' value='' class='step-datasample'>";
                                 common::printIcon('testcase', 'datasample',"", '',
                                     'list', 'edit', '', 'showinonlybody iframe btn-datasample',
-                                    true,"",'填写' );
+                                    true,"",'填写数据规则' );
+                                common::printIcon('testcase', 'generatedatasample',"", '',
+                                    'list', 'list', '', 'showinonlybody iframe btn-generatedatasample',
+                                    true,'','显示数据样本' );
                             }
                           ?>
                           <input type='hidden' name='is_updated[]' id='is_updated' value='' >
