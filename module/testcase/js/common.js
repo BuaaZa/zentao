@@ -279,6 +279,8 @@ function initSteps(selector)
                     var exceptions_len = resultObject['exception'].length;
                     var selected_exception_index = Math.floor(Math.random()*exceptions_len);
                     $step.find('[name^="abnormal_examples["]').val(resultObject['exception'][selected_exception_index]['value']);
+                }else{
+                    $step.find('[name^="abnormal_examples["]').val('');
                 }
 
                 /*var exceptions = "";
