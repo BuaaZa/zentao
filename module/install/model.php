@@ -335,40 +335,69 @@ class installModel extends model
             /* Get mysql version. */
             $version = $this->getMysqlVersion();
 
-            /* If database no exits, try to create it. */
-            if(!$this->dbExists())
+            // if database not exists, try to create it.
+            if(!$this->databaseExists())
             {
-                if(!$this->createDB())
+                if(!$this->createDatabase())
                 {
                     $return->result = 'fail';
                     $return->error  = $this->lang->install->errorCreateDB;
                     return $return;
                 }
             }
-            elseif($this->tableExits() and !$this->post->clearDB)
+            // if database exists and table exists, judge the clear DB tag
+            elseif($this->tableExists())
+            {
+                if ($this->post->clearDB)
+                {
+                    if (!$this->dropTable())
+                    {
+                        $return->result = 'fail';
+                        $return->error  = $this->lang->install->errorCreateTable . " in createTable2";
+                        return $return;
+                    }
+                }
+                else
+                {
+                    $return->result = 'fail';
+                    $return->error = $this->lang->install->errorTableExists;
+                    return $return;
+                }
+            }
+
+            // create table
+            if (!$this->createTable2())
             {
                 $return->result = 'fail';
-                $return->error  = $this->lang->install->errorTableExists;
+                $return->error  = $this->lang->install->errorCreateTable . " in createTable2";
+                return $return;
+            }
+
+            // insert the metadata
+            if (!$this->initData())
+            {
+                $return->result = 'fail';
+                $return->error  = $this->lang->install->errorCreateTable . "在初始化数据阶段";
                 return $return;
             }
 
             /* Create tables. */
-            if(!$this->createTable($version))
-            {
-                $return->result = 'fail';
-                $return->error  = $this->lang->install->errorCreateTable;
-                return $return;
-            }
+//            if(!$this->createTable($version))
+//            {
+//                $return->result = 'fail';
+//                $return->error  = $this->lang->install->errorCreateTable;
+//                return $return;
+//            }
         }
         elseif ($this->post->installType === 'upgrade')
         {
-            if(!$this->dbExists())
+            if (!$this->databaseExists())
             {
                 $return->result = 'fail';
                 $return->error  = "所迁移数据库不存在";
                 return $return;
             }
-            if(!$this->upgradeDB())
+            if (!$this->upgradeDatabase())
             {
                 $return->result = 'fail';
                 $return->error  = $this->lang->install->errorUpdateDB;
@@ -389,7 +418,7 @@ class installModel extends model
      * @access public
      * @return void
      */
-    public function setDBParam()
+    public function setDBParam(): void
     {
         $this->config->db->host     = $this->post->dbHost;
         $this->config->db->name     = $this->post->dbName;
@@ -428,21 +457,27 @@ class installModel extends model
      * Check db exits or not.
      *
      * @access public
-     * @return bool
+     * @return bool | stdClass
      */
-    public function dbExists(): bool | stdClass
+    public function databaseExists(): bool | stdClass
     {
         $sql = "SHOW DATABASES like '{$this->config->db->name}'";
         return $this->dbh->query($sql)->fetch();
+    }
+
+    public function createDatabase(): bool
+    {
+        $sql = "CREATE DATABASE `{$this->config->db->name}`";
+        return $this->dbh->query($sql);
     }
 
     /**
      * Check table exits or not.
      *
      * @access public
-     * @return void
+     * @return bool | stdClass
      */
-    public function tableExits()
+    public function tableExists(): bool | stdClass
     {
         $configTable = str_replace('`', "'", TABLE_CONFIG);
         $sql = "SHOW TABLES FROM {$this->config->db->name} like $configTable";
@@ -480,19 +515,76 @@ class installModel extends model
      * @return bool|stdClass
      * @throws EndResponseException
      */
-    public function upgradeDB(): bool | stdClass
+    public function upgradeDatabase(): bool | stdClass
     {
         try
         {
             $dbFile = $this->app->getAppRoot() . 'database' . DS . 'upgrade.sql';
             $commands = explode(';', file_get_contents($dbFile));
 
-            if (trim(end($commands)) === '')
-                array_pop($commands);
+            $this->dbh->exec("USE {$this->config->db->name}");
+            foreach($commands as $command)
+                if(!empty(trim($command)) && !$this->dbh->query($command))
+                    return false;
+        }
+        catch (PDOException $exception)
+        {
+            echo $exception->getMessage();
+            helper::end();
+        }
+        return true;
+    }
+
+    public function createTable2(): bool
+    {
+        try
+        {
+            $dbFile = $this->app->getAppRoot() . 'database' . DS . 'table' . DS . 'create.sql';
+            $commands = explode(';', file_get_contents($dbFile));
 
             $this->dbh->exec("USE {$this->config->db->name}");
             foreach($commands as $command)
-                if(!$this->dbh->query($command))
+                if(!empty(trim($command)) && !$this->dbh->query($command))
+                    return false;
+        }
+        catch (PDOException $exception)
+        {
+            echo $exception->getMessage();
+            helper::end();
+        }
+        return true;
+    }
+
+    public function dropTable(): bool
+    {
+        try
+        {
+            $dbFile = $this->app->getAppRoot() . 'database' . DS . 'table' . DS . 'drop.sql';
+            $commands = explode(';', file_get_contents($dbFile));
+
+            $this->dbh->exec("USE {$this->config->db->name}");
+            foreach($commands as $command)
+                if(!empty(trim($command)) && !$this->dbh->query($command))
+                    return false;
+        }
+        catch (PDOException $exception)
+        {
+            echo $exception->getMessage();
+            helper::end();
+        }
+        return true;
+    }
+
+    public function initData(): bool
+    {
+        try
+        {
+            $dbFile = $this->app->getAppRoot() . 'database' . DS . 'metadata.sql';
+            $commands = explode(';', file_get_contents($dbFile));
+
+            $this->dbh->exec("USE {$this->config->db->name}");
+            foreach($commands as $command)
+                if(!empty(trim($command)) && !$this->dbh->query($command))
                     return false;
         }
         catch (PDOException $exception)

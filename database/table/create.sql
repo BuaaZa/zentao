@@ -2972,25 +2972,6 @@ create index repo
 create index revision
     on zt_repohistory (revision);
 
-create table if not exists zt_report
-(
-    id        int auto_increment
-        primary key,
-    code      varchar(100)  not null,
-    name      text          not null,
-    module    varchar(100)  not null,
-    `sql`     text          not null,
-    vars      text          not null,
-    langs     text          not null,
-    params    text          not null,
-    step      int default 2 not null,
-    `desc`    text          not null,
-    addedBy   char(30)      not null,
-    addedDate datetime      not null,
-    constraint code
-        unique (code)
-);
-
 create table if not exists zt_researchplan
 (
     id          int unsigned auto_increment
