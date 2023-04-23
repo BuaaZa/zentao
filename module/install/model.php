@@ -12,6 +12,8 @@
 
 class installModel extends model
 {
+    public userModel $user;
+
     /**
      * Get license according the client lang.
      *
@@ -588,12 +590,12 @@ class installModel extends model
         return true;
     }
     /**
-     * Create a comapny, set admin.
+     * Create a company, set admin.
      *
      * @access public
-     * @return void
+     * @return bool
      */
-    public function grantPriv()
+    public function grantPriv(): bool
     {
         $data = fixer::input('post')
             ->stripTags('company')
@@ -609,13 +611,13 @@ class installModel extends model
             }
         }
 
-        $this->loadModel('user');
+        $this->user = $this->loadModel('user');
         $this->app->loadConfig('admin');
         /* Check password. */
         if(!validater::checkReg($this->post->password, '|(.){6,}|')) dao::$errors['password'][] = $this->lang->error->passwordrule;
         if($this->user->computePasswordStrength($this->post->password) < 1) dao::$errors['password'][] = $this->lang->user->placeholder->passwordStrengthCheck[1];
         if(!isset($this->config->safe->weak)) $this->app->loadConfig('admin');
-        if(strpos(",{$this->config->safe->weak},", ",{$this->post->password},") !== false) dao::$errors['password'] = sprintf($this->lang->user->errorWeak, $this->config->safe->weak);
+        if(str_contains(",{$this->config->safe->weak},", ",{$this->post->password},")) dao::$errors['password'] = sprintf($this->lang->user->errorWeak, $this->config->safe->weak);
         if(dao::isError()) return false;
 
         /* Insert a company. */
@@ -634,6 +636,7 @@ class installModel extends model
             $admin->visions  = 'rnd,lite';
             $this->dao->replace(TABLE_USER)->data($admin)->exec();
         }
+        return true;
     }
 
     /**
@@ -671,44 +674,44 @@ class installModel extends model
             $this->dao->update(TABLE_STAGE)->set('name')->eq($value)->where('`type`')->eq($key)->exec();
         }
 
-        if($this->config->edition != 'open')
-        {
-            /* Update flowdatasource by lang. */
-            foreach($this->lang->install->workflowdatasource as $id => $name)
-            {
-                $this->dao->update(TABLE_WORKFLOWDATASOURCE)->set('name')->eq($name)->where('id')->eq($id)->exec();
-            }
+//        if($this->config->edition != 'open')
+//        {
+//            /* Update flowdatasource by lang. */
+//            foreach($this->lang->install->workflowdatasource as $id => $name)
+//            {
+//                $this->dao->update(TABLE_WORKFLOWDATASOURCE)->set('name')->eq($name)->where('id')->eq($id)->exec();
+//            }
+//
+//            /* Update workflowrule by lang. */
+//            foreach($this->lang->install->workflowrule as $id => $name)
+//            {
+//                $this->dao->update(TABLE_WORKFLOWRULE)->set('name')->eq($name)->where('id')->eq($id)->exec();
+//            }
+//        }
 
-            /* Update workflowrule by lang. */
-            foreach($this->lang->install->workflowrule as $id => $name)
-            {
-                $this->dao->update(TABLE_WORKFLOWRULE)->set('name')->eq($name)->where('id')->eq($id)->exec();
-            }
-        }
-
-        if($this->config->edition == 'max')
-        {
-            /* Update process by lang. */
-            foreach($this->lang->install->processList as $id => $name)
-            {
-                $this->dao->update(TABLE_PROCESS)->set('name')->eq($name)->where('id')->eq($id)->exec();
-            }
-
-            foreach($this->lang->install->activity as $id => $name)
-            {
-                $this->dao->update(TABLE_ACTIVITY)->set('name')->eq($name)->where('id')->eq($id)->exec();
-            }
-
-            foreach($this->lang->install->zoutput as $id => $name)
-            {
-                $this->dao->update(TABLE_ZOUTPUT)->set('name')->eq($name)->where('id')->eq($id)->exec();
-            }
-
-            /* Update basicmeas by lang. */
-            foreach($this->lang->install->basicmeasList as $id => $basic)
-            {
-                $this->dao->update(TABLE_BASICMEAS)->set('name')->eq($basic['name'])->set('unit')->eq($basic['unit'])->set('definition')->eq($basic['definition'])->where('id')->eq($id)->exec();
-            }
-        }
+//        if($this->config->edition == 'max')
+//        {
+//            /* Update process by lang. */
+//            foreach($this->lang->install->processList as $id => $name)
+//            {
+//                $this->dao->update(TABLE_PROCESS)->set('name')->eq($name)->where('id')->eq($id)->exec();
+//            }
+//
+//            foreach($this->lang->install->activity as $id => $name)
+//            {
+//                $this->dao->update(TABLE_ACTIVITY)->set('name')->eq($name)->where('id')->eq($id)->exec();
+//            }
+//
+//            foreach($this->lang->install->zoutput as $id => $name)
+//            {
+//                $this->dao->update(TABLE_ZOUTPUT)->set('name')->eq($name)->where('id')->eq($id)->exec();
+//            }
+//
+//            /* Update basicmeas by lang. */
+//            foreach($this->lang->install->basicmeasList as $id => $basic)
+//            {
+//                $this->dao->update(TABLE_BASICMEAS)->set('name')->eq($basic['name'])->set('unit')->eq($basic['unit'])->set('definition')->eq($basic['definition'])->where('id')->eq($id)->exec();
+//            }
+//        }
     }
 }
