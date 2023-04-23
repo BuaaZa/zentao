@@ -97,22 +97,21 @@ class datasampleModel extends model
         $match = preg_match('/^\$(\w+)\(.*\)$/', $mock, $matches);
         if ($match) {
             $funcName = $matches[1];
-
-            if ($funcName) {
-                $paramStr = preg_replace('/^\$\w+\(|\)$/', '', $mock);
-                $paramStr = str_replace(',',' ,',$paramStr);
-                preg_match_all('/("[^"]*"|\'[^\']*\'|\{[^}]*\}|\[[^\]]*\]|[^,]+)+/', $paramStr, $params);
-            } else {
-                $match = preg_match('/^\$(\w+)$/', $mock, $matches);
-                if ($match) {
-                    $funcName = $matches[1];
-                }
-                else {
-                    $response['error'] = '无funcName';
-                }
-            }
-            $funcName = ucfirst(strtolower($funcName));
         }
+        if ($funcName) {
+            $paramStr = preg_replace('/^\$\w+\(|\)$/', '', $mock);
+            $paramStr = str_replace(',',' ,',$paramStr);
+            preg_match_all('/("[^"]*"|\'[^\']*\'|\{[^}]*\}|\[[^\]]*\]|[^,]+)+/', $paramStr, $params);
+        } else {
+            $match = preg_match('/^\$(\w+)$/', $mock, $matches);
+            if ($match) {
+                $funcName = $matches[1];
+            }
+            else {
+                $response['error'] = '无funcName';
+            }
+        }
+        $funcName = ucfirst(strtolower($funcName));
         $response['funcName'] = $funcName;
         $response['params'] = $params[0];
         return $response;
