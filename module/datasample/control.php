@@ -30,4 +30,77 @@ class datasample extends control
         return 0;
     }
 
+    public function singleMock(){
+        $response = array();
+        $data = $this->datasample->parseStrMock($_POST['mock']);
+        $notNull = true;
+        if($_POST['notNull'] === '0'){
+            $notNull = false;
+        }
+        if(!empty($data['error'])) {
+            echo json_encode($data);
+            return;
+        }
+        $response = $this->datasample->findMock($data['params'], $data['funcName'],$notNull,false);
+        if(!$response['error']){
+            $res = $this->datasample->findMock($data['params'], $data['funcName'],$notNull,true);
+            $response = $res['exception'];
+            $response['message'] = 'success';
+        }else{
+            $response['message'] = 'error';
+        }
+        echo json_encode($response);
+        return;
+    }
+
+    public function batchGenerate(){
+        $response = array();
+        $response['error'] = array();
+        $response['samples'] = array();
+        $trueSample = array(); 
+        foreach($_POST['list'] as $item){
+            $data = $this->datasample->parseStrMock($item['mock']);
+            $notNull = true;
+            if($item['notNull'] === '0'){
+                $notNull = false;
+            }
+            $res = $this->datasample->findMock($data['params'], $data['funcName'],$notNull,false);
+            if(!empty($res['error'])){
+                $response['error'][] = array("id"=>$item['id'], "message"=>$res['error']);
+            }else{
+                $trueSample[] = array("id"=>$item['id'], "value"=>$res['value']);
+            }
+        }
+        if(!empty($response['error'])){
+            echo json_encode($response);
+            return;
+        }
+        $response['samples'][] = array("type"=>"正例", "content"=>$trueSample);
+        foreach($_POST['list'] as $item){
+            $data = $this->datasample->parseStrMock($item['mock']);
+            $notNull = true;
+            if($item['notNull'] === '0'){
+                $notNull = false;
+            }
+            $res = $this->datasample->findMock($data['params'], $data['funcName'],$notNull,true);
+            foreach($res['exception'] as $e){
+                $sample = array('type'=>$item['id'].'::'.$e['type'], 'content'=>array());
+                $sample['content'][] = array("id"=>$item['id'], "value"=>$e['value']);
+                foreach($_POST['list'] as $it){
+                    if($it['id'] === $item['id'])
+                        continue;
+                    $data = $this->datasample->parseStrMock($it['mock']);
+                    $notNull = true;
+                    if($it['notNull'] === '0'){
+                        $notNull = false;
+                    }
+                    $res = $this->datasample->findMock($data['params'], $data['funcName'],$notNull,false);
+                    $sample['content'][] = array("id"=>$it['id'], "value"=>$res['value']);
+                }
+                $response['samples'][] = $sample;
+            }
+        }
+        echo json_encode($response);
+        return;
+    }
 }
