@@ -244,12 +244,15 @@ class datasampleModel extends model
         $min = NULL;
         $max = NULL;
 
+        $minFlag = false;
+        $maxFlag = false;
+
         if(isset($params[0]) and is_numeric($params[0])){
-            $min = (float)$args[0];
+            $min = (float)$params[0];
             $minFlag = true;
         }
         if(isset($params[1]) and is_numeric($params[1])){
-            $max = (float)$args[1];
+            $max = (float)$params[1];
             $maxFlag = true;
         }
         if($min and $max and $min > $max){
