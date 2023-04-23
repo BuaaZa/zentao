@@ -44,7 +44,7 @@ class datasample extends control
         $response = $this->datasample->findMock($data['params'], $data['funcName'],$notNull,false);
         if(!$response['error']){
             $res = $this->datasample->findMock($data['params'], $data['funcName'],$notNull,true);
-            $response = $res['exception'];
+            $response['exception'] = $res['exception'];
             $response['message'] = 'success';
         }else{
             $response['message'] = 'error';
