@@ -156,7 +156,8 @@ foreach(explode(',', $config->testcase->create->requiredFields) as $field)
           <tr>
             <th><?php echo $lang->testcase->steps;?></th>
             <td colspan='2'>
-              <table class='table table-form mg-0 table-bordered' id="stepform" style='border: 1px solid #ddd; '>
+              <table class='table table-form mg-0 table-bordered' id="stepform"
+                     style='border: 1px solid #ddd; '>
                 <thead>
                   <tr class="text-center">
                     <th class='w-50px text-center'><?php echo $lang->testcase->stepID;?></th>
@@ -165,8 +166,8 @@ foreach(explode(',', $config->testcase->create->requiredFields) as $field)
                     <th><?php echo $lang->testcase->step_goal_action;?></th>
                     <th><?php echo $lang->testcase->stepExpect;?></th>
                     <th><?php echo $lang->testcase->step_eval_criteria;?></th>
-                      <th class='step-actions text-center'><?php echo "数据样本";?></th>
-                      <th class='step-actions'><?php echo $lang->actions;?></th>
+                    <th class='step-actions text-center'><?php echo "数据样本";?></th>
+                    <th class='step-actions'><?php echo $lang->actions;?></th>
 
                   </tr>
                 </thead>
@@ -199,15 +200,16 @@ foreach(explode(',', $config->testcase->create->requiredFields) as $field)
                     <td><textarea rows='1' class='form-control autosize step-expects' name='goal_actions[]'></textarea></td>
                     <td><textarea rows='1' class='form-control autosize step-expects' name='expects[]'></textarea></td>
                     <td><textarea rows='1' class='form-control autosize step-expects' name='eval_criterias[]'></textarea></td>
-                    <td class='step-actions stepsample-actions'>
+                    <td class='stepsample-actions'>
+                        <input type='hidden' name='inputs_rules[]' id='inputs_rules' value='' class='step-inputs-rules'>
                         <input type='hidden' name='datasample[]' id='datasample' value='' class='step-datasample'>
                         <?php
-                          common::printIcon('testcase', 'datasample',"", '',
-                              'list', 'edit', '', 'showinonlybody iframe btn-datasample',
-                              true,'','填写' );
-//                        echo $this->loadModel('common')->buildMenu('testcase', 'datasample',"", '',
-//                              'button', 'edit', '', 'showinonlybody iframe',
-//                              true, '', '填写');
+                        common::printIcon('testcase', 'datasample',"", '',
+                            'list', 'edit', '', 'showinonlybody iframe btn-datasample',
+                            true,'','填写' );
+                        common::printIcon('testcase', 'generatedatasample',"", '',
+                            'list', 'list', '', 'showinonlybody iframe btn-generatedatasample',
+                            true,'','显示数据样本' );
                         ?>
                         <button type='button' title="重置数据样本" class='btn datasample-undo '>
                             <i class='icon icon-undo'></i>
@@ -215,9 +217,15 @@ foreach(explode(',', $config->testcase->create->requiredFields) as $field)
                     </td>
                     <td class='step-actions'>
                       <div class='btn-group'>
-                        <button type='button' class='btn btn-step-add' tabindex='-1'><i class='icon icon-plus'></i></button>
-                        <button type='button' class='btn btn-step-move' tabindex='-1'><i class='icon icon-move'></i></button>
-                        <button type='button' class='btn btn-step-delete' tabindex='-1'><i class='icon icon-close'></i></button>
+                        <button type='button' class='btn btn-step-add' tabindex='-1'>
+                          <i class='icon icon-plus'></i>
+                        </button>
+                        <button type='button' class='btn btn-step-move' tabindex='-1'>
+                          <i class='icon icon-move'></i>
+                        </button>
+                        <button type='button' class='btn btn-step-delete' tabindex='-1'>
+                          <i class='icon icon-close'></i>
+                        </button>
                       </div>
                     </td>
 
@@ -256,25 +264,32 @@ foreach(explode(',', $config->testcase->create->requiredFields) as $field)
                     <td><?php echo html::textarea('goal_actions[]', $step->goal_action, "rows='1' class='form-control autosize step-expects'") ?></td>
                     <td><?php echo html::textarea('expects[]', $step->expect, "rows='1' class='form-control autosize step-expects'") ?></td>
                     <td><?php echo html::textarea('eval_criterias[]', $step->eval_criteria, "rows='1' class='form-control autosize step-expects'") ?></td>
-                    <td class='step-actions stepsample-actions'>
+                    <td class='stepsample-actions'>
+                        <input type='hidden' name='inputs_rules[]' id='inputs_rules' value='' class='step-inputs-rules'>
                         <input type='hidden' name='datasample[]' id='datasample' value='' class='step-datasample'>
                         <?php
-                            common::printIcon('testcase', 'datasample',"", '',
-                                'list', 'edit', '', 'showinonlybody iframe btn-datasample',
-                                true,'','填写' );
-//                          echo $this->loadModel('common')->buildMenu('testcase', 'datasample',"", '',
-//                            'button', 'edit', '', 'showinonlybody iframe',
-//                            true, '', '填写');
+                        common::printIcon('testcase', 'datasample',"", '',
+                            'list', 'edit', '', 'showinonlybody iframe btn-datasample',
+                            true,'','填写数据规则' );
+                        common::printIcon('testcase', 'generatedatasample',"", '',
+                            'list', 'list', '', 'showinonlybody iframe btn-generatedatasample',
+                            true,'','显示数据样本' );
                         ?>
-                        <button type='button' title="重置数据样本" class='btn datasample-undo '>
+                        <button type='button' title="清空数据样本" class='btn datasample-undo '>
                             <i class='icon icon-undo'></i>
                         </button>
                     </td>
                     <td class='step-actions'>
                       <div class='btn-group'>
-                        <button type='button' class='btn btn-step-add' tabindex='-1'><i class='icon icon-plus'></i></button>
-                        <button type='button' class='btn btn-step-move' tabindex='-1'><i class='icon icon-move'></i></button>
-                        <button type='button' class='btn btn-step-delete' tabindex='-1'><i class='icon icon-close'></i></button>
+                        <button type='button' class='btn btn-step-add' tabindex='-1'>
+                          <i class='icon icon-plus'></i>
+                        </button>
+                        <button type='button' class='btn btn-step-move' tabindex='-1'>
+                          <i class='icon icon-move'></i>
+                        </button>
+                        <button type='button' class='btn btn-step-delete' tabindex='-1'>
+                          <i class='icon icon-close'></i>
+                        </button>
                       </div>
                     </td>
 
@@ -284,6 +299,7 @@ foreach(explode(',', $config->testcase->create->requiredFields) as $field)
               </table>
             </td>
           </tr>
+
           <?php $hiddenKeywords = strpos(",$showFields,", ',keywords,') !== false ? '' : 'hidden';?>
           <tr class="<?php echo $hiddenKeywords?> keywordsBox">
             <th><?php echo $lang->testcase->keywords;?></th>

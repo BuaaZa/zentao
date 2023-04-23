@@ -14,6 +14,7 @@ use PhpOffice\PhpWord\TemplateProcessor;
 use PhpOffice\PhpWord\IOFactory;
 ?>
 <?php
+require_once __DIR__ . '/../../vendor/autoload.php';
 class ztinterfaceModel extends model
 {
     public function setMenu($productID)
@@ -250,6 +251,19 @@ class ztinterfaceModel extends model
             }
             $data.="</datalist>";
         }
+        return $data;
+    }
+
+
+    public function generateMockListForTestCaseModel($id, $name){
+        $data = "<datalist id='$id' name='$name'>";
+        foreach(array("integer",'float','string') as $type){
+            $mock = $type."Mock";
+            foreach($this->lang->ztinterface->$mock as $mockFunc) {
+                $data .= '<option value="' . $mockFunc['example'] . '" label="' . $mockFunc['description'] . '">';
+            }
+        }
+        $data.="</datalist>";
         return $data;
     }
 

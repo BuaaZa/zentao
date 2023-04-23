@@ -59,7 +59,7 @@
                 .append($link)
                 .appendTo($menuMainNav);
 
-            if(item.code == 'qa'){
+            if(item.code== 'qa'){
                 var moreLink = createLink('index', 'ajaxGetMoreList', 'checkApp='+item.code);
                 $.get(moreLink, function(data){
                     var $itemLi = $("#menuMainNav li[data-app='"+item.code+"']");

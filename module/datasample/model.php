@@ -8,11 +8,12 @@ class datasampleModel extends model
      * @param int $caseID 测试用例编号
      * @param int $stepID 测试执行步骤编号
      * @param int $stepLevel 测试执行步骤顺序
+     * @param string $rules 数据样本规则
      * @param string $object 数据样本
      * @param int $version 测试执行步骤版本
      * @return bool
      */
-    public function saveDataSample(int $caseID, int $stepID, int $stepLevel, string $object, int $version): bool
+    public function saveDataSample(int $caseID, int $stepID, int $stepLevel, string $rules, string $object, int $version): bool
     {
         // 空数据样本会传''，此时不进行存储
         if ($object === '') return false;
@@ -20,6 +21,7 @@ class datasampleModel extends model
         $data->case_id = $caseID;
         $data->casestep_id = $stepID;
         $data->casestep_level = $stepLevel;
+        $data->rules = $rules;
         $data->object = $object;
         $data->version = $version;
 
@@ -98,6 +100,7 @@ class datasampleModel extends model
 
             if ($funcName) {
                 $paramStr = preg_replace('/^\$\w+\(|\)$/', '', $mock);
+                $paramStr = str_replace(',',' ,',$paramStr);
                 preg_match_all('/("[^"]*"|\'[^\']*\'|\{[^}]*\}|\[[^\]]*\]|[^,]+)+/', $paramStr, $params);
             } else {
                 $match = preg_match('/^\$(\w+)$/', $mock, $matches);
@@ -111,7 +114,7 @@ class datasampleModel extends model
             $funcName = ucfirst(strtolower($funcName));
         }
         $response['funcName'] = $funcName;
-        $response['params'] = $params;
+        $response['params'] = $params[0];
         return $response;
     }
     
@@ -121,12 +124,13 @@ class datasampleModel extends model
             $response['value'] = '';
             return $response;
         }
-        if(in_array(strtolower($funcName), $this->lang->ztinterface->funcTable)){
-            return $this->datasample->mockFunc($params, $funcName, $notNull, $except);
+        $ztinterface = $this->loadModel('ztinterface');
+        if(in_array(strtolower($funcName), $ztinterface->lang->ztinterface->funcTable)){
+            return $this->mockFunc($params, $funcName, $notNull, $except);
         }
         $funcName = 'mock'.ucfirst(strtolower($funcName));
         if (method_exists($this, $funcName)) {
-            return $this->datasample->$funcName($params, $notNull, $except);
+            return $this->$funcName($params, $notNull, $except);
         }
         $response['error'] = "Mock函数不存在";
         return $response;
@@ -136,7 +140,7 @@ class datasampleModel extends model
         $response = array();
         $response['exception'] = array();
         if(!$notNull and !$except){
-            if(rand(0,5) == 0){
+            if(rand(0,8) == 0){
                 $response["value"] = "";
                 return $response;
             }
@@ -181,7 +185,7 @@ class datasampleModel extends model
                 $response['exception'][] = array('value'=>$max+1,'type'=>'上越界');
             }
         }else{
-            $faker = $this->loadModule('ztinterface')->getFaker('en_US');
+            $faker = $this->loadModel('ztinterface')->getFaker('en_US');
             $response['value'] = $faker->numberBetween($min,$max);
         }
         
@@ -192,7 +196,7 @@ class datasampleModel extends model
         $response = array();
         $response['exception'] = array();
         if(!$notNull and !$except){
-            if(rand(0,5) == 0){
+            if(rand(0,8) == 0){
                 $response["value"] = "";
                 return $response;
             }
@@ -231,7 +235,7 @@ class datasampleModel extends model
                 $response['exception'][] = array('value'=>$max+1,'type'=>'上越界');
             }
         }else{
-            $faker = $this->loadModule('ztinterface')->getFaker('en_US');
+            $faker = $this->loadModel('ztinterface')->getFaker('en_US');
             $response['value'] = $faker->randomFloat(NULL, $min, $max);
         }
 
@@ -242,7 +246,7 @@ class datasampleModel extends model
         $response = array();
         $response['exception'] = array();
         if(!$notNull and !$except){
-            if(rand(0,5) == 0){
+            if(rand(0,8) == 0){
                 $response["value"] = "";
                 return $response;
             }
@@ -250,7 +254,7 @@ class datasampleModel extends model
         if($notNull and $except){
             $response['exception'][] = array('value'=>'','type'=>'值为空');
         }
-        $args = $this->loadModule('ztinterface')->parseParams($params);
+        $args = $this->loadModel('ztinterface')->parseParams($params);
         $min = 1;
         $max = 50;
 
@@ -311,7 +315,7 @@ class datasampleModel extends model
     public function mockDatetime($params = '', $notNull = true, $except = false){
         $response = array();
         if(!$notNull and !$except){
-            if(rand(0,5) == 0){
+            if(rand(0,8) == 0){
                 $response["value"] = "";
                 return $response;
             }
@@ -323,7 +327,7 @@ class datasampleModel extends model
 
         $format = 'Y-m-d H:i:s';
         if($args[0]){
-            $format = $this->loadModule('ztinterface')->trimQuotation($args[0]);
+            $format = $this->loadModel('ztinterface')->trimQuotation($args[0]);
         }
         
         if($except){
@@ -361,9 +365,9 @@ class datasampleModel extends model
                     return $response;
                 }
             }
-            $response['exception'][] = array('value'=>$this->loadModule('ztinterface')->mockDate($format),'type'=>'错误日期');
+            $response['exception'][] = array('value'=>$this->loadModel('ztinterface')->mockDate($format),'type'=>'错误日期');
         }else{
-            $response['value'] = $this->loadModule('ztinterface')->mockDate($format);
+            $response['value'] = $this->loadModel('ztinterface')->mockDate($format);
         }
         
         return $response;
@@ -372,7 +376,7 @@ class datasampleModel extends model
     public function mockRegex($params = '', $notNull = true, $except = false){
         $response = array();
         if(!$notNull and !$except){
-            if(rand(0,5) == 0){
+            if(rand(0,8) == 0){
                 $response["value"] = "";
                 return $response;
             }
@@ -380,7 +384,7 @@ class datasampleModel extends model
         if($notNull and $except){
             $response['exception'][] = array('value'=>'','type'=>'值为空');
         }
-        $args = $this->loadModule('ztinterface')->parseParams($params);
+        $args = $this->loadModel('ztinterface')->parseParams($params);
         
         if(!isset($args[0])){
             $response["error"] = "需要正则表达式";
@@ -402,7 +406,7 @@ class datasampleModel extends model
     public function mockRegexnum($params = '', $notNull = true, $except = false){
         $response = array();
         if(!$notNull and !$except){
-            if(rand(0,5) == 0){
+            if(rand(0,8) == 0){
                 $response["value"] = "";
                 return $response;
             }
@@ -412,7 +416,7 @@ class datasampleModel extends model
         }
         $n = 5;
         while($n > 0){
-            $response = $this->datasample->mockRegex($params);
+            $response = $this->mockRegex($params);
             if($response['value']){
                 if(is_numeric($response['value']) or $response['value']=='null')
                     break;
@@ -436,7 +440,7 @@ class datasampleModel extends model
     public function mockFunc($params = '', $funcName = '', $notNull = true, $except = false){
         $response = array();
         if(!$notNull and !$except){
-            if(rand(0,5) == 0){
+            if(rand(0,8) == 0){
                 $response["value"] = "";
                 return $response;
             }
@@ -444,7 +448,7 @@ class datasampleModel extends model
         if($notNull and $except){
             $response['exception'][] = array('value'=>'','type'=>'值为空');
         }
-        $args = $this->loadModule('ztinterface')->parseParams($params);
+        $args = $this->loadModel('ztinterface')->parseParams($params);
         $faker = "";
         $gen = $funcName;
 
