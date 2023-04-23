@@ -8,11 +8,12 @@ class datasampleModel extends model
      * @param int $caseID 测试用例编号
      * @param int $stepID 测试执行步骤编号
      * @param int $stepLevel 测试执行步骤顺序
+     * @param string $rules 数据样本规则
      * @param string $object 数据样本
      * @param int $version 测试执行步骤版本
      * @return bool
      */
-    public function saveDataSample(int $caseID, int $stepID, int $stepLevel, string $object, int $version): bool
+    public function saveDataSample(int $caseID, int $stepID, int $stepLevel, string $rules, string $object, int $version): bool
     {
         // 空数据样本会传''，此时不进行存储
         if ($object === '') return false;
@@ -20,6 +21,7 @@ class datasampleModel extends model
         $data->case_id = $caseID;
         $data->casestep_id = $stepID;
         $data->casestep_level = $stepLevel;
+        $data->rules = $rules;
         $data->object = $object;
         $data->version = $version;
 
