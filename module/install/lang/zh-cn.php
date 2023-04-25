@@ -11,6 +11,10 @@
  */
 $lang->install = new stdclass();
 
+$lang->install->sync2wbsApi = '工时同步API';
+$lang->install->getCodeLineApi ='获取提交代码工作量API';
+$lang->install->syncWorkCodeLine2WbsApi = '同步提交代码工作量API';
+
 $lang->install->common = '安装';
 $lang->install->next   = '下一步';
 $lang->install->pre    = '返回';

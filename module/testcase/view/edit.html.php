@@ -153,7 +153,7 @@
                       <td><?php echo html::textarea('goal_actions[]', $step->goal_action, "rows='1' class='form-control autosize step-expects'") ?></td>
                       <td><?php echo html::textarea('expects[]', $step->expect, "rows='1' class='form-control autosize step-expects'") ?></td>
                       <td><?php echo html::textarea('eval_criterias[]', $step->eval_criteria, "rows='1' class='form-control autosize step-expects'") ?></td>
-                      <td class='step-actions stepsample-actions'>
+                      <td class='stepsample-actions'>
                           <?php
                             if(isset($data_samples[$stepLevel])){
                                 $rules = $data_samples[$stepLevel]['rules'];
