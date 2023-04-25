@@ -7,3 +7,6 @@
  [lang^=en] .detail > table > tbody th, [lang^=fr] .detail > table > tbody th {width: 100px !important;}
  [lang^=de] .detail > table > tbody th {width: 125px !important;}
  .linkCaseTitle, .linkBugTitle {white-space: nowrap;}
+
+.table-form{table-layout: auto}
+.stepsample-actions {width: 135px;text-align: center}

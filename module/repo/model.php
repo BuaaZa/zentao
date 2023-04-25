@@ -1924,14 +1924,14 @@ class repoModel extends model
 
     public function getCommitWorkCodeLine($data)
     {
-        $url = $this->config->repo->getCodeLineApi;
+        $url = $this->config->synAPI->getCodeLineApi;
         $response = common::http( $url, $data, array(CURLOPT_CUSTOMREQUEST => 'GET'), array("Content-Type: multipart/form-data"),'data','GET');
         return json_decode($response);
     }
 
     public function syncWorkCodeLine2Wbs($data)
     {
-        $url = $this->config->repo->syncWorkCodeLine2WbsApi . '?zenTaoTaskId=' .$data->zenTaoTaskId . '&count='.$data->count;
+        $url = $this->config->synAPI->syncWorkCodeLine2WbsApi . '?zenTaoTaskId=' .$data->zenTaoTaskId . '&count='.$data->count;
         $response = common::http( $url, null, array(CURLOPT_CUSTOMREQUEST => 'PUT'), array(), 'json','PUT');
         return json_decode($response);
     }

@@ -2193,7 +2193,7 @@ class taskModel extends model
      */
     public function taskFeedback($data)
     {
-        $url = $this->config->task->sync2wbsApi;
+        $url = $this->config->synAPI->sync2wbsApi;
         $response = common::http($url,$data,array(), array(), 'json');
         return json_decode($response);
     }

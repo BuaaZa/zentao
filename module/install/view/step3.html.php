@@ -28,6 +28,12 @@ if(!isset($error))
 \$config->db->prefix      = '$dbPrefix';
 \$config->webRoot         = getWebRoot();
 \$config->default->lang   = '$defaultLang';
+
+\$config->synAPI = new stdClass();
+\$config->synAPI->sync2wbsApi = '$sync2wbsApi';
+\$config->synAPI->getCodeLineApi ='$getCodeLineApi';
+\$config->synAPI->syncWorkCodeLine2WbsApi = '$syncWorkCodeLine2WbsApi';
+
 EOT;
     if($customSession) $configContent .= "\n\$config->customSession = true;";
 }
