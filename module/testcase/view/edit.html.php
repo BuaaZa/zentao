@@ -156,8 +156,8 @@
                       <td class='stepsample-actions'>
                           <?php
                             if(isset($data_samples[$stepLevel])){
-                                $rules = $data_samples[$stepLevel]['rules'];
-                                $datasample = $data_samples[$stepLevel]['obj'];
+                                $rules = htmlspecialchars($data_samples[$stepLevel]['rules']);
+                                $datasample =htmlspecialchars($data_samples[$stepLevel]['obj']) ;
                                 echo "<input type='hidden' name='inputs_rules[]' id='inputs_rules' value='$rules' class='step-inputs-rules'>";
                                 echo "<input type='hidden' name='datasample[]' id='datasample' value='$datasample' class='step-datasample'>";
                                 common::printIcon('testcase', 'datasample',"", '',
@@ -176,6 +176,7 @@
                                     'list', 'list', '', 'showinonlybody iframe btn-generatedatasample',
                                     true,'','显示数据样本' );
                             }
+
                           ?>
                           <input type='hidden' name='is_updated[]' id='is_updated' value='' >
                           <button type='button' title="重置数据样本" class='btn datasample-undo '>
