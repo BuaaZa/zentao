@@ -29,7 +29,23 @@ class datasample extends control
         $this->display();
         return 0;
     }
+    public function viewrule(int $caseID, int $casestepLevel, int $version): int
+    {
+        $testcase = $this->testcaseModel->getById($caseID);
+        $sample = $this->datasampleModel->getDataSampleByCasestepLevel($caseID, $casestepLevel, $version);
 
+        $this->view->case = new stdClass();
+        $this->view->case->id = $caseID;
+        $this->view->case->title = $testcase->title;
+        $this->view->sample = new stdClass();
+        $this->view->sample->casestep_level = $sample->casestep_level;
+        $this->view->sample->input_name = $sample->rules[0][0];
+        $this->view->sample->mock_rule = $sample->rules[0][1];
+        $this->view->table = json_decode($sample->rules);
+
+        $this->display();
+        return 0;
+    }
     public function singleMock(){
         $response = array();
         $data = $this->datasample->parseStrMock($_POST['mock']);

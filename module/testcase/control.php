@@ -870,6 +870,7 @@ class testcase extends control
         $this->view->isLibCase = $isLibCase;
         $this->view->caseFails = $caseFails;
 
+
         $this->view->datasamples = array();
         foreach ($datasamples as $sample) {
             $this->view->datasamples[$sample->casestep_level - 1] = $sample ?: '';

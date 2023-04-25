@@ -61,10 +61,13 @@
     //  从隐藏input获得的json序列化的rule
     let dataSampleRuleFromInput;
     let inputArray =[]
+    let inputArrayWithResult = []
     //  ajax请求得到的样本示例
     let dataSampleItemJson;
     //  当前数据样本，二维数组，内容是string
-    let curDataSample
+    let curDataSample;
+    //  转置的数据样本二维矩阵，第一列是字段名称，从第二列开始是样本
+    let transDataSampleWithHead;
 
     $(function () {
         stepID = $.cookie('curStepID');
@@ -79,7 +82,7 @@
         let nameStr2 = 'datasample[' + stepID + ']';
         let selector2 = parent.document.getElementsByName(nameStr2);
         let element2 = $(selector2);
-        curDataSample = element2.attr("value");
+        transDataSampleWithHead = element2.attr("value");
         // console.log(curDataSample)
 
         if (dataSampleRuleFromInput.length > 0) {
@@ -90,8 +93,10 @@
             addHead();
             generateTemplate();
 
-            if (curDataSample.length > 0 && JSON.parse(curDataSample).length>0) {
-                curDataSample = JSON.parse(curDataSample)
+            if (transDataSampleWithHead.length > 0 && JSON.parse(transDataSampleWithHead)[0].length>1) {
+                transDataSampleWithHead = JSON.parse(transDataSampleWithHead);
+                curDataSample = transpose(transDataSampleWithHead).slice(1);
+                //curDataSample = JSON.parse(curDataSample)
             } else {
                 // dataSampleItemJson = ajaxGetDataSampleJson()
                 curDataSample = []
@@ -99,6 +104,7 @@
                 for (let i = 0; i < ruleCountMax; i++) {
                     curDataSample[0].push('')
                 }
+                curDataSample[0].push('')
             }
 
             generateDataSample()
@@ -111,6 +117,29 @@
 
     })
 
+    // 转置数据样本矩阵
+    /**
+     * @param {array(array())} matrix 传入的二维矩阵
+     */
+    function transpose(matrix){
+        let row_len = matrix.length;
+        if(row_len === 0){
+            return matrix
+        }
+        let col_len = matrix[0].length;
+        if(col_len === 0){
+            return matrix;
+        }
+        let t_matrix = [];
+        for(let i = 0; i < col_len; i += 1){
+            t_matrix[i] = []
+            for(let j = 0; j < row_len; j += 1){
+                t_matrix[i][j] = matrix[j][i];
+            }
+        }
+        return t_matrix;
+    }
+
     function addHead() {
         let testTableHead = $('#sampleTable thead tr');
         // let rowTemplate = "<th class='step-id'> <b>样本编号</b> </th>"
@@ -119,11 +148,13 @@
 
         let i;
         for (i = 0; i < ruleCountMax; i++) {
-            rowTemplate += "<th> <b>" + dataSampleRuleFromInput[i][0] + "</b></th>"
+            rowTemplate += "<th> <b>" + dataSampleRuleFromInput[i][0] + (dataSampleRuleFromInput[i][2]=="1" ?"『<b>必填</b>』":"『<b>选填</b>』") +"</b></th>"
             inputArray.push(dataSampleRuleFromInput[i][0])
+            inputArrayWithResult.push(dataSampleRuleFromInput[i][0]);
         }
         // rowTemplate += "<th class='step-actions'> <b>操作</b> </th>";
         rowTemplate += "<th> <b> 预期结果 </b> </th>";
+        inputArrayWithResult.push("预期结果");
         rowTemplate += "<th class='sample-actions'> <b>操作</b> </th>";
 
         testTableHead.append(rowTemplate);
@@ -174,6 +205,7 @@
         if(clear){
             $steps.find('tr:not(.template)').remove()
         }
+        console.log(curDataSample)
 
         let sampleNum = curDataSample.length;
         // console.log($('#stepTemplate'))
@@ -189,14 +221,26 @@
 
             let curSample = curDataSample[i-1];
 
+            var lastTD;
+
+
             $step.find('[name^="datasampleitem["]').each(function ()
                 {
+                    lastTD = $(this);
                     let rule = $(this).attr('data-rule');
-                    $(this).attr('name',"datasampleitem[" +stepID + ']['+ rule +']')
-                        .attr('value',(curSample[rule]?curSample[rule]:''))
+                    if(rule == (curSample.length-1)){
+                        $(this).attr('name',"datasampleitem[" +stepID + ']['+ rule +']')
+                            .attr('value','')
+                    }else{
+                        $(this).attr('name',"datasampleitem[" +stepID + ']['+ rule +']')
+                            .attr('value',(curSample[rule]?curSample[rule]:''))
+                    }
                     $.autoResizeTextarea(this);
                 }
+
             )
+
+            lastTD.attr('value',(curSample[curSample.length-1]?curSample[curSample.length-1]:''));
         }
 
         refreshSteps(true,$steps)
@@ -232,9 +276,9 @@
                     label: '<i class="icon icon-check"></i> 添加生成',
                     className: 'btn-primary',
                     callback: function() {
-                        // Todo : ajax
                         dataSampleItemJson = ajaxGetDataSampleJson()
                         curDataSample = sampleJsonConvertToArray(dataSampleItemJson)
+
                         generateDataSample()
                     }
                 }
@@ -302,6 +346,7 @@
     }
 
     function sampleJsonConvertToArray(sampleJson){
+        console.log(sampleJson)
         let ret = [];
         let samples = sampleJson.samples
         for (let i = 0; i < samples.length ; i++) {
@@ -315,8 +360,11 @@
             for (let j = 0; j < curSampleContent.length; j++) {
                 sample.push(curSampleContent[j].value)
             }
+            //生成预期结果默认值
+            sample.push(samples[i].type=='正例'?'成功':'失败')
             ret.push(sample)
         }
+        console.log(ret)
         return ret
     }
 
@@ -331,11 +379,15 @@
 
         let form = document.getElementById("dataform"); // get form element
         let matrix = []; // initialize empty array
+        matrix[0] = [];
+        for(let j = 0; j < inputArrayWithResult.length; j += 1){
+            matrix[0][j] = inputArrayWithResult[j];
+        }
         for (let i = 0; i < form.elements.length; i++) { // loop through each form element
             let element = form.elements[i]; // get current element
             if (element.name.startsWith("datasampleitem")) { // if element name starts with matrix
                 let indices = element.name.match(/\d+/g); // get row and column indices from name
-                let row = parseInt(indices[0])-1; // get row index as number
+                let row = parseInt(indices[0]); // get row index as number
                 let col = parseInt(indices[1]); // get column index as number
                 if (!matrix[row]) { // if row does not exist in array yet
                     matrix[row] = []; // create empty row array
@@ -343,6 +395,8 @@
                 matrix[row][col] = element.value; // assign element value to array position
             }
         }
+        matrix = transpose(matrix);
+        console.log(matrix)
         let matrixString = JSON.stringify(matrix); // convert array to string using JSON.stringify()
 
         let stepID = $.cookie('curStepID');

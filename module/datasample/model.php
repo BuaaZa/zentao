@@ -330,6 +330,24 @@ class datasampleModel extends model
             }
         }
         if($except){
+            if(empty($response["error"]) or strpos($args[0], '@all') !== false){
+                $regexChar = $regex.'{'.($min > 1 ? $min : 1).','.$max.'}';
+                $value = $this->ztinterface->mockStringByRegex($regexChar);
+                $alphaBeta = '';
+                for($i = 33; $i <= 126; $i++){
+                    if(strpos($value, chr($i)) === false)
+                        $alphaBeta .= chr($i);
+                }
+                if(!empty($alphaBeta)){
+                    $count = mt_rand(1, strlen($value));
+                    for($i = 0; $i < $count; $i++){
+                        $pos = mt_rand(0, strlen($value) - 1);
+                        $other = mt_rand(0, strlen($alphaBeta) - 1);
+                        $value[$pos] = $alphaBeta[$other];
+                    }
+                    $response['exception'][] = array('value'=>$value,'type'=>'超出字符集');
+                }
+            }
             if($minFlag){
                 $regexMin = $regex.'{'.$min.','.$min.'}';
                 $response['exception'][] = array('value'=>$this->ztinterface->mockStringByRegex($regexMin),'type'=>'下边界');
