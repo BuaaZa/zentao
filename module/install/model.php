@@ -345,7 +345,7 @@ class installModel extends model
                     return $return;
                 }
             }
-            // if database exists and table exists, judge the clear DB tag
+            // else if database exists and table exists, judge the clear DB tag
             elseif($this->tableExists())
             {
                 if ($this->post->clearDB)
@@ -380,14 +380,6 @@ class installModel extends model
                 $return->error  = $this->lang->install->errorCreateTable . "在初始化数据阶段";
                 return $return;
             }
-
-            /* Create tables. */
-//            if(!$this->createTable($version))
-//            {
-//                $return->result = 'fail';
-//                $return->error  = $this->lang->install->errorCreateTable;
-//                return $return;
-//            }
         }
         elseif ($this->post->installType === 'upgrade')
         {
@@ -406,7 +398,12 @@ class installModel extends model
         }
         else if ($this->post->installType === 'connect')
         {
-            // do nothing
+            if (!$this->tableExists())
+            {
+                $return->result = 'fail';
+                $return->error = "数据库中表不存在，您连接的数据库可能未配置正确";
+                return $return;
+            }
         }
 
         return $return;
