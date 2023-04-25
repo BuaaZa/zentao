@@ -1,6 +1,5 @@
 <?php
 $config->task = new stdclass();
-$config->task->sync2wbsApi = 'http://192.168.7.182:6102/task/taskFeedback';
 $config->task->batchCreate = 10;
 
 $config->task->create   = new stdclass();

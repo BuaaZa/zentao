@@ -94,6 +94,27 @@ include '../../common/view/header.lite.html.php'; ?>
                             </div>
                         </td>
                     </tr>
+                    <tr>
+                        <th><?php echo $lang->install->sync2wbsApi; ?></th>
+                        <td>
+                            <?php echo html::input('sync2wbsApi', $sync2wbsApi, "class='form-control'"); ?>
+                        </td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <th><?php echo $lang->install->getCodeLineApi; ?></th>
+                        <td>
+                            <?php echo html::input('getCodeLineApi', $getCodeLineApi, "class='form-control'"); ?>
+                        </td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <th><?php echo $lang->install->syncWorkCodeLine2WbsApi; ?></th>
+                        <td>
+                            <?php echo html::input('syncWorkCodeLine2WbsApi', $syncWorkCodeLine2WbsApi, "class='form-control'"); ?>
+                        </td>
+                        <td></td>
+                    </tr>
                 </table>
             </div>
             <div class='modal-footer'>

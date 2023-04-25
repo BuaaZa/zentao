@@ -205,7 +205,7 @@
         if(clear){
             $steps.find('tr:not(.template)').remove()
         }
-        console.log(curDataSample)
+        // console.log(curDataSample)
 
         let sampleNum = curDataSample.length;
         // console.log($('#stepTemplate'))
@@ -346,7 +346,7 @@
     }
 
     function sampleJsonConvertToArray(sampleJson){
-        console.log(sampleJson)
+        // console.log(sampleJson)
         let ret = [];
         let samples = sampleJson.samples
         for (let i = 0; i < samples.length ; i++) {
@@ -364,7 +364,7 @@
             sample.push(samples[i].type=='正例'?'成功':'失败')
             ret.push(sample)
         }
-        console.log(ret)
+        // console.log(ret)
         return ret
     }
 

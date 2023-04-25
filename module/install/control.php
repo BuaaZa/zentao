@@ -124,6 +124,10 @@ class install extends control
     {
         $dbHost = $dbPort = $dbName = $dbUser = $dbPassword = '';
 
+        $sync2wbsApi = 'http://localhost/task/taskFeedback';
+        $getCodeLineApi = 'http://localhost/gitlabCount/getCodeLine';
+        $syncWorkCodeLine2WbsApi = 'http://localhost/syncToWbs/addCodeNumberByZenTao';
+
         /* Get mysql env in docker container. */
         if(getenv('MYSQL_HOST'))     $dbHost     = getenv('MYSQL_HOST');
         if(getenv('MYSQL_PORT'))     $dbPort     = getenv('MYSQL_PORT');
@@ -138,6 +142,11 @@ class install extends control
         $this->view->dbName     = $dbName ?: 'zentao';
         $this->view->dbUser     = $dbUser ?: 'root';
         $this->view->dbPassword = $dbPassword ?: '';
+
+        $this->view->sync2wbsApi             = $sync2wbsApi;
+        $this->view->getCodeLineApi          = $getCodeLineApi;
+        $this->view->syncWorkCodeLine2WbsApi = $syncWorkCodeLine2WbsApi;
+
         $this->display();
     }
 
