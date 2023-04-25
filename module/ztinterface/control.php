@@ -152,10 +152,17 @@ class ztinterface extends control
 
         $productID = $interface->product;
         $product   = $this->product->getByID($productID);
+        $temp = explode(',', $interface->format);
+        $format = array();
+        foreach($temp as $str){
+            $str = strtolower($str);
+            $format[$str] = $str;
+        }
 
         $this->ztinterface->setMenu($productID);
 
-        $this->view->title       = $interface->name ;
+        $this->view->title       = $interface->name;
+        $this->view->format       = $format;
         $this->view->product     = $product;
         $this->view->productName = $product->name;
         $this->view->header = json_decode($interface->header,TRUE);
@@ -870,26 +877,6 @@ class ztinterface extends control
         return $response;
     }
 
-    public function parseStrMock($mock = ''){
-        $match = preg_match('/^\$(\w+)\(.*\)$/', $mock, $matches);
-        if ($match) {
-            $funcName = $matches[1];
-
-            if ($funcName) {
-                $paramStr = preg_replace('/^\$\w+\(|\)$/', '', $mock);
-                preg_match_all('/("[^"]*"|\'[^\']*\'|\{[^}]*\}|\[[^\]]*\]|[^,]+)+/', $paramStr, $params);
-            } else {
-                $match = preg_match('/^\$(\w+)$/', $mock, $matches);
-                if ($match) {
-                $funcName = $matches[1];
-                }
-            }
-
-            $funcName = ucfirst(strtolower($funcName));
-        }
-        
-    }
-
     public function saveMock($id){
         $res = $this->ztinterface->saveMock($id,$_POST['data']);
         if(dao::isError()) $res = dao::getError();
@@ -930,7 +917,7 @@ class ztinterface extends control
             $obj = $response['value']['object'];
         }
         $obj = $this->ztinterface->convertStrToNULL($obj);
-        $response['value']['message'] = $this->ztinterface->genMessage($_POST['head'], $obj, $interface->method, $url);
+        $response['value']['message'] = $this->ztinterface->genMessage($_POST['head'], $obj, $interface->method, $url, $_POST['format']);
         echo json_encode($response);
         return;
     }

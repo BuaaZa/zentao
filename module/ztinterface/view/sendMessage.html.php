@@ -75,160 +75,165 @@
       <?php echo "<b style=\"font-size: 1.3em;\">$interface->name</b>";?>
     </h2>
   </div>
-  <form method='post' enctype='multipart/form-data' target='hiddenwin' id='dataform'>
-    <div class='main-row'>
-      <div class='main-col col-7'>
-        <div class='cell'>
-          <div class='detail'>
-            <div class='detail-title' style="display: flex; justify-content: space-between;">
-              <?php echo $lang->ztinterface->url;?>
-              <?php 
-                echo html::a($this->createLink('ztinterface','editbaseurl',"productID=$interface->product&onlybody=yes"), '<i class="icon-cog-outline"></i>', '', "class=\"btn iframe\" title=\"修改基地址集\" data-app=\"ztinterface\" style=\"float: right;\"")
-              ?>
-            </div>
-            <div class="detail-content">
-              <div class="input-control" style="display: flex; align-items: center;">
-                <?php #echo '<span style="font-size: 1.3rem; letter-spacing: 0.05em;">' . $interface->url . '</span>';?>
-                <?php echo html::input('baseURL', '', 'class="form-control" style="width: 60%;" list="baseUrlList" placeholder="' . $lang->ztinterface->baseUrl . '"');?>
-                <?php echo html::input('URL', $interface->url, 'class="form-control" style="width: 40%;" disabled title="接口文档中指定"');?>
-                <?php echo $baseURLList;?>
-              </div>
-              <div id="urlError">
-                <span id="error" style="font-size:4px;color:red;display:none;">Mock函数不存在</span>
-              </div>
-            </div>
+  <div class='main-row'>
+    <div class='main-col col-7'>
+      <div class='cell'>
+        <div class='detail'>
+          <div class='detail-title' style="display: flex; justify-content: space-between;">
+            <?php echo $lang->ztinterface->url;?>
+            <?php 
+              echo html::a($this->createLink('ztinterface','editbaseurl',"productID=$interface->product&onlybody=yes"), '<i class="icon-cog-outline"></i>', '', "class=\"btn iframe\" title=\"修改基地址集\" data-app=\"ztinterface\" style=\"float: right;\"")
+            ?>
           </div>
-          <div class='detail'>
-            <div class='detail-title'><?php echo $lang->ztinterface->head;?></div>
-            <div class='detail-content'>
-              <table class='table table-form table-bordered'>
-                <thead>
-                  <tr>
-                    <th width="30%"><?php echo $lang->ztinterface->key?></th>
-                      <th width="100px"><?php echo $lang->ztinterface->type;?></th>
-                      <!-- <th width="50px"><?php echo $lang->ztinterface->canNull;?></th> -->
-                      <!-- <th width="15%"><?php echo $lang->ztinterface->mock;?></th> -->
-                      <th><?php echo $lang->ztinterface->value;?></th>
-                  </tr>
-                </thead>
-                <tbody id='headers' class='table table-form' data-group-name='<?php echo $lang->testcase->groupName ?>'>
-                  <?php if(empty($header["content"])):?>
-                    <tr>
-                      <td colspan="3" class="no-data-message"><?php echo $lang->ztinterface->noHeaders?></td>
-                    </tr>
-                  <?php else:?>
-                    <?php foreach($header["content"] as $id => $message):?>
-                    <tr class='header-key'>
-                      <td id='name'>
-                        <b><?php echo $message["name"];?></b>
-                        <?php if(!empty($message["description"])){
-                            echo "<span style=\"color: #888888;\">({$message["description"]})</span>";
-                          }
-                        ?>
-                      </td>
-                      <td id='type' style="text-align: center;"><?php echo $message["type"];?></td>
-                      <td id='value'><?php
-                          $valueExample = '';
-                          if(!empty($message["example"])){
-                            $valueExample = "示例:".$message["example"];
-                          }
-                          echo html::input('header_value[]', '', "rows='1' class='form-control header-value' placeholder=\"$valueExample\""); ?>
-                        <span id="error" style="font-size:4px;color:red;display:none;">类型不符</span>
-                      </td>
-                    </tr>
-                    <?php endforeach; ?>
-                  <?php endif;?>
-                </tbody>
-              </table>
+          <div class="detail-content">
+            <div class="input-control" style="display: flex; align-items: center;">
+              <?php #echo '<span style="font-size: 1.3rem; letter-spacing: 0.05em;">' . $interface->url . '</span>';?>
+              <?php echo html::input('baseURL', '', 'class="form-control" style="width: 60%;" list="baseUrlList" placeholder="' . $lang->ztinterface->baseUrl . '"');?>
+              <?php echo html::input('URL', $interface->url, 'class="form-control" style="width: 40%;" disabled title="接口文档中指定"');?>
+              <?php echo $baseURLList;?>
             </div>
-          </div>
-          <div class='detail'>
-            <div class='detail-title'>
-              <span style="display: inline;"><?php echo $lang->ztinterface->body;?></span>
-              <div style="text-align: right;display: inline;">
-                <button type="button" class="btn iframe fill-in" style="float: right;">
-                  <i class="icon-import" title="填充空白项" data-app="ztinterface"></i>
-                </button>
-                <button type="button" class="btn iframe all-refresh" style="float: right;">
-                  <i class="icon-refresh" title="全部随机" data-app="ztinterface"></i>
-                </button>
-              </div>
+            <div id="urlError">
+              <span id="error" style="font-size:4px;color:red;display:none;">Mock函数不存在</span>
             </div>
-            <div class='detail-content'>
-              <table class='table table-form table-bordered'>
-                <thead>
-                  <tr>
-                    <th width="30%"><?php echo $lang->ztinterface->key?></th>
-                      <th width="70px"><?php echo $lang->ztinterface->type;?></th>
-                      <th width="50px"><?php echo $lang->ztinterface->notNull;?></th>
-                      <th width="25%"><?php echo $lang->ztinterface->mock;?></th>
-                      <th><?php echo $lang->ztinterface->value;?></th>
-                  </tr>
-                </thead>
-                <tbody id='bodys' class='table table-form' data-group-name='<?php echo $lang->testcase->groupName ?>'>
-                  <?php if(empty($header["content"])):?>
-                    <tr>
-                      <td colspan="5" class="no-data-message"><?php echo $lang->ztinterface->noBody;?></td>
-                    </tr>
-                  <?php else:?>
-                    <?php echo $bodyHtml;?>
-                  <?php endif;?>
-                </tbody>
-              </table>
-              <?php echo $mocklist;?>
-            </div>
-          </div>
-          <div class='text-center detail form-actions'>
-            <button type="button" id="saveMock" class="btn btn-wide btn-primary">保存Mock设置</button>
           </div>
         </div>
-      </div>
-        <div class='side-col col-4'>
-        <div class='cell'>
-          <div class='detail'>
-            <div class='detail-title'><?php echo $lang->ztinterface->messageView;?></div>
-            <div class='detail-content'>
-              <?php echo html::textarea('messageHeadView', '', "disabled rows='6' class=' form-control'");?>
-              <?php echo html::textarea('messageBodyView', '', "spellcheck=\"false\" style=\"font-size: 14px; letter-spacing: 0.1em; line-height: 1.5em;\" rows='14' class='form-control'");?>
-            </div>
+        <div class='detail'>
+          <div class='detail-title'><?php echo $lang->ztinterface->head;?></div>
+          <div class='detail-content'>
+            <table class='table table-form table-bordered'>
+              <thead>
+                <tr>
+                  <th width="30%"><?php echo $lang->ztinterface->key?></th>
+                    <th width="100px"><?php echo $lang->ztinterface->type;?></th>
+                    <!-- <th width="50px"><?php echo $lang->ztinterface->canNull;?></th> -->
+                    <!-- <th width="15%"><?php echo $lang->ztinterface->mock;?></th> -->
+                    <th><?php echo $lang->ztinterface->value;?></th>
+                </tr>
+              </thead>
+              <tbody id='headers' class='table table-form' data-group-name='<?php echo $lang->testcase->groupName ?>'>
+                <?php if(empty($header["content"])):?>
+                  <tr>
+                    <td colspan="3" class="no-data-message"><?php echo $lang->ztinterface->noHeaders?></td>
+                  </tr>
+                <?php else:?>
+                  <?php foreach($header["content"] as $id => $message):?>
+                  <tr class='header-key'>
+                    <td id='name'>
+                      <b><?php echo $message["name"];?></b>
+                      <?php if(!empty($message["description"])){
+                          echo "<span style=\"color: #888888;\">({$message["description"]})</span>";
+                        }
+                      ?>
+                    </td>
+                    <td id='type' style="text-align: center;"><?php echo $message["type"];?></td>
+                    <td id='value'><?php
+                        $valueExample = '';
+                        if(!empty($message["example"])){
+                          $valueExample = "示例:".$message["example"];
+                        }
+                        echo html::input('header_value[]', '', "rows='1' class='form-control header-value' placeholder=\"$valueExample\""); ?>
+                      <span id="error" style="font-size:4px;color:red;display:none;">类型不符</span>
+                    </td>
+                  </tr>
+                  <?php endforeach; ?>
+                <?php endif;?>
+              </tbody>
+            </table>
           </div>
-          <div class='text-center form-actions'>
-            <button type="button" id="genMessage" class="btn btn-wide btn-primary" data-type='gen'>
-              <i class=" icon-refresh" title="生成报文" data-app="ztinterface"></i>
-              <span>生成报文</span>
-            </button>
-            <button type="button" id="sendMessage" class="btn btn-wide btn-primary">
-              <i class=" icon-run" title="发送报文" data-app="ztinterface"></i>
-              <span>发送报文</span>
-            </button>
-          </div>
-          <div id='response' class='detail'>
-            <div class='detail-title'>
-              <?php echo $lang->ztinterface->response;?>
-              <span>&nbsp;&nbsp;&nbsp;&nbsp;</span>
-              <span id='code' style="color: #777777;display: none;">200</span>
-              <span>&nbsp;</span>
-              <span id='status' style="color: #777777;display: none;">OK</span>
-            </div>
-            <div class='detail-content'>
-              <?php echo html::textarea('responseView', '', "disabled rows='8' class=' form-control'");?>
-            </div>
-          </div>
-          <div id='messageWrong' class='detail' style='display: none;'>
-            <div class='detail-title'>
-              <?php echo $lang->ztinterface->messageWrong;?>
-            </div>
-            <div class='detail-content'>
-              <?php echo html::textarea('wrongView', '', "disabled rows='8' class=' form-control'");?>
-              <button type="button" id="confirmSend" class="btn btn-wide btn-primary">
-                <span>仍要发送</span>
+        </div>
+        <div class='detail'>
+          <div class='detail-title'>
+            <span style="display: inline;"><?php echo $lang->ztinterface->body;?></span>
+            <div style="text-align: right;display: inline;">
+              <button type="button" class="btn iframe fill-in" style="float: right;">
+                <i class="icon-import" title="填充空白项" data-app="ztinterface"></i>
+              </button>
+              <button type="button" class="btn iframe all-refresh" style="float: right;">
+                <i class="icon-refresh" title="全部随机" data-app="ztinterface"></i>
               </button>
             </div>
+          </div>
+          <div class='detail-content'>
+            <table class='table table-form table-bordered'>
+              <thead>
+                <tr>
+                  <th width="30%"><?php echo $lang->ztinterface->key?></th>
+                    <th width="70px"><?php echo $lang->ztinterface->type;?></th>
+                    <th width="50px"><?php echo $lang->ztinterface->notNull;?></th>
+                    <th width="25%"><?php echo $lang->ztinterface->mock;?></th>
+                    <th><?php echo $lang->ztinterface->value;?></th>
+                </tr>
+              </thead>
+              <tbody id='bodys' class='table table-form' data-group-name='<?php echo $lang->testcase->groupName ?>'>
+                <?php if(empty($header["content"])):?>
+                  <tr>
+                    <td colspan="5" class="no-data-message"><?php echo $lang->ztinterface->noBody;?></td>
+                  </tr>
+                <?php else:?>
+                  <?php echo $bodyHtml;?>
+                <?php endif;?>
+              </tbody>
+            </table>
+            <?php echo $mocklist;?>
+          </div>
+        </div>
+        <div class='text-center detail form-actions'>
+          <button type="button" id="saveMock" class="btn btn-wide btn-primary">保存Mock设置</button>
+        </div>
+      </div>
+    </div>
+      <div class='side-col col-4'>
+      <div class='cell'>
+        <div class='detail'>
+          <div class='detail-title'>
+          <div class='detail-title' style="display: flex; justify-content: space-between;">
+            <?php echo $lang->ztinterface->messageView;?>
+            <?php 
+              echo html::select('format', $format, $format[0], 'class="form-control" style="float: right;width: 70px" title="报文类型：接口文档中指定"');
+            ?>
+          </div>
+          </div>
+          <div class='detail-content'>
+            <?php echo html::textarea('messageHeadView', '', "disabled rows='6' class=' form-control'");?>
+            <?php echo html::textarea('messageBodyView', '', "spellcheck=\"false\" style=\"font-size: 14px; letter-spacing: 0.1em; line-height: 1.5em;\" rows='14' class='form-control'");?>
+          </div>
+        </div>
+        <div class='text-center form-actions'>
+          <button type="button" id="genMessage" class="btn btn-wide btn-primary" data-type='gen'>
+            <i class=" icon-refresh" title="生成报文" data-app="ztinterface"></i>
+            <span>生成报文</span>
+          </button>
+          <button type="button" id="sendMessage" class="btn btn-wide btn-primary">
+            <i class=" icon-run" title="发送报文" data-app="ztinterface"></i>
+            <span>发送报文</span>
+          </button>
+        </div>
+        <div id='response' class='detail'>
+          <div class='detail-title'>
+            <?php echo $lang->ztinterface->response;?>
+            <span>&nbsp;&nbsp;&nbsp;&nbsp;</span>
+            <span id='code' style="color: #777777;display: none;">200</span>
+            <span>&nbsp;</span>
+            <span id='status' style="color: #777777;display: none;">OK</span>
+          </div>
+          <div class='detail-content'>
+            <?php echo html::textarea('responseView', '', "disabled rows='8' class=' form-control'");?>
+          </div>
+        </div>
+        <div id='messageWrong' class='detail' style='display: none;'>
+          <div class='detail-title'>
+            <?php echo $lang->ztinterface->messageWrong;?>
+          </div>
+          <div class='detail-content'>
+            <?php echo html::textarea('wrongView', '', "disabled rows='8' class=' form-control'");?>
+            <button type="button" id="confirmSend" class="btn btn-wide btn-primary">
+              <span>仍要发送</span>
+            </button>
           </div>
         </div>
       </div>
     </div>
-  </form>
+  </div>
 </div>
 <script>
 $(function()

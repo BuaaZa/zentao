@@ -9,7 +9,10 @@
  * @version     $Id: model.php 5108 2013-07-12 01:59:04Z chencongzhi520@gmail.com $
  * @link        http://www.zentao.net
  */
-
+require_once __DIR__ . '/../../vendor/autoload.php';
+use JMS\Serializer\SerializerBuilder;
+use JMS\Serializer\Visitor\Factory\XmlSerializationVisitorFactory;
+use JMS\Serializer\SerializationContext;
 use PhpOffice\PhpWord\TemplateProcessor;
 use PhpOffice\PhpWord\IOFactory;
 ?>
@@ -351,6 +354,29 @@ class ztinterfaceModel extends model
         return $str;
     }
 
+    public function parseStrMock($mock = ''){
+        $match = preg_match('/^\$(\w+)\(.*\)$/', $mock, $matches);
+        if ($match) {
+            $funcName = $matches[1];
+
+            if ($funcName) {
+                $paramStr = preg_replace('/^\$\w+\(|\)$/', '', $mock);
+                preg_match_all('/("[^"]*"|\'[^\']*\'|\{[^}]*\}|\[[^\]]*\]|[^,]+)+/', $paramStr, $params);
+                foreach($params as $key => $p){
+                    $params[$key] = trim($p);
+                }
+            } else {
+                $match = preg_match('/^\$(\w+)$/', $mock, $matches);
+                if ($match) {
+                $funcName = $matches[1];
+                }
+            }
+
+            $funcName = ucfirst(strtolower($funcName));
+        }
+        
+    }
+
     public function trimQuotation($str){
         if(substr($str,-1) === substr($str,0,1)){
             if(substr($str,-1) === '"')
@@ -529,10 +555,60 @@ class ztinterfaceModel extends model
         }
     }
 
-    public function genMessage($header, $body, $method, $url){
+    public function isAssocArray($arr) {
+        if(!is_array($arr))
+            return false;
+        return array_keys($arr) !== range(0, count($arr) - 1);
+    }
+
+    public function toObj($array){
+        if($this->isAssocArray($array)){
+            if(isset($array['entry']) and !$this->isAssocArray($array['entry'])){
+                $onlyEntry = true;
+                foreach($array as $key => $value){
+                    if($key!='entry'){
+                        $onlyEntry = false;
+                        break;
+                    }
+                }
+                if($onlyEntry)
+                    return $array['entry'];
+            }
+            $obj = new stdClass();
+            foreach($array as $key => $value){
+                $obj->$key = $this->toObj($value);
+            }
+            return $obj;
+        }
+        return $array;
+    }
+
+    public function convertXmlToObj($body){
+        $array = json_decode(json_encode((simplexml_load_string($body,NULL,LIBXML_NOCDATA))),true);
+        return $this->toObj($array);
+    }
+
+    public function convertObjToXml($body){
+        $serializerBuilder = SerializerBuilder::create();
+        $visitorFactory = new XmlSerializationVisitorFactory();
+        //$visitorFactory->setDefaultRootName('root');
+        $serializerBuilder->setSerializationVisitor('xml', $visitorFactory);
+        $serializer = $serializerBuilder->build();
+        $context = new SerializationContext();
+        $context->setSerializeNull(true);
         
-        $header['Content-Type'] =  'application/json';
-        $body = json_encode($body);
+        return $serializer->serialize($body, 'xml', $context);
+    }
+
+    public function genMessage($header, $body, $method, $url, $format){
+        
+        if(strtolower($format) === 'xml'){
+            $body = $this->convertObjToXml($body);
+            ChromePhp::log($this->convertXmlToObj($body));   
+        }else{
+            $header['Content-Type'] =  'application/json';
+            $body = json_encode($body,JSON_UNESCAPED_UNICODE|JSON_PRETTY_PRINT);
+        }
         $method = strtoupper($method);
 
         $headersString = '';

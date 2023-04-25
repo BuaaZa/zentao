@@ -89,8 +89,9 @@ $('button#genMessage').click(function(){
   var baseUrl = $('input#baseURL').val();
   var list = getTrData(table, 'body-key', true);
   var head = getHeadData();
+  var format = $('select#format').val();
   var obj = {item:list,type:'object',notNull:'true',value:'input'};
-  var postData = {object:obj, head:head,id:interfaceID,baseUrl:baseUrl};
+  var postData = {object:obj, head:head,id:interfaceID,baseUrl:baseUrl,format:format};
   var link = createLink('ztinterface', 'genMessage', 'type=' + button.attr('data-type'));
   
   if(button.attr('data-type') == 'update'){
@@ -125,7 +126,7 @@ $('button#genMessage').click(function(){
           }
           if(response['value']['message']['body']){
             var bodyText = $('textarea#messageBodyView');
-            bodyText.val(JSON.stringify(JSON.parse(response['value']['message']['body'].trim()),null,2)); 
+            bodyText.val(response['value']['message']['body'].trim()); 
             if (!bodyText.hasClass('autosize')) { 
                 bodyText.addClass('autosize'); 
             }
@@ -155,9 +156,10 @@ $('button#genMessage').click(function(){
 $('button#sendMessage, button#confirmSend').click(function(){
   var head = getHeadData();
   var button = $(this);
+  var format = $('select#format').val();
   var bodyText = $('textarea#messageBodyView').val();
   var baseUrl = $('input#baseURL').val();
-  var postData = {head:head, body:bodyText, id:interfaceID, baseUrl:baseUrl};
+  var postData = {head:head, body:bodyText, id:interfaceID, baseUrl:baseUrl, format:format};
   var link = createLink('ztinterface', 'checkAndSend', '');
   if($(this).attr('id') == 'confirmSend'){
     var link = createLink('ztinterface', 'checkAndSend', 'confirm=true');
@@ -462,7 +464,7 @@ function parseRow(parentRow){
     funcName = match[1];
 
   if(funcName){
-    const paramStr = mock.replace(/^\$\w+\(|\)$/g, '');
+    var paramStr = mock.replace(/^\$\w+\(|\)$/g, '');
     const params = paramStr.match(/("[^"]*"|'[^']*'|\{[^}]*\}|\[[^\]]*\]|[^,]+)+/g);
     jsonData = JSON.stringify(params);
   }else{
