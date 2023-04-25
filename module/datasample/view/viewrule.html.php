@@ -18,7 +18,7 @@
         <h2>
             <span class='label label-id'><?php echo $case->id;?></span>
             <span title='<?php echo $case->title?>'>
-                <?php echo $case->title;?>数据样本#步骤<?php echo $sample->casestep_level?>
+                <?php echo $case->title;?>数据规则#步骤<?php echo $sample->casestep_level?>
             </span>
         </h2>
     </div>
@@ -34,10 +34,16 @@
         </tr>
         <?php foreach ($table as $row):?>
         <tr>
+            <?php $i = 0;?>
             <?php foreach ($row as $item):?>
             <td>
-                <?php echo $item; ?>
+                <?php if($i==2): ?>
+                    <?php echo ($item==1)?"是":"否"; ?>
+                <?php else: ?>
+                    <?php echo $item; ?>
+                <?php endif; ?>
             </td>
+                <?php $i +=1;?>
             <?php endforeach;?>
         </tr>
         <?php endforeach;?>

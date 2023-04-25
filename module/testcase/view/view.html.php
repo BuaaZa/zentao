@@ -93,6 +93,7 @@
                             <th class='text-left'><?php echo $lang->datasample->rule; ?></th>
                         </tr>
                         </thead>
+                        <?php $showLevel = 1; ?>
                         <?php
                         $stepId = $childId = 0;
                         $step_id_for_datasample = 0;
@@ -135,11 +136,14 @@
                             //查看数据规则
                             echo "<td class='text-left'>";
                             //error_log($level);
-                            if ($level !== 0)
+                            if ($level !== 0){
+                                $showLevel = $level;
                                 common::printIcon('datasample', 'viewrule',"caseID=$case->id&casestepLevel=$level&version=$version", '',
-                                'button', 'eye', '', 'showinonlybody iframe',
-                                true,'','detail' );
-                            echo "</div></td>";
+                                    'button', 'eye', '', 'showinonlybody iframe',
+                                    true,'','查看' );
+                            }
+
+                            echo "</td>";
 
                             echo "</tr>";
 
@@ -153,9 +157,11 @@
 
              <div class="cell">
     <details class="detail" open>
-        <summary class="detail-title"><?php echo $lang->datasample->common;?></summary>
+        <summary class="detail-title"><?php echo "数据样本#步骤$showLevel";?></summary>
         <div class="detail-content">
         <?php
+        $datasample = json_decode($datasamples[$showLevel-1]->object);
+
 // 假设你有一个数组，存储了样本序列和对应的数据输出项、用户名、密码、邮箱
         $data = array(
                 array("sample1", "output1", "user1", "pass1", "email1"),
@@ -167,21 +173,25 @@
             echo "<table class='table table-condensed table-hover table-striped table-bordered' id='samples'>";
             // 创建第一行，包含列名
             echo "<tr>";
-            echo "<th>数据输出项</th>";
-            echo "<th>用户名</th>";
-            echo "<th>密码</th>";
-            echo "<th>邮箱</th>";
+            echo "<th>样本 \ 输入输出项</th>";
+            foreach($datasample as $row){
+                echo "<th>$row[0]</th>";
+            }
             echo "</tr>";
 
         // 遍历数组，创建后面的行
-        foreach ($data as $row) {
+        $input_names_num = count($datasample);
+        $samples_num = count($datasample[0])-1;
+        for($i = 1;$i<=$samples_num;$i+=1){
             echo "<tr>";
-        // 遍历每一行的元素，创建单元格
-            foreach ($row as $cell) {
-             echo "<td class='text-left'>$cell</td>";
+            echo "<td class='text-left'>样本$i</td>";
+            for($j=0;$j<=$input_names_num;$j+=1){
+                $val = $datasample[$j][$i];
+                echo "<td class='text-left'>$val</td>";
             }
-        echo "</tr>";
-}
+            echo "</tr>";
+        }
+
 
 // 结束表格
         echo "</table>";
