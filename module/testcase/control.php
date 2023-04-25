@@ -401,21 +401,6 @@ class testcase extends control
         if(!empty($_POST))
         {
 
-            /*$checkGroup = $this->post->stepType;
-            $groupsNum = 0;
-            foreach($checkGroup as $val){
-                if($val == 'group'){
-                    $groupsNum += 1;
-                }
-            }
-            #如果选了两个多选框，则提示：'最多使一个步骤绑定输入输出项！'
-            if($groupsNum >= 2){
-                $noticeStr = $this->lang->testcase->noticegroupnum;
-                $response['result']  = 'fail';
-                $response['message'] = $noticeStr;
-                return $this->send($response);
-                //die($noticeStr);
-            }*/
 
             $response['result'] = 'success';
 
@@ -966,7 +951,8 @@ class testcase extends control
         $data_samples_by_case = $this->datasample->getDataSamplesByCase($caseID, $case->version);
         $this->view->data_samples = array();
         foreach($data_samples_by_case as $datasample){
-            $this->view->data_samples[$datasample->casestep_level] = $datasample->object;
+            $this->view->data_samples[$datasample->casestep_level]['rules'] = $datasample->rules;
+            $this->view->data_samples[$datasample->casestep_level]['obj'] = $datasample->object;
         }
 
         if(!$case) return print(js::error($this->lang->notFound) . js::locate('back'));
@@ -2707,6 +2693,19 @@ class testcase extends control
      * @return void
      */
     public function datasample()
+    {
+        if($this->server->request_method == 'POST')
+        {
+            return $this->send(
+                array(
+                    'result' => 'success',
+                    'message' => $this->lang->saveSuccess,
+                    'closeModal' => true));
+        }
+        $this->display();
+    }
+
+    public function generatedatasample()
     {
         if($this->server->request_method == 'POST')
         {

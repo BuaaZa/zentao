@@ -91,7 +91,7 @@ class testcaseModel extends model
              */
             ->remove('steps,goal_actions,expects,eval_criterias,stepType')
             ->remove('files')
-            ->remove('forceNotReview,stepIoType,datasample')
+            ->remove('forceNotReview,stepIoType,datasample,inputs_rules')
             ->setDefault('story', 0)
             ->cleanInt('story,product,branch,module')
             ->join('stage', ',')
@@ -147,10 +147,13 @@ class testcaseModel extends model
             if ($step->type == 'group') $parentStepID = $this->dao->lastInsertID();
             if ($step->type == 'step') $parentStepID = 0;
 
+            //error_log(print_r($this->post->inputs_rules,1));
+            //ChromePhp::log("this->post->inputs_rules: ", $this->post->inputs_rules);
+            $rules = (string)$this->post->inputs_rules[$index];
             $obj = (string)$this->post->datasample[$index];
 
             // 保存测试步骤关联的数据样本
-            $this->datasample->saveDataSample($caseID, $this->dao->lastInsertID(), $index, $obj, $step->version);
+            $this->datasample->saveDataSample($caseID, $this->dao->lastInsertID(), $index, $rules, $obj, $step->version);
         }
 
         return array('status' => 'created', 'id' => $caseID, 'caseInfo' => $case);
@@ -882,7 +885,7 @@ class testcaseModel extends model
             ->setForce('status', $status)
             ->cleanInt('story,product,branch,module')
             ->stripTags($this->config->testcase->editor->edit['id'], $this->config->allowedTags)
-            ->remove('comment,steps,expects,files,labels,linkBug,stepType,goal_actions,eval_criterias,stepIoType,datasample,is_updated')
+            ->remove('comment,steps,expects,files,labels,linkBug,stepType,goal_actions,eval_criterias,stepIoType,datasample,is_updated,inputs_rules')
             ->get();
 
         $requiredFields = $this->config->testcase->edit->requiredFields;
@@ -932,10 +935,12 @@ class testcaseModel extends model
                         if($step->type == 'group') $parentStepID = $this->dao->lastInsertID();
                         if($step->type == 'step')  $parentStepID = 0;
 
+                        //ChromePhp::log("this->post->inputs_rules: ", $this->post->inputs_rules);
+                        $rules = (string)$this->post->inputs_rules[$stepID];
                         $obj = (string)$this->post->datasample[$stepID];
 
                         // 保存测试步骤关联的数据样本
-                        $this->datasample->saveDataSample($caseID, $this->dao->lastInsertID(), $stepID, $obj, $step->version);
+                        $this->datasample->saveDataSample($caseID, $this->dao->lastInsertID(), $stepID, $rules, $obj, $step->version);
                     }
                 }
                 else

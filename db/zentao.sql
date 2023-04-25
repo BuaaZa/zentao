@@ -16123,6 +16123,7 @@ create table if not exists `zt_data_sample`
     `case_id`          int unsigned not null comment '用例外键ID',
     `casestep_id` int unsigned not null comment '测试步骤外键ID',
     `casestep_level`   int unsigned not null comment '测试步骤编号',
+    `rules`            text comment '样本规则',
     `object`           text comment '样本实体',
     `version`          int unsigned not null comment '数据样本版本 对应于测试用例和步骤的版本'
 );
@@ -16160,3 +16161,4 @@ CREATE TABLE `zt_baseurl`  (
   `name` CHAR(50),
   `url` TEXT NOT NULL
 );
+

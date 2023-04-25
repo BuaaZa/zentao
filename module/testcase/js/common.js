@@ -9,6 +9,12 @@ $(function()
             $(this).parent().toggleClass('active');
         });
     }
+
+    $('*').submit(
+        function (event){
+
+        }
+    )
 })
 
 var newRowID = 0;
@@ -161,158 +167,12 @@ function initSteps(selector)
     });
 
     var $steps = $(selector || '#steps');
-    var $stepTemplate = $('#stepTemplate').detach().removeClass('template').attr('id', null);
+    var $stepTemplate = $('#stepTemplate')
+    if($stepTemplate.attr('data-type') == 'sample'){
+        $stepTemplate = $stepTemplate.clone(true).removeClass('template').attr('id', null);
+    }else $stepTemplate = $stepTemplate.detach().removeClass('template').attr('id', null);
     var groupNameText = $steps.data('groupName');
-    var insertStepRow = function($row, count, type, notFocus)
-    {
 
-        if(count === undefined) count = 1;
-        var $step;
-        for(var i = 0; i < count; ++i)
-        {
-            $step = $stepTemplate.clone(true);
-            if($row) $row.after($step);
-            else $steps.append($step);
-            $step.addClass('step-new').addClass('text-center');
-            console.log($.cookie('isSampleEmpty'));
-            console.log($.cookie('isSampleEmpty')==0);
-            if($.cookie('isSampleEmpty')==0 && $('#steps tr td.stepsample-actions input').val()!=''){
-                var $stepSampleActions = $step.find('td.stepsample-actions');
-                $stepSampleActions.find('a').attr("disabled",true).css("pointer-events","none");
-                $stepSampleActions.find('button').attr("disabled",true);
-            }
-            if(type) $step.find('.step-type').val(type);
-        }
-        if(!notFocus && $step) setTimeout(function(){$step.find('.step-steps').focus();}, 10);
-    };
-    var updateStepType = function($step, type, defaultText)
-    {
-        $step.attr('data-type', type).find('.step-steps').addClass('autosize').attr('placeholder', defaultText);
-    };
-    var getStepsElements = function()
-    {
-        return $steps.children('.step:not(.drag-shadow)');
-    };
-    var refreshSteps = function(skipAutoAddStep)
-    {
-        var parentId = 1, childId = 0;
-
-        getStepsElements().each(function(idx)
-        {
-            var $step = $(this).attr('data-index', idx + 1);
-            var type = $step.find('.step-type').val();
-            var stepID;
-            var defaultText = null;
-            if(type == 'group')
-            {
-                $step.removeClass('step-item').removeClass('step-step').addClass('step-group');
-                stepID = parentId++;
-                $step.find('.step-id').text(stepID);
-                childId = 1;
-                defaultText = groupNameText;
-            }
-            else if(type == 'step')
-            {
-                $step.removeClass('step-item').removeClass('step-group').addClass('step-step');
-                stepID = parentId++;
-                $step.find('.step-id').text(stepID);
-                childId = 0;
-            }
-            else // step type is not set
-            {
-                if(childId) // type as child
-                {
-                    stepID = (parentId - 1) + '.' + (childId++);
-                    $step.removeClass('step-step').removeClass('step-group').addClass('step-item').find('.step-item-id').text(stepID);
-                    defaultText = "输入项名称";
-                    if($step.find('.step-group-toggle2').is(':checked')){
-                        defaultText = "输出项名称";
-                    }
-                }
-                else // type as step
-                {
-                    $step.removeClass('step-item').removeClass('step-group').addClass('step-step');
-                    stepID = parentId++;
-                    $step.find('.step-id').text(stepID);
-                }
-            }
-            $step.find('[name^="steps["]').attr('name', "steps[" +stepID + ']');
-            $step.find('[name^="stepType["]').attr('name', "stepType[" +stepID + ']');
-            //从1开始索引
-            $step.find('[name^="inputs["]').attr('name', "inputs[" +stepID + ']');
-            $step.find('[name^="goal_actions["]').attr('name', "goal_actions[" +stepID + ']');
-            $step.find('[name^="expects["]').attr('name', "expects[" +stepID + ']');
-            $step.find('[name^="eval_criterias["]').attr('name', "eval_criterias[" +stepID + ']');
-            $step.find('[name^="stepIoType["]').attr('name', "stepIoType[" +stepID + ']');
-            $step.find('[name^="datasample["]').attr('name', "datasample[" +stepID + ']');
-            $step.find('[name^="is_updated["]').attr('name', "is_updated[" +stepID + ']');
-
-            if($step.find('.step-group-toggle2').is(':checked')){
-                $step.find('.step-iotype').val('1');
-            }else{
-                $step.find('.step-iotype').val('0');
-            }
-            updateStepType($step, type, defaultText);
-        });
-
-        /* Auto insert step to group without any steps */
-        if(!skipAutoAddStep)
-        {
-            var needRefresh = false;
-            getStepsElements().each(function(idx)
-            {
-                var $step = $(this).attr('data-index', idx + 1);
-                if($step.attr('data-type') !== 'group') return;
-                var $nextStep = $step.next('.step:not(.drag-shadow)');
-                if(!$nextStep.length || $nextStep.attr('data-type') !== 'item')
-                {
-                    insertStepRow($step, 1, 'item', true);
-                    needRefresh = true;
-                }
-            });
-
-            if(needRefresh) refreshSteps(true);
-        }
-    };
-    var initSortable = function()
-    {
-        var isMouseDown = false;
-        var $moveStep = null, moveOrder = 0;
-        $steps.on('mousedown', '.btn-step-move', function()
-        {
-            isMouseDown = true;
-            $moveStep = $(this).closest('.step').addClass('drag-row');
-
-            $(document).off('.sortable').one('mouseup.sortable', function()
-            {
-                isMouseDown = false;
-                $moveStep.removeClass('drag-row');
-                $steps.removeClass('sortable-sorting');
-                $moveStep = null;
-                refreshSteps();
-            });
-            $steps.addClass('sortable-sorting');
-        }).on('mouseenter', '.step:not(.drag-row)', function()
-        {
-            if(!isMouseDown) return;
-            var $targetStep = $(this);
-            getStepsElements().each(function(idx)
-            {
-                $(this).data('order', idx);
-            });
-            moveOrder = $moveStep.data('order');
-            var targetOrder = $targetStep.data('order');
-            if(moveOrder === targetOrder) return;
-            else if(targetOrder > moveOrder)
-            {
-                $targetStep.after($moveStep);
-            }
-            else if(targetOrder < moveOrder)
-            {
-                $targetStep.before($moveStep);
-            }
-        });
-    }
     $steps.on('click', '.btn-step-add', function()
     {
         var $step = $(this).closest('.step');
@@ -323,15 +183,16 @@ function initSteps(selector)
             $step.addClass('step-new');
             $step.find('.step-type').val('step');
         }else{
-            insertStepRow($step);
+            insertStepRow($step,undefined,undefined,undefined,$steps,$stepTemplate);
         }
-        refreshSteps();
+        refreshSteps(true,$steps);
     }).on('click', '.btn-step-delete', function()
     {
         if($steps.children('.step').length == 1) return;
         $(this).closest('.step').remove();
-        refreshSteps();
-    }).on('change', '.step-group-toggle', function()
+        refreshSteps(true,$steps);
+    })
+       /* .on('change', '.step-group-toggle', function()
     {
         var $checkbox = $(this);
         var $step = $checkbox.closest('.step');
@@ -347,7 +208,7 @@ function initSteps(selector)
         $step.find('.step-type').val(suggestType);
 
 
-        /* Auto insert step to group without any steps */
+        /!* Auto insert step to group without any steps *!/
         if(suggestType === 'group')
         {
             var $nextStep = $step.next('.step:not(.drag-shadow)');
@@ -361,17 +222,18 @@ function initSteps(selector)
     }).on('change', '.step-group-toggle2', function()
     {
         refreshSteps();
-    }).on('change', '.form-control', function()
+    })*/
+        .on('change', '.form-control', function()
     {
         var $control = $(this);
         if($control.val())
         {
             var $step = $control.closest('.step');
-            if($step.data('index') === getStepsElements().length)
+            if($step.data('index') === getStepsElements($steps).length)
             {
 /*                insertStepRow($step, 1, 'step', true);
                 if($step.is('.step-item,.step-group')) insertStepRow($step, 1, 'item', true);*/
-                refreshSteps();
+                refreshSteps(true,$steps);
             }
         }
     }).on('click', '.btn-datasample', function()
@@ -379,6 +241,13 @@ function initSteps(selector)
         var $step = $(this).closest('.step');
         var stepID = $step.find('.step-id').text();
         $.cookie('curStepID', stepID);
+    }).on('click', '.btn-generatedatasample', function()
+    {
+        var $step = $(this).closest('.step');
+
+        var stepID = $step.find('.step-id').text();
+        $.cookie('curStepID', stepID);
+
     }).on('click', '.datasample-undo', function()
     {
         var $step = $(this).closest('.step');
@@ -403,9 +272,223 @@ function initSteps(selector)
             time: 900 // 不进行自动隐藏
         }).show();
 
+    }).on('click', '.mock-refresh', function()
+    {
+        var $step = $(this).closest('.step');
+        var $mockRule = $step.find('#rules').val();
+        var $notNull = $step.find('#notNull').val();
+        var testUrl = createLink('datasample', 'singleMock');
+        $.post(testUrl, {'mock': $mockRule, 'notNull': $notNull}, function(result){
+            var resultObject = JSON.parse(result);
+            if(resultObject['message'] === 'success'){
+                console.log(resultObject);
+                $step.find('[name^="normal_examples["]').val(resultObject['value']);
+
+                if(resultObject['exception'] && resultObject['exception'].length>0){
+                    var exceptions_len = resultObject['exception'].length;
+                    var selected_exception_index = Math.floor(Math.random()*exceptions_len);
+                    $step.find('[name^="abnormal_examples["]').val(resultObject['exception'][selected_exception_index]['value']);
+                }else{
+                    $step.find('[name^="abnormal_examples["]').val('');
+                }
+
+                /*var exceptions = "";
+                for(let exception of resultObject['exception']){
+                    exceptions += ('['+exception['type']+']'+exception['value']+'\n');
+                }
+                $step.find('[name^="abnormal_examples["]').val(exceptions).autosize();*/
+                new $.zui.Messager('成功刷新mock示例值', {
+                    type: 'success',
+                    close: true,
+                    icon: 'exclamation-sign',
+                    time: 500 // 不进行自动隐藏
+                }).show();
+            }else{
+                new $.zui.Messager(resultObject['error'], {
+                    type: 'warning',
+                    close: true,
+                    icon: 'exclamation-sign',
+                    time: 500 // 不进行自动隐藏
+                }).show();
+            }
+
+        });
+
     });
-    initSortable();
-    refreshSteps();
+    initSortable($steps);
+    refreshSteps(true,$steps);
+}
+
+var insertStepRow = function($row, count, type, notFocus,$steps,$stepTemplate)
+{
+    if(count === undefined) count = 1;
+    var $step;
+    for(var i = 0; i < count; ++i)
+    {
+        $step = $stepTemplate.clone(true);
+        if($row) $row.after($step);
+        else $steps.append($step);
+        $step.addClass('step-new').addClass('text-center');
+
+        if($row.find('.step-type').val()=='step' && $.cookie('isSampleEmpty')==0 && $('#steps tr td.stepsample-actions input').val()!=''){
+            var $stepSampleActions = $step.find('td.stepsample-actions');
+            $stepSampleActions.find('a').attr("disabled",true).css("pointer-events","none");
+            $stepSampleActions.find('button').attr("disabled",true);
+        }
+        if(type) $step.find('.step-type').val(type);
+    }
+
+    if(!notFocus && $step) setTimeout(function(){$step.find('.step-steps').focus();}, 10);
+};
+var updateStepType = function($step, type, defaultText)
+{
+    $step.attr('data-type', type).find('.step-steps').addClass('autosize').attr('placeholder', defaultText);
+};
+var getStepsElements = function($steps)
+{
+    return $steps.children('.step:not(.drag-shadow, .template)');
+};
+var refreshSteps = function(skipAutoAddStep = true,$steps)
+{
+    var parentId = 1, childId = 0;
+
+    getStepsElements($steps).each(function(idx)
+    {
+        var $step = $(this).attr('data-index', idx + 1);
+        var type = $step.find('.step-type').val();
+        var stepID;
+        var defaultText = null;
+        if(type == 'group')
+        {
+            $step.removeClass('step-item').removeClass('step-step').addClass('step-group');
+            stepID = parentId++;
+            $step.find('.step-id').text(stepID);
+            childId = 1;
+            defaultText = groupNameText;
+        }
+        else if(type == 'step')
+        {
+            $step.removeClass('step-item').removeClass('step-group').addClass('step-step');
+            stepID = parentId++;
+            $step.find('.step-id').text(stepID);
+            childId = 0;
+        }else if(type == 'sampleInput'){
+            $step.removeClass('step-item').removeClass('step-group').addClass('step-step');
+            stepID = parentId++;
+            $step.find('.step-id').text(stepID);
+            childId = 0;
+            defaultText = '输入项名称';
+        }else if(type == 'sample'){
+            $step.removeClass('step-item').removeClass('step-group').addClass('step-step');
+            stepID = parentId++;
+            $step.find('.step-id').text(stepID);
+            childId = 0;
+        }
+        else // step type is not set
+        {
+            if(childId) // type as child
+            {
+                stepID = (parentId - 1) + '.' + (childId++);
+                $step.removeClass('step-step').removeClass('step-group').addClass('step-item').find('.step-item-id').text(stepID);
+                defaultText = "输入项名称";
+                if($step.find('.step-group-toggle2').is(':checked')){
+                    defaultText = "输出项名称";
+                }
+            }
+            else // type as step
+            {
+                $step.removeClass('step-item').removeClass('step-group').addClass('step-step');
+                stepID = parentId++;
+                $step.find('.step-id').text(stepID);
+            }
+        }
+        $step.find('[name^="steps["]').attr('name', "steps[" +stepID + ']');
+        $step.find('[name^="stepType["]').attr('name', "stepType[" +stepID + ']');
+        //从1开始索引
+        $step.find('[name^="inputs["]').attr('name', "inputs[" +stepID + ']');
+        $step.find('[name^="goal_actions["]').attr('name', "goal_actions[" +stepID + ']');
+        $step.find('[name^="expects["]').attr('name', "expects[" +stepID + ']');
+        $step.find('[name^="eval_criterias["]').attr('name', "eval_criterias[" +stepID + ']');
+        $step.find('[name^="stepIoType["]').attr('name', "stepIoType[" +stepID + ']');
+        $step.find('[name^="datasample["]').attr('name', "datasample[" +stepID + ']');
+        $step.find('[name^="is_updated["]').attr('name', "is_updated[" +stepID + ']');
+        $step.find('[name^="inputs_rules["]').attr('name', "inputs_rules[" +stepID + ']');
+
+        if(type == 'sampleInput'){
+            $step.find('[id^="inputs"]').attr('name', "inputs_rules[" +stepID + "][0]");
+            $step.find('[id^="rules"]').attr('name', "inputs_rules[" +stepID + "][1]");
+            $step.find('[id^="notNull"]').attr('name', "inputs_rules[" +stepID + "][2]");
+            $step.find('[name^="normal_examples["]').attr('name', "normal_examples[" +stepID + ']');
+            $step.find('[name^="abnormal_examples["]').attr('name', "abnormal_examples[" +stepID + ']');
+        }else if(type == 'sample'){
+            $step.find('[name^="datasampleitem["]').each(function ()
+                {
+                    let rule = $(this).attr('data-rule');
+                    $(this).attr('name',"datasampleitem[" +stepID + ']['+ rule +']')
+                }
+            )
+
+        }
+        updateStepType($step, type, defaultText);
+    });
+
+    /* Auto insert step to group without any steps */
+    if(!skipAutoAddStep)
+    {
+        var needRefresh = false;
+        getStepsElements($steps).each(function(idx)
+        {
+            var $step = $(this).attr('data-index', idx + 1);
+            if($step.attr('data-type') !== 'group') return;
+            var $nextStep = $step.next('.step:not(.drag-shadow)');
+            if(!$nextStep.length || $nextStep.attr('data-type') !== 'item')
+            {
+                insertStepRow($step, 1, 'item', true,$steps);
+                needRefresh = true;
+            }
+        });
+
+        if(needRefresh) refreshSteps(true,$steps);
+    }
+};
+var initSortable = function($steps)
+{
+    var isMouseDown = false;
+    var $moveStep = null, moveOrder = 0;
+    $steps.on('mousedown', '.btn-step-move', function()
+    {
+        isMouseDown = true;
+        $moveStep = $(this).closest('.step').addClass('drag-row');
+
+        $(document).off('.sortable').one('mouseup.sortable', function()
+        {
+            isMouseDown = false;
+            $moveStep.removeClass('drag-row');
+            $steps.removeClass('sortable-sorting');
+            $moveStep = null;
+            refreshSteps(true,$steps);
+        });
+        $steps.addClass('sortable-sorting');
+    }).on('mouseenter', '.step:not(.drag-row)', function()
+    {
+        if(!isMouseDown) return;
+        var $targetStep = $(this);
+        getStepsElements($steps).each(function(idx)
+        {
+            $(this).data('order', idx);
+        });
+        moveOrder = $moveStep.data('order');
+        var targetOrder = $targetStep.data('order');
+        if(moveOrder === targetOrder) return;
+        else if(targetOrder > moveOrder)
+        {
+            $targetStep.after($moveStep);
+        }
+        else if(targetOrder < moveOrder)
+        {
+            $targetStep.before($moveStep);
+        }
+    });
 }
 
 /**
