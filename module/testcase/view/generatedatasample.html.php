@@ -104,6 +104,7 @@
                 for (let i = 0; i < ruleCountMax; i++) {
                     curDataSample[0].push('')
                 }
+                curDataSample[0].push('')
             }
 
             generateDataSample()
@@ -147,7 +148,7 @@
 
         let i;
         for (i = 0; i < ruleCountMax; i++) {
-            rowTemplate += "<th> <b>" + dataSampleRuleFromInput[i][0] + "</b></th>"
+            rowTemplate += "<th> <b>" + dataSampleRuleFromInput[i][0] + (dataSampleRuleFromInput[i][2]=="1" ?"『<b>必填</b>』":"『<b>选填</b>』") +"</b></th>"
             inputArray.push(dataSampleRuleFromInput[i][0])
             inputArrayWithResult.push(dataSampleRuleFromInput[i][0]);
         }
@@ -204,6 +205,7 @@
         if(clear){
             $steps.find('tr:not(.template)').remove()
         }
+        console.log(curDataSample)
 
         let sampleNum = curDataSample.length;
         // console.log($('#stepTemplate'))
@@ -265,10 +267,6 @@
                         // console.log(dataSampleItemJson)
                         curDataSample = sampleJsonConvertToArray(dataSampleItemJson)
                         // console.log(curDataSample)
-                        //生成预期结果默认值
-                        for(let key in curDataSample){
-                            curDataSample[key].push('');
-                        }
                         generateDataSample(true)
                         // 阻止关闭
                         // return false;
@@ -278,13 +276,9 @@
                     label: '<i class="icon icon-check"></i> 添加生成',
                     className: 'btn-primary',
                     callback: function() {
-                        // Todo : ajax
                         dataSampleItemJson = ajaxGetDataSampleJson()
                         curDataSample = sampleJsonConvertToArray(dataSampleItemJson)
-                        //生成预期结果默认值
-                        for(let key in curDataSample){
-                            curDataSample[key].push('');
-                        }
+
                         generateDataSample()
                     }
                 }
@@ -352,6 +346,7 @@
     }
 
     function sampleJsonConvertToArray(sampleJson){
+        console.log(sampleJson)
         let ret = [];
         let samples = sampleJson.samples
         for (let i = 0; i < samples.length ; i++) {
@@ -365,8 +360,11 @@
             for (let j = 0; j < curSampleContent.length; j++) {
                 sample.push(curSampleContent[j].value)
             }
+            //生成预期结果默认值
+            sample.push(samples[i].type=='正例'?'成功':'失败')
             ret.push(sample)
         }
+        console.log(ret)
         return ret
     }
 
@@ -398,6 +396,7 @@
             }
         }
         matrix = transpose(matrix);
+        console.log(matrix)
         let matrixString = JSON.stringify(matrix); // convert array to string using JSON.stringify()
 
         let stepID = $.cookie('curStepID');
