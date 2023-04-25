@@ -26,6 +26,7 @@
         <tr>
             <td><b>数据输入项名称</b></td>
             <td><b>MOCK规则</b></td>
+            <td><b>是否必填</b></td>
             <?php
                 //for ($i = 1; $i < count($table[0]); $i++)
                   //  echo "<td><b>样本" . $i . "</b></td>"

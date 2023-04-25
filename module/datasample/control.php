@@ -39,7 +39,9 @@ class datasample extends control
         $this->view->case->title = $testcase->title;
         $this->view->sample = new stdClass();
         $this->view->sample->casestep_level = $sample->casestep_level;
-        $this->view->table = json_decode($sample->object);
+        $this->view->sample->input_name = $sample->rules[0][0];
+        $this->view->sample->mock_rule = $sample->rules[0][1];
+        $this->view->table = json_decode($sample->rules);
 
         $this->display();
         return 0;

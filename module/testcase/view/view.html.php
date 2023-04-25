@@ -90,7 +90,6 @@
                             <th class='text-left'><?php echo $lang->testcase->step_goal_action; ?></th>
                             <th class='text-left'><?php echo $lang->testcase->stepExpect; ?></th>
                             <th class='text-left'><?php echo $lang->testcase->step_eval_criteria; ?></th>
-                            <th class='text-left'><?php echo $lang->datasample->common; ?></th>
                             <th class='text-left'><?php echo $lang->datasample->rule; ?></th>
                         </tr>
                         </thead>
@@ -125,20 +124,21 @@
 
 
                             // 拼接数据样本url
-                            echo "<td class='text-left'>";
-                            if ($level !== 0)
-                                common::printIcon('datasample', 'view',"caseID=$case->id&casestepLevel=$level&version=$version", '',
-                                'button', 'eye', '', 'showinonlybody iframe',
-                                true,'','查看' );
-                            echo "</div></td>";
+                            //echo "<td class='text-left'>";
+                            //if ($level !== 0)
+                                //common::printIcon('datasample', 'view',"caseID=$case->id&casestepLevel=$level&version=$version", '',
+                                //'button', 'eye', '', 'showinonlybody iframe',
+                                //true,'','查看' );
+                            //echo "</div></td>";
 
 
                             //查看数据规则
                             echo "<td class='text-left'>";
+                            //error_log($level);
                             if ($level !== 0)
                                 common::printIcon('datasample', 'viewrule',"caseID=$case->id&casestepLevel=$level&version=$version", '',
                                 'button', 'eye', '', 'showinonlybody iframe',
-                                true,'','查看' );
+                                true,'','detail' );
                             echo "</div></td>";
 
                             echo "</tr>";
